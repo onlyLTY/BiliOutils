@@ -1,0 +1,21 @@
+component: scf
+name: ap-chengdu_default_biliExp
+org: ''
+app: biliExp
+stage: dev
+inputs:
+  name: biliExp
+  src: ./dist
+  runtime: Nodejs12.16
+  region: ap-chengdu
+  description: bilibili小工具
+  handler: index.main_handler
+  memorySize: 64
+  timeout: 900
+  events:
+    - timer: # 定时触发器
+        parameters:
+          # name: timer # 触发器名称，默认timer-${name}-${stage}
+          cronExpression: '22 22 22 * * * *' # 每天22点22分22秒触发
+          enable: true
+# For more information: https://github.com/serverless-components/tencent-scf/blob/v2/doc/configure.md

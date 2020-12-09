@@ -1,0 +1,25 @@
+{
+  "name": "catlair-BiliTools",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "prebuild": "rm -rf dist/",
+    "postbuild": "cp -r node_modules/ ./dist/node_modules/ && cp .env ./dist && rm ./dist/run.js",
+    "build": "tsc",
+    "deploy": "sls deploy",
+    "dev": "ts-node run.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/node": "^14.14.10",
+    "@types/qs": "^6.9.5"
+  },
+  "dependencies": {
+    "axios": "^0.21.0",
+    "dotenv": "^8.2.0",
+    "qs": "^6.9.4"
+  }
+}
