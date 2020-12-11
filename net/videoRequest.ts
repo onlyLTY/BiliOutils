@@ -7,6 +7,7 @@ import {
   HeartbeatDto,
   AddCoinDto,
 } from '../dto/Video.dto';
+import { TaskConfig } from '../globalVar';
 
 /**
  * 分享视频
@@ -14,7 +15,7 @@ import {
  */
 export async function addShare(aid: number): Promise<ShareAddDto> {
   const reqData = {
-    csrf: process.env.BILIJCT,
+    csrf: TaskConfig.BILIJCT,
     aid,
   };
   const { data } = await biliApi.post(
@@ -95,7 +96,7 @@ export async function addCoinForVideo(
       aid,
       multiply,
       selectLike,
-      csrf: process.env.BILIJCT,
+      csrf: TaskConfig.BILIJCT,
       // cross_domain: true,
     })
   );

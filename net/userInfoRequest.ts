@@ -70,8 +70,8 @@ export async function getFollowings(
 
 /**
  * 获取特别关注
- * @param pageNumber 页数
- * @param pageSize 每页数量
+ * @param pageNumber 页数 [1]
+ * @param pageSize 每页数量 [50]
  */
 export async function getSpecialFollowings(
   pageNumber: number = 1,

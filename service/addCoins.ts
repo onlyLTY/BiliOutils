@@ -1,5 +1,5 @@
 import { addCoinForVideo } from '../net/videoRequest';
-import { getAidBySpecialFollowing } from './getOneAid';
+import { getAidByByPriority } from './getOneAid';
 import { TaskModule } from '../globalVar';
 import { apiDelay } from '../util';
 
@@ -12,7 +12,8 @@ export async function addCoins() {
   let i = 0;
   //判断需要投币的数量
   while (TaskModule.coinsTask) {
-    const { data, msg } = await getAidBySpecialFollowing();
+    const { data, msg } = await getAidByByPriority();
+    await apiDelay();
     if (msg === '0') {
       const { aid, title, author } = data;
       try {
@@ -26,8 +27,8 @@ export async function addCoins() {
       } catch (error) {
         console.log('投币异常', error.message);
       }
+    } else {
     }
-    await apiDelay();
   }
   console.log(`一共成功投币${i}颗`);
   console.log(`硬币还剩${TaskModule.money}颗`);

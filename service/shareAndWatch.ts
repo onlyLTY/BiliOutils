@@ -1,6 +1,6 @@
 import { apiDelay, random } from '../util';
 import { addShare, uploadVideoHeartbeat } from '../net/videoRequest';
-import { getAidBySpecialFollowing } from './getOneAid';
+import { getAidByByPriority } from './getOneAid';
 import { TaskModule } from '../globalVar';
 
 /**
@@ -9,13 +9,13 @@ import { TaskModule } from '../globalVar';
 export async function shareAndWatch() {
   console.log('----【分享/播放视频】----');
   if (TaskModule.share && TaskModule.watch) {
-    console.log('跳过');
+    console.log('已完成,跳过分享/播放');
     return;
   }
   let gAid = 0;
   //获取aid
   try {
-    let biliav = await getAidBySpecialFollowing();
+    let biliav = await getAidByByPriority();
 
     if (biliav.msg === '0') {
       const { aid, author, title } = biliav.data;
@@ -23,6 +23,7 @@ export async function shareAndWatch() {
       console.log(`获取视频: ${title} --up【${author}】`);
     } else {
       console.log('获取视频失败', biliav.msg);
+      return false;
     }
   } catch (error) {
     console.log('获取视频出现异常: ', error.message);

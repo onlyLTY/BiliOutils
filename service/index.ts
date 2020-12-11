@@ -5,8 +5,9 @@ import { shareAndWatch } from './shareAndWatch';
 import { addCoins } from './addCoins';
 import { mangaSign } from './mangaTask';
 
+export { loginTask };
+
 export default {
-  loginTask,
   taskReward,
   liveSignTask,
   shareAndWatch,

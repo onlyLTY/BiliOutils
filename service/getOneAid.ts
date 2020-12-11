@@ -1,6 +1,12 @@
-import { apiDelay, randomNum } from '../util';
-import { getSpecialFollowings, getVideosByUpId } from '../net/userInfoRequest';
+import { apiDelay, random } from '../util';
+import {
+  getFollowings,
+  getSpecialFollowings,
+  getVideosByUpId,
+} from '../net/userInfoRequest';
 import { getRegionRankingVideos } from '../net/videoRequest';
+import { TaskConfig } from '../globalVar';
+import { FollowingsDto } from '../dto/UserInfo.dto';
 
 class AidInfo {
   msg: string;
@@ -13,20 +19,33 @@ class AidInfo {
 
 /**
  * 从关注列表随机获取一个视频
+ * @param special 是否只获取特别关注列表
  */
-export async function getAidBySpecialFollowing(): Promise<AidInfo> {
+export async function getAidByFollowing(
+  special: boolean = true
+): Promise<AidInfo> {
   try {
-    const { data } = await getSpecialFollowings();
+    const uid = TaskConfig.USERID;
+    let tempData: FollowingsDto;
+    if (special) {
+      tempData = await getSpecialFollowings();
+    } else {
+      tempData = await getFollowings(uid);
+    }
+
+    const { data, message } = tempData;
 
     if (data) {
       await apiDelay();
 
-      const { mid } = data[randomNum(data.length)];
+      const { mid } = data[random(data.length)];
 
       return await getAidByUp(mid);
     }
     return {
-      msg: '-1',
+      msg: special
+        ? `未获取到特别关注列表: ${message}`
+        : `未获取到关注列表: ${message}`,
       data: {},
     };
   } catch (error) {
@@ -42,12 +61,12 @@ export async function getAidBySpecialFollowing(): Promise<AidInfo> {
  */
 export async function getAidByRegionRank(): Promise<AidInfo> {
   const arr = [1, 3, 4, 5, 160, 22, 119];
-  const rid = arr[randomNum(arr.length)];
+  const rid = arr[random(arr.length)];
 
   try {
-    const { data } = await getRegionRankingVideos(rid, 0);
+    const { data, message } = await getRegionRankingVideos(rid, 0);
     if (data) {
-      const { aid, title, author } = data[randomNum(data.length)];
+      const { aid, title, author } = data[random(data.length)];
       return {
         msg: '0',
         data: {
@@ -58,7 +77,7 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
       };
     }
     return {
-      msg: '-1',
+      msg: `未获取到排行信息: ${message}`,
       data: {},
     };
   } catch (error) {
@@ -72,11 +91,16 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
 /**
  * 从自定义up主列表中随机选择
  */
-export async function getAidByCustomizeUp(
-  customizeUp: Array<number>
-): Promise<AidInfo> {
-  //process.env.BILI_CUSTOMIZE_UP
-  const mid = customizeUp[randomNum(customizeUp.length)];
+export async function getAidByCustomizeUp(): Promise<AidInfo> {
+  const customizeUp = TaskConfig.BILI_CUSTOMIZE_UP;
+
+  if (customizeUp.length === 0) {
+    return {
+      msg: '自定义up列表为空',
+      data: {},
+    };
+  }
+  const mid = customizeUp[random(customizeUp.length)];
   return await getAidByUp(mid);
 }
 
@@ -86,11 +110,11 @@ export async function getAidByCustomizeUp(
  */
 export async function getAidByUp(id: number): Promise<AidInfo> {
   try {
-    const { data } = await getVideosByUpId(id);
+    const { message, data } = await getVideosByUpId(id);
 
     if (data) {
       const avList = data.media_list;
-      const { id, title, upper } = avList[randomNum(avList.length)];
+      const { id, title, upper } = avList[random(avList.length)];
       return {
         msg: '0',
         data: {
@@ -101,7 +125,7 @@ export async function getAidByUp(id: number): Promise<AidInfo> {
       };
     }
     return {
-      msg: '-1',
+      msg: `通过uid获取视频失败: ${message}`,
       data: {},
     };
   } catch (error) {
@@ -109,5 +133,22 @@ export async function getAidByUp(id: number): Promise<AidInfo> {
       msg: error.message,
       data: {},
     };
+  }
+}
+
+/**
+ * 按照优先顺序调用不同函数获取aid
+ */
+export async function getAidByByPriority() {
+  let data: AidInfo;
+  const aidFunArray: Array<() => Promise<AidInfo>> = [
+    getAidByCustomizeUp,
+    getAidByFollowing,
+    () => getAidByFollowing(false),
+    getAidByRegionRank,
+  ];
+  for (const fun of aidFunArray) {
+    data = await fun();
+    if (data.msg === '0') return data;
   }
 }

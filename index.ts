@@ -1,19 +1,19 @@
 require('dotenv').config();
 
 import { apiDelay } from './util';
-import bili from './service';
+import bili, { loginTask } from './service';
 
-const biliArr = [...Object.values(bili)].slice(1);
+const biliArr = [...Object.values(bili)];
 
 exports.main_handler = async (_event, _context, _callback) => {
   try {
-    await bili.loginTask();
+    await loginTask();
   } catch (error) {
     console.log('登录失败: ', error.message);
     return '未完成';
   }
 
-  for await (const asyncfun of biliArr) {
+  for (const asyncfun of biliArr) {
     await asyncfun();
     await apiDelay();
   }

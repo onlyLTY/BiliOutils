@@ -13,10 +13,10 @@ export async function taskReward() {
     const { data: coinExp } = await getDonateCoinExp(); //获取更精准的已投币数
     if (code === 0) {
       /**还需投币 */
-      const coins = TaskConfig.TARGET_COINS - coinExp / 10;
+      const coins = TaskConfig.BILI_TARGET_COINS - coinExp / 10;
 
       console.log(
-        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskConfig.TARGET_COINS}颗)`
+        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskConfig.BILI_TARGET_COINS}颗)`
       );
       console.log(`每日分享: ${data.share ? '已完成' : '[未完成]'}`);
       console.log(`每日播放: ${data.watch ? '已完成' : '[未完成]'}`);
