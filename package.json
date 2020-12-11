@@ -5,10 +5,11 @@
   "main": "index.ts",
   "scripts": {
     "prebuild": "rm -rf dist/",
-    "postbuild": "cp -r node_modules/ ./dist/node_modules/ && cp .env ./dist && rm ./dist/run.js",
+    "predeploy": "cp -rf node_modules/ ./dist/node_modules/ && cp .env ./dist && rm -f ./dist/run.js",
     "build": "tsc",
-    "deploy": "sls deploy",
-    "dev": "ts-node run.ts"
+    "deploy": "cp -f ./serverless/serverless.yaml ./dist && cd ./dist && sls deploy --debug",
+    "dev": "ts-node ./src/run.ts",
+    "start": "node ./dist/run.js"
   },
   "author": "",
   "license": "ISC",

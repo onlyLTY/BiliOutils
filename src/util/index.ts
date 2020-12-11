@@ -6,11 +6,19 @@ import { TaskConfig } from '../globalVar';
  */
 export function apiDelay(delayTime?: number) {
   const API_DELAY = TaskConfig.BILI_API_DELAY;
-  const DELAY = API_DELAY || delayTime || random(2000, 6000);
+
+  let delay;
+  if (API_DELAY.length === 1) {
+    delay = API_DELAY[0] * 1000;
+  } else {
+    delay = random(API_DELAY[0], API_DELAY[1]) * 1000;
+  }
+  delay = delayTime || delay;
+
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve('doing');
-    }, DELAY);
+    }, delay);
   });
 }
 
@@ -26,6 +34,11 @@ export function random(min: number = 0, max: number = 1): number {
   if (min !== undefined && max === undefined) {
     max = min;
     min = 0;
+  } else if (max < min) {
+    //写反顺序后
+    let temp = max;
+    max = min;
+    min = temp;
   }
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }

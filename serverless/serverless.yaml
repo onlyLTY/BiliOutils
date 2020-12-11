@@ -1,11 +1,11 @@
-component: scf
+component: scf # 必填内容
 name: ap-chengdu_default_biliExp
 org: ''
 app: biliExp
 stage: dev
 inputs:
   name: biliExp
-  src: ./dist
+  src: ./
   runtime: Nodejs12.16
   region: ap-chengdu
   description: bilibili小工具
