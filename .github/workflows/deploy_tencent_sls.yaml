@@ -51,7 +51,7 @@ jobs:
           echo "部署至腾讯云需要填写TENCENT_SECRET_ID和TENCENT_SECRET_KEY两个secrets"
           exit -1
           fi
-          mv .env.example .env
+          mv -n .env.example .env
           echo USERID=${{secrets.USERID}} >> .env
           echo SESSDATA=${{secrets.SESSDATA}} >> .env
           echo BILIJCT=${{secrets.BILIJCT}} >> .env

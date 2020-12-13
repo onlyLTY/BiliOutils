@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rm -rf dist/",
     "predeploy": "cp -rf node_modules/ ./dist/node_modules/ && cp .env ./dist && rm -f ./dist/run.js",
-    "build": "tsc",
+    "build": "tsc && rm -rf ./dist/dto/",
     "deploy": "cp -f ./serverless/serverless.yaml ./dist && cd ./dist && sls deploy --debug",
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js"

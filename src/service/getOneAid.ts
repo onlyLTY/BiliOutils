@@ -5,7 +5,7 @@ import {
   getVideosByUpId,
 } from '../net/userInfoRequest';
 import { getRegionRankingVideos } from '../net/videoRequest';
-import { TaskConfig } from '../globalVar';
+import { TaskConfig } from '../config/globalVar';
 import { FollowingsDto } from '../dto/UserInfo.dto';
 
 class AidInfo {
@@ -22,7 +22,7 @@ class AidInfo {
  * @param special 是否只获取特别关注列表
  */
 export async function getAidByFollowing(
-  special: boolean = true
+  special: boolean = true,
 ): Promise<AidInfo> {
   try {
     const uid = TaskConfig.USERID;
@@ -33,12 +33,12 @@ export async function getAidByFollowing(
       tempData = await getFollowings(uid);
     }
 
-    const { data, message } = tempData;
+    const { data, message, code } = tempData;
 
-    if (data) {
+    if (code === 0 && data.length > 0) {
       await apiDelay();
 
-      const { mid } = data[random(data.length)];
+      const { mid } = data[random(data.length - 1)];
 
       return await getAidByUp(mid);
     }
@@ -64,8 +64,8 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
   const rid = arr[random(arr.length)];
 
   try {
-    const { data, message } = await getRegionRankingVideos(rid, 0);
-    if (data) {
+    const { data, message, code } = await getRegionRankingVideos(rid, 0);
+    if (code == 0) {
       const { aid, title, author } = data[random(data.length)];
       return {
         msg: '0',
@@ -110,11 +110,11 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
  */
 export async function getAidByUp(id: number): Promise<AidInfo> {
   try {
-    const { message, data } = await getVideosByUpId(id);
+    const { message, data, code } = await getVideosByUpId(id);
 
-    if (data) {
+    if (code == 0) {
       const avList = data.media_list;
-      const { id, title, upper } = avList[random(avList.length)];
+      const { id, title, upper } = avList[random(avList.length - 1)];
       return {
         msg: '0',
         data: {
@@ -147,8 +147,15 @@ export async function getAidByByPriority() {
     () => getAidByFollowing(false),
     getAidByRegionRank,
   ];
+
+  const errInfo = [];
+
   for (const fun of aidFunArray) {
     data = await fun();
+    errInfo.push({ funName: fun.name, message: data.msg });
     if (data.msg === '0') return data;
   }
+
+  console.warn('调试输出:', errInfo);
+  return { msg: '没有找到视频', data: {} };
 }

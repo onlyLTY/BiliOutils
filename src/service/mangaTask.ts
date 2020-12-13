@@ -1,6 +1,6 @@
 import { clockIn } from '../net/mangaRequest';
 
-export async function mangaSign() {
+export default async function mangaSign() {
   console.log('----【漫画签到】----');
   try {
     const { code } = await clockIn();

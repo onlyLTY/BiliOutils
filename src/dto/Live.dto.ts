@@ -34,5 +34,5 @@ export class Silver2CoinDto {
   'code': number;
   'msg': string;
   'message': string;
-  'data': object | null;
+  'data'?: {};
 }

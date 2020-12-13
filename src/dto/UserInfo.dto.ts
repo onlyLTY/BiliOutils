@@ -48,9 +48,12 @@ export class UserInfoNavDto extends ApiAbstract {
     moral: number;
     scores: number;
     uname: string;
-    vipDueDate: number; //会员到期时间
-    vipStatus: number;
-    vipType: number;
+    /** 会员到期时间 */
+    vipDueDate: number;
+    /** 0无 1有 */
+    vipStatus: 0 | 1;
+    /** 0:无 1:月度 2:年度及以上 */
+    vipType: 0 | 1 | 2;
     vip_label: {
       text: number;
     };

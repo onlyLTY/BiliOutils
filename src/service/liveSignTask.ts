@@ -1,6 +1,6 @@
 import { doLiveSign, webGetSignInfo } from '../net/liveRequest';
 
-export async function liveSignTask() {
+export default async function liveSignTask() {
   console.log('----【直播签到】----');
   try {
     const { data } = await webGetSignInfo();

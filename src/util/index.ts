@@ -1,4 +1,4 @@
-import { TaskConfig } from '../globalVar';
+import { TaskConfig } from '../config/globalVar';
 
 /**
  * 异步延迟函数

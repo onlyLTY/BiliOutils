@@ -7,7 +7,7 @@ import {
   HeartbeatDto,
   AddCoinDto,
 } from '../dto/Video.dto';
-import { TaskConfig } from '../globalVar';
+import { TaskConfig } from '../config/globalVar';
 
 /**
  * 分享视频

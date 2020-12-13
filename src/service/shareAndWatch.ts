@@ -1,12 +1,12 @@
 import { apiDelay, random } from '../util';
 import { addShare, uploadVideoHeartbeat } from '../net/videoRequest';
 import { getAidByByPriority } from './getOneAid';
-import { TaskModule } from '../globalVar';
+import { TaskModule } from '../config/globalVar';
 
 /**
  * 每日分享/播放视频
  */
-export async function shareAndWatch() {
+export default async function shareAndWatch() {
   console.log('----【分享/播放视频】----');
   if (TaskModule.share && TaskModule.watch) {
     console.log('已完成,跳过分享/播放');
