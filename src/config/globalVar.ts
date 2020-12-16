@@ -19,7 +19,7 @@ export abstract class TaskConfig {
 
   /** 预计投币数,默认5 */
   static readonly BILI_TARGET_COINS: number =
-    envToNumber('BILI_TARGET_COINS') || 5;
+    envToNumber('BILI_TARGET_COINS') ?? 5;
 
   private static biliApiDelay = envCommaArray('BILI_API_DELAY', true);
   /** 调用api时的延迟(单位s),默认2s至6s */
@@ -29,7 +29,7 @@ export abstract class TaskConfig {
 
   /**自定义高优先级用户列表 */
   static readonly BILI_CUSTOMIZE_UP: Array<number> = envCommaArray(
-    'BILI_CUSTOMIZE_UP',
+    'BILI_CUSTOMIZE_UP'
   );
 
   /** 目标等级 默认6级 */
@@ -37,7 +37,7 @@ export abstract class TaskConfig {
     envToNumber('BILI_TARGET_LEVEL') || 6;
 
   /** 最低剩余硬币数,默认0 */
-  static readonly BILI_STAY_COINS: number = envToNumber('BILI_STAY_COINS') || 0;
+  static readonly BILI_STAY_COINS: number = envToNumber('BILI_STAY_COINS') ?? 0;
 }
 
 //任务完成情况统计
@@ -46,8 +46,19 @@ export abstract class TaskModule {
   static money: number = 0;
   /**还需要投币数量,初值BILI_TARGET_COINS */
   static coinsTask: number = TaskConfig.BILI_TARGET_COINS;
-  /**今日时候已经分享视频 */
+  /**今日是否已经分享视频 */
   static share: boolean = false;
-  /**今日时候已经观看视频 */
+  /**今日是否已经观看视频 */
   static watch: boolean = false;
+}
+
+//风纪委员情况
+export abstract class JuryTask {
+  static isJury: boolean = false;
+  /** 总仲裁数量 */
+  static caseNum: number = 0;
+  /** 仲裁胜率 */
+  static rightRadio: number = 0;
+  /** 是否继续进行 */
+  static isRun: boolean = true;
 }

@@ -12,7 +12,7 @@ export default async function taskReward() {
     await apiDelay();
     const { data: coinExp } = await getDonateCoinExp(); //获取更精准的已投币数
     if (code != 0) {
-      console.log('状态获取失败: ', message);
+      console.log('状态获取失败: ', code, message);
       return;
     }
 
@@ -30,12 +30,12 @@ export default async function taskReward() {
       //(狗头保命)
       coins = TaskModule.coinsTask - targetCoinsDiff;
       console.log(
-        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`,
+        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`
       );
     } else {
       coins = TaskModule.coinsTask - coinExp / 10;
       console.log(
-        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`,
+        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`
       );
     }
 

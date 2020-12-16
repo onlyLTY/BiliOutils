@@ -11,7 +11,7 @@ import { FollowingsDto } from '../dto/UserInfo.dto';
 class AidInfo {
   msg: string;
   data: {
-    aid?: number;
+    aid?: number | string;
     title?: string;
     author?: string;
   };
@@ -22,7 +22,7 @@ class AidInfo {
  * @param special 是否只获取特别关注列表
  */
 export async function getAidByFollowing(
-  special: boolean = true,
+  special: boolean = true
 ): Promise<AidInfo> {
   try {
     const uid = TaskConfig.USERID;
@@ -44,8 +44,8 @@ export async function getAidByFollowing(
     }
     return {
       msg: special
-        ? `未获取到特别关注列表: ${message}`
-        : `未获取到关注列表: ${message}`,
+        ? `未获取到特别关注列表: ${code}-${message}`
+        : `未获取到关注列表: ${code}-${message}`,
       data: {},
     };
   } catch (error) {
@@ -64,20 +64,20 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
   const rid = arr[random(arr.length)];
 
   try {
-    const { data, message, code } = await getRegionRankingVideos(rid, 0);
+    const { data, message, code } = await getRegionRankingVideos(rid, 3);
     if (code == 0) {
       const { aid, title, author } = data[random(data.length)];
       return {
         msg: '0',
         data: {
-          aid: Number(aid),
+          aid,
           title,
           author,
         },
       };
     }
     return {
-      msg: `未获取到排行信息: ${message}`,
+      msg: `未获取到排行信息: ${code}-${message}`,
       data: {},
     };
   } catch (error) {
@@ -125,7 +125,7 @@ export async function getAidByUp(id: number): Promise<AidInfo> {
       };
     }
     return {
-      msg: `通过uid获取视频失败: ${message}`,
+      msg: `通过uid获取视频失败: ${code}-${message}`,
       data: {},
     };
   } catch (error) {
@@ -152,8 +152,11 @@ export async function getAidByByPriority() {
 
   for (const fun of aidFunArray) {
     data = await fun();
-    errInfo.push({ funName: fun.name, message: data.msg });
-    if (data.msg === '0') return data;
+    if (data.msg === '0') {
+      return data;
+    } else {
+      errInfo.push({ funName: fun.name, message: data.msg });
+    }
   }
 
   console.warn('调试输出:', errInfo);

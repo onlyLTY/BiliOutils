@@ -5,7 +5,7 @@ app: biliExp
 stage: dev
 inputs:
   name: biliExp
-  src: ./
+  src: ./dist
   runtime: Nodejs12.16
   region: ap-chengdu
   description: bilibili小工具
@@ -16,6 +16,13 @@ inputs:
     - timer: # 定时触发器
         parameters:
           # name: timer # 触发器名称，默认timer-${name}-${stage}
-          cronExpression: '22 22 22,8 * * * *' # 每天22点22分22秒触发
+          cronExpression: '55 43 22 * * * *' # 每天22点43分55秒触发
           enable: true
-# For more information: https://github.com/serverless-components/tencent-scf/blob/v2/doc/configure.md
+          argument: 日常任务
+    - timer: # 定时触发器
+        parameters:
+          name: jury-timer # 风纪委员触发
+          cronExpression: '45 3/8 11-16 * * * *' # 用12-16这几个小时来执行风纪委员任务
+          enable: ${env.BILI_JURY_VOTE}
+          argument: 评审任务
+# For more information: https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md

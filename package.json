@@ -5,15 +5,20 @@
   "main": "index.ts",
   "scripts": {
     "prebuild": "rm -rf dist/",
-    "predeploy": "cp -rf node_modules/ ./dist/node_modules/ && cp .env ./dist && rm -f ./dist/run.js",
-    "build": "tsc && rm -rf ./dist/dto/",
-    "deploy": "cp -f ./serverless/serverless.yaml ./dist && cd ./dist && sls deploy --debug",
+    "predeploy": "node ./util/dependencies.js && cp .env ./dist && rm -f ./dist/run.js",
+    "build": "tsc && babel ./dist --out-dir ./dist",
+    "postbuild": "cp ./src/config/*.json ./dist/config/ && rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
+    "deploy": "node ./util/updateSLS.js ./ && sls deploy --debug",
+    "postdeploy": "rm -f ./serverless.yaml",
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.10",
     "@types/axios": "^0.14.0",
     "@types/node": "^14.14.10",
     "@types/qs": "^6.9.5"

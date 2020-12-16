@@ -46,16 +46,13 @@ export function envToBoolean(key: string): boolean {
  *  从环境变量中获取值,判断是否开启某功能
  * @param key 环境变量名称
  *
- *  默认开启功能
- *
  */
-export function isOnFunction(key: string): boolean {
+export function isOnFunction(key: string): boolean | undefined {
   const value = process.env[key];
-  if (!value) {
+  if (value === 'true') {
     return true;
   }
   if (value === 'false') {
     return false;
   }
-  return true;
 }

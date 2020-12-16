@@ -12,7 +12,7 @@ export default async function shareAndWatch() {
     console.log('已完成,跳过分享/播放');
     return;
   }
-  let gAid = 0;
+  let gAid: number | string = 0;
   //获取aid
   try {
     let biliav = await getAidByByPriority();
@@ -38,7 +38,7 @@ export default async function shareAndWatch() {
       if (code === 0) {
         console.log(`分享视频成功!`);
       } else {
-        console.log('分享视频失败: ', message);
+        console.log('分享视频失败: ', code, message);
       }
     } catch (error) {
       console.log('分享视频异常: ', error.message);
@@ -54,7 +54,7 @@ export default async function shareAndWatch() {
       if (code === 0) {
         console.log(`播放视频成功!`);
       } else {
-        console.log('播放视频失败: ', message);
+        console.log('播放视频失败: ', code, message);
       }
     } catch (error) {
       console.log('播放视频异常: ', error.message);

@@ -5,7 +5,10 @@ import { apiDelay } from '../util';
 export default async function loginTask() {
   console.log('----【登录】----');
   try {
-    const { data, message } = await loginByCookie();
+    const { data, message, code } = await loginByCookie();
+    if (code !== 0) {
+      console.log('登录错误', code, message);
+    }
     await apiDelay();
     const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
     if (data.isLogin) {
@@ -28,7 +31,7 @@ export default async function loginTask() {
         const upLevelDate =
           upLevelExp / (TaskConfig.BILI_TARGET_COINS * 10 + 15);
         console.log(
-          `距离升级还需要${upLevelExp}经验,预计${upLevelDate.toFixed()}天`,
+          `距离升级还需要${upLevelExp}经验,预计${upLevelDate.toFixed()}天`
         );
       }
 

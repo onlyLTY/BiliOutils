@@ -1,4 +1,7 @@
 export abstract class ApiAbstract {
+  /**
+   * -658 Token 过期
+   */
   'code': number;
   'message': string;
   'ttl': number;

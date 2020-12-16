@@ -13,14 +13,14 @@ import { TaskConfig } from '../config/globalVar';
  * 分享视频
  * @param aid 分享的视频av号
  */
-export async function addShare(aid: number): Promise<ShareAddDto> {
+export async function addShare(aid: number | string): Promise<ShareAddDto> {
   const reqData = {
     csrf: TaskConfig.BILIJCT,
     aid,
   };
   const { data } = await biliApi.post(
     '/x/web-interface/share/add',
-    stringify(reqData)
+    stringify(reqData),
   );
 
   return data;
@@ -33,7 +33,7 @@ export async function addShare(aid: number): Promise<ShareAddDto> {
  */
 export async function getRegionRankingVideos(
   rid: number = 1,
-  day: number = 3
+  day: number = 3,
 ): Promise<RegionRankingVideosDto> {
   const { data } = await biliApi.get('/x/web-interface/ranking/region', {
     params: {
@@ -50,7 +50,7 @@ export async function getRegionRankingVideos(
  * @param aid 视频av号
  */
 export async function donatedCoinsForVideo(
-  aid: number
+  aid: number,
 ): Promise<DonatedCoinsForVideoDto> {
   const { data } = await biliApi.get('/x/web-interface/archive/coins', {
     params: { aid },
@@ -65,15 +65,15 @@ export async function donatedCoinsForVideo(
  * @param playedTime 观看时间
  */
 export async function uploadVideoHeartbeat(
-  aid: number,
-  playedTime: number
+  aid: number | string,
+  playedTime: number,
 ): Promise<HeartbeatDto> {
   const { data } = await biliApi.post(
     '/x/click-interface/web/heartbeat',
     stringify({
-      aid: aid,
+      aid,
       played_time: playedTime,
-    })
+    }),
   );
 
   return data;
@@ -86,9 +86,9 @@ export async function uploadVideoHeartbeat(
  * @param selectLike 是否点赞
  */
 export async function addCoinForVideo(
-  aid: number,
+  aid: number | string,
   multiply: 1 | 2,
-  selectLike: number
+  selectLike: 1 | 2,
 ): Promise<AddCoinDto> {
   const { data } = await biliApi.post(
     '/x/web-interface/coin/add',
@@ -98,7 +98,7 @@ export async function addCoinForVideo(
       selectLike,
       csrf: TaskConfig.BILIJCT,
       // cross_domain: true,
-    })
+    }),
   );
 
   return data;

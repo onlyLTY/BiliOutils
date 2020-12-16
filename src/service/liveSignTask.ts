@@ -17,7 +17,7 @@ export default async function liveSignTask() {
         `直播签到成功: ${data.text}, 特别信息: ${data.specialText}, 本月签到天数: ${data.hadSignDays}天;`
       );
     } else {
-      console.log('直播签到失败: ', message);
+      console.log('直播签到失败: ', code, message);
     }
   } catch (error) {
     console.log('直播签到异常: ', error.message);
