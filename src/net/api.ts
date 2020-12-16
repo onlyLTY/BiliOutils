@@ -15,3 +15,7 @@ export const biliApi = axios.create({
 export const mangaApi = axios.create({
   baseURL: 'https://manga.bilibili.com',
 });
+
+export const vcApi = axios.create({
+  baseURL: 'https://api.vc.bilibili.com',
+});

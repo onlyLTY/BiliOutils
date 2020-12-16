@@ -8,6 +8,7 @@ const envConfig = {
   mangaSign: ['BILI_MANGA_SIGN', true],
   shareAndWatch: ['BILI_SHARE_WATCH', true],
   judgement: ['BILI_JURY_VOTE', false],
+  supGroupSign: ['BILI_GROUP_SIGN', true],
 };
 
 for (const envName in envConfig) {
@@ -35,6 +36,6 @@ for (const envName in envConfig) {
  */
 export function offFunctions(funArr: Array<() => {}>): Array<() => {}> {
   return funArr
-    .map((el) => (envConfig[el.name] && envConfig[el.name][1] ? el : null))
+    .map((el) => (envConfig[el.name]?.[1] ? el : null))
     .filter((el) => el);
 }

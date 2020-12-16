@@ -13,3 +13,10 @@ export abstract class AccountAbstract {
   'status': boolean;
   abstract data?: object;
 }
+
+export abstract class PureData {
+  code: number;
+  msg: string;
+  message: string;
+  data?: object | [] | null;
+}
