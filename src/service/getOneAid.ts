@@ -66,7 +66,7 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
   try {
     const { data, message, code } = await getRegionRankingVideos(rid, 3);
     if (code == 0) {
-      const { aid, title, author } = data[random(data.length)];
+      const { aid, title, author } = data[random(data.length - 1)];
       return {
         msg: '0',
         data: {
@@ -100,7 +100,7 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
       data: {},
     };
   }
-  const mid = customizeUp[random(customizeUp.length)];
+  const mid = customizeUp[random(customizeUp.length - 1)];
   return await getAidByUp(mid);
 }
 
@@ -152,13 +152,17 @@ export async function getAidByByPriority() {
 
   for (const fun of aidFunArray) {
     data = await fun();
-    if (data.msg === '0') {
-      return data;
-    } else {
-      errInfo.push({ funName: fun.name, message: data.msg });
-    }
-  }
+    if (data.msg === '0') return data;
 
-  console.warn('调试输出:', errInfo);
-  return { msg: '没有找到视频', data: {} };
+    let i = Number(process.env.BILI_COIN_RETRY_NUM ?? 4);
+    i = i < 1 ? 1 : i > 8 ? 8 : i;
+    while (i--) {
+      errInfo.push({ funName: fun.name, message: data.msg });
+      data = await fun();
+
+      if (data.msg === '0') return data;
+    }
+
+    return { msg: '没有找到视频', data: {} };
+  }
 }

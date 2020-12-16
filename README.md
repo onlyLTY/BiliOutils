@@ -46,14 +46,15 @@
 
 可以把变量设置`false`关闭部分功能,`true`开启指定功能
 
-| 变量名             | 说明                                  |
-| ------------------ | ------------------------------------- |
-| BILI_SILVER_2_COIN | 银瓜子兑换硬币                        |
-| BILI_LIVE_SIGN     | 直播签到                              |
-| BILI_ADD_COINS     | 每日投币(将投币数设置成 0 也可以关闭) |
-| BILI_MANGA_SIGN    | 漫画签到                              |
-| BILI_SHARE_WATCH   | 每日视频分享/播放(懒得分开写)         |
-| BILI_JURY_VOTE     | 风纪投票(默认关闭,使用 true 开启)     |
+| 变量名              | 说明                                           |
+| ------------------- | ---------------------------------------------- |
+| BILI_SILVER_2_COIN  | 银瓜子兑换硬币                                 |
+| BILI_LIVE_SIGN      | 直播签到                                       |
+| BILI_ADD_COINS      | 每日投币(将投币数设置成 0 也可以关闭)          |
+| BILI_MANGA_SIGN     | 漫画签到                                       |
+| BILI_SHARE_WATCH    | 每日视频分享/播放(懒得分开写)                  |
+| BILI_JURY_VOTE      | 风纪投票(默认关闭,使用 true 开启)              |
+| BILI_COIN_RETRY_NUM | 投币任务,每种获取视频方式的重试次数(默认 4 次) |
 
 ### 本地/服务器使用
 

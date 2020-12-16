@@ -3,7 +3,7 @@ require('dotenv').config();
 import { apiDelay, random } from './utils';
 import bili, { doOneJuryVote, loginTask, taskReward } from './service';
 import { offFunctions } from './config/envConfigOffFun';
-import { JuryTask } from 'config/globalVar';
+import { JuryTask } from './config/globalVar';
 
 const biliArr = offFunctions([...Object.values(bili)]);
 
