@@ -1,4 +1,4 @@
-import { apiDelay, random } from '../util';
+import { apiDelay, random } from '../utils';
 import { addShare, uploadVideoHeartbeat } from '../net/videoRequest';
 import { getAidByByPriority } from './getOneAid';
 import { TaskModule } from '../config/globalVar';

@@ -5,10 +5,10 @@
   "main": "index.ts",
   "scripts": {
     "prebuild": "rm -rf dist/",
-    "predeploy": "node ./util/dependencies.js && cp .env ./dist && rm -f ./dist/run.js",
+    "predeploy": "node ./tools/dependencies.js && cp .env ./dist && rm -f ./dist/run.js",
     "build": "tsc && babel ./dist --out-dir ./dist",
     "postbuild": "cp ./src/config/*.json ./dist/config/ && rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
-    "deploy": "node ./util/updateSLS.js ./ && sls deploy --debug",
+    "deploy": "node ./tools/updateSLS.js ./ && sls deploy --debug",
     "postdeploy": "rm -f ./serverless.yaml",
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js"

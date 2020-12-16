@@ -1,4 +1,4 @@
-import { apiDelay, random } from '../util';
+import { apiDelay, random } from '../utils';
 import {
   getFollowings,
   getSpecialFollowings,

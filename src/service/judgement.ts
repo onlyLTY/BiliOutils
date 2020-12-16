@@ -8,7 +8,7 @@ import {
   juryVoteOpinion,
 } from '../net/juryRequest';
 import { JuryTask } from '../config/globalVar';
-import { apiDelay, random } from '../util';
+import { apiDelay, random } from '../utils';
 
 const prohibitWords = require('../config/prohibitWords.json');
 

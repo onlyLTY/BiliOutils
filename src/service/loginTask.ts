@@ -1,6 +1,6 @@
 import { loginByCookie, getCoinBalance } from '../net/userInfoRequest';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { apiDelay } from '../util';
+import { apiDelay } from '../utils';
 
 export default async function loginTask() {
   console.log('----【登录】----');
