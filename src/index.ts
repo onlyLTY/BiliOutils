@@ -3,6 +3,7 @@ require('dotenv').config();
 import { apiDelay, random } from './util';
 import bili, { doOneJuryVote, loginTask, taskReward } from './service';
 import { offFunctions } from './config/envConfigOffFun';
+import { JuryTask } from 'config/globalVar';
 
 const biliArr = offFunctions([...Object.values(bili)]);
 
@@ -17,6 +18,10 @@ exports.main_handler = async (event, _context) => {
   // 只有serverless才有event
   if (event === undefined) event = {};
   if (event.TriggerName === 'jury-timer') {
+    if (!JuryTask.isRun) {
+      console.log(JuryTask.noRunMessage);
+      return;
+    }
     try {
       await doOneJuryVote(random(30000, 60000));
     } catch (error) {

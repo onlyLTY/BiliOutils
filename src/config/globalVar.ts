@@ -61,4 +61,6 @@ export abstract class JuryTask {
   static rightRadio: number = 0;
   /** 是否继续进行 */
   static isRun: boolean = true;
+  /** 不运行的原因 */
+  static noRunMessage: string = '';
 }

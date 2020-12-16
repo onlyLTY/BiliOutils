@@ -57,12 +57,12 @@ async function getJuryInfo() {
 async function getJuryCaseObtain() {
   const { data, code, message } = await juryCaseObtain();
   if (code === 25008) {
-    console.log('没有新的案件了');
+    console.log((JuryTask.noRunMessage = '没有新的案件了'));
     JuryTask.isRun = false;
     return;
   }
   if (code === 25014) {
-    console.log('今日的案件已经审核完成');
+    console.log((JuryTask.noRunMessage = '今日的案件已经审核完成'));
     JuryTask.isRun = false;
     return;
   }
@@ -152,7 +152,8 @@ function makeDecision({
     //就这几个字你好含有地域黑嫌疑词
     console.log('应该是地域黑吧?');
     myVote = Vote['封禁'];
-  } else if (opinionRedCount && banOfRed.length / opinionRedCount >= 0.8) {
+  } else if (opinionRedCount > 3 && banOfRed.length / opinionRedCount >= 0.8) {
+    //>3 还是严谨点
     console.log('多人发布观点表示封禁');
     myVote = Vote['封禁'];
   } else if (voteDelete > 200 && voteRule < 20) {

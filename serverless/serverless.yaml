@@ -10,7 +10,7 @@ inputs:
   region: ap-chengdu
   description: bilibili小工具
   handler: index.main_handler
-  memorySize: 128
+  memorySize: 64
   timeout: 900
   events:
     - timer: # 定时触发器
