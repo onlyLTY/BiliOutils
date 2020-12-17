@@ -1,11 +1,11 @@
 {
   "name": "catlair-BiliTools",
   "version": "0.0.1",
-  "description": "",
+  "description": "this is BiliTools",
   "main": "index.ts",
   "scripts": {
     "prebuild": "rm -rf dist/",
-    "predeploy": "node ./tools/dependencies.js && cp .env ./dist && rm -f ./dist/run.js",
+    "predeploy": "cp .env ./dist && rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
     "build": "tsc && babel ./dist --out-dir ./dist",
     "postbuild": "cp ./src/config/*.json ./dist/config/ && rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
     "deploy": "node ./tools/updateSLS.js ./ && sls deploy --debug",
@@ -13,7 +13,7 @@
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js"
   },
-  "author": "",
+  "author": "catlair",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.12.10",
