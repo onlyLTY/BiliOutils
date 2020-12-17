@@ -18,9 +18,9 @@ exports.main_handler = async (event, _context) => {
   // 只有serverless才有event
   if (event === undefined) event = {};
   if (event.TriggerName === 'jury-timer') {
-    if (!JuryTask.isRun) {
+    if (!JuryTask.isRun && JuryTask.noRunMessage === '今日的案件已经审核完成') {
       console.log(JuryTask.noRunMessage);
-      return;
+      return '跳过执行';
     }
     try {
       await doOneJuryVote(random(30000, 60000));

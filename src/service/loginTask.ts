@@ -53,7 +53,7 @@ export default async function loginTask() {
 
       //判断是否过期,因为即使大会员过期,下面也会显示
       if (data.vipStatus === 0) {
-        vipTypeMsg = vipTypeMsg === '' ? vipTypeMsg : vipTypeMsg + '[已过期]';
+        vipTypeMsg = vipTypeMsg === '无' ? vipTypeMsg : vipTypeMsg + '[已过期]';
       }
 
       console.log('大会员状态: ', vipTypeMsg);
