@@ -61,7 +61,7 @@ export async function getAidByFollowing(
  */
 export async function getAidByRegionRank(): Promise<AidInfo> {
   const arr = [1, 3, 4, 5, 160, 22, 119];
-  const rid = arr[random(arr.length)];
+  const rid = arr[random(arr.length - 1)];
 
   try {
     const { data, message, code } = await getRegionRankingVideos(rid, 3);
@@ -158,6 +158,7 @@ export async function getAidByByPriority() {
     i = i < 1 ? 1 : i > 8 ? 8 : i;
     while (i--) {
       errInfo.push({ funName: fun.name, message: data.msg });
+      await apiDelay();
       data = await fun();
 
       if (data.msg === '0') return data;

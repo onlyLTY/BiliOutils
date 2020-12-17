@@ -22,7 +22,7 @@ inputs:
     - timer: # 定时触发器
         parameters:
           name: jury-timer # 风纪委员触发
-          cronExpression: '45 3/8 11-16 * * * *' # 用12-16这几个小时来执行风纪委员任务
+          cronExpression: '45 3/8 11-15 * * * *' # 用12-16这几个小时来执行风纪委员任务
           enable: ${env.BILI_JURY_VOTE}
           argument: 评审任务
 # For more information: https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md

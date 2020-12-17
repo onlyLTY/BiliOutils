@@ -275,11 +275,9 @@ export default async function judgement() {
     return;
   }
 
-  await apiDelay();
-
   while (JuryTask.isRun) {
-    await doOneJuryVote(random(12000, 30000));
     await apiDelay();
+    await doOneJuryVote(random(12000, 30000));
   }
 
   console.log(`一共处理了${JuryTask.caseNum}件案件`);
