@@ -21,16 +21,16 @@ export default async function taskReward() {
     let coins = 0;
     if (TaskModule.coinsTask === 0) {
       //根据经验设置的目标
-      console.log('经验够了,不想投了');
+      console.log(`今日投币获取经验: ${coinExp}，还需投币0颗，经验够了,不想投了`);
     } else if (targetCoinsDiff <= 0) {
       //剩余硬币比需要保留的少
-      console.log('硬币不够了,不投币了');
+      console.log(`今日投币获取经验: ${coinExp}，还需投币0颗，硬币不够了,不投币了`);
     } else if (targetCoinsDiff < TaskModule.coinsTask) {
       //确保最后一次投币精准降落到设置的需要保留硬币数上
       //(狗头保命)
       coins = TaskModule.coinsTask - targetCoinsDiff;
       console.log(
-        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`
+        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗，忽略部分投币)`
       );
     } else {
       coins = TaskModule.coinsTask - coinExp / 10;
