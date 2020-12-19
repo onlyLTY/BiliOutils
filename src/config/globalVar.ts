@@ -34,7 +34,7 @@ export abstract class TaskConfig {
 
   /** 目标等级 默认6级 */
   static readonly BILI_TARGET_LEVEL: number =
-    envToNumber('BILI_TARGET_LEVEL') || 6;
+    envToNumber('BILI_TARGET_LEVEL') ?? 6;
 
   /** 最低剩余硬币数,默认0 */
   static readonly BILI_STAY_COINS: number = envToNumber('BILI_STAY_COINS') ?? 0;

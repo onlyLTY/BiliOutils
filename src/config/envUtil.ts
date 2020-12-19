@@ -9,8 +9,6 @@ export function envToNumber(key: string): number {
   const valueNum = Number(value);
   if (typeof valueNum === 'number' && !isNaN(valueNum)) {
     return valueNum;
-  } else {
-    return 0;
   }
 }
 
@@ -20,7 +18,7 @@ export function envToNumber(key: string): number {
  */
 export function envCommaArray(
   key: string,
-  isNumber: boolean = false,
+  isNumber: boolean = false
 ): Array<any> {
   const envString = process.env[key];
   let value: any = envString ? envString.split(',') : [];
