@@ -52,6 +52,8 @@ jobs:
           exit -1
           fi
           mv -n .env.example .env
+          echo SERVER_SCKEY=${{secrets.SERVER_SCKEY}} >> .env
+          echo NODE_MAIL=${{secrets.NODE_MAIL}} >> .env
           echo USERID=${{secrets.USERID}} >> .env
           echo SESSDATA=${{secrets.SESSDATA}} >> .env
           echo BILIJCT=${{secrets.BILIJCT}} >> .env

@@ -1,4 +1,7 @@
+import { resolve } from 'path';
 import { TaskConfig } from '../config/globalVar';
+import sendMail from './email';
+import scSend from './serverChan';
 
 /**
  * 异步延迟函数
@@ -41,4 +44,14 @@ export function random(min: number = 0, max: number = 1): number {
     min = temp;
   }
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+/**
+ * 发送消息到其他设备
+ * @param title 标题
+ * @param text 文本内容
+ */
+export async function sendMessage(title: string, text: string) {
+  sendMail(title, text).catch(console.log);
+  scSend(title, text.replace(/\n/g, '\n\n'));
 }

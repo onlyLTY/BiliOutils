@@ -4,8 +4,9 @@
  *
  * 不能转化成数字的返回0
  */
-export function envToNumber(key: string): number {
+export function envToNumber(key: string): number | undefined {
   const value = process.env[key];
+  if (value === undefined) return undefined;
   const valueNum = Number(value);
   if (typeof valueNum === 'number' && !isNaN(valueNum)) {
     return valueNum;
@@ -13,15 +14,18 @@ export function envToNumber(key: string): number {
 }
 
 /**
- * 将逗号分割的字符串转换为数组
- * @param key 环境变量名
+ * 将符号分割的字符串转换为数组
+ * @param key 变量名
+ * @param symbol 符号字符串[默认英文逗号]
+ * @param isNumber 是否需要转换成数字数组[默认不]
  */
-export function envCommaArray(
+export function envSymbolArray(
   key: string,
+  symbol: string = ',',
   isNumber: boolean = false
 ): Array<any> {
   const envString = process.env[key];
-  let value: any = envString ? envString.split(',') : [];
+  let value: any = envString ? envString.split(symbol) : [];
   if (isNumber) value = value.map((el) => Number(el));
   return value;
 }

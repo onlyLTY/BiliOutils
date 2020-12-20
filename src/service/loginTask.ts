@@ -6,7 +6,10 @@ export default async function loginTask() {
   console.log('----【登录】----');
   try {
     const { data, message, code } = await loginByCookie();
-    if (code !== 0) {
+    if (code === 65006 || code === -404) {
+      console.log('登录错误', code, message);
+      return;
+    } else if (code !== 0) {
       console.log('登录错误', code, message);
     }
     await apiDelay();

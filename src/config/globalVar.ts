@@ -1,4 +1,4 @@
-import { envCommaArray, envToNumber } from './envUtil';
+import { envSymbolArray, envToNumber } from './envUtil';
 
 //默认的任务配置
 export abstract class TaskConfig {
@@ -21,14 +21,14 @@ export abstract class TaskConfig {
   static readonly BILI_TARGET_COINS: number =
     envToNumber('BILI_TARGET_COINS') ?? 5;
 
-  private static biliApiDelay = envCommaArray('BILI_API_DELAY', true);
+  private static biliApiDelay = envSymbolArray('BILI_API_DELAY', ',', true);
   /** 调用api时的延迟(单位s),默认2s至6s */
   static readonly BILI_API_DELAY: number[] = TaskConfig.biliApiDelay.length
     ? TaskConfig.biliApiDelay
     : [2, 6];
 
   /**自定义高优先级用户列表 */
-  static readonly BILI_CUSTOMIZE_UP: Array<number> = envCommaArray(
+  static readonly BILI_CUSTOMIZE_UP: Array<number> = envSymbolArray(
     'BILI_CUSTOMIZE_UP'
   );
 
@@ -50,6 +50,8 @@ export abstract class TaskModule {
   static share: boolean = false;
   /**今日是否已经观看视频 */
   static watch: boolean = false;
+  /** 执行任务产生的消息 */
+  static appInfo: string = '\n';
 }
 
 //风纪委员情况
@@ -63,4 +65,6 @@ export abstract class JuryTask {
   static isRun: boolean = true;
   /** 不运行的原因 */
   static noRunMessage: string = '';
+  /** 审核完成后再次调用的次数 */
+  static dailyCompleteCount: number = 0;
 }

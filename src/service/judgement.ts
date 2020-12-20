@@ -62,7 +62,10 @@ async function getJuryCaseObtain() {
     return;
   }
   if (code === 25014) {
-    console.log((JuryTask.noRunMessage = '今日的案件已经审核完成'));
+    console.log(
+      (JuryTask.noRunMessage = '今日的案件已经审核完成'),
+      ++JuryTask.dailyCompleteCount
+    );
     JuryTask.isRun = false;
     return;
   }

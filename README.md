@@ -35,28 +35,48 @@
 
 ![github secrets](https://cdn.jsdelivr.net/gh/catlair/BiliTools@main/images/secrets.png)
 
-| 变量名             | 说明                                                                            | 举例        |
-| ------------------ | ------------------------------------------------------------------------------- | ----------- |
-| USERID             | 【必选】b 站用户 uid                                                            | -           |
-| SESSDATA           | 【必选】                                                                        | -           |
-| BILIJCT            | 【必选】                                                                        | -           |
-| TENCENT_SECRET_ID  | 【腾讯 serverless 必选】                                                        | -           |
-| TENCENT_SECRET_KEY | 【腾讯 serverless 必选】                                                        | -           |
-| BILI_TARGET_COINS  | 每日投币目标(包括自己通过其他方式投的)                                          | 5           |
-| BILI_CUSTOMIZE_UP  | 视频转发、播放、投币优先考虑的 up 主 uid(英文逗号分隔)                          | 123,345,567 |
-| BILI_API_DELAY     | 调用 api 的时间间隔(单位秒)，可填一个数字，或逗号分隔的两个数字(最小值及最大值) | 6           |
+| 变量名              | 说明                                                                            | 举例        |
+| ------------------- | ------------------------------------------------------------------------------- | ----------- |
+| USERID              | 【必选】b 站用户 uid                                                            | -           |
+| SESSDATA            | 【必选】                                                                        | -           |
+| BILIJCT             | 【必选】                                                                        | -           |
+| TENCENT_SECRET_ID   | 【腾讯 serverless 必选】                                                        | -           |
+| TENCENT_SECRET_KEY  | 【腾讯 serverless 必选】                                                        | -           |
+| BILI_TARGET_COINS   | 每日投币目标(包括自己通过其他方式投的)                                          | 5           |
+| BILI_CUSTOMIZE_UP   | 视频转发、播放、投币优先考虑的 up 主 uid(英文逗号分隔)                          | xxx,xxx,xxx |
+| BILI_API_DELAY      | 调用 api 的时间间隔(单位秒)，可填一个数字，或逗号分隔的两个数字(最小值及最大值) | 6           |
+| BILI_COIN_RETRY_NUM | 投币任务,每种获取视频方式的重试次数(默认 4 次)                                  | 6           |
 
 可以把变量设置`false`关闭部分功能,`true`开启指定功能
 
-| 变量名              | 说明                                           |
-| ------------------- | ---------------------------------------------- |
-| BILI_SILVER_2_COIN  | 银瓜子兑换硬币                                 |
-| BILI_LIVE_SIGN      | 直播签到                                       |
-| BILI_ADD_COINS      | 每日投币(将投币数设置成 0 也可以关闭)          |
-| BILI_MANGA_SIGN     | 漫画签到                                       |
-| BILI_SHARE_WATCH    | 每日视频分享/播放(懒得分开写)                  |
-| BILI_JURY_VOTE      | 风纪投票(默认关闭,使用 true 开启)              |
-| BILI_COIN_RETRY_NUM | 投币任务,每种获取视频方式的重试次数(默认 4 次) |
+| 变量名             | 说明                                  | 默认值 |
+| ------------------ | ------------------------------------- | ------ |
+| BILI_SILVER_2_COIN | 银瓜子兑换硬币                        | true   |
+| BILI_LIVE_SIGN     | 直播签到                              | true   |
+| BILI_ADD_COINS     | 每日投币(将投币数设置成 0 也可以关闭) | true   |
+| BILI_MANGA_SIGN    | 漫画签到                              | true   |
+| BILI_SHARE_WATCH   | 每日视频分享/播放(懒得分开写)         | true   |
+| BILI_JURY_VOTE     | 风纪投票                              | false  |
+
+## 消息推送
+
+### server 酱
+
+去 server 酱官网申请 sckey,并设置环境变量`SERVER_SCKEY`存放 sckey
+
+### email
+
+去邮箱官网开启`SMTP`服务,并保存获得的授权密码
+
+设置如下格式的环境变量(英文逗号分割选项,163 邮箱举例)  
+`NODE_MAIL=发送邮箱@163.com,smtp授权密码,接收邮箱@qq.com,smtp.163.com`  
+`smtp.163.com` ssl 加密默认端口`465`
+
+如果不采用安全模式发送,需要在最后加上端口  
+`NODE_MAIL=发送邮箱@163.com,smtp授权密码,接收邮箱@qq.com,smtp.163.com,端口`
+
+收件邮箱最好将发件邮箱设置为白名单,或者收件邮箱和发件邮箱一致  
+暂不支持多个接收邮箱
 
 ### 本地/服务器使用
 
