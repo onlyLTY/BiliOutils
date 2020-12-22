@@ -24,15 +24,16 @@ exports.main_handler = async (event, _context) => {
   if (event === undefined) event = {};
   if (event.TriggerName === 'jury-timer') {
     if (!JuryTask.isRun && JuryTask.noRunMessage === '今日的案件已经审核完成') {
-      if (JuryTask.dailyCompleteCount === 1) {
-        sendMessage('bili风纪任务完成', TaskModule.appInfo);
-      }
+      console.log(JuryTask.noRunMessage, JuryTask.dailyCompleteCount++);
       return '跳过执行';
     }
     try {
       await doOneJuryVote(random(30000, 60000));
     } catch (error) {
       console.log(error);
+    }
+    if (JuryTask.dailyCompleteCount === 1) {
+      sendMessage('bili风纪任务完成', TaskModule.appInfo);
     }
     return '评审任务';
   }

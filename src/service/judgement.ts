@@ -7,8 +7,8 @@ import {
   juryVote,
   juryVoteOpinion,
 } from '../net/juryRequest';
-import { JuryTask } from '../config/globalVar';
-import { apiDelay, random } from '../utils';
+import { JuryTask, TaskModule } from '../config/globalVar';
+import { apiDelay, random, sendMessage } from '../utils';
 
 const prohibitWords = require('../config/prohibitWords.json');
 
@@ -62,10 +62,8 @@ async function getJuryCaseObtain() {
     return;
   }
   if (code === 25014) {
-    console.log(
-      (JuryTask.noRunMessage = '今日的案件已经审核完成'),
-      ++JuryTask.dailyCompleteCount
-    );
+    console.log((JuryTask.noRunMessage = '今日的案件已经审核完成'));
+    JuryTask.dailyCompleteCount++;
     JuryTask.isRun = false;
     return;
   }
