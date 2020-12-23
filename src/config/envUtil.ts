@@ -16,13 +16,13 @@ export function envToNumber(key: string): number | undefined {
 /**
  * 将符号分割的字符串转换为数组
  * @param key 变量名
+ * @param isNumber 是否需要转换成数字数组[默认true]
  * @param symbol 符号字符串[默认英文逗号]
- * @param isNumber 是否需要转换成数字数组[默认不]
  */
 export function envSymbolArray(
   key: string,
-  symbol: string = ',',
-  isNumber: boolean = false
+  isNumber: boolean = true,
+  symbol: string = ','
 ): Array<any> {
   const envString = process.env[key];
   let value: any = envString ? envString.split(symbol) : [];

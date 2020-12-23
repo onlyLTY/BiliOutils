@@ -35,17 +35,18 @@
 
 ![github secrets](https://cdn.jsdelivr.net/gh/catlair/BiliTools@main/images/secrets.png)
 
-| 变量名              | 说明                                                                            | 举例        |
-| ------------------- | ------------------------------------------------------------------------------- | ----------- |
-| USERID              | 【必选】b 站用户 uid                                                            | -           |
-| SESSDATA            | 【必选】                                                                        | -           |
-| BILIJCT             | 【必选】                                                                        | -           |
-| TENCENT_SECRET_ID   | 【腾讯 serverless 必选】                                                        | -           |
-| TENCENT_SECRET_KEY  | 【腾讯 serverless 必选】                                                        | -           |
-| BILI_TARGET_COINS   | 每日投币目标(包括自己通过其他方式投的)                                          | 5           |
-| BILI_CUSTOMIZE_UP   | 视频转发、播放、投币优先考虑的 up 主 uid(英文逗号分隔)                          | xxx,xxx,xxx |
-| BILI_API_DELAY      | 调用 api 的时间间隔(单位秒)，可填一个数字，或逗号分隔的两个数字(最小值及最大值) | 6           |
-| BILI_COIN_RETRY_NUM | 投币任务,每种获取视频方式的重试次数(默认 4 次)                                  | 6           |
+| 变量名               | 说明                                                                             | 举例              |
+| -------------------- | -------------------------------------------------------------------------------- | ----------------- |
+| USERID               | 【必选】b 站用户 uid                                                             | -                 |
+| SESSDATA             | 【必选】                                                                         | -                 |
+| BILIJCT              | 【必选】                                                                         | -                 |
+| TENCENT_SECRET_ID    | 【腾讯 serverless 必选】                                                         | -                 |
+| TENCENT_SECRET_KEY   | 【腾讯 serverless 必选】                                                         | -                 |
+| BILI_TARGET_COINS    | 每日投币目标(包括自己通过其他方式投的)                                           | 5                 |
+| BILI_CUSTOMIZE_UP    | 视频转发、播放、投币优先考虑的 up 主 uid(英文逗号分隔)                           | xxx,xxx,xxx       |
+| BILI_API_DELAY       | 调用 api 的时间间隔(单位秒)，可填一个数字，或逗号分隔的两个数字(最小值及最大值)  | 6                 |
+| BILI_COIN_RETRY_NUM  | 投币任务,每种获取视频方式的重试次数(默认 4 次)                                   | 6                 |
+| BILI_UPPER_ACC_MATCH | 是否精准匹配 up,排除通过 uid 搜索到的视频是别人发的合作视频(避免投币给非指定 up) | false (默认 true) |
 
 可以把变量设置`false`关闭部分功能,`true`开启指定功能
 
@@ -56,6 +57,7 @@
 | BILI_ADD_COINS     | 每日投币(将投币数设置成 0 也可以关闭) | true   |
 | BILI_MANGA_SIGN    | 漫画签到                              | true   |
 | BILI_SHARE_WATCH   | 每日视频分享/播放(懒得分开写)         | true   |
+| BILI_GROUP_SIGN    | 应援团签到                            | true   |
 | BILI_JURY_VOTE     | 风纪投票                              | false  |
 
 ## 消息推送

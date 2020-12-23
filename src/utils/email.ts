@@ -4,7 +4,7 @@ import * as nodemailer from 'nodemailer';
 // async..await is not allowed in global scope, must use a wrapper
 export default async function sendMail(title: string, text: string) {
   //发件邮箱,密码,收件邮箱,stmp地址[,端口]
-  const user = envSymbolArray('NODE_MAIL');
+  const user = envSymbolArray('NODE_MAIL', false, ',');
   if (user.length < 4) return;
 
   let transporter = nodemailer.createTransport({

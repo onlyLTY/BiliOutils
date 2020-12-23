@@ -21,7 +21,7 @@ export abstract class TaskConfig {
   static readonly BILI_TARGET_COINS: number =
     envToNumber('BILI_TARGET_COINS') ?? 5;
 
-  private static biliApiDelay = envSymbolArray('BILI_API_DELAY', ',', true);
+  private static biliApiDelay = envSymbolArray('BILI_API_DELAY');
   /** 调用api时的延迟(单位s),默认2s至6s */
   static readonly BILI_API_DELAY: number[] = TaskConfig.biliApiDelay.length
     ? TaskConfig.biliApiDelay
@@ -38,6 +38,10 @@ export abstract class TaskConfig {
 
   /** 最低剩余硬币数,默认0 */
   static readonly BILI_STAY_COINS: number = envToNumber('BILI_STAY_COINS') ?? 0;
+
+  /** 是否精准匹配UP主的视频 */
+  static readonly BILI_UPPER_ACC_MATCH: any =
+    process.env.BILI_UPPER_ACC_MATCH || 'true';
 }
 
 //任务完成情况统计

@@ -106,14 +106,18 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
 
 /**
  * 获取指定up主的随机视频
- * @param id up主ip
+ * @param uid up主ip
  */
-export async function getAidByUp(id: number): Promise<AidInfo> {
+export async function getAidByUp(uid: number): Promise<AidInfo> {
   try {
-    const { message, data, code } = await getVideosByUpId(id);
+    const { message, data, code } = await getVideosByUpId(uid);
 
     if (code == 0) {
-      const avList = data.media_list;
+      let avList = data.media_list;
+
+      if (TaskConfig.BILI_UPPER_ACC_MATCH === 'true') {
+        avList = avList.filter((el) => uid === el.upper?.mid);
+      }
       const { id, title, upper } = avList[random(avList.length - 1)];
       return {
         msg: '0',
@@ -164,6 +168,7 @@ export async function getAidByByPriority() {
       if (data.msg === '0') return data;
     }
 
-    return { msg: '没有找到视频', data: {} };
+    console.warn('错误信息: ', errInfo);
   }
+  return { msg: '没有找到视频', data: {} };
 }
