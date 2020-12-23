@@ -33,11 +33,8 @@ export function apiDelay(delayTime?: number) {
  * random(2,6) --> [2,6]
  * random(9)   --> [0,9]
  */
-export function random(min: number = 0, max: number = 1): number {
-  if (min !== undefined && max === undefined) {
-    max = min;
-    min = 0;
-  } else if (max < min) {
+export function random(min: number = 1, max: number = 0): number {
+  if (max < min) {
     //写反顺序后
     let temp = max;
     max = min;
