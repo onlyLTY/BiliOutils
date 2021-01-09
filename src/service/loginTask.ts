@@ -22,7 +22,7 @@ export default async function loginTask() {
       /**等级相关信息 */
       const levelInfo = data.level_info;
       const currentLevel = levelInfo.current_level;
-      //判断是否还需要投币
+      //判断当前等级是否还需要投币
       if (currentLevel >= TaskConfig.BILI_TARGET_LEVEL) {
         TaskModule.coinsTask = 0;
       }
@@ -39,7 +39,7 @@ export default async function loginTask() {
       }
 
       /**大会员信息 */
-      let vipTypeMsg: string = '无';
+      let vipTypeMsg: string = '';
 
       switch (data.vipType) {
         case 0:
@@ -56,7 +56,8 @@ export default async function loginTask() {
 
       //判断是否过期,因为即使大会员过期,下面也会显示
       if (data.vipStatus === 0) {
-        vipTypeMsg = vipTypeMsg === '无' ? vipTypeMsg : vipTypeMsg + '[已过期]';
+        vipTypeMsg =
+          vipTypeMsg === '无大会员' ? vipTypeMsg : vipTypeMsg + '[已过期]';
       }
 
       console.log('大会员状态: ', vipTypeMsg);

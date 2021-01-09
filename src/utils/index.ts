@@ -1,4 +1,3 @@
-import { resolve } from 'path';
 import { TaskConfig } from '../config/globalVar';
 import sendMail from './email';
 import scSend from './serverChan';

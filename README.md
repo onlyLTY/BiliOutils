@@ -30,7 +30,8 @@
 ### 变量说明
 
 在自己的设备使用时,按照`.env.example`的格式填写变量,并保存为`.env`文件。在 github action 使用时直接更改`.env.example`中的内容,不需要更名为`.env`  
-在`github`上使用时,`.env`中不要包含隐私信息,`USERID`,`SESSDATA`,`BILIJCT`以及 severless 运营商的 SECRET 都应该使用`github secrets`保存  
+在`github`上使用时,`.env`中不要包含隐私信息,`USERID`,`COOKIE`,`BILIJCT`以及 severless 运营商的 SECRET 都应该使用`github secrets`保存  
+`COOKIE`是直接在浏览器中复制的 `cookie`,不再和之前一样选取三者组合
 变量优先级`系统环境变量(包括github secrets)` >> `.env变量`
 
 ![github secrets](https://cdn.jsdelivr.net/gh/catlair/BiliTools@main/images/secrets.png)
@@ -38,10 +39,11 @@
 | 变量名               | 说明                                                                             | 举例              |
 | -------------------- | -------------------------------------------------------------------------------- | ----------------- |
 | USERID               | 【必选】b 站用户 uid                                                             | -                 |
-| SESSDATA             | 【必选】                                                                         | -                 |
+| COOKIE               | 【必选】                                                                         | -                 |
 | BILIJCT              | 【必选】                                                                         | -                 |
 | TENCENT_SECRET_ID    | 【腾讯 serverless 必选】                                                         | -                 |
 | TENCENT_SECRET_KEY   | 【腾讯 serverless 必选】                                                         | -                 |
+| USER_AGENT           | 用户代理(浏览器标识)                                                             | \*                |
 | BILI_TARGET_COINS    | 每日投币目标(包括自己通过其他方式投的)                                           | 5                 |
 | BILI_CUSTOMIZE_UP    | 视频转发、播放、投币优先考虑的 up 主 uid(英文逗号分隔)                           | xxx,xxx,xxx       |
 | BILI_API_DELAY       | 调用 api 的时间间隔(单位秒)，可填一个数字，或逗号分隔的两个数字(最小值及最大值)  | 6                 |

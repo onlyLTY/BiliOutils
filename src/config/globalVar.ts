@@ -12,7 +12,8 @@ export abstract class TaskConfig {
   static readonly SESSDATA: string = process.env.SESSDATA;
 
   /**用于鉴权的cookie 必须传入USERID,SESSDATA,BILIJCT三个环境变量*/
-  static readonly COOKIT: string = `DedeUserID=${TaskConfig.USERID};SESSDATA=${TaskConfig.SESSDATA};bili_jct=${TaskConfig.BILIJCT};`;
+  /** 直接复制全部吧 */
+  static COOKIT: string = process.env.COOKIE;
 
   /**【可选】用户代理(浏览器) */
   static readonly USER_AGENT: string = process.env.USER_AGENT;
