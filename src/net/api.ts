@@ -4,7 +4,7 @@ import getCookie from '../config/cookie';
 
 const res = (res) => {
   const setCookie = res.headers?.['set-cookie'] || [];
-  TaskConfig.COOKIT = getCookie(TaskConfig.COOKIT, setCookie);
+  TaskConfig.COOKIE = getCookie(TaskConfig.COOKIE, setCookie);
   return res;
 };
 

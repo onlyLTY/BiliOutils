@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { TaskConfig } from '../config/globalVar';
 
-axios.defaults.headers['Cookie'] = TaskConfig.COOKIT;
+axios.defaults.headers['Cookie'] = TaskConfig.COOKIE;
 
 axios.defaults.withCredentials = true;
 

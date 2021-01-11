@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  schedule: # 计划任务触发
+    - cron: '5 16 * * *'
 
 env:
   TENCENT_SECRET_ID: ${{secrets.TENCENT_SECRET_ID}}
@@ -16,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [14.x]
 
     steps:
       # 输出IP
@@ -33,7 +35,9 @@ jobs:
 
       # 环境
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
 
       # 安装依赖
       - name: Install dependencies
@@ -55,9 +59,10 @@ jobs:
           echo SERVER_SCKEY=${{secrets.SERVER_SCKEY}} >> .env
           echo NODE_MAIL=${{secrets.NODE_MAIL}} >> .env
           echo USERID=${{secrets.USERID}} >> .env
-          echo SESSDATA=${{secrets.SESSDATA}} >> .env
+          echo BILI_COOKIE=${{secrets.BILI_COOKIE}} >> .env
           echo BILIJCT=${{secrets.BILIJCT}} >> .env
           echo BILI_JCT=${{secrets.BILI_JCT}} >> .env
+          echo BILI_CUSTOMIZE_UP=${{secrets.BILI_CUSTOMIZE_UP}} >> .env
 
       # 部署
       - name: Deploy APP

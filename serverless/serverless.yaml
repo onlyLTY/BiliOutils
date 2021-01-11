@@ -2,7 +2,7 @@ component: scf # 必填内容
 name: ap-chengdu_default_biliExp
 org: ''
 app: biliExp
-stage: dev
+stage: production
 inputs:
   name: biliExp
   src: ./dist
@@ -16,7 +16,7 @@ inputs:
     - timer: # 定时触发器
         parameters:
           # name: timer # 触发器名称，默认timer-${name}-${stage}
-          cronExpression: '55 43 22 * * * *' # 每天22点43分55秒触发
+          cronExpression: '${env.BILI_DAILY_CRON_EXPRESSION}' # 每天22点43分55秒触发
           enable: true
           argument: 日常任务
     - timer: # 定时触发器
