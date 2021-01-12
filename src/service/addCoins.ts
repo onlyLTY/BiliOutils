@@ -10,9 +10,10 @@ export default async function addCoins() {
     console.log('跳过投币,今日已完成');
     return;
   }
-  let i = 0;
+  let i = 0,
+    eCount = 0;
   //判断需要投币的数量
-  while (TaskModule.coinsTask) {
+  while (TaskModule.coinsTask && eCount < 5) {
     /**
      * 增加投币数据的稳定性,同时执行两个脚本也可能保持正常的投币数
      * 为啥会同时执行两个?不知道,可能我脑子有问题吧(狗头)
@@ -37,14 +38,23 @@ export default async function addCoins() {
           TaskModule.coinsTask--;
           i++;
           console.log(`给[${title}--up【${author}】]投币成功`);
+        } else {
+          eCount++;
+          if (coinData.code == -111) {
+            console.log(coinData.message, '无法继续进行投币');
+            break;
+          }
+          console.log('给up投币失败 ', coinData.code, coinData.message);
         }
       } catch (error) {
-        console.log('投币异常', error.message);
+        eCount++;
+        console.log('投币异常 ', error.message);
       } finally {
         await apiDelay(1500);
       }
     }
   }
+  if (eCount >= 5) console.log(`出现异常/错误5次，自动退出投币`);
   console.log(`一共成功投币${i}颗`);
   console.log(`硬币还剩${TaskModule.money}颗`);
 }

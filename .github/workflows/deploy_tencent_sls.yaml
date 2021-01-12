@@ -5,7 +5,8 @@ on:
     branches:
       - main
   schedule: # 计划任务触发
-    - cron: '5 16 * * *'
+    - cron: '5 16 * * *' # 每天0点5分执行
+  workflow_dispatch: #手动触发
 
 env:
   TENCENT_SECRET_ID: ${{secrets.TENCENT_SECRET_ID}}
@@ -63,6 +64,20 @@ jobs:
           echo BILIJCT=${{secrets.BILIJCT}} >> .env
           echo BILI_JCT=${{secrets.BILI_JCT}} >> .env
           echo BILI_CUSTOMIZE_UP=${{secrets.BILI_CUSTOMIZE_UP}} >> .env
+          echo USER_AGENT=${{secrets.USER_AGENT}} >> .env
+          echo BILI_DAILY_RUN_TIME=${{secrets.BILI_DAILY_RUN_TIME}} >> .env
+          echo BILI_TARGET_COINS=${{secrets.BILI_TARGET_COINS}} >> .env
+          echo BILI_API_DELAY=${{secrets.BILI_API_DELAY}} >> .env
+          echo BILI_COIN_RETRY_NUM=${{secrets.BILI_COIN_RETRY_NUM}} >> .env
+          echo BILI_UPPER_ACC_MATCH=${{secrets.BILI_UPPER_ACC_MATCH}} >> .env
+          echo '# 功能开关' >> .env
+          echo BILI_SILVER_2_COIN=${{secrets.BILI_SILVER_2_COIN}} >> .env
+          echo BILI_LIVE_SIGN=${{secrets.BILI_LIVE_SIGN}} >> .env
+          echo BILI_ADD_COINS=${{secrets.BILI_ADD_COINS}}  >> .env
+          echo BILI_MANGA_SIGN=${{secrets.BILI_MANGA_SIGN}} >> .env
+          echo BILI_SHARE_WATCH=${{secrets.BILI_SHARE_WATCH}} >> .env
+          echo BILI_GROUP_SIGN=${{secrets.BILI_GROUP_SIGN}} >> .env
+          echo BILI_JURY_VOTE=${{secrets.BILI_JURY_VOTE}} >> .env
 
       # 部署
       - name: Deploy APP
