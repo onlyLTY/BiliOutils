@@ -19,13 +19,15 @@
 
 ### 获取自己的 Cookie
 
-- 浏览器打开并登录[bilibili 网站](https://www.bilibili.com/)
-- 按 **F12** 打开"开发者工具"，依次点击 **应用程序/Application** -> **存储**-> **Cookies**
-- 找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。
+**目前暂时可以获取所有 cookie 保存为`BILI_COOKIE`,程序自动获取所需要的字段**
+
+- ~~浏览器打开并登录[bilibili 网站](https://www.bilibili.com/)~~
+- ~~按 **F12** 打开"开发者工具"，依次点击 **应用程序/Application** -> **存储**-> **Cookies**~~
+- ~~找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。~~
 
 ![获取Cookie图示](https://cdn.jsdelivr.net/gh/catlair/BiliTools@main/images/get-bilibili-web-cookie.jpg)
 
-**Token 有效期为 1 月，更改密码或过期失效,失效后需要重新登录获取**
+~~**Token 有效期为 1 月，更改密码或过期失效,失效后需要重新登录获取**~~
 
 ### 变量说明
 
@@ -38,12 +40,10 @@
 
 | 变量名               | 说明                                                                             | 举例              |
 | -------------------- | -------------------------------------------------------------------------------- | ----------------- |
-| USERID               | 【必选】b 站用户 uid                                                             | -                 |
 | BILI_COOKIE          | 【必选】                                                                         | -                 |
-| BILIJCT              | 【必选】                                                                         | -                 |
 | TENCENT_SECRET_ID    | 【腾讯 serverless 必选】                                                         | -                 |
 | TENCENT_SECRET_KEY   | 【腾讯 serverless 必选】                                                         | -                 |
-| USER_AGENT           | 用户代理(浏览器标识)                                                             | \*                |
+| USER_AGENT           | 【推荐】用户代理(浏览器标识)                                                     | \*                |
 | BILI_DAILY_RUN_TIME  | 每日运行时间范围(` 0 <= 时 < 24``0 <= 分 < 60 `),格式参考例子                    | 19:19:19-23:23:23 |
 | BILI_TARGET_COINS    | 每日投币目标(包括自己通过其他方式投的)                                           | 5                 |
 | BILI_CUSTOMIZE_UP    | 视频转发、播放、投币优先考虑的 up 主 uid(英文逗号分隔)                           | xxx,xxx,xxx       |

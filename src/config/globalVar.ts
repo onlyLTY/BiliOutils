@@ -1,15 +1,13 @@
-import { envSymbolArray, envToNumber } from './envUtil';
+import { envSymbolArray, envToNumber, getUserId, getBiliJct } from './envUtil';
 
 //默认的任务配置
 export abstract class TaskConfig {
   /**bilibili账号的jct */
-  static readonly BILIJCT: string = process.env.BILIJCT || process.env.BILI_JCT; //变量名兼容
+  static readonly BILIJCT: string =
+    getBiliJct() || process.env.BILIJCT || process.env.BILI_JCT; //变量名兼容
 
   /**操作用户的bilibili uid */
-  static readonly USERID: number = envToNumber('USERID');
-
-  /** 用于登录的token */
-  static readonly SESSDATA: string = process.env.SESSDATA;
+  static readonly USERID: number = getUserId() || envToNumber('USERID');
 
   /**用于鉴权的cookie 必须传入USERID,SESSDATA,BILIJCT三个环境变量*/
   /** 直接复制全部吧 */

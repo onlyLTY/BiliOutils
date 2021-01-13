@@ -58,3 +58,17 @@ export function isOnFunction(key: string): boolean | undefined {
     return false;
   }
 }
+
+export function getCookieItem(cookie: string, key: string) {
+  const reg = `(?:^|)${key}=([^;]*)(?:;|$)`;
+  const r = cookie.match(reg);
+  return r ? r[1] : null;
+}
+
+export function getUserId(): number {
+  return Number(getCookieItem(process.env.BILI_COOKIE, 'DedeUserID')) || 0;
+}
+
+export function getBiliJct(): string {
+  return getCookieItem(process.env.BILI_COOKIE, 'bili_jct') || '';
+}
