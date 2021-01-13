@@ -16,13 +16,13 @@ inputs:
     - timer: # 定时触发器
         parameters:
           # name: timer # 触发器名称，默认timer-${name}-${stage}
-          cronExpression: '@{env.BILI_DAILY_CRON_EXPRESSION}' # 每天22点43分55秒触发
+          cronExpression: '22 15 22 * * * *' # 每天22点43分55秒触发
           enable: true
           argument: 日常任务
     - timer: # 定时触发器
         parameters:
           name: jury-timer # 风纪委员触发
-          cronExpression: '@{env.BILI_JURY_CRON_EXPRESSION}' # 用11-16这几个小时来执行风纪委员任务
-          enable: @{env.BILI_JURY_VOTE}
+          cronExpression: '29 1/6 11-16 * * * *' # 用11-16这几个小时来执行风纪委员任务
+          enable: true
           argument: 评审任务
 # For more information: https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md

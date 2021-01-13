@@ -4,14 +4,15 @@
   "description": "this is BiliTools",
   "main": "index.ts",
   "scripts": {
+    "deploy:local": "npm run build && npm run deploy",
+    "build": "tsc && babel ./dist --out-dir ./dist",
+    "deploy": "node ./tools/updateSLS.js ./ && sls deploy --debug",
+    "dev": "ts-node ./src/run.ts",
+    "start": "node ./dist/run.js",
     "prebuild": "rm -rf dist/",
     "predeploy": "cp .env ./dist && rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
-    "build": "tsc && babel ./dist --out-dir ./dist",
     "postbuild": "cp ./src/config/*.json ./dist/config/ && rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
-    "deploy": "node ./tools/updateSLS.js ./ && sls deploy --debug",
-    "postdeploy": "rm -f ./serverless.yaml",
-    "dev": "ts-node ./src/run.ts",
-    "start": "node ./dist/run.js"
+    "postdeploy": "rm -f ./serverless.yaml"
   },
   "author": "catlair",
   "license": "ISC",

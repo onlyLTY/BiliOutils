@@ -28,6 +28,7 @@ exports.main_handler = async (event, _context) => {
       return '跳过执行';
     }
     try {
+      apiDelay(random(60000));
       await doOneJuryVote(random(30000, 60000));
     } catch (error) {
       console.log(error);
