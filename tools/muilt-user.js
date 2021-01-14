@@ -6,13 +6,13 @@ const updateSLS = require('./updateSLS');
 
 json?.account.forEach((el) => {
   new updateSLS()
-    .openJuryVote(el.juryVote)
+    .openJuryVote(el.function?.judgement)
     .randomDailyRunTime(el.dailyRunTime)
     .randomJuryRunTime()
-    .updateDescription(el.sls.description)
-    .updateRegion(el.sls.region)
-    .updateComponentAppName(el.sls.appName)
-    .updateSCFName(el.sls.name)
+    .updateDescription(el.sls?.description)
+    .updateRegion(el.sls?.region)
+    .updateComponentAppName(el.sls?.appName)
+    .updateSCFName(el.sls?.name)
     .update(`serverless.yaml`);
 
   delete el.sls;
