@@ -5,20 +5,18 @@ import bili, { doOneJuryVote, loginTask, taskReward } from './service';
 import { offFunctions } from './config/envConfigOffFun';
 import { JuryTask, TaskModule } from './config/globalVar';
 
-exports.main_handler = async (event, _context) => {
+interface Event {
+  Type?: string; //timer
+  TriggerName?: string;
+  Time?: string; //2019-02-21T11:49:00Z
+  Message?: string;
+}
+
+exports.main_handler = async (event: Event, _context) => {
   //必须得写在main_handler中,否则serverless无效
-  console.log = warpLog();
+  console.log = warpLog('appInfo');
 
   const biliArr = offFunctions([...Object.values(bili)]);
-
-  /**  
-    {
-     "Type":"timer",
-     "TriggerName":"EveryDay",
-     "Time":"2019-02-21T11:49:00Z",
-     "Message":"您输入的附加信息"
-   }
-   **/
 
   // 只有serverless才有event
   if (event === undefined) event = {};
@@ -27,6 +25,9 @@ exports.main_handler = async (event, _context) => {
       console.log(JuryTask.noRunMessage, JuryTask.dailyCompleteCount++);
       return '跳过执行';
     }
+
+    console.log = warpLog('juryInfo');
+
     try {
       apiDelay(random(60000));
       await doOneJuryVote(random(30000, 60000));
@@ -34,8 +35,25 @@ exports.main_handler = async (event, _context) => {
       console.log(error);
     }
     if (JuryTask.dailyCompleteCount === 1) {
-      sendMessage('bili风纪任务完成', TaskModule.appInfo);
+      sendMessage('bili风纪任务完成', TaskModule.juryInfo);
+      return '评审任务完成';
     }
+
+    let endTime: string[] = ['24', '60'];
+    if (event.Message) {
+      const time = event.Message.split('评审任务')[1];
+      time && (endTime = time.split('-'));
+    }
+    let date = new Date();
+    if (date.getHours() > +endTime[0]) {
+      sendMessage('今日审核任务超时', TaskModule.juryInfo);
+      return '今日评审超时';
+    }
+    if (date.getHours() === +endTime[0] && date.getMinutes() >= +endTime[1]) {
+      sendMessage('今日审核任务超时', TaskModule.juryInfo);
+      return '今日评审超时';
+    }
+
     return '评审任务';
   }
   try {

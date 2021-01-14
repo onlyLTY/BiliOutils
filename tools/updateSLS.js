@@ -66,9 +66,14 @@ writeFileSync(
     minutes = randomInt(5, 9),
     seconds = randomInt(60);
 
-  const endHours = Math.ceil((minutes * 2) / 3 + 0.4) + startHours;
+  const endHours = Math.floor(minutes * 0.67) + startHours;
 
   const DAILY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
+
+  let min = startMinutes;
+  while ((min += minutes) < 60) {}
+  min -= minutes;
+
   writeFileSync(
     dest,
     readFileSync(dest)
@@ -77,5 +82,10 @@ writeFileSync(
         /(?<=')@{env.BILI_JURY_CRON_EXPRESSION}(?=')/g,
         `${DAILY_CRON_EXPRESSION}`
       )
+      .replace(
+        'argument: 评审任务',
+        `argument: 评审任务${endHours}-${min}`
+      )
   );
 })();
+ 

@@ -9,7 +9,7 @@ import { TaskModule } from '../config/globalVar';
  */
 const _log = console.log;
 
-function warpLog() {
+function warpLog(infoName: 'appInfo' | 'juryInfo') {
   return (message?: any, ...optionalParams: any[]): void => {
     let msgStr = message;
     for (const m of optionalParams) {
@@ -22,7 +22,7 @@ function warpLog() {
       bjHours = bjHoursStr.length === 1 ? '0' + bjHoursStr : bjHoursStr,
       TIME = `[${bjHours + ISO_TIME.replace(/^\w{2}/, '')}] `;
     _log(TIME, message, ...optionalParams);
-    TaskModule.appInfo += TIME + msgStr + '\n';
+    TaskModule[infoName] += TIME + msgStr + '\n';
   };
 }
 

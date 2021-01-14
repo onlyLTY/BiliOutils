@@ -53,8 +53,10 @@ export abstract class TaskModule {
   static share: boolean = false;
   /**今日是否已经观看视频 */
   static watch: boolean = false;
-  /** 执行任务产生的消息 */
+  /** 执行每日任务产生的消息 */
   static appInfo: string = '\n';
+  /** 执行jury任务产生的消息 */
+  static juryInfo: string = '\n';
 }
 
 //风纪委员情况
