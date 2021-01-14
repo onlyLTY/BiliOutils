@@ -50,37 +50,21 @@ jobs:
       - name: Build APP
         run: npm run build
 
-      - name: 生成.env文件存储某些隐私数据
+      - name: 生成config.temp.json文件
         run: |
           if [ -z "$TENCENT_SECRET_ID" ]; then
           echo "部署至腾讯云需要填写TENCENT_SECRET_ID和TENCENT_SECRET_KEY两个secrets"
           exit -1
           fi
-          mv -n .env.example .env
-          echo SERVER_SCKEY=${{secrets.SERVER_SCKEY}} >> .env
-          echo NODE_MAIL=${{secrets.NODE_MAIL}} >> .env
-          echo BILI_COOKIE=${{secrets.BILI_COOKIE}} >> .env
-          echo BILI_CUSTOMIZE_UP=${{secrets.BILI_CUSTOMIZE_UP}} >> .env
-          echo USER_AGENT=${{secrets.USER_AGENT}} >> .env
-          echo BILI_DAILY_RUN_TIME=${{secrets.BILI_DAILY_RUN_TIME}} >> .env
-          echo BILI_TARGET_COINS=${{secrets.BILI_TARGET_COINS}} >> .env
-          echo BILI_API_DELAY=${{secrets.BILI_API_DELAY}} >> .env
-          echo BILI_COIN_RETRY_NUM=${{secrets.BILI_COIN_RETRY_NUM}} >> .env
-          echo BILI_UPPER_ACC_MATCH=${{secrets.BILI_UPPER_ACC_MATCH}} >> .env
-          echo '# 功能开关' >> .env
-          echo BILI_SILVER_2_COIN=${{secrets.BILI_SILVER_2_COIN}} >> .env
-          echo BILI_LIVE_SIGN=${{secrets.BILI_LIVE_SIGN}} >> .env
-          echo BILI_ADD_COINS=${{secrets.BILI_ADD_COINS}}  >> .env
-          echo BILI_MANGA_SIGN=${{secrets.BILI_MANGA_SIGN}} >> .env
-          echo BILI_SHARE_WATCH=${{secrets.BILI_SHARE_WATCH}} >> .env
-          echo BILI_GROUP_SIGN=${{secrets.BILI_GROUP_SIGN}} >> .env
-          echo BILI_JURY_VOTE=${{secrets.BILI_JURY_VOTE}} >> .env
-          echo '# 过时变量'  >> .env
-          echo BILIJCT=${{secrets.BILIJCT}} >> .env
-          echo BILI_JCT=${{secrets.BILI_JCT}} >> .env
-          echo USERID=${{secrets.USERID}} >> .env
-          echo SESSDATA=${{secrets.SESSDATA}} >> .env
+          string="${{ secrets.BILI_CONFIG }}"
+          if [ -n "$string" ]; then
+          echo "$string" >> ./config/config.temp.txt
+          echo "成功将secrets(BILI_CONFIG)内容输出到配置文件config.temp.txt"
+          node ./tools/processConfig.js
+          echo "成功转换成config.temp.json"
+          exit 0
+          fi
 
       # 部署
-      - name: Deploy APP
-        run: npm run deploy
+      - name: 部署多用户程序
+        run: npm run deploy:muilt
