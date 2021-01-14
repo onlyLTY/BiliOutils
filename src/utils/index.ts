@@ -1,6 +1,7 @@
 import { TaskConfig } from '../config/globalVar';
 import sendMail from './email';
 import scSend from './serverChan';
+export * from './cookie';
 
 /**
  * 异步延迟函数
@@ -13,15 +14,12 @@ export function apiDelay(delayTime?: number) {
   if (API_DELAY.length === 1) {
     delay = API_DELAY[0] * 1000;
   } else {
-    delay = random(API_DELAY[0], API_DELAY[1]) * 1000;
+    delay = random(API_DELAY[0] || 2, API_DELAY[1] || 6) * 1000;
   }
   delay = delayTime || delay;
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('doing');
-    }, delay);
-  });
+  let startTime = new Date().getTime() + parseInt(delay, 10);
+  while (new Date().getTime() < startTime) {}
 }
 
 /**

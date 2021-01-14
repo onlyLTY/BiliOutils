@@ -115,7 +115,7 @@ export async function getAidByUp(uid: number): Promise<AidInfo> {
     if (code == 0) {
       let avList = data.media_list;
 
-      if (TaskConfig.BILI_UPPER_ACC_MATCH === 'true') {
+      if (TaskConfig.BILI_UPPER_ACC_MATCH === true) {
         avList = avList.filter((el) => uid === el.upper?.mid);
       }
       const { id, title, upper } = avList[random(avList.length - 1)];
@@ -158,7 +158,7 @@ export async function getAidByByPriority() {
     data = await fun();
     if (data.msg === '0') return data;
 
-    let i = Number(process.env.BILI_COIN_RETRY_NUM ?? 4);
+    let i = Number(TaskConfig.BILI_COIN_RETRY_NUM ?? 4);
     i = i < 1 ? 1 : i > 8 ? 8 : i;
     while (i--) {
       errInfo.push({ funName: fun.name, message: data.msg });

@@ -1,14 +1,14 @@
 component: scf # 必填内容
-name: ap-chengdu_default_biliExp
+name: catlair_BiliExpTools
 org: ''
-app: biliExp
+app: @{env.COMPONENT_APP_NAME}
 stage: production
 inputs:
-  name: biliExp
+  name: @{env.SCF_NAME}
   src: ./dist
   runtime: Nodejs12.16
-  region: ap-chengdu
-  description: bilibili小工具
+  region: @{env.SCF_REGION}
+  description: @{env.SCF_DESCRIPTION}
   handler: index.main_handler
   memorySize: 64
   timeout: 900

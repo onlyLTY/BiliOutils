@@ -1,8 +1,9 @@
+import { TaskConfig } from '../config/globalVar';
 import { stringify } from 'qs';
 import axios from '../net';
 
 export default function scSend(text: string, desp: string): void {
-  const sckey = process.env.SERVER_SCKEY;
+  const sckey = TaskConfig.config.message?.serverChan;
   if (!sckey) return;
   axios
     .post(

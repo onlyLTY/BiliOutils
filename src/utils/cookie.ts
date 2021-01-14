@@ -1,3 +1,13 @@
+import { Config } from '../interface/Config';
+
+let config: Config;
+
+try {
+  config = require('../config/config.json');
+} catch (error) {
+  config = require('../../config/config.json');
+}
+
 function getCookieArray(cookie: string | undefined) {
   if (!cookie) return [];
   return cookie.split('; ').map((el) => el.split('='));
@@ -38,4 +48,19 @@ export default function (cookie: string, setCookie: []) {
   if (!setCookie || setCookie.length === 0) return cookie;
 
   return getCookieString(cookie2Obj(cookie, setCookie));
+}
+
+export function getCookieItem(cookie: string, key: string) {
+  if (!cookie) return null;
+  const reg = `(?:^|)${key}=([^;]*)(?:;|$)`;
+  const r = cookie.match(reg);
+  return r ? r[1] : null;
+}
+
+export function getUserId(): number {
+  return Number(getCookieItem(config.cookie, 'DedeUserID')) || 0;
+}
+
+export function getBiliJct(): string {
+  return getCookieItem(config.cookie, 'bili_jct') || '';
 }

@@ -6,11 +6,12 @@
   "scripts": {
     "deploy:local": "npm run build && npm run deploy",
     "build": "tsc && babel ./dist --out-dir ./dist",
-    "deploy": "node ./tools/updateSLS.js ./ && sls deploy --debug",
+    "deploy": "sls deploy --debug",
+    "deploy:muilt": "node tools/muilt-user.js",
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js",
     "prebuild": "rm -rf dist/",
-    "predeploy": "cp .env ./dist && rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
+    "predeploy": "rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
     "postbuild": "cp ./src/config/*.json ./dist/config/ && rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
     "postdeploy": "rm -f ./serverless.yaml"
   },

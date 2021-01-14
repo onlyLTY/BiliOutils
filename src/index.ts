@@ -2,7 +2,7 @@ require('dotenv').config();
 import { _log, warpLog } from './utils/log';
 import { apiDelay, random, sendMessage } from './utils';
 import bili, { doOneJuryVote, loginTask, taskReward } from './service';
-import { offFunctions } from './config/envConfigOffFun';
+import { offFunctions } from './config/configOffFun';
 import { JuryTask, TaskModule } from './config/globalVar';
 
 exports.main_handler = async (event, _context) => {

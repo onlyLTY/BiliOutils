@@ -1,6 +1,6 @@
 import axios from './index';
 import { TaskConfig } from '../config/globalVar';
-import getCookie from '../config/cookie';
+import getCookie from '../utils/cookie';
 
 const res = (res) => {
   const setCookie = res.headers?.['set-cookie'] || [];
