@@ -36,7 +36,7 @@ export abstract class TaskConfig {
     : [TaskConfig.biliApiDelay];
 
   /**自定义高优先级用户列表 */
-  static readonly BILI_CUSTOMIZE_UP: Array<number> = config.customizeUp;
+  static readonly BILI_CUSTOMIZE_UP: Array<number> = config.customizeUp || [];
 
   /** 目标等级 默认6级 */
   static readonly BILI_TARGET_LEVEL: number = config.targetLevel ?? 6;

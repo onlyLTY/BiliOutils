@@ -1,9 +1,8 @@
-require('dotenv').config();
 import { _log, warpLog } from './utils/log';
+import { JuryTask, TaskModule } from './config/globalVar';
 import { apiDelay, random, sendMessage } from './utils';
 import bili, { doOneJuryVote, loginTask, taskReward } from './service';
 import { offFunctions } from './config/configOffFun';
-import { JuryTask, TaskModule } from './config/globalVar';
 
 exports.main_handler = async (event, _context) => {
   //必须得写在main_handler中,否则serverless无效
