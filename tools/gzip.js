@@ -34,7 +34,7 @@ module.exports = (() => {
         return result;
       }
     } catch (e) {
-      return 'Error: 当前字符串不能被Gzip解密';
+      throw new Error('Error: 当前字符串不能被Gzip解密');
     }
   };
 

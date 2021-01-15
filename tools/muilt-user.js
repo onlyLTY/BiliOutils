@@ -39,16 +39,15 @@ json?.account.forEach((el) => {
 
   writeFileSync(
     resolve(process.cwd(), 'dist/config/config.json'),
-    JSON.stringify(el)
+    //格式化输出
+    JSON.stringify(el, null, '\t')
   );
 
-  cp.execSync('npm run deploy', function (error, stdout, stderr) {
-    if (error) {
-      console.error('部署失败', error);
-      return;
-    }
-    console.log('部署成功', el.sls.description, el.sls.name, el.sls.region);
+  try {
+    let stdout = cp.execSync('npm run deploy');
     console.log(stdout);
-    console.log(stderr);
-  });
+    console.log('部署成功');
+  } catch (error) {
+    console.error(error);
+  }
 });

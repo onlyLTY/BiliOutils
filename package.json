@@ -11,7 +11,7 @@
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js",
     "prebuild": "rm -rf dist/",
-    "predeploy": "rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
+    "predeploy:muilt": "rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
     "postbuild": "cp ./src/config/*.json ./dist/config/ && rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
     "postdeploy": "rm -f ./serverless.yaml"
   },
