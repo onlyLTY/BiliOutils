@@ -29,13 +29,13 @@
         "serverChan": "server酱的key" //如果填写具体内容则代表替换默认配置
       },
       "function": {
-        "silver2coin": true, // 是否开启功能[银瓜子兑换硬币]默认开启
-        "liveSign": true, //是否开启功能[直播签到]默认开启
+        "silver2Coin": true, // 是否开启功能[银瓜子兑换硬币]默认开启
+        "liveSignTask": true, //是否开启功能[直播签到]默认开启
         "addCoins": true, //是否开启功能[每日投币]默认开启
         "mangaSign": true, //是否开启功能[漫画签到]默认开启
-        "shareWatch": true, //是否开启功能[每日分享和观看]默认开启
-        "groupSign": true, //是否开启功能[应援团签到]默认开启
-        "juryVote": false //是否开启功能[风纪委员任务]默认关闭
+        "shareAndWatch": true, //是否开启功能[每日分享和观看]默认开启
+        "supGroupSign": true, //是否开启功能[应援团签到]默认开启
+        "judgement": false //是否开启功能[风纪委员任务]默认关闭
       },
       "cookie": "这是隐私请不要让他人看见", // 【必填】
       "stayCoins": 0, // 剩余硬币下限,避免投币把买皮肤都投了
@@ -54,6 +54,7 @@
         "region": "ap-guangzhou",
         "description": "小号"
       },
+      "message": true,
       "cookie": "klasjhkfhasf;safkasf;afhkaf;asfhksaf;",
       "dailyRunTime": "19:19:19-23:23:23"
     },
@@ -69,21 +70,16 @@
         "serverChan": "server酱的key"
       },
       "function": {
-        "silver2coin": true,
-        "liveSign": true,
-        "addCoins": true,
-        "mangaSign": true,
-        "shareWatch": true,
-        "groupSign": true,
-        "juryVote": false
+        "silver2Coin": true,
+        "liveSignTask": true,
+        "supGroupSign": true,
+        "judgement": false
       },
       "cookie": "这是隐私请不要让他人看见",
       "stayCoins": 0,
-      "userAgent": "",
       "dailyRunTime": "19:19:19-23:23:23",
       "targetCoins": 5,
       "targetLevel": 6,
-      "customizeUp": [],
       "coinRetryNum": 4,
       "apiDelay": [2, 6],
       "upperAccMatch": true

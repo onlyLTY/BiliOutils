@@ -44,8 +44,9 @@ json?.account.forEach((el) => {
   );
 
   try {
+    console.log('开始部署', el.sls?.name);
     let stdout = cp.execSync('npm run deploy');
-    console.log(stdout);
+    console.log(stdout.toString());
     console.log('部署成功');
   } catch (error) {
     console.error(error);

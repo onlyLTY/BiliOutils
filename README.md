@@ -17,89 +17,17 @@
 
 ## 使用方法
 
-### 获取自己的 Cookie
+**多用户版本说明暂缺(原因是除我之外也没人用啊)**
 
-**目前暂时可以获取所有 cookie 保存为`BILI_COOKIE`,程序自动获取所需要的字段**
+**目前只支持腾讯 serveless**
 
-- ~~浏览器打开并登录[bilibili 网站](https://www.bilibili.com/)~~
-- ~~按 **F12** 打开"开发者工具"，依次点击 **应用程序/Application** -> **存储**-> **Cookies**~~
-- ~~找到`DEDEUSERID`、`SESSDATA`、`bili_jct`三项，复制保存它们到记事本，待会儿会用到。~~
+通过部署多个云函数实现多用户,每日凌晨 action 会重新部署云函数,以此达到随机执行时间的效果
 
-![获取Cookie图示](https://cdn.jsdelivr.net/gh/catlair/BiliTools@main/images/get-bilibili-web-cookie.jpg)
+`config/config.demo.jsonc`中进行了三个用户的配置演示,使用单用户可以只配置一个
 
-~~**Token 有效期为 1 月，更改密码或过期失效,失效后需要重新登录获取**~~
+配置格式必须为严格的 json,不能有注释,[点我检测 json 是否合格](https://www.baidufe.com/fehelper/json-format/index.html)
 
-### 变量说明
-
-在自己的设备使用时,按照`.env.example`的格式填写变量,并保存为`.env`文件。在 github action 使用时直接更改`.env.example`中的内容,不需要更名为`.env`  
-在`github`上使用时,`.env`中不要包含隐私信息,`USERID`,`COOKIE`,`BILIJCT`以及 severless 运营商的 SECRET 都应该使用`github secrets`保存  
-`COOKIE`是直接在浏览器中复制的 `cookie`,不再和之前一样选取三者组合
-变量优先级`系统环境变量(包括github secrets)` >> `.env变量`
-
-![github secrets](https://cdn.jsdelivr.net/gh/catlair/BiliTools@main/images/secrets.png)
-
-| 变量名               | 说明                                                                             | 举例              |
-| -------------------- | -------------------------------------------------------------------------------- | ----------------- |
-| BILI_COOKIE          | 【必选】                                                                         | -                 |
-| TENCENT_SECRET_ID    | 【腾讯 serverless 必选】                                                         | -                 |
-| TENCENT_SECRET_KEY   | 【腾讯 serverless 必选】                                                         | -                 |
-| USER_AGENT           | 【推荐】用户代理(浏览器标识)                                                     | \*                |
-| BILI_DAILY_RUN_TIME  | 每日运行时间范围(` 0 <= 时 < 24``0 <= 分 < 60 `),格式参考例子                    | 19:19:19-23:23:23 |
-| BILI_TARGET_COINS    | 每日投币目标(包括自己通过其他方式投的)                                           | 5                 |
-| BILI_CUSTOMIZE_UP    | 视频转发、播放、投币优先考虑的 up 主 uid(英文逗号分隔)                           | xxx,xxx,xxx       |
-| BILI_API_DELAY       | 调用 api 的时间间隔(单位秒)，可填一个数字，或逗号分隔的两个数字(最小值及最大值)  | 6                 |
-| BILI_COIN_RETRY_NUM  | 投币任务,每种获取视频方式的重试次数(默认 4 次)                                   | 6                 |
-| BILI_UPPER_ACC_MATCH | 是否精准匹配 up,排除通过 uid 搜索到的视频是别人发的合作视频(避免投币给非指定 up) | false (默认 true) |
-
-可以把变量设置`false`关闭部分功能,`true`开启指定功能
-
-| 变量名             | 说明                                  | 默认值 |
-| ------------------ | ------------------------------------- | ------ |
-| BILI_SILVER_2_COIN | 银瓜子兑换硬币                        | true   |
-| BILI_LIVE_SIGN     | 直播签到                              | true   |
-| BILI_ADD_COINS     | 每日投币(将投币数设置成 0 也可以关闭) | true   |
-| BILI_MANGA_SIGN    | 漫画签到                              | true   |
-| BILI_SHARE_WATCH   | 每日视频分享/播放(懒得分开写)         | true   |
-| BILI_GROUP_SIGN    | 应援团签到                            | true   |
-| BILI_JURY_VOTE     | 风纪投票                              | false  |
-
-## 消息推送
-
-### server 酱
-
-去 server 酱官网申请 sckey,并设置环境变量`SERVER_SCKEY`存放 sckey
-
-### email
-
-去邮箱官网开启`SMTP`服务,并保存获得的授权密码
-
-设置如下格式的环境变量(英文逗号分割选项,163 邮箱举例)  
-`NODE_MAIL=发送邮箱@163.com,smtp授权密码,接收邮箱@qq.com,smtp.163.com`  
-`smtp.163.com` ssl 加密默认端口`465`
-
-如果不采用安全模式发送,需要在最后加上端口  
-`NODE_MAIL=发送邮箱@163.com,smtp授权密码,接收邮箱@qq.com,smtp.163.com,端口`
-
-收件邮箱最好将发件邮箱设置为白名单,或者收件邮箱和发件邮箱一致  
-暂不支持多个接收邮箱
-
-### 本地/服务器使用
-
-需要安装 typescript
-
-```bash
-  npm run build
-```
-
-```bash
-  npm run start
-```
-
-也可以从计算机部署 serverless
-
-### github action
-
-`.github/workflows/bilibili-task.yaml`
+配置的 json 经过 gzip 压缩后([点我 zip 压缩](https://www.baidufe.com/fehelper/en-decode/index.html))再填入`secrets`配置名为`BILI_CONFIG`
 
 ### 腾讯云 serverless
 
@@ -108,12 +36,6 @@
 获取 key 参考[腾讯云权限管理](https://cloud.tencent.com/document/product/583/44786)
 
 `.github/workflows/deploy_tencent_sls.yaml`
-
-## 关于多用户
-
-~~个人没有需求~~  
-~~暂时可以直接复制 serverless 达成多用户需求~~
-多用户分支开发中
 
 ## API 参考
 

@@ -20,6 +20,10 @@ export function apiDelay(delayTime?: number) {
 
   let startTime = new Date().getTime() + parseInt(delay, 10);
   while (new Date().getTime() < startTime) {}
+
+  return new Promise((resolve) => {
+    resolve('done');
+  });
 }
 
 /**
