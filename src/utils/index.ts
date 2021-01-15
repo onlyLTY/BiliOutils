@@ -16,11 +16,11 @@ export function apiDelay(delayTime?: number) {
     delay = random(API_DELAY[0], API_DELAY[1]) * 1000;
   }
   delay = delayTime || delay;
+  let startTime = new Date().getTime() + parseInt(delay, 10);
+  while (new Date().getTime() < startTime) {}
 
   return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('doing');
-    }, delay);
+    resolve('doing');
   });
 }
 

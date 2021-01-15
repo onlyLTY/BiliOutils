@@ -4,4 +4,4 @@ dist/
 /temp/**
 /config/config.json
 /serverless.yaml
-/config/config.temp.json
+/config/config.temp.*
