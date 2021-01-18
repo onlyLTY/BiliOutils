@@ -25,9 +25,15 @@
 
 `config/config.demo.jsonc`中进行了三个用户的配置演示,使用单用户可以只配置一个
 
-配置格式必须为严格的 json,不能有注释,[点我检测 json 是否合格](https://www.baidufe.com/fehelper/json-format/index.html)
+~~配置格式必须为严格的 json,不能有注释,[点我检测 json 是否合格](https://www.baidufe.com/fehelper/json-format/index.html)~~
 
-配置的 json 经过 gzip 压缩后([点我 zip 压缩](https://www.baidufe.com/fehelper/en-decode/index.html))再填入`secrets`配置名为`BILI_CONFIG`
+~~配置的 json 经过 gzip 压缩后([点我 zip 压缩](https://www.baidufe.com/fehelper/en-decode/index.html))再填入`secrets`配置名为`BILI_CONFIG`~~
+
+填写表单就能够获取配置了`[初步测试版]`<https://catlair.gitee.io/bili-tools-docs-deploy/>
+
+使用时请不要刷新哦(404 警告)
+
+[仓库地址](https://github.com/catlair/BiliTools-docs)
 
 ### 腾讯云 serverless
 
