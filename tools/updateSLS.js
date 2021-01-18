@@ -2,7 +2,7 @@ const { randomInt } = require('crypto');
 const { writeFileSync, readFileSync } = require('fs');
 const { resolve } = require('path');
 
-module.exports = function () {
+module.exports = function() {
   this.rootPath = process.cwd();
   this.dest = resolve(this.rootPath, 'serverless.yaml');
   // new时读取string
@@ -14,7 +14,7 @@ module.exports = function () {
    * 写入文件
    * @param {string} dest 目标地址(默认/serverless)
    */
-  this.writeFile = (dest) => {
+  this.writeFile = dest => {
     writeFileSync(dest || this.dest, this.destString);
     return this;
   };
@@ -25,7 +25,7 @@ module.exports = function () {
    * 是否开启风纪委员任务执行
    * @param {boolen} isOpenJuryVote
    */
-  this.openJuryVote = (isOpenJuryVote) => {
+  this.openJuryVote = isOpenJuryVote => {
     this.destString = this.destString.replace(
       /\B@{env\.BILI_JURY_VOTE}\B/g,
       `${isOpenJuryVote || false}`
@@ -37,7 +37,7 @@ module.exports = function () {
    * 更新组件app名
    * @param {string} componentAppName 默认''
    */
-  this.updateComponentAppName = (componentAppName) => {
+  this.updateComponentAppName = componentAppName => {
     this.destString = this.destString.replace(
       /\B@{env\.COMPONENT_APP_NAME}\B/g,
       componentAppName || `''`
@@ -50,7 +50,7 @@ module.exports = function () {
    * 函数名
    * @param {string} scfName (必须参数)
    */
-  this.updateSCFName = (scfName) => {
+  this.updateSCFName = scfName => {
     if (!scfName) {
       throw new Error('没有设置serverless函数名,无法进行部署');
     }
@@ -62,7 +62,7 @@ module.exports = function () {
    * 函数运行地域(默认成都)
    * @param {string} region
    */
-  this.updateRegion = (region) => {
+  this.updateRegion = region => {
     this.destString = this.destString.replace(
       /\B@{env\.SCF_REGION}\B/g,
       region || 'ap-chengdu'
@@ -74,7 +74,7 @@ module.exports = function () {
    * 函数描述
    * @param {string} description
    */
-  this.updateDescription = (description) => {
+  this.updateDescription = description => {
     this.destString = this.destString.replace(
       /\B@{env\.SCF_DESCRIPTION}\B/g,
       description || '可以填写识别该函数是哪个账号用'
@@ -86,7 +86,7 @@ module.exports = function () {
    * 提交时设置执行时间
    * @param {string} dailyRunTime 每日任务时间
    */
-  this.randomDailyRunTime = (dailyRunTime) => {
+  this.randomDailyRunTime = dailyRunTime => {
     const BILI_DAILY_RUN_TIME = dailyRunTime || '17:30:00-23:40:00';
     const taskTime = BILI_DAILY_RUN_TIME.split('-');
     const startTime = taskTime[0].split(':');
@@ -121,12 +121,13 @@ module.exports = function () {
   /** 风纪任务随机时间设置 */
   this.randomJuryRunTime = () => {
     //完成任务需要20次，暂时设计大约执行40次
-    const startHours = randomInt(10, 13), //10,11,12
+    const startHours = randomInt(10, 12), //10,11
       startMinutes = randomInt(6), // 0 - 5
-      minutes = randomInt(5, 9),
+      minutes = randomInt(2, 5),
       seconds = randomInt(60);
 
-    const endHours = Math.floor(minutes * 0.667) + startHours;
+    // const endHours = Math.floor(minutes * 0.667) + startHours;
+    const endHours = 5 + startHours;
 
     const DAILY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
     this.destString = this.destString.replace(

@@ -4,15 +4,17 @@ const { resolve } = require('path');
 const json = require('../config/config.temp.json');
 const updateSLS = require('./updateSLS');
 
-json?.account.forEach((el) => {
+json?.account.forEach(el => {
+  const sls = JSON.parse(JSON.stringify(el.sls));
+
   new updateSLS()
     .openJuryVote(el.function?.judgement)
     .randomDailyRunTime(el.dailyRunTime)
     .randomJuryRunTime()
-    .updateDescription(el.sls?.description)
-    .updateRegion(el.sls?.region)
-    .updateComponentAppName(el.sls?.appName)
-    .updateSCFName(el.sls?.name)
+    .updateDescription(sls?.description)
+    .updateRegion(sls?.region)
+    .updateComponentAppName(sls?.appName)
+    .updateSCFName(sls?.name)
     .update(`serverless.yaml`);
 
   delete el.sls;
@@ -43,11 +45,13 @@ json?.account.forEach((el) => {
     JSON.stringify(el, null, '\t')
   );
 
+  console.log('开始部署', sls?.name);
+  console.log('地区', sls?.region);
+  console.log('描述', sls?.description);
   try {
-    console.log('开始部署', el.sls?.name);
     let stdout = cp.execSync('npm run deploy');
     console.log(stdout.toString());
-    console.log('部署成功');
+    console.log('部署成功\n\n');
   } catch (error) {
     console.error(error);
   }
