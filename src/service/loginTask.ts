@@ -2,6 +2,15 @@ import { loginByCookie, getCoinBalance } from '../net/userInfoRequest';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 
+function estimatedDays(upLevelExp: number): number {
+  const dailyExp = TaskConfig.BILI_TARGET_COINS * 10 + 15;
+  const idealDays = upLevelExp / dailyExp;
+  const coinSupportDays = TaskModule.money / (TaskConfig.BILI_TARGET_COINS - 1);
+  if (idealDays < coinSupportDays) return Math.floor(idealDays);
+  const needExp = upLevelExp - coinSupportDays * dailyExp;
+  return Math.floor(needExp / 25 + coinSupportDays);
+}
+
 export default async function loginTask() {
   console.log('----【登录】----');
   try {
@@ -31,10 +40,9 @@ export default async function loginTask() {
         console.log('已经满级,不需要再投币了,做个白嫖怪吧');
       } else {
         const upLevelExp = levelInfo.next_exp - levelInfo.current_exp;
-        const upLevelDate =
-          upLevelExp / (TaskConfig.BILI_TARGET_COINS * 10 + 15);
+        //实际天数肯定会少一些
         console.log(
-          `距离升级还需要${upLevelExp}经验,预计${upLevelDate.toFixed()}天`
+          `距离升级还需要${upLevelExp}经验,预计${estimatedDays(upLevelExp)}天`
         );
       }
 
