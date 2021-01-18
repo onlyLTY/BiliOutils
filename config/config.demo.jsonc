@@ -6,7 +6,7 @@
       "to": "收件邮箱",
       "pass": "发件邮箱授权码",
       "host": "例如smtp.163.com",
-      "port": "465"
+      "port": 465
     },
     "serverChan": "server酱的key"
   },

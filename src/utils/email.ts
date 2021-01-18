@@ -7,21 +7,23 @@ export default async function sendMail(title: string, text: string) {
   const user = TaskConfig.config.message?.email;
   if (!user || !user.pass || !user.from || !user.host) return;
 
+  const port: number = Number(user.port) || 465;
+
   let transporter = nodemailer.createTransport({
     host: user.host,
-    port: user.port || 465,
-    secure: user.port === 465 ? false : true, // true for 465, false for other ports
+    port: port,
+    secure: port === 465, // true for 465, false for other ports
     auth: {
       user: user.from,
-      pass: user.pass,
-    },
+      pass: user.pass
+    }
   });
 
   let info = await transporter.sendMail({
     from: `"BiliTools任务" <${user.from}>`, // sender address
     to: user.to, // list of receivers
     subject: title, // Subject line
-    text: text, // plain text body
+    text: text // plain text body
     // html: '<b>Hello world?</b>', // html body
   });
 
