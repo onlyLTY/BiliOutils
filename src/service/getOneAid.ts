@@ -108,7 +108,8 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
  * 获取指定up主的随机视频
  * @param uid up主ip
  */
-export async function getAidByUp(uid: number): Promise<AidInfo> {
+export async function getAidByUp(uid: number | string): Promise<AidInfo> {
+  uid = Number(uid)
   try {
     const { message, data, code } = await getVideosByUpId(uid);
 
