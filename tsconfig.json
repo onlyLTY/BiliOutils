@@ -4,7 +4,8 @@
     "removeComments": true,
     "target": "es2020",
     "outDir": "./dist",
-    "baseUrl": "./src"
+    "baseUrl": "./src",
+    "lib": ["esnext"]
   },
   "exclude": ["node_modules", "test", "temp", "dist", "**/*spec.ts"]
 }
