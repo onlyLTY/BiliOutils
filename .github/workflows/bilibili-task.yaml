@@ -3,9 +3,9 @@ name: bilibili-task
 on:
   workflow_dispatch: # 手动触发
   # schedule: # 计划任务触发
-    # - cron: '5 15 * * *'
-    # cron表达式，时区是UTC时间，比我们晚8小时，要用我们的时间减去8小时后填上去，如上所表示的是每天23点5分
-    # 建议每个人都修改下时间！不要使用默认时间！最好不要设定在整点，错开峰值，避免大量G站同一个IP在相同时间去请求B站接口，导致IP被禁！
+  # - cron: '5 15 * * *'
+  # cron表达式，时区是UTC时间，比我们晚8小时，要用我们的时间减去8小时后填上去，如上所表示的是每天23点5分
+  # 建议每个人都修改下时间！不要使用默认时间！最好不要设定在整点，错开峰值，避免大量G站同一个IP在相同时间去请求B站接口，导致IP被禁！
 
 jobs:
   run-bilibili-tool:
@@ -42,15 +42,21 @@ jobs:
       - name: Build APP
         run: npm run build
 
+      - name: 生成config.temp.json文件
+        run: |
+          if [ -z "$TENCENT_SECRET_ID" ]; then
+          echo "部署至腾讯云需要填写TENCENT_SECRET_ID和TENCENT_SECRET_KEY两个secrets"
+          exit -1
+          fi
+          string="${{ secrets.BILI_CONFIG }}"
+          if [ -n "$string" ]; then
+          echo "$string" >> ./config/config.temp.txt
+          echo "成功将secrets(BILI_CONFIG)内容输出到配置文件config.temp.txt"
+          node ./tools/processConfig.js
+          echo "成功转换成config.temp.json"
+          exit 0
+          fi
+
       # 运行
       - name: Run APP
-        env:
-          USERID: ${{secrets.USERID}}
-          SESSDATA: ${{secrets.SESSDATA}}
-          BILIJCT: ${{secrets.BILIJCT}}
-          BILIJCT: ${{secrets.BILI_JCT}} # 为了兼容 GitHub Secrets 经常会被填错
-          BILI_TARGET_COINS: ${{secrets.BILI_TARGET_COINS}}
-          BILI_API_DELAY: ${{secrets.BILI_API_DELAY}}
-          BILI_CUSTOMIZE_UP: ${{secrets.BILI_CUSTOMIZE_UP}}
-          USER_AGENT: ${{secrets.USER_AGENT}}
-        run: npm run start
+        run: npm run start:muilt
