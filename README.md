@@ -17,23 +17,33 @@
 
 ## 使用方法
 
-**多用户版本说明暂缺(原因是除我之外也没人用啊)**
-
-**目前只支持腾讯 serveless**
-
 通过部署多个云函数实现多用户,每日凌晨 action 会重新部署云函数,以此达到随机执行时间的效果
+
+fork 项目,开启 action(略)
+
+## 配置
 
 `config/config.demo.jsonc`中进行了三个用户的配置演示,使用单用户可以只配置一个
 
-~~配置格式必须为严格的 json,不能有注释,[点我检测 json 是否合格](https://www.baidufe.com/fehelper/json-format/index.html)~~
-
-~~配置的 json 经过 gzip 压缩后([点我 zip 压缩](https://www.baidufe.com/fehelper/en-decode/index.html))再填入`secrets`配置名为`BILI_CONFIG`~~
-
 填写表单就能够获取配置了`[初步测试版]`<https://catlair.gitee.io/bili-tools-docs-deploy/>
 
-使用时请不要刷新哦(404 警告)
-
 [仓库地址](https://github.com/catlair/BiliTools-docs)
+
+消息推送配置(可选)
+![消息推送配置](./images/message-push.png)
+
+账号配置(必填),可以多次配置,使用多账号
+![账号配置](./images/config.png)
+
+获取压缩的配置
+![获取压缩的配置](./images/getGzip.png)
+
+打开 github fork 的项目
+![设置](./images/setting.png)
+
+![设置](./images/setting-new.png)
+
+![设置](./images/setting-new-2.png)
 
 ### 腾讯云 serverless
 
