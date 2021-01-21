@@ -123,7 +123,7 @@ module.exports = function() {
     //完成任务需要20次，暂时设计大约执行40次
     const startHours = randomInt(10, 12), //10,11
       startMinutes = randomInt(6), // 0 - 5
-      minutes = randomInt(2, 5),
+      minutes = randomInt(20, 40),
       seconds = randomInt(60);
 
     // const endHours = Math.floor(minutes * 0.667) + startHours;
