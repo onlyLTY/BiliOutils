@@ -1,4 +1,4 @@
-import { ApiAbstract } from './BiLiAbstractClass';
+import { ApiAbstract, PureData } from './BiLiAbstractClass';
 
 //直播签到
 export class LiveSignDto extends ApiAbstract {
@@ -30,9 +30,6 @@ export class SilverStatusDto {
 }
 
 //瓜子换硬币
-export class Silver2CoinDto {
-  'code': number;
-  'msg': string;
-  'message': string;
+export class Silver2CoinDto extends PureData {
   'data'?: {};
 }
