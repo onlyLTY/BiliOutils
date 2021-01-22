@@ -4,10 +4,11 @@ const envConfig = {
   silver2Coin: true,
   liveSignTask: true,
   addCoins: true,
-  mangaSign: true,
+  mangaSign: false,
   shareAndWatch: true,
   judgement: false,
-  supGroupSign: true,
+  supGroupSign: false,
+  liveSendMessage: false
 };
 
 for (const envName in envConfig) {
@@ -35,7 +36,5 @@ for (const envName in envConfig) {
  * @param funArr 函数数组
  */
 export function offFunctions(funArr: Array<() => {}>): Array<() => {}> {
-  return funArr
-    .map((el) => (envConfig[el.name] ? el : null))
-    .filter((el) => el);
+  return funArr.map(el => (envConfig[el.name] ? el : null)).filter(el => el);
 }

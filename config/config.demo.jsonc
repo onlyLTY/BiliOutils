@@ -32,10 +32,11 @@
         "silver2Coin": true, // 是否开启功能[银瓜子兑换硬币]默认开启
         "liveSignTask": true, //是否开启功能[直播签到]默认开启
         "addCoins": true, //是否开启功能[每日投币]默认开启
-        "mangaSign": true, //是否开启功能[漫画签到]默认开启
+        "mangaSign": false, //是否开启功能[漫画签到]默认关闭
         "shareAndWatch": true, //是否开启功能[每日分享和观看]默认开启
-        "supGroupSign": true, //是否开启功能[应援团签到]默认开启
-        "judgement": false //是否开启功能[风纪委员任务]默认关闭
+        "supGroupSign": false, //是否开启功能[应援团签到]默认关闭
+        "judgement": false, //是否开启功能[风纪委员任务]默认关闭
+        "liveSendMessage": false //是否开启功能[直播间发送弹幕]默认关闭
       },
       "cookie": "这是隐私请不要让他人看见", // 【必填】
       "stayCoins": 0, // 剩余硬币下限,避免投币把买皮肤都投了
