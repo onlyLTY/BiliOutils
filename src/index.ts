@@ -3,7 +3,6 @@ import { JuryTask, TaskModule } from './config/globalVar';
 import { apiDelay, random, sendMessage } from './utils';
 import bili, { doOneJuryVote, loginTask, taskReward } from './service';
 import { offFunctions } from './config/configOffFun';
-import judgement from './service/judgement';
 
 exports.main_handler = async (event, _context) => {
   //必须得写在main_handler中,否则serverless无效
@@ -27,17 +26,18 @@ exports.main_handler = async (event, _context) => {
       console.log(JuryTask.noRunMessage, JuryTask.dailyCompleteCount++);
       return '跳过执行';
     }
-    // try {
-    //   apiDelay(random(60000));
-    //   await doOneJuryVote(random(30000, 60000));
-    // } catch (error) {
-    //   console.log(error);
-    // }
+
     try {
-      await judgement();
+      // apiDelay(random(60000));
+      // await doOneJuryVote(random(30000, 60000));
+      while (JuryTask.isRun) {
+        await apiDelay();
+        await doOneJuryVote(random(12000, 30000));
+      }
     } catch (error) {
       console.log(error);
     }
+
     if (JuryTask.dailyCompleteCount === 1) {
       sendMessage('bili风纪任务完成', TaskModule.appInfo);
     }
