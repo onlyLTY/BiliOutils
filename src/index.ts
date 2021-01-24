@@ -38,7 +38,7 @@ exports.main_handler = async (event, _context) => {
       console.log(error);
     }
 
-    if (JuryTask.dailyCompleteCount === 1) {
+    if (JuryTask.dailyCompleteCount === 1 && JuryTask.caseNum > 0) {
       sendMessage('bili风纪任务完成', TaskModule.appInfo);
     }
     return '评审任务';

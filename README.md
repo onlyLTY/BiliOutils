@@ -30,6 +30,8 @@ fork 项目,开启 action(略)
 
 填写表单就能够获取配置了`[初步测试版]`<https://catlair.gitee.io/bili-tools-docs-deploy/>
 
+json 数据在线压缩地址<https://catlair.gitee.io/bili-tools-docs-deploy/#/data/format>
+
 [仓库地址](https://github.com/catlair/BiliTools-docs)
 
 消息推送配置(可选)
