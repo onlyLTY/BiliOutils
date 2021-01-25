@@ -124,9 +124,9 @@ module.exports = function() {
 
     const time = juryRunTime.split('/').map(el => el.split('-'));
 
-    const startHours = randomInt(time[0][0], time[0][1]), //10,11
+    const startHours = randomInt(+time[0][0], +time[0][1]), //10,11
       startMinutes = randomInt(6), // 0 - 5
-      minutes = randomInt(time[1][0], time[1][1]),
+      minutes = randomInt(+time[1][0], +time[1][1]),
       seconds = randomInt(60);
 
     // const endHours = Math.floor(minutes * 0.667) + startHours;
