@@ -60,6 +60,5 @@ json 数据在线压缩地址<https://catlair.gitee.io/bili-tools-docs-deploy/#/
 
 ## API 参考
 
-- [happy888888/BiliExp](https://github.com/happy888888/BiliExp)
 - [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)

@@ -92,7 +92,7 @@ module.exports = function() {
     const startTime = taskTime[0].split(':');
     const endTime = taskTime[1].split(':');
 
-    const hours = randomInt(+startTime[0] || 19, +endTime[0] + 1 || 24);
+    const hours = randomInt(+startTime[0] ?? 19, +endTime[0] + 1 ?? 24);
     let minutes = 0;
     if (hours == startTime[0]) {
       minutes = randomInt(+startTime[1], 60);
@@ -119,11 +119,14 @@ module.exports = function() {
   };
 
   /** 风纪任务随机时间设置 */
-  this.randomJuryRunTime = () => {
-    //完成任务需要20次，暂时设计大约执行40次
-    const startHours = randomInt(10, 12), //10,11
+  this.randomJuryRunTime = juryRunTime => {
+    juryRunTime = juryRunTime || '8-12/20-40';
+
+    const time = juryRunTime.split('/').map(el => el.split('-'));
+
+    const startHours = randomInt(time[0][0], time[0][1]), //10,11
       startMinutes = randomInt(6), // 0 - 5
-      minutes = randomInt(20, 40),
+      minutes = randomInt(time[1][0], time[1][1]),
       seconds = randomInt(60);
 
     // const endHours = Math.floor(minutes * 0.667) + startHours;
