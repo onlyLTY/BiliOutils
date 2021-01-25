@@ -50,40 +50,9 @@
       "upperAccMatch": true //投币是否精准配置up, 排除发表视频不是本人的合作视频
     },
     {
-      "sls": {
-        "name": "catlair_BiliTools_2",
-        "region": "ap-guangzhou",
-        "description": "小号"
-      },
+      //第二个
       "message": true,
-      "cookie": "klasjhkfhasf;safkasf;afhkaf;asfhksaf;",
       "dailyRunTime": "19:19:19-23:23:23"
-    },
-    {
-      "sls": {
-        "name": "catlair_BiliTools_1",
-        "appName": "catlair_Bilibili",
-        "region": "ap-chengdu",
-        "description": "bilibili小工具"
-      },
-      "message": {
-        "email": true,
-        "serverChan": "server酱的key"
-      },
-      "function": {
-        "silver2Coin": true,
-        "liveSignTask": true,
-        "supGroupSign": true,
-        "judgement": false
-      },
-      "cookie": "这是隐私请不要让他人看见",
-      "stayCoins": 0,
-      "dailyRunTime": "19:19:19-23:23:23",
-      "targetCoins": 5,
-      "targetLevel": 6,
-      "coinRetryNum": 4,
-      "apiDelay": [2, 6],
-      "upperAccMatch": true
     }
   ]
 }

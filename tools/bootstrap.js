@@ -40,7 +40,7 @@ function scfConfig(el) {
   new updateSLS()
     .openJuryVote(el.function?.judgement)
     .randomDailyRunTime(el.dailyRunTime)
-    .randomJuryRunTime()
+    .randomJuryRunTime(el.juryRunTime)
     .updateDescription(sls?.description)
     .updateRegion(sls?.region)
     .updateComponentAppName(sls?.appName)
