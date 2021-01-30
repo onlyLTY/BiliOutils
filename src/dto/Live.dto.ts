@@ -85,8 +85,9 @@ export class FansMedalDto extends PureData {
       // medal_color_end: number;
       // guard_level: number;
       // medal_color_border: number;
+      /** 下面三个都是今日已经获得亲密度 */
+      todayFeed: number;
       // today_feed: number;
-      // todayFeed: number;
       // dayLimit: number;
       // uname: string;
       color: number;

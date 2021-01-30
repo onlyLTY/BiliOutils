@@ -41,7 +41,7 @@ export default async function addCoins() {
         } else {
           eCount++;
           if (coinData.code == -111) {
-            console.log(coinData.message, '无法继续进行投币');
+            console.log(aid, coinData.message, '无法继续进行投币');
             break;
           }
           console.log('给up投币失败 ', coinData.code, coinData.message);

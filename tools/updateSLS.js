@@ -120,7 +120,7 @@ module.exports = function() {
 
   /** 风纪任务随机时间设置 */
   this.randomJuryRunTime = juryRunTime => {
-    juryRunTime = juryRunTime || '8-12/20-40';
+    juryRunTime = juryRunTime || '8-10/20-30';
 
     const time = juryRunTime.split('/').map(el => el.split('-'));
 
@@ -130,7 +130,7 @@ module.exports = function() {
       seconds = randomInt(60);
 
     // const endHours = Math.floor(minutes * 0.667) + startHours;
-    const endHours = 5 + startHours;
+    const endHours = 6 + startHours;
 
     const DAILY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
     this.destString = this.destString.replace(

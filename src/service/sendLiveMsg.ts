@@ -107,7 +107,7 @@ export default async function liveSendMessage() {
     }
     console.log(`给【${medal.target_name}】${medal.roomid}发送弹幕`);
     (await sendOneMessage(medal.roomid)) && count++;
-    await apiDelay();
+    await apiDelay(random(60000, 20000));
   }
   console.log(`成功发送${count}个弹幕,跳过${jumpCount}个`);
 }
