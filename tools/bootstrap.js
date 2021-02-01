@@ -59,7 +59,7 @@ function scfDeploy(sls) {
     console.log(stdout.toString());
     console.log('部署成功\n\n');
   } catch (error) {
-    console.error(error);
+    console.error(error.toString());
   }
 }
 

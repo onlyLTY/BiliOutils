@@ -5,7 +5,7 @@ on:
   # branches:
   # - main
   schedule: # 计划任务触发
-    - cron: '5 16 * * *' # 每天0点5分执行
+    - cron: '5 16 * * *' # 每天0点5分执行(存在误差)
   workflow_dispatch: #手动触发
 
 env:
@@ -42,6 +42,7 @@ jobs:
 
       # 安装依赖
       - name: Install dependencies
+        timeout-minutes: 5
         run: |
           npm install -g typescript serverless
           npm install
@@ -51,6 +52,7 @@ jobs:
         run: npm run build
 
       - name: 生成config.temp.json文件
+        timeout-minutes: ${{secrets.TIMEOUT_MINUTES || 15}} # 超时时间(分钟)
         run: |
           if [ -z "$TENCENT_SECRET_ID" ]; then
           echo "部署至腾讯云需要填写TENCENT_SECRET_ID和TENCENT_SECRET_KEY两个secrets"
