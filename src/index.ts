@@ -30,7 +30,7 @@ exports.main_handler = async (event, _context) => {
     try {
       // apiDelay(random(60000));
       // await doOneJuryVote(random(30000, 60000));
-      while (JuryTask.isRun) {
+      while (JuryTask.noRunMessage !== '今日的案件已经审核完成') {
         await apiDelay();
         await doOneJuryVote(random(12000, 30000));
       }
