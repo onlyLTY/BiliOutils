@@ -4,6 +4,11 @@ const json = require('../config/config.temp.json');
 const updateSLS = require('./updateSLS');
 const cp = require('child_process');
 
+if (json.isRun === false) {
+  console.log('不需要运行');
+  return;
+}
+
 /**
  * 提取一个配置
  */
@@ -38,6 +43,7 @@ function baseConfig(el) {
 function scfConfig(el) {
   const sls = el.sls;
   new updateSLS()
+    .isRunDailyTask(el.isRun)
     .openJuryVote(el.function?.judgement)
     .randomDailyRunTime(el.dailyRunTime)
     .randomJuryRunTime(el.juryRunTime)
@@ -65,7 +71,7 @@ function scfDeploy(sls) {
 
 (async () => {
   if (process.argv.includes('--scf')) {
-    json?.account.forEach(el => {
+    json.account?.forEach(el => {
       const sls = JSON.parse(JSON.stringify(el.sls));
       scfConfig(el);
       baseConfig(el);
@@ -78,7 +84,11 @@ function scfDeploy(sls) {
     const { sendMessage } = require('../dist/utils');
     let message = '',
       errorCount = 0;
-    json?.account.forEach(el => {
+    json.account?.forEach(el => {
+      if (el.isRun === false) {
+        console.log('跳过');
+        return;
+      }
       //多用户不再单发请求
       delete el.message;
       baseConfig(el);

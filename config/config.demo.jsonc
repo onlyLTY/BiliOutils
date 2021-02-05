@@ -1,4 +1,5 @@
 {
+  "isRun": true, //是否运行,默认(不填写)运行,改成false则不运行
   //默认推送消息配置
   "message": {
     "email": {
@@ -51,6 +52,7 @@
     },
     {
       //第二个
+      "isRun": false, //不运行
       "message": true,
       "dailyRunTime": "19:19:19-23:23:23"
     }

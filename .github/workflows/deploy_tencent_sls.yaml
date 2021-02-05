@@ -22,6 +22,16 @@ jobs:
         node-version: [14.x]
 
     steps:
+      # 判断是否暂停运行
+      - name: isStop ?
+        env:
+          STOP_RUN: ${{secrets.STOP_RUN}}
+        run: |
+          if [ $STOP_RUN ]; then
+          echo "用户设置停止运行程序"
+          exit -1
+          fi
+
       # 输出IP
       - name: IP
         run: sudo curl ifconfig.me

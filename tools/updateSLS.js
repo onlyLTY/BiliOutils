@@ -83,6 +83,18 @@ module.exports = function() {
   };
 
   /**
+   * 是否执行日常任务
+   * @param {any} isRun
+   */
+  this.isRunDailyTask = isRun => {
+    this.destString = this.destString.replace(
+      /\B@{env.BILI_DAILY_RUN}\B/g,
+      isRun === false ? false : true
+    );
+    return this;
+  };
+
+  /**
    * 提交时设置执行时间
    * @param {string} dailyRunTime 每日任务时间
    */
@@ -120,7 +132,7 @@ module.exports = function() {
 
   /** 风纪任务随机时间设置 */
   this.randomJuryRunTime = juryRunTime => {
-    juryRunTime = juryRunTime || '8-10/20-30';
+    juryRunTime = juryRunTime || '8-12/20-40';
 
     const time = juryRunTime.split('/').map(el => el.split('-'));
 
