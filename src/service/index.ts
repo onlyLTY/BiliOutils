@@ -9,9 +9,10 @@ import supGroupSign from './supGroupSign';
 import judgement, { doOneJuryVote } from './judgement';
 import liveSendMessage from './sendLiveMsg';
 
-export { loginTask, taskReward, doOneJuryVote };
+export { loginTask, doOneJuryVote };
 
 export default {
+  taskReward,
   liveSignTask,
   shareAndWatch,
   silver2Coin,

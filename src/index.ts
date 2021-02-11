@@ -1,7 +1,7 @@
 import { _log, warpLog } from './utils/log';
 import { JuryTask, TaskModule } from './config/globalVar';
 import { apiDelay, random, sendMessage } from './utils';
-import bili, { doOneJuryVote, loginTask, taskReward } from './service';
+import bili, { doOneJuryVote, loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
 
 exports.main_handler = async (event, _context) => {
@@ -51,8 +51,6 @@ exports.main_handler = async (event, _context) => {
     sendMessage('bili每日任务失败', TaskModule.appInfo);
     return '未完成';
   }
-  // 获取每日任务状态(出现异常不用担心,投币会有多重逻辑)
-  await taskReward();
   for (const asyncfun of biliArr) {
     await asyncfun();
     await apiDelay();
