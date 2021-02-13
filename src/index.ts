@@ -1,14 +1,12 @@
 import { _log, warpLog } from './utils/log';
 import { JuryTask, TaskModule } from './config/globalVar';
 import { apiDelay, random, sendMessage } from './utils';
-import bili, { doOneJuryVote, loginTask, taskReward } from './service';
+import bili, { doOneJuryVote, loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
 
 exports.main_handler = async (event, _context) => {
   //必须得写在main_handler中,否则serverless无效
   console.log = warpLog();
-
-  const biliArr = offFunctions([...Object.values(bili)]);
 
   /**  
     {
@@ -30,7 +28,7 @@ exports.main_handler = async (event, _context) => {
     try {
       // apiDelay(random(60000));
       // await doOneJuryVote(random(30000, 60000));
-      while (JuryTask.noRunMessage !== '今日的案件已经审核完成') {
+      while (JuryTask.isRun) {
         await apiDelay();
         await doOneJuryVote(random(12000, 30000));
       }
@@ -51,8 +49,9 @@ exports.main_handler = async (event, _context) => {
     sendMessage('bili每日任务失败', TaskModule.appInfo);
     return '未完成';
   }
-  // 获取每日任务状态(出现异常不用担心,投币会有多重逻辑)
-  await taskReward();
+
+  const biliArr = offFunctions([...Object.values(bili)]);
+
   for (const asyncfun of biliArr) {
     await asyncfun();
     await apiDelay();
