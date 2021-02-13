@@ -1,6 +1,6 @@
 import { TaskConfig } from './globalVar';
 
-const envConfig = {
+export const functionConfig = {
   silver2Coin: true,
   liveSignTask: true,
   addCoins: true,
@@ -8,25 +8,32 @@ const envConfig = {
   shareAndWatch: true,
   judgement: false,
   supGroupSign: false,
-  liveSendMessage: false
+  liveSendMessage: false,
+  taskReward: true,
 };
 
-for (const envName in envConfig) {
-  if (Object.prototype.hasOwnProperty.call(envConfig, envName)) {
-    const el: boolean = envConfig[envName];
-    const taskFunction = TaskConfig.config.function || {};
-    //el 设置的值 --> false --> 设置成关闭
-    //设置的值 --> true --> 设置成开启
-    //未配置 --> undefined --> 默认
-    switch (taskFunction[envName]) {
-      case true:
-        el === false && (envConfig[envName] = true);
-        break;
-      case false:
-        el === true && (envConfig[envName] = false);
-        break;
-      default:
-        break;
+function funHandle() {
+  if (!functionConfig.addCoins && !functionConfig.shareAndWatch) {
+    functionConfig.taskReward = false;
+  }
+
+  for (const funName in functionConfig) {
+    if (Object.prototype.hasOwnProperty.call(functionConfig, funName)) {
+      const el: boolean = functionConfig[funName];
+      const taskFunction = TaskConfig.config.function || {};
+      //el 设置的值 --> false --> 设置成关闭
+      //设置的值 --> true --> 设置成开启
+      //未配置 --> undefined --> 默认
+      switch (taskFunction[funName]) {
+        case true:
+          el === false && (functionConfig[funName] = true);
+          break;
+        case false:
+          el === true && (functionConfig[funName] = false);
+          break;
+        default:
+          break;
+      }
     }
   }
 }
@@ -36,5 +43,8 @@ for (const envName in envConfig) {
  * @param funArr 函数数组
  */
 export function offFunctions(funArr: Array<() => {}>): Array<() => {}> {
-  return funArr.map(el => (envConfig[el.name] ? el : null)).filter(el => el);
+  funHandle();
+  return funArr
+    .map(el => (functionConfig[el.name] ? el : null))
+    .filter(el => el);
 }
