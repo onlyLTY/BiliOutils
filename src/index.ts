@@ -8,8 +8,6 @@ exports.main_handler = async (event, _context) => {
   //必须得写在main_handler中,否则serverless无效
   console.log = warpLog();
 
-  const biliArr = offFunctions([...Object.values(bili)]);
-
   /**  
     {
      "Type":"timer",
@@ -51,6 +49,9 @@ exports.main_handler = async (event, _context) => {
     sendMessage('bili每日任务失败', TaskModule.appInfo);
     return '未完成';
   }
+
+  const biliArr = offFunctions([...Object.values(bili)]);
+
   for (const asyncfun of biliArr) {
     await asyncfun();
     await apiDelay();
