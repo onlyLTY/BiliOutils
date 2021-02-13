@@ -22,7 +22,7 @@ class AidInfo {
  * @param special 是否只获取特别关注列表
  */
 export async function getAidByFollowing(
-  special: boolean = true
+  special: boolean = true,
 ): Promise<AidInfo> {
   try {
     const uid = TaskConfig.USERID;
@@ -42,6 +42,11 @@ export async function getAidByFollowing(
 
       return await getAidByUp(mid);
     }
+    if (data.length === 0)
+      return {
+        msg: '-1',
+        data: {},
+      };
     return {
       msg: special
         ? `未获取到特别关注列表: ${code}-${message}`
@@ -96,7 +101,7 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
 
   if (customizeUp.length === 0) {
     return {
-      msg: '自定义up列表为空',
+      msg: '-1',
       data: {},
     };
   }
@@ -109,7 +114,7 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
  * @param uid up主ip
  */
 export async function getAidByUp(uid: number | string): Promise<AidInfo> {
-  uid = Number(uid)
+  uid = Number(uid);
   try {
     const { message, data, code } = await getVideosByUpId(uid);
 
@@ -117,7 +122,7 @@ export async function getAidByUp(uid: number | string): Promise<AidInfo> {
       let avList = data.media_list;
 
       if (TaskConfig.BILI_UPPER_ACC_MATCH === true) {
-        avList = avList.filter((el) => uid === el.upper?.mid);
+        avList = avList.filter(el => uid === el.upper?.mid);
       }
       const { id, title, upper } = avList[random(avList.length - 1)];
       return {
@@ -153,9 +158,9 @@ export async function getAidByByPriority() {
     getAidByRegionRank,
   ];
 
-  const errInfo = [];
-
   for (const fun of aidFunArray) {
+    const errInfo = [];
+
     data = await fun();
     if (data.msg === '0') return data;
 
@@ -165,11 +170,11 @@ export async function getAidByByPriority() {
       errInfo.push({ funName: fun.name, message: data.msg });
       await apiDelay();
       data = await fun();
-
+      if (data.msg === '-1') i = 0;
       if (data.msg === '0') return data;
     }
 
-    console.warn('错误信息: ', errInfo);
+    console.warn('调试信息: ', errInfo);
   }
   return { msg: '没有找到视频', data: {} };
 }
