@@ -1,4 +1,4 @@
-import { _log, warpLog } from './utils/log';
+import { warpLog } from './utils/log';
 import { JuryTask, TaskModule } from './config/globalVar';
 import { apiDelay, random, sendMessage } from './utils';
 import bili, { doOneJuryVote, loginTask } from './service';
@@ -8,8 +8,8 @@ exports.main_handler = async (event, _context) => {
   //必须得写在main_handler中,否则serverless无效
   console.log = warpLog();
 
-  /**  
-    {
+  /**
+   {
      "Type":"timer",
      "TriggerName":"EveryDay",
      "Time":"2019-02-21T11:49:00Z",
@@ -26,9 +26,10 @@ exports.main_handler = async (event, _context) => {
     }
 
     try {
-      // apiDelay(random(60000));
-      // await doOneJuryVote(random(30000, 60000));
-      while (JuryTask.noRunMessage !== '今日的案件已经审核完成') {
+      // 到这里了说明不会是今日已经审核完成,如果是未找到案件,那就应该继续
+      JuryTask.isRun = true;
+      // 当循环中审核完成或没有按键就退出此次执行
+      while (JuryTask.isRun) {
         await apiDelay();
         await doOneJuryVote(random(12000, 30000));
       }
@@ -37,7 +38,7 @@ exports.main_handler = async (event, _context) => {
     }
 
     if (JuryTask.dailyCompleteCount === 1 && JuryTask.caseNum > 0) {
-      sendMessage('bili风纪任务完成', TaskModule.appInfo);
+      await sendMessage('bili风纪任务完成', TaskModule.appInfo);
     }
     return '评审任务';
   }
@@ -46,17 +47,17 @@ exports.main_handler = async (event, _context) => {
     await loginTask();
   } catch (error) {
     console.log('登录失败: ', error);
-    sendMessage('bili每日任务失败', TaskModule.appInfo);
+    await sendMessage('bili每日任务失败', TaskModule.appInfo);
     return '未完成';
   }
 
   const biliArr = offFunctions([...Object.values(bili)]);
 
-  for (const asyncfun of biliArr) {
-    await asyncfun();
+  for (const asyncFun of biliArr) {
+    await asyncFun();
     await apiDelay();
   }
 
-  sendMessage('bili每日任务完成', TaskModule.appInfo);
+  await sendMessage('bili每日任务完成', TaskModule.appInfo);
   return '完成';
 };

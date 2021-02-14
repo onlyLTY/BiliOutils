@@ -5,3 +5,4 @@ dist/
 /config/config.json
 /serverless.yaml
 /config/config.temp.*
+.idea
