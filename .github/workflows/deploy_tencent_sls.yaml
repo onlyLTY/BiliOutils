@@ -22,7 +22,7 @@ jobs:
         node-version: [14.x]
 
     environment: Production
-    
+
     steps:
       # 判断是否暂停运行
       - name: isStop ?

@@ -2,12 +2,12 @@ const { randomInt } = require('crypto');
 const { writeFileSync, readFileSync } = require('fs');
 const { resolve } = require('path');
 
-module.exports = function() {
+module.exports = function () {
   this.rootPath = process.cwd();
   this.dest = resolve(this.rootPath, 'serverless.yaml');
   // new时读取string
   this.destString = readFileSync(
-    resolve(this.rootPath, 'serverless/serverless.yaml')
+    resolve(this.rootPath, 'serverless/serverless.yaml'),
   ).toString();
 
   /**
@@ -28,7 +28,7 @@ module.exports = function() {
   this.openJuryVote = isOpenJuryVote => {
     this.destString = this.destString.replace(
       /\B@{env\.BILI_JURY_VOTE}\B/g,
-      `${isOpenJuryVote || false}`
+      `${isOpenJuryVote || false}`,
     );
     return this;
   };
@@ -40,7 +40,7 @@ module.exports = function() {
   this.updateComponentAppName = componentAppName => {
     this.destString = this.destString.replace(
       /\B@{env\.COMPONENT_APP_NAME}\B/g,
-      componentAppName || `''`
+      componentAppName || `''`,
     );
 
     return this;
@@ -65,7 +65,7 @@ module.exports = function() {
   this.updateRegion = region => {
     this.destString = this.destString.replace(
       /\B@{env\.SCF_REGION}\B/g,
-      region || 'ap-chengdu'
+      region || 'ap-chengdu',
     );
     return this;
   };
@@ -77,7 +77,7 @@ module.exports = function() {
   this.updateDescription = description => {
     this.destString = this.destString.replace(
       /\B@{env\.SCF_DESCRIPTION}\B/g,
-      description || '可以填写识别该函数是哪个账号用'
+      description || '可以填写识别该函数是哪个账号用',
     );
     return this;
   };
@@ -88,8 +88,8 @@ module.exports = function() {
    */
   this.isRunDailyTask = isRun => {
     this.destString = this.destString.replace(
-      /\B@{env.BILI_DAILY_RUN}\B/g,
-      isRun === false ? false : true
+      /\B@{env\.BILI_DAILY_RUN}\B/g,
+      `${isRun === false ? false : true}`,
     );
     return this;
   };
@@ -125,7 +125,7 @@ module.exports = function() {
     const DAILY_CRON_EXPRESSION = `${seconds} ${minutes} ${hours} * * * *`;
     this.destString = this.destString.replace(
       /(?<=')\@{env.BILI_DAILY_CRON_EXPRESSION}(?=')/g,
-      `${DAILY_CRON_EXPRESSION}`
+      `${DAILY_CRON_EXPRESSION}`,
     );
     return this;
   };
@@ -147,7 +147,7 @@ module.exports = function() {
     const DAILY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
     this.destString = this.destString.replace(
       /(?<=')@{env.BILI_JURY_CRON_EXPRESSION}(?=')/g,
-      `${DAILY_CRON_EXPRESSION}`
+      `${DAILY_CRON_EXPRESSION}`,
     );
     return this;
   };
