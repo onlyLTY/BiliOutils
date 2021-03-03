@@ -1,9 +1,6 @@
 ## 支持功能
 
-- [x] 每日签到
-- [x] 每日分享
-- [x] 每日播放
-- [x] 直播签到
+- [x] 每日签到/分享/播放
 - [x] 漫画签到
 - [x] 每日自动投币(指定数量)
 - [x] 银瓜子兑换硬币
@@ -25,7 +22,10 @@ fork 项目, 通过下面链接自定义获取配置, 开启 action(略)
 
 填写表单就能够获取配置了`[初步测试版]`<https://catlair.gitee.io/bili-tools-docs-deploy/>
 
+为了避免配置中的特殊符号影响,配置必须进行压缩(压缩也可以减少配置的大小),下面是压缩地址(参考百度 Helper 进行的压缩)  
 json 数据在线压缩地址<https://catlair.gitee.io/bili-tools-docs-deploy/#/data/format>
+
+`api`的调用速度配置对部分情况不会生效,该部分使用了个人觉得应该使用的最小区间,就不做更大范围的兼容了
 
 [仓库地址](https://github.com/catlair/BiliTools-docs)
 

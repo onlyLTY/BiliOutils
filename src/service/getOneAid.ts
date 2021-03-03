@@ -5,7 +5,7 @@ import {
   getVideosByUpId,
 } from '../net/userInfoRequest';
 import { getRegionRankingVideos } from '../net/videoRequest';
-import { TaskConfig } from '../config/globalVar';
+import { TaskConfig, TaskModule } from '../config/globalVar';
 import { FollowingsDto } from '../dto/UserInfo.dto';
 
 class AidInfo {
@@ -158,23 +158,36 @@ export async function getAidByByPriority() {
     getAidByRegionRank,
   ];
 
-  for (const fun of aidFunArray) {
-    const errInfo = [];
+  //如果没有自定义up则直接删除
+  if (!TaskConfig.BILI_CUSTOMIZE_UP) {
+    aidFunArray.shift();
+  }
 
+  //从指定下标开始调用函数
+  aidFunArray.splice(0, TaskModule.currentStartFun);
+
+  aidFunArray.forEach(async (fun, index) => {
     data = await fun();
     if (data.msg === '0') return data;
 
     let i = Number(TaskConfig.BILI_COIN_RETRY_NUM ?? 4);
     i = i < 1 ? 1 : i > 8 ? 8 : i;
     while (i--) {
-      errInfo.push({ funName: fun.name, message: data.msg });
       await apiDelay();
       data = await fun();
       if (data.msg === '-1') i = 0;
       if (data.msg === '0') return data;
     }
 
-    console.warn('调试信息: ', errInfo);
-  }
-  return { msg: '没有找到视频', data: {} };
+    //当调用出现多次错误后将使用优先级更低的函数
+    //此处保留出错的索引
+    if (i <= 0) {
+      TaskModule.currentStartFun = index;
+    }
+  });
+
+  return {
+    msg: '没有找到视频',
+    data: { aid: 0, title: '傻逼ts', author: '卧槽泥马' },
+  };
 }

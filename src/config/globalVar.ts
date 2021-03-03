@@ -30,7 +30,7 @@ export abstract class TaskConfig {
   private static biliApiDelay = config.apiDelay || [2, 6];
   /** 调用api时的延迟(单位s),默认2s至6s */
   static readonly BILI_API_DELAY: number[] = Array.isArray(
-    TaskConfig.biliApiDelay
+    TaskConfig.biliApiDelay,
   )
     ? TaskConfig.biliApiDelay
     : [TaskConfig.biliApiDelay];
@@ -62,6 +62,8 @@ export abstract class TaskModule {
   static watch: boolean = false;
   /** 执行任务产生的消息 */
   static appInfo: string = '\n';
+  /** 确定获取aid的函数开始下标 */
+  static currentStartFun: number = 0;
 }
 
 //风纪委员情况
