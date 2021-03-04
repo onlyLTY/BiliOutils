@@ -4,6 +4,7 @@ import { apiDelay } from '../utils';
 import { functionConfig } from '../config/configOffFun';
 
 function estimatedDays(upLevelExp: number): number {
+  if (TaskConfig.BILI_TARGET_COINS <= 0) return upLevelExp / 15;
   const dailyExp = TaskConfig.BILI_TARGET_COINS * 10 + 15;
   const idealDays = upLevelExp / dailyExp;
   const coinSupportDays = TaskModule.money / (TaskConfig.BILI_TARGET_COINS - 1);
