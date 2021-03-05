@@ -13,7 +13,7 @@
     "start": "node ./dist/run.js",
     "prebuild": "rm -rf dist/",
     "predeploy:muilt": "rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
-    "postbuild": "cp ./src/config/*.json ./dist/config/ && rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
+    "postbuild": "rm -rf ./dist/dto/ && rm -rf ./dist/interface/",
     "postdeploy": "rm -f ./serverless.yaml"
   },
   "author": "catlair",
@@ -22,6 +22,7 @@
     "@babel/cli": "^7.12.13",
     "@babel/core": "^7.12.13",
     "@babel/preset-env": "^7.12.13",
+    "@types/lodash": "^4.14.168",
     "@types/node": "^14.14.25",
     "@types/nodemailer": "^6.4.0",
     "@types/qs": "^6.9.5",
@@ -32,6 +33,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "dotenv": "^8.2.0",
+    "lodash": "^4.17.21",
     "nodemailer": "^6.4.17",
     "qs": "^6.9.6"
   }

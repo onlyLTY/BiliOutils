@@ -9,11 +9,20 @@ import {
 } from '../net/juryRequest';
 import { JuryTask } from '../config/globalVar';
 import { apiDelay, random } from '../utils';
-
-const prohibitWords = require('../config/prohibitWords.json');
+import prohibitWords from '../config/prohibitWords';
+import * as _ from 'lodash';
 
 type VoteType = JuryVoteOption['vote'];
 type VoteOpinion = JuryVoteOpinionDto['data'];
+
+interface VoteDecisionOption {
+  voteDelete?: number;
+  voteBreak?: number;
+  voteRule?: number;
+  originContent: string;
+  voteOpinionBlue: VoteOpinion;
+  voteOpinionRed: VoteOpinion;
+}
 
 enum Vote {
   '未投票',
@@ -44,7 +53,7 @@ async function getJuryInfo() {
     `${data.uname}:
      仲裁总数:${data.caseTotal},
      仲裁胜率:${data.rightRadio}%,
-     资格剩余天数:${data.restDays}天`
+     资格剩余天数:${data.restDays}天`,
   );
 
   JuryTask.isJury = true;
@@ -81,7 +90,7 @@ async function getJuryCaseObtain() {
  * @param cid 案件id
  */
 async function getJuryCaseInfo(
-  cid: number | string
+  cid: number | string,
 ): Promise<JuryCaseInfoDto['data']> {
   const { data, message, code } = await juryCaseInfo(cid);
   if (code !== 0) {
@@ -100,7 +109,7 @@ async function getJuryCaseInfo(
  */
 async function getJuryVoteOpinion(
   cid: string | number,
-  otype: 1 | 2 = 1
+  otype: 1 | 2 = 1,
 ): Promise<VoteOpinion | undefined> {
   try {
     const { data, message, code } = await juryVoteOpinion(cid, otype);
@@ -117,10 +126,21 @@ async function getJuryVoteOpinion(
   }
 }
 
-function containProhibit(words: string[], str: string): boolean {
-  return words.some((el) => {
-    return str.indexOf(el) !== -1;
-  });
+function containProhibit(
+  words: Array<string | Function | RegExp>,
+  str: string,
+): boolean {
+  if (!str) {
+    return false;
+  }
+  const strWords = words.filter(word => _.isString(word)) as string[];
+  const regWords = words.filter(word => _.isRegExp(word)) as RegExp[];
+  const funWords = words.filter(word => _.isFunction(word)) as Function[];
+  let result = false;
+  result = strWords.some(el => str.includes(el)) || result;
+  result = regWords.some(el => el.test(str)) || result;
+  result = funWords.some(el => el(str)) || result;
+  return result;
 }
 
 function makeDecision({
@@ -130,30 +150,34 @@ function makeDecision({
   originContent,
   voteOpinionBlue,
   voteOpinionRed,
-}: {
-  voteDelete?: number;
-  voteBreak?: number;
-  voteRule?: number;
-  originContent: string;
-  voteOpinionBlue: VoteOpinion;
-  voteOpinionRed: VoteOpinion;
-}): VoteType {
+}: VoteDecisionOption): VoteType {
   //瞎鸡*巴计算怎么投票
-  let myVote: VoteType = 0;
+  let myVote: VoteType = 4;
 
-  const opinionRedCount = voteOpinionRed?.count;
-  const opinionBlueCount = voteOpinionBlue?.count;
+  const opinionRedCount = voteOpinionRed?.count || 0;
+  const opinionBlueCount = voteOpinionBlue?.count || 0;
 
+  //vote判断不合理,有的人喊着封禁实则没有
   const banOfRed =
-    voteOpinionRed?.opinion?.filter((el) => el.vote === Vote['封禁']) || [];
+    voteOpinionRed?.opinion?.filter(el => {
+      if (el.vote === Vote['封禁']) {
+        return true;
+      }
+      const text = ['封禁', '小黑屋', '封了', '建议封', '小黑屋'];
+      if (text.some(v => el.content.includes(v))) {
+        return true;
+      }
+      return false;
+    }) || [];
   const ban = containProhibit(prohibitWords, originContent);
 
-  //大家都说你
-  if (ban && originContent.length < 6) {
-    //就这几个字你好含有地域黑嫌疑词
+  if (ban) {
     console.log('应该是地域黑吧?');
     myVote = Vote['封禁'];
-  } else if (opinionRedCount > 3 && banOfRed.length / opinionRedCount >= 0.8) {
+  } else if (
+    (opinionRedCount > 3 && banOfRed.length / opinionRedCount >= 0.8) ||
+    banOfRed.length > 5
+  ) {
     //>3 还是严谨点
     console.log('多人发布观点表示封禁');
     myVote = Vote['封禁'];
@@ -256,7 +280,7 @@ export async function doOneJuryVote(delayTime: number) {
       蓝方人数:${voteRule}/评论数:${voteOpinionBlue.count}
       弃权人数:${voteBreak}
       本人投票:【${Vote[myVote]}】
-      `
+      `,
     );
   } catch (error) {
     console.log('风纪委员投票异常', error);
