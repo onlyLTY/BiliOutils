@@ -1,6 +1,5 @@
 import { TaskConfig } from '../config/globalVar';
 import sendMail from './email';
-import scSend from './serverChan';
 export * from './cookie';
 
 /**
@@ -51,5 +50,4 @@ export function random(min: number = 1, max: number = 0): number {
  */
 export async function sendMessage(title: string, text: string) {
   sendMail(title, text).catch(console.log);
-  scSend(title, text.replace(/\n/g, '\n\n'));
 }
