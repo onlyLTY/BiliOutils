@@ -3,19 +3,11 @@ import { JuryTask, TaskModule } from './config/globalVar';
 import { apiDelay, random, sendMessage } from './utils';
 import bili, { doOneJuryVote, loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
+import updateTrigger from './utils/updateTrigger';
 
 exports.main_handler = async (event, _context) => {
   //必须得写在main_handler中,否则serverless无效
   console.log = warpLog();
-
-  /**
-   {
-     "Type":"timer",
-     "TriggerName":"EveryDay",
-     "Time":"2019-02-21T11:49:00Z",
-     "Message":"您输入的附加信息"
-   }
-   **/
 
   // 只有serverless才有event
   if (event === undefined) event = {};
@@ -43,20 +35,24 @@ exports.main_handler = async (event, _context) => {
     return '评审任务';
   }
 
-  try {
-    await loginTask();
-  } catch (error) {
-    console.log('登录失败: ', error);
-    await sendMessage('bili每日任务失败', TaskModule.appInfo);
-    return '未完成';
-  }
+  // try {
+  //   await loginTask();
+  // } catch (error) {
+  //   console.log('登录失败: ', error);
+  //   await sendMessage('bili每日任务失败', TaskModule.appInfo);
+  //   return '未完成';
+  // }
 
-  const biliArr = offFunctions([...Object.values(bili)]);
+  // const biliArr = offFunctions([...Object.values(bili)]);
 
-  for (const asyncFun of biliArr) {
-    await asyncFun();
-    await apiDelay();
-  }
+  // for (const asyncFun of biliArr) {
+  //   await asyncFun();
+  //   await apiDelay();
+  // }
+
+  console.log('任务完成');
+
+  await updateTrigger();
 
   await sendMessage('bili每日任务完成', TaskModule.appInfo);
   return '完成';
