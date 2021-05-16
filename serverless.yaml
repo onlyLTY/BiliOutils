@@ -1,14 +1,14 @@
 component: scf # 必填内容
-name: catlair_BiliExpTools
+name: ${env:COMPONENT_NAME}
 org: ''
-app: @{env.COMPONENT_APP_NAME}
+app: ''
 stage: production
 inputs:
-  name: @{env.SCF_NAME}
+  name: ${env:SCF_NAME}
   src: ./dist
   runtime: Nodejs12.16
-  region: @{env.SCF_REGION}
-  description: @{env.SCF_DESCRIPTION}
+  region: ${env:SCF_REGION}
+  description: ${env:SCF_DESCRIPTION}
   handler: index.main_handler
   memorySize: 64
   timeout: 900
@@ -16,13 +16,14 @@ inputs:
     - timer: # 定时触发器
         parameters:
           # name: timer # 触发器名称，默认timer-${name}-${stage}
-          cronExpression: '@{env.BILI_DAILY_CRON_EXPRESSION}' # 每天22点43分55秒触发
-          enable: @{env.BILI_DAILY_RUN}
+          name: bilitools_daily_timer
+          cronExpression: ${env:BILI_DAILY_CRON_EXPRESSION} # 每天22点43分55秒触发
+          enable: ${env:BILI_DAILY_RUN}
           argument: 日常任务
     - timer: # 定时触发器
         parameters:
           name: jury-timer # 风纪委员触发
-          cronExpression: '@{env.BILI_JURY_CRON_EXPRESSION}' # 用11-16这几个小时来执行风纪委员任务
-          enable: @{env.BILI_JURY_VOTE}
+          cronExpression: ${env:BILI_JURY_CRON_EXPRESSION} # 用11-16这几个小时来执行风纪委员任务
+          enable: ${env:BILI_JURY_VOTE}
           argument: 评审任务
 # For more information: https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md

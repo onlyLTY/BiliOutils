@@ -1,48 +1,21 @@
 const { randomInt } = require('crypto');
-const { writeFileSync, readFileSync } = require('fs');
-const { resolve } = require('path');
 
 module.exports = function () {
-  this.rootPath = process.cwd();
-  this.dest = resolve(this.rootPath, 'serverless.yaml');
-  // new时读取string
-  this.destString = readFileSync(
-    resolve(this.rootPath, 'serverless/serverless.yaml'),
-  ).toString();
-
-  /**
-   * 写入文件
-   * @param {string} dest 目标地址(默认/serverless)
-   */
-  this.writeFile = dest => {
-    writeFileSync(dest || this.dest, this.destString);
-    return this;
-  };
-
-  this.end = this.update = this.writeFile;
-
   /**
    * 是否开启风纪委员任务执行
    * @param {boolen} isOpenJuryVote
    */
   this.openJuryVote = isOpenJuryVote => {
-    this.destString = this.destString.replace(
-      /\B@{env\.BILI_JURY_VOTE}\B/g,
-      `${isOpenJuryVote || false}`,
-    );
+    process.env.BILI_JURY_VOTE = `${isOpenJuryVote || false}`;
     return this;
   };
 
   /**
-   * 更新组件app名
-   * @param {string} componentAppName 默认''
+   * 更新组件名
+   * @param {string} componentName
    */
-  this.updateComponentAppName = componentAppName => {
-    this.destString = this.destString.replace(
-      /\B@{env\.COMPONENT_APP_NAME}\B/g,
-      componentAppName || `''`,
-    );
-
+  this.updateComponentName = scfName => {
+    process.env.COMPONENT_NAME = `cbts_${scfName}`;
     return this;
   };
 
@@ -54,7 +27,7 @@ module.exports = function () {
     if (!scfName) {
       throw new Error('没有设置serverless函数名,无法进行部署');
     }
-    this.destString = this.destString.replace(/\B@{env\.SCF_NAME}\B/g, scfName);
+    process.env.SCF_NAME = scfName;
     return this;
   };
 
@@ -63,10 +36,7 @@ module.exports = function () {
    * @param {string} region
    */
   this.updateRegion = region => {
-    this.destString = this.destString.replace(
-      /\B@{env\.SCF_REGION}\B/g,
-      region || 'ap-chengdu',
-    );
+    process.env.SCF_REGION = region || 'ap-chengdu';
     return this;
   };
 
@@ -75,10 +45,8 @@ module.exports = function () {
    * @param {string} description
    */
   this.updateDescription = description => {
-    this.destString = this.destString.replace(
-      /\B@{env\.SCF_DESCRIPTION}\B/g,
-      description || '可以填写识别该函数是哪个账号用',
-    );
+    process.env.SCF_DESCRIPTION =
+      description || '可以填写识别该函数是哪个账号用';
     return this;
   };
 
@@ -87,10 +55,7 @@ module.exports = function () {
    * @param {any} isRun
    */
   this.isRunDailyTask = isRun => {
-    this.destString = this.destString.replace(
-      /\B@{env\.BILI_DAILY_RUN}\B/g,
-      `${isRun === false ? false : true}`,
-    );
+    process.env.BILI_DAILY_RUN = isRun === false ? 'false' : 'true';
     return this;
   };
 
@@ -122,11 +87,7 @@ module.exports = function () {
       seconds = randomInt(60);
     }
 
-    const DAILY_CRON_EXPRESSION = `${seconds} ${minutes} ${hours} * * * *`;
-    this.destString = this.destString.replace(
-      /(?<=')\@{env.BILI_DAILY_CRON_EXPRESSION}(?=')/g,
-      `${DAILY_CRON_EXPRESSION}`,
-    );
+    process.env.BILI_DAILY_CRON_EXPRESSION = `${seconds} ${minutes} ${hours} * * * *`;
     return this;
   };
 
@@ -141,14 +102,9 @@ module.exports = function () {
       minutes = randomInt(+time[1][0], +time[1][1]),
       seconds = randomInt(60);
 
-    // const endHours = Math.floor(minutes * 0.667) + startHours;
     const endHours = 6 + startHours;
 
-    const DAILY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
-    this.destString = this.destString.replace(
-      /(?<=')@{env.BILI_JURY_CRON_EXPRESSION}(?=')/g,
-      `${DAILY_CRON_EXPRESSION}`,
-    );
+    process.env.BILI_JURY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
     return this;
   };
 };

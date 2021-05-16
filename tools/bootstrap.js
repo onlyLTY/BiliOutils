@@ -36,7 +36,7 @@ function baseConfig(el) {
   writeFileSync(
     resolve(process.cwd(), 'dist/config/config.json'),
     //格式化输出
-    JSON.stringify(el, null, '\t')
+    JSON.stringify(el, null, '\t'),
   );
 }
 
@@ -49,11 +49,8 @@ function scfConfig(el) {
     .randomJuryRunTime(el.juryRunTime)
     .updateDescription(sls?.description)
     .updateRegion(sls?.region)
-    .updateComponentAppName(sls?.appName)
-    .updateSCFName(sls?.name)
-    .update(`serverless.yaml`);
-
-  delete el.sls;
+    .updateComponentName(sls?.name)
+    .updateSCFName(sls?.name);
 }
 
 function scfDeploy(sls) {
