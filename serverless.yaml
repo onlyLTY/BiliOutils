@@ -26,4 +26,8 @@ inputs:
           cronExpression: ${env:BILI_JURY_CRON_EXPRESSION} # 用11-16这几个小时来执行风纪委员任务
           enable: ${env:BILI_JURY_VOTE}
           argument: 评审任务
-# For more information: https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md
+  environment:
+    variables:
+      TENCENT_SECRET_ID: ${env:TENCENT_SECRET_ID}
+      TENCENT_SECRET_KEY: ${env:TENCENT_SECRET_KEY}
+  # For more information: https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md

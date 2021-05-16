@@ -28,4 +28,10 @@ export interface Config {
   coinRetryNum?: number;
   apiDelay?: [number, number] | number;
   upperAccMatch?: boolean;
+  sls: {
+    appName: string;
+    name: string;
+    description: string;
+    region: string;
+  };
 }
