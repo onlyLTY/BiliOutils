@@ -30,27 +30,27 @@ exports.main_handler = async (event, _context) => {
     }
 
     if (JuryTask.dailyCompleteCount === 1 && JuryTask.caseNum > 0) {
+      await updateTrigger('jury');
       await sendMessage('bili风纪任务完成', TaskModule.appInfo);
     }
+
     return '评审任务';
   }
 
-  // try {
-  //   await loginTask();
-  // } catch (error) {
-  //   console.log('登录失败: ', error);
-  //   await sendMessage('bili每日任务失败', TaskModule.appInfo);
-  //   return '未完成';
-  // }
+  try {
+    await loginTask();
+  } catch (error) {
+    console.log('登录失败: ', error);
+    await sendMessage('bili每日任务失败', TaskModule.appInfo);
+    return '未完成';
+  }
 
-  // const biliArr = offFunctions([...Object.values(bili)]);
+  const biliArr = offFunctions([...Object.values(bili)]);
 
-  // for (const asyncFun of biliArr) {
-  //   await asyncFun();
-  //   await apiDelay();
-  // }
-
-  console.log('任务完成');
+  for (const asyncFun of biliArr) {
+    await asyncFun();
+    await apiDelay();
+  }
 
   await updateTrigger();
 

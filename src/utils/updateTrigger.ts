@@ -4,7 +4,7 @@ import { random } from './index';
 import { Config } from '../interface/Config';
 let config: Config;
 try {
-  config = require('./config.json');
+  config = require('../config/config.json');
 } catch (error) {
   config = require('../../config/config.json');
 }
@@ -26,38 +26,39 @@ const client = new ScfClient(clientConfig);
 
 async function createTrigger(params) {
   try {
-    console.log('创建trigger');
     return await client.CreateTrigger(params);
   } catch (error) {
-    console.log('创建失败', error);
+    console.log('创建trigger失败', error);
     return false;
   }
 }
 
 async function deleteTrigger(params) {
   try {
-    console.log('删除trigger');
     return await client.DeleteTrigger(params);
   } catch (error) {
-    console.log('删除失败', error);
+    console.log('删除trigger失败', error);
     return false;
   }
 }
 
 export default async function (taskName = 'daily') {
+  let RUN_TIME = randomDailyRunTime(config.dailyRunTime);
+
   const params = {
     FunctionName: config.sls.name,
     TriggerName: 'bilitools_daily_timer',
     Type: 'timer',
-    TriggerDesc: randomDailyRunTime(config.dailyRunTime),
+    TriggerDesc: RUN_TIME,
     Qualifier: '$DEFAULT',
   };
 
+  RUN_TIME = randomJuryRunTime();
   if (taskName.toLowerCase() === 'jury') {
-    params.TriggerDesc = randomJuryRunTime();
+    params.TriggerDesc = RUN_TIME;
     params.TriggerName = 'jury-timer';
   }
-
+  console.log(`修改时间为：${RUN_TIME}`);
   const deleteResult = await deleteTrigger(params);
   if (!deleteResult) {
     return;

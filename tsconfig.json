@@ -5,7 +5,8 @@
     "target": "es2020",
     "outDir": "./dist",
     "baseUrl": "./src",
-    "lib": ["esnext"]
+    "lib": ["esnext"],
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", "test", "temp", "dist", "**/*spec.ts"]
 }
