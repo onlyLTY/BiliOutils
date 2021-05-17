@@ -25,6 +25,7 @@ const clientConfig = {
 const client = new ScfClient(clientConfig);
 
 async function createTrigger(params) {
+  params.CustomArgument = new Date().getDate().toString();
   try {
     return await client.CreateTrigger(params);
   } catch (error) {
@@ -51,7 +52,6 @@ export default async function (taskName = 'daily') {
     Type: 'timer',
     TriggerDesc: RUN_TIME,
     Qualifier: '$DEFAULT',
-    CustomArgument: new Date().getDate().toString(),
   };
 
   if (taskName.toLowerCase() === 'jury') {
