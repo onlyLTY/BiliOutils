@@ -19,7 +19,7 @@
 ## 使用方法
 
 fork 项目， 通过下面链接自定义获取配置， 开启 action(略)
-每次更新后可能需要手动运行 action 推送到 scf
+每次从 action 提交到 scf 都会自动运行一次，若要关闭自动运行，请在 `secrets` 中添加 `SCF_SKIP_FIRST_RUN` 值为 `true`
 
 ## 配置
 

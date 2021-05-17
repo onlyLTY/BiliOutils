@@ -49,7 +49,7 @@ jobs:
       - name: Build APP
         run: npm run build
 
-      - name: 生成config.temp.json文件
+      - name: create config.temp.json file
         timeout-minutes: ${{secrets.TIMEOUT_MINUTES || 15}} # 超时时间(分钟)
         run: |
           if [ -z "$TENCENT_SECRET_ID" ]; then
@@ -65,6 +65,11 @@ jobs:
           exit 0
           fi
 
-      # 部署
-      - name: 部署多用户程序
+      - name: deploy muilt user
         run: npm run deploy:muilt
+
+      - name: Invoke SCF
+        env:
+          SCF_SKIP_FIRST_RUN: ${{ secrets.SCF_SKIP_FIRST_RUN }}
+        if: ${{ env.SCF_SKIP_FIRST_RUN != 'true'}}
+        run: node tools/scfRunAll.js
