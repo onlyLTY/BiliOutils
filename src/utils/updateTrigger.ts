@@ -51,10 +51,11 @@ export default async function (taskName = 'daily') {
     Type: 'timer',
     TriggerDesc: RUN_TIME,
     Qualifier: '$DEFAULT',
+    CustomArgument: new Date().getDate().toString(),
   };
 
-  RUN_TIME = randomJuryRunTime();
   if (taskName.toLowerCase() === 'jury') {
+    RUN_TIME = randomJuryRunTime();
     params.TriggerDesc = RUN_TIME;
     params.TriggerName = 'jury-timer';
   }
@@ -95,7 +96,7 @@ function randomDailyRunTime(dailyRunTime = '17:30:00-23:40:00') {
 
 /** 风纪任务随机时间设置 */
 function randomJuryRunTime(juryRunTime = '8-12/20-40') {
-  const time = juryRunTime.split('/').map(el => +el.split('-'));
+  const time = juryRunTime.split('/').map(el => el.split('-').map(el => +el));
 
   const startHours = random(time[0][0], time[0][1]), // 8 - 12
     startMinutes = random(5), // 0 - 5

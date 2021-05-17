@@ -20,7 +20,7 @@ export function apiDelay(delayTime?: number) {
   let startTime = new Date().getTime() + parseInt(delay, 10);
   while (new Date().getTime() < startTime) {}
 
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     resolve('done');
   });
 }
@@ -34,6 +34,12 @@ export function apiDelay(delayTime?: number) {
  * random(9)   --> [0,9]
  */
 export function random(min: number = 1, max: number = 0): number {
+  if (max === undefined) {
+    max = 0;
+  }
+  if (min === undefined) {
+    min = 0;
+  }
   if (max < min) {
     //写反顺序后
     let temp = max;

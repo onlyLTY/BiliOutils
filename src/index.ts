@@ -11,6 +11,7 @@ exports.main_handler = async (event, _context) => {
 
   // 只有serverless才有event
   if (event === undefined) event = {};
+  if (event.Message === new Date().getDate().toString()) return '今日重复执行';
   if (event.TriggerName === 'jury-timer') {
     if (!JuryTask.isRun && JuryTask.noRunMessage === '今日的案件已经审核完成') {
       console.log(JuryTask.noRunMessage, JuryTask.dailyCompleteCount++);
