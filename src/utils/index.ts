@@ -1,5 +1,6 @@
 import { TaskConfig } from '../config/globalVar';
 import sendMail from './email';
+import { random as baseRandom } from 'lodash';
 export * from './cookie';
 
 /**
@@ -25,29 +26,7 @@ export function apiDelay(delayTime?: number) {
   });
 }
 
-/**
- * 返回随机值
- * @param min
- * @param max
- *
- * random(2,6) --> [2,6]
- * random(9)   --> [0,9]
- */
-export function random(min: number = 1, max: number = 0): number {
-  if (max === undefined) {
-    max = 0;
-  }
-  if (min === undefined) {
-    min = 0;
-  }
-  if (max < min) {
-    //写反顺序后
-    let temp = max;
-    max = min;
-    min = temp;
-  }
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+export const random = baseRandom;
 
 /**
  * 发送消息到其他设备

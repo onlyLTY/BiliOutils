@@ -1,6 +1,5 @@
-require('dotenv').config();
 import { scf } from 'tencentcloud-sdk-nodejs';
-import { random } from './index';
+import { random } from 'lodash';
 import { Config } from '../interface/Config';
 let config: Config;
 try {
@@ -68,27 +67,36 @@ export default async function (taskName = 'daily') {
   return createResult;
 }
 
+const MAX_MINUTES = 59,
+  MAX_HOURS = 23,
+  DAILY_MIN_HOURS = 19,
+  JURY_START_MINUTES = 5,
+  JURY_RUNTIME_HOURS = 6;
+
 function randomDailyRunTime(dailyRunTime = '17:30:00-23:40:00') {
   const taskTime = dailyRunTime.split('-');
   const startTime = taskTime[0].split(':').map(str => +str);
   const endTime = taskTime[1].split(':').map(str => +str);
 
-  const hours = random(startTime[0] ?? 19, endTime[0] ?? 24);
+  const hours = random(
+    startTime[0] ?? DAILY_MIN_HOURS,
+    endTime[0] ?? MAX_HOURS,
+  );
   let minutes = 0;
   if (hours == startTime[0]) {
-    minutes = random(startTime[1], 60);
+    minutes = random(startTime[1], MAX_MINUTES);
   } else if (hours == endTime[0]) {
     minutes = random(endTime[1]);
   } else {
-    minutes = random(60);
+    minutes = random(MAX_MINUTES);
   }
   let seconds = 0;
   if (hours == startTime[0]) {
-    seconds = random(startTime[2], 60);
+    seconds = random(startTime[2], MAX_MINUTES);
   } else if (hours == endTime[0]) {
     seconds = random(endTime[2]);
   } else {
-    seconds = random(60);
+    seconds = random(MAX_MINUTES);
   }
 
   return `${seconds} ${minutes} ${hours} * * * *`;
@@ -99,11 +107,11 @@ function randomJuryRunTime(juryRunTime = '8-12/20-40') {
   const time = juryRunTime.split('/').map(el => el.split('-').map(el => +el));
 
   const startHours = random(time[0][0], time[0][1]), // 8 - 12
-    startMinutes = random(5), // 0 - 5
+    startMinutes = random(JURY_START_MINUTES), // 0 - 5 分钟开始
     minutes = random(time[1][0], time[1][1]),
-    seconds = random(59);
+    seconds = random(MAX_MINUTES);
 
-  const endHours = 6 + startHours;
+  const endHours = JURY_RUNTIME_HOURS + startHours;
 
   return `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
 }

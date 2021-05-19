@@ -53,7 +53,9 @@ exports.main_handler = async (event, _context) => {
     await apiDelay();
   }
 
-  await updateTrigger();
+  if (event.TriggerName) {
+    await updateTrigger();
+  }
 
   await sendMessage('bili每日任务完成', TaskModule.appInfo);
   return '完成';
