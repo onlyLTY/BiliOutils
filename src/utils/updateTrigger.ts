@@ -147,7 +147,7 @@ function randomJuryRunTime(juryRunTime = '8-12/20-40') {
 
 export default async function (taskName = 'daily', runningTotalNumber = 2) {
   let updateResults = false;
-  while (!updateResults && !runningTotalNumber) {
+  while (!updateResults && runningTotalNumber) {
     updateResults = await aSingleUpdate(taskName);
     runningTotalNumber--;
   }
