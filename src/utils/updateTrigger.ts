@@ -8,6 +8,13 @@ try {
   config = require('../../config/config.json');
 }
 
+const FUNCTION_NAME = config.sls?.name;
+const DAILY_TRIGGER_NAME = 'daily_bili_timer';
+const JURY_TRIGGER_NAME = 'jury_bili_timer';
+if (!FUNCTION_NAME) {
+  throw Error('函数名不存在');
+}
+
 const ScfClient = scf.v20180416.Client;
 const clientConfig = {
   credential: {
@@ -27,8 +34,8 @@ async function createTrigger(params) {
   params.CustomArgument = new Date().getDate().toString();
   try {
     return await client.CreateTrigger(params);
-  } catch (error) {
-    console.log('创建trigger失败', error);
+  } catch ({ code, message }) {
+    console.log('创建trigger失败', `${code} => ${message}`);
     return false;
   }
 }
@@ -36,35 +43,57 @@ async function createTrigger(params) {
 async function deleteTrigger(params) {
   try {
     return await client.DeleteTrigger(params);
-  } catch (error) {
-    console.log('删除trigger失败', error);
+  } catch ({ code, message }) {
+    console.log('删除trigger失败', `${code} => ${message}`);
     return false;
   }
 }
 
-export default async function (taskName = 'daily') {
-  let RUN_TIME = randomDailyRunTime(config.dailyRunTime);
+async function getHasTrigger(taskName) {
+  try {
+    const { Triggers } = await client.ListTriggers({
+      FunctionName: FUNCTION_NAME,
+    });
+    const TRIGGER_NAME =
+      taskName === 'daily' ? DAILY_TRIGGER_NAME : JURY_TRIGGER_NAME;
+    const triggerIndex = Triggers?.findIndex(
+      trigger => trigger.TriggerName === TRIGGER_NAME,
+    );
 
+    return triggerIndex !== -1;
+  } catch ({ code, message }) {
+    console.log('获取trigger失败', `${code} => ${message}`);
+    return false;
+  }
+}
+
+async function aSingleUpdate(taskName) {
+  let runTime = randomDailyRunTime(config.dailyRunTime);
   const params = {
-    FunctionName: config.sls.name,
-    TriggerName: 'bilitools_daily_timer',
+    FunctionName: FUNCTION_NAME,
+    TriggerName: DAILY_TRIGGER_NAME,
     Type: 'timer',
-    TriggerDesc: RUN_TIME,
+    TriggerDesc: runTime,
     Qualifier: '$DEFAULT',
   };
 
+  const hasTrigger = await getHasTrigger(taskName);
+
   if (taskName.toLowerCase() === 'jury') {
-    RUN_TIME = randomJuryRunTime();
-    params.TriggerDesc = RUN_TIME;
-    params.TriggerName = 'jury-timer';
+    runTime = randomJuryRunTime();
+    params.TriggerDesc = runTime;
+    params.TriggerName = JURY_TRIGGER_NAME;
   }
-  console.log(`修改时间为：${RUN_TIME}`);
-  const deleteResult = await deleteTrigger(params);
-  if (!deleteResult) {
-    return;
+  console.log(`修改时间为：${runTime}`);
+
+  if (hasTrigger) {
+    const deleteResult = await deleteTrigger(params);
+    if (!deleteResult) {
+      return;
+    }
   }
-  const createResult = await createTrigger(params);
-  return createResult;
+
+  return !!(await createTrigger(params));
 }
 
 const MAX_MINUTES = 59,
@@ -114,4 +143,13 @@ function randomJuryRunTime(juryRunTime = '8-12/20-40') {
   const endHours = JURY_RUNTIME_HOURS + startHours;
 
   return `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
+}
+
+export default async function (taskName = 'daily', runningTotalNumber = 2) {
+  let updateResults = false;
+  while (!updateResults && !runningTotalNumber) {
+    updateResults = await aSingleUpdate(taskName);
+    runningTotalNumber--;
+  }
+  return updateResults;
 }
