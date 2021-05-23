@@ -10,7 +10,7 @@
 - [x] 应援团签到
 - [x] 直播间弹幕
 
-## 说明
+## 使用说明
 
 项目仅供自己使用，旨在减少每日的操作，轻松升级. 不会提供抢辣条等有损他人利益的功能
 
@@ -20,47 +20,28 @@ scf 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 
 ## 使用方法
 
-fork 项目， 通过下面链接自定义获取配置， 开启 action(略)  
-每次从 action 提交到 scf 都会自动运行一次，若要关闭自动运行，请在 `secrets` 中添加 `SCF_SKIP_FIRST_RUN` 值为 `true`
+`config/config.demo.jsonc`中进行了三个用户的配置演示，使用单用户可以只配置一个。
 
-## 配置
-
-`config/config.demo.jsonc`中进行了三个用户的配置演示，使用单用户可以只配置一个
-
-填写表单就能够获取配置了`[初步测试版]`<https://catlair.gitee.io/bili-tools-docs-deploy/>
-
-为了避免配置中的特殊符号影响，配置必须进行压缩(压缩也可以减少配置的大小)，下面是压缩地址(参考百度 Helper 进行的压缩)  
-json 数据在线压缩地址<https://catlair.gitee.io/bili-tools-docs-deploy/#/data/format>
-
-`api`的调用速度配置对部分情况不会生效，该部分使用了个人觉得应该使用的最小区间，就不做更大范围的兼容了
-
-[仓库地址](https://github.com/catlair/BiliTools-docs)
-
-消息推送配置(可选)
-![消息推送配置](./images/message-push.png)
-
-账号配置(必填)，可以多次配置，使用多账号
-![账号配置](./images/config.png)
-
-获取压缩的配置
-![获取压缩的配置](./images/getGzip.png)
-
-打开 github fork 的项目
-![设置](./images/setting.png)
-
-![设置](./images/setting-new.png)
-
-![设置](./images/setting-new-2.png)
+- [手动部署到 SCF](https://github.com/catlair/BiliTools/issues/18)
+- [Action 部署到 SCF](https://github.com/catlair/BiliTools/issues/20) （不推荐）
 
 ### 腾讯云 serverless
 
-需要在`github secrets`添加腾讯云的 secret
-
 获取 key 参考[腾讯云权限管理](https://cloud.tencent.com/document/product/583/44786)
-
-`.github/workflows/deploy_tencent_sls.yaml`
 
 ## API 参考
 
 - [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
+- [catlair/bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
+
+## 责任声明
+
+1. 本项目旨在学习 Github、Git 及 TypeScript 的使用，若存在损害您合法权益的内容，请联系本人处理（hub 主页有邮箱）。
+2. bug 是不可避免的，我们尽量减少 bug 所带来得损失，**但这并不意味着我们要为此负责**，选择权在您，望周知。
+3. 使用 Bilibili （以下简称 b 站） 进行测试，不会提供的内容**包括但不限于** b 站抢辣条、转发抽奖、下载 VIP 视频等内容，**请在阅读代码后删除源码及相关工具**。
+4. 不会以任何方式收集用户 ID、cookie、关注列表、收藏记录等信息。
+5. 任何方式的 cookie 泄露都与我无关。请不要将 cookie 上传到 Github 等开放平台以及其他任何不可信平台。
+6. 除仓库和本仓库 Releases 中开发下载的内容，其余皆与本人无关。
+7. 本仓库只使用 Actions 进行 Releases 构建、项目测试等操作。**请您务必遵守 Github 服务条款，不要滥用 Actions 工作流**。
+8. 仓库中不含本人任何 b 站相关信息，任何您不清楚的投币、充电、打赏都与本仓库无关。
