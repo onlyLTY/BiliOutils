@@ -40,7 +40,6 @@ jobs:
         with:
           files: |
             dist/tencent_scf.zip
-          body_path: ${{ github.workflow }}-CHANGELOG.txt
           draft: false
           prerelease: false
         env:
