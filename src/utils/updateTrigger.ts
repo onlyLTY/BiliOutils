@@ -146,6 +146,10 @@ function randomJuryRunTime(juryRunTime = '8-12/20-40') {
 }
 
 export default async function (taskName = 'daily', runningTotalNumber = 2) {
+  if (!process.env.TENCENT_SECRET_ID && !process.env.TENCENT_SECRET_KEY) {
+    console.log('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
+    return false;
+  }
   let updateResults = false;
   while (!updateResults && runningTotalNumber) {
     updateResults = await aSingleUpdate(taskName);
