@@ -166,7 +166,8 @@ export async function getAidByByPriority() {
   //从指定下标开始调用函数
   aidFunArray.splice(0, TaskModule.currentStartFun);
 
-  aidFunArray.forEach(async (fun, index) => {
+  for (let index = 0; index < aidFunArray.length; index++) {
+    const fun = aidFunArray[index];
     data = await fun();
     if (data.msg === '0') return data;
 
@@ -184,10 +185,10 @@ export async function getAidByByPriority() {
     if (i <= 0) {
       TaskModule.currentStartFun = index;
     }
-  });
+  }
 
   return {
-    msg: '没有找到视频',
-    data: { aid: 0, title: '傻逼ts', author: '卧槽泥马' },
+    msg: '-1',
+    data: { aid: 0 },
   };
 }

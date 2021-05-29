@@ -28,6 +28,10 @@ export default async function addCoins() {
     if (TaskModule.coinsTask <= 0) break;
     //这个函数不会报错的
     const { data, msg } = await getAidByByPriority();
+    if (!data?.aid) {
+      eCount++;
+    }
+
     await apiDelay();
     if (msg === '0') {
       const { aid, title, author } = data;
