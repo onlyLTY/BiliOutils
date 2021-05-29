@@ -12,17 +12,17 @@
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js",
     "prebuild": "rm -rf dist/",
-    "predeploy:muilt": "rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package-lock.json && cd ../",
+    "predeploy:muilt": "rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
     "postbuild": "rm -rf ./dist/dto/ && rm -rf ./dist/interface/"
   },
   "author": "catlair",
   "license": "ISC",
   "devDependencies": {
-    "@babel/cli": "^7.13.16",
-    "@babel/core": "^7.13.16",
-    "@babel/preset-env": "^7.13.15",
-    "@types/lodash": "^4.14.168",
-    "@types/node": "^15.3.0",
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/preset-env": "^7.14.2",
+    "@types/lodash": "^4.14.169",
+    "@types/node": "^15.6.1",
     "@types/nodemailer": "^6.4.1",
     "@types/qs": "^6.9.6",
     "atob": "^2.1.2",
@@ -31,10 +31,9 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "dotenv": "^9.0.2",
     "lodash": "^4.17.21",
     "nodemailer": "^6.6.0",
     "qs": "^6.10.1",
-    "tencentcloud-sdk-nodejs": "^4.0.119"
+    "tencentcloud-sdk-nodejs": "^4.0.133"
   }
 }
