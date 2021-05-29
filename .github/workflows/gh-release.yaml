@@ -31,7 +31,7 @@ jobs:
       - name: ZIP
         run: |
           npm prune --production
-          modclean
+          modclean -r
           mv node_modules dist/node_modules
           cd dist
           zip -r -q tencent_scf.zip *
