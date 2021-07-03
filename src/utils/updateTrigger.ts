@@ -1,5 +1,6 @@
 import { scf } from 'tencentcloud-sdk-nodejs';
 import { random } from 'lodash';
+import { getPRCDate } from './';
 import { Config } from '../interface/Config';
 let config: Config;
 try {
@@ -31,7 +32,8 @@ const clientConfig = {
 const client = new ScfClient(clientConfig);
 
 async function createTrigger(params) {
-  params.CustomArgument = new Date().getDate().toString();
+  const today = getPRCDate();
+  params.CustomArgument = today.getDate().toString();
   try {
     return await client.CreateTrigger(params);
   } catch ({ code, message }) {

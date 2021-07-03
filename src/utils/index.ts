@@ -36,3 +36,14 @@ export const random = baseRandom;
 export async function sendMessage(title: string, text: string) {
   sendMail(title, text).catch(console.log);
 }
+
+/**
+ * 不同时区获取北京时间
+ */
+export function getPRCDate(): Date {
+  const now = new Date(),
+    nowTime = now.getTime(),
+    timezone = now.getTimezoneOffset() / 60;
+  // 3600000 为每小时毫秒数
+  return new Date(nowTime + (timezone + 8) * 3600000);
+}
