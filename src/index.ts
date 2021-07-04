@@ -1,6 +1,6 @@
 import { warpLog } from './utils/log';
 import { JuryTask, TaskModule } from './config/globalVar';
-import { apiDelay, sendMessage } from './utils';
+import { apiDelay, sendMessage, getPRCDate } from './utils';
 import { random } from 'lodash';
 import bili, { doOneJuryVote, loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
@@ -38,7 +38,7 @@ exports.main_handler = async (event, _context) => {
   if (!event) {
     return await baseTasks();
   }
-  if (event.Message === new Date().getDate().toString()) {
+  if (event.Message === getPRCDate().getDate().toString()) {
     return '今日重复执行';
   }
 
