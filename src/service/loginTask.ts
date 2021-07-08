@@ -103,6 +103,6 @@ export async function getBCoinBalance() {
       return;
     }
   } catch (error) {
-    console.log('获取用户信息异常：', error);
+    console.log('获取用户信息异常：', error.message);
   }
 }

@@ -45,7 +45,7 @@ export default async function supGroupSign() {
         console.log('签到失败', message);
       }
     } catch (error) {
-      console.log('签到异常', error);
+      console.log('签到异常', error.message);
     } finally {
       await apiDelay();
     }
