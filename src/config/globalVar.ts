@@ -14,19 +14,14 @@ export abstract class TaskConfig {
   static readonly config = config;
   /** 直接复制全部吧 */
   static COOKIE: string = config.cookie;
-
   /**bilibili账号的jct */
   static readonly BILIJCT: string = getBiliJct();
-
   /**操作用户的bilibili uid */
   static readonly USERID: number = getUserId();
-
   /**【可选】用户代理(浏览器) */
   static readonly USER_AGENT: string = config.userAgent;
-
   /** 预计投币数,默认5 */
   static readonly BILI_TARGET_COINS: number = config.targetCoins ?? 5;
-
   private static biliApiDelay = config.apiDelay || [2, 6];
   /** 调用api时的延迟(单位s),默认2s至6s */
   static readonly BILI_API_DELAY: number[] = Array.isArray(
@@ -34,20 +29,20 @@ export abstract class TaskConfig {
   )
     ? TaskConfig.biliApiDelay
     : [TaskConfig.biliApiDelay];
-
   /**自定义高优先级用户列表 */
   static readonly BILI_CUSTOMIZE_UP: Array<number> = config.customizeUp || [];
-
   /** 目标等级 默认6级 */
   static readonly BILI_TARGET_LEVEL: number = config.targetLevel ?? 6;
-
   /** 最低剩余硬币数,默认0 */
   static readonly BILI_STAY_COINS: number = config.stayCoins ?? 0;
-
   /** 是否精准匹配UP主的视频 */
   static readonly BILI_UPPER_ACC_MATCH: boolean = config.upperAccMatch || true;
-
+  /** 投币操作重试次数 默认 4 */
   static readonly BILI_COIN_RETRY_NUM: number = config.coinRetryNum || 4;
+  /** 充电的 up 默认自己 */
+  static readonly CHARGE_ID = config.chargeUpId || TaskConfig.USERID;
+  /** 充电预设时间，哪一天？ */
+  static readonly CHARGE_PRESET_TIME = config.chargePresetTime || 31;
 }
 
 //任务完成情况统计
@@ -64,6 +59,12 @@ export abstract class TaskModule {
   static appInfo: string = '\n';
   /** 确定获取aid的函数开始下标 */
   static currentStartFun: number = 0;
+  /** B币券余额 */
+  static bCoinCouponBalance: number = 0;
+  /** 0为无，1为月度，2为年度 */
+  static vipType: number = 0;
+  /** 充电留言 token */
+  static chargeOrderNo: string;
 }
 
 //风纪委员情况

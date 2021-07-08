@@ -18,6 +18,8 @@ export interface Config {
     shareAndWatch?: boolean;
     supGroupSign?: boolean;
     judgement?: boolean;
+    charging?: boolean;
+    getVipPrivilege?: boolean;
   };
   targetLevel?: number;
   stayCoins?: number;
@@ -28,6 +30,8 @@ export interface Config {
   coinRetryNum?: number;
   apiDelay?: [number, number] | number;
   upperAccMatch?: boolean;
+  chargeUpId: number;
+  chargePresetTime: number;
   sls: {
     appName: string;
     name: string;

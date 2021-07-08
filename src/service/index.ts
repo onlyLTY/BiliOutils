@@ -8,6 +8,7 @@ import silver2Coin from './silver2Coin';
 import supGroupSign from './supGroupSign';
 import judgement, { doOneJuryVote } from './judgement';
 import liveSendMessage from './sendLiveMsg';
+import charging from './charging';
 
 export { loginTask, doOneJuryVote };
 
@@ -20,5 +21,6 @@ export default {
   mangaSign,
   supGroupSign,
   judgement,
-  liveSendMessage
+  liveSendMessage,
+  charging,
 };

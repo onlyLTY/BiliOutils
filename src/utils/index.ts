@@ -47,3 +47,23 @@ export function getPRCDate(): Date {
   // 3600000 为每小时毫秒数
   return new Date(nowTime + (timezone + 8) * 3600000);
 }
+
+/**
+ * 返回本月天数
+ */
+export function getMonthHasDays(now?: Date) {
+  const nowTime = now || getPRCDate(),
+    year = nowTime.getFullYear(),
+    month = nowTime.getMonth() + 1,
+    smallMonth = [4, 6, 9, 11];
+
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 100 === 0;
+
+  if (month === 2) {
+    return isLeapYear ? 29 : 28;
+  } else if (smallMonth.includes(month)) {
+    return 30;
+  } else {
+    return 31;
+  }
+}
