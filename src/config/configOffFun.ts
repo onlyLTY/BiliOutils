@@ -1,16 +1,5 @@
 import { TaskConfig } from './globalVar';
-
-export const functionConfig = {
-  silver2Coin: true,
-  liveSignTask: true,
-  addCoins: true,
-  mangaSign: false,
-  shareAndWatch: true,
-  judgement: false,
-  supGroupSign: false,
-  liveSendMessage: false,
-  taskReward: true,
-};
+import functionConfig from './funcConfig';
 
 function funHandle() {
   if (!functionConfig.addCoins && !functionConfig.shareAndWatch) {

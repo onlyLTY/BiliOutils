@@ -34,8 +34,9 @@ export class VideosByUpIdDto extends ApiAbstract {
 
 //用户信息
 export class UserInfoNavDto extends ApiAbstract {
-  data?: {
+  data: {
     isLogin: boolean;
+    email_verified: number;
     //等级信息
     level_info: {
       current_level: number;
@@ -43,8 +44,9 @@ export class UserInfoNavDto extends ApiAbstract {
       current_exp: number;
       next_exp: number;
     };
-    mid: number; //用户id
-    money: number; //硬币
+    mid: number;
+    mobile_verified: number;
+    money: number;
     moral: number;
     scores: number;
     uname: string;
@@ -54,8 +56,13 @@ export class UserInfoNavDto extends ApiAbstract {
     vipStatus: 0 | 1;
     /** 0:无 1:月度 2:年度及以上 */
     vipType: 0 | 1 | 2;
-    vip_label: {
-      text: number;
+    wallet: {
+      mid: number;
+      /** b 币数量（包含券） */
+      bcoin_balance: number;
+      /** b 币券数量 */
+      coupon_balance: number;
+      coupon_due_time: number;
     };
   };
 }
