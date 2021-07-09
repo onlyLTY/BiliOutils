@@ -1,5 +1,5 @@
 {
-  "isRun": true, // 是否运行,默认(不填写)运行,改成false则不运行
+  "isRun": true, // 是否运行,默认(不填写)运行,改成 false 则不运行
   // 默认推送消息配置
   "message": {
     "email": {
@@ -9,7 +9,7 @@
       "host": "例如smtp.163.com",
       "port": 465
     },
-    "serverChan": "server酱的key"
+    "serverChan": "server酱的key（暂不支持此功能）"
   },
   "account": [
     {
@@ -44,13 +44,15 @@
       "cookie": "这是隐私请不要让他人看见（完整的cookie）", // 【必填】
       "stayCoins": 0, // 剩余硬币下限,避免投币把买皮肤都投了
       "userAgent": "", //【推荐】浏览器的ua,默认是pc chrome87的ua
-      "dailyRunTime": "19:19:19-23:23:23", //使用serverless随机时间,每日任务随机范围,例子"19:19:19-23:23:23"
-      "targetCoins": 5, //每日投币目标(实际投币数根据已投量减少)
-      "targetLevel": 6, //目标等级,达到等级后不再投币
-      "customizeUp": [], //投币指定up主,数组中填写id数字(不是字符串)
-      "coinRetryNum": 4, //投币搜索视频重试次数,默认4
-      "apiDelay": [2, 6], //调用api延时时间(s),默认2,6s随机
-      "upperAccMatch": true //投币是否精准配置up, 排除发表视频不是本人的合作视频
+      "dailyRunTime": "19:19:19-23:23:23", // 使用serverless随机时间,每日任务随机范围,例子"19:19:19-23:23:23"
+      "targetCoins": 5, // 每日投币目标(实际投币数根据已投量减少)
+      "targetLevel": 6, // 目标等级,达到等级后不再投币
+      "customizeUp": [], // 投币指定up主,数组中填写id数字(不是字符串)
+      "coinRetryNum": 4, // 投币搜索视频重试次数,默认4
+      "apiDelay": [2, 6], // 调用api延时时间(s),默认2,6s随机
+      "upperAccMatch": true, // 投币是否精准配置up, 排除发表视频不是本人的合作视频
+      "chargeUpId": 0, // 使用 B 币券充电的目标ID（数字），默认自己
+      "chargePresetTime": 31 // 充电预设时间，默认每月最后一天
     },
     {
       // 第二个
