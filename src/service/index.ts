@@ -9,6 +9,7 @@ import supGroupSign from './supGroupSign';
 import judgement, { doOneJuryVote } from './judgement';
 import liveSendMessage from './sendLiveMsg';
 import charging from './charging';
+import getVipPrivilege from './getVipPrivilege';
 
 export { loginTask, doOneJuryVote };
 
@@ -23,4 +24,5 @@ export default {
   judgement,
   liveSendMessage,
   charging,
+  getVipPrivilege,
 };

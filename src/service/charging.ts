@@ -1,7 +1,8 @@
-import { chargingForUp, chargingCommentsForUp } from '../net/charging';
+import { chargingForUp, chargingCommentsForUp } from '../net/vipRequest';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { getPRCDate, getMonthHasDays, apiDelay } from '../utils';
 import { random } from 'lodash';
+import { updateNav } from './updateNav';
 
 enum ChargeStatus {
   '成功' = 4,
@@ -55,6 +56,10 @@ function init() {
 
 export default async function charging() {
   console.log('----【给目标充电】----');
+
+  // 充电前获取下 nav
+  await updateNav();
+  await apiDelay();
 
   if (!init()) {
     return;

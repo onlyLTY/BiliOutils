@@ -1,7 +1,28 @@
 import { stringify } from 'qs';
 import { TaskConfig } from '../config/globalVar';
-import { ChargingDto, ChargingMessageDto } from '../dto/VipPrivilege.dto';
+import {
+  ChargingDto,
+  ChargingMessageDto,
+  ReceiveVipPrivilegeDto,
+} from '../dto/VipPrivilege.dto';
 import { biliApi } from './api';
+
+/**
+ * 领取年度大会员权益
+ * @param type 1.大会员B币券；2.大会员福利
+ */
+export async function receiveVipPrivilege(
+  type: number = 1,
+): Promise<ReceiveVipPrivilegeDto> {
+  const { data } = await biliApi.post(
+    '/x/vip/privilege/receive',
+    stringify({
+      csrf: TaskConfig.BILIJCT,
+      type,
+    }),
+  );
+  return data;
+}
 
 /**
  * 为 up 充电

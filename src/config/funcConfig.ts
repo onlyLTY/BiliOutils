@@ -9,6 +9,7 @@ export const functionConfig = {
   liveSendMessage: false,
   taskReward: true,
   charging: false,
+  getVipPrivilege: false,
 };
 
 export default functionConfig;
