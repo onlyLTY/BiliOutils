@@ -36,7 +36,7 @@ function packageClean(rootPath) {
       dirPath.push(p);
       return;
     }
-    if (statSync(p).isFile() && p.endsWith('package.json')) {
+    if (p.endsWith('package.json')) {
       filePath.push(p);
     }
   });

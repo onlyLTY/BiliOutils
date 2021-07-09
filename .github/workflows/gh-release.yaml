@@ -31,8 +31,7 @@ jobs:
       - name: ZIP
         run: |
           npm prune --production
-          modclean -r -a "*.md,*LICENSE*,.github,.nycrc,*.ts,*.html,*.txt,*.js.map,*.mjs.map,browser.js,@types"
-          node tools/pkgclean.js
+          npm run modclean
           mv node_modules dist/node_modules
           cd dist
           zip -r -q tencent_scf.zip *

@@ -1,22 +1,22 @@
 {
   "name": "catlair-bilitools",
-  "version": "0.0.1",
+  "version": "0.3.6",
   "description": "this is BiliTools",
   "main": "index.ts",
   "scripts": {
-    "deploy:local": "npm run build && npm run deploy",
     "build": "tsc && babel ./dist --out-dir ./dist",
     "deploy": "sls deploy --debug",
     "deploy:muilt": "node tools/bootstrap.js --scf",
     "start:muilt": "node tools/bootstrap.js --start",
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js",
+    "modclean": "modclean -r -a \"*.md,*LICENSE*,.github,.nycrc,*.ts,*.html,*.txt,*.js.map,*.mjs.map,browser.js,@types\" && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
-    "predeploy:muilt": "rm -f ./dist/run.js && cp -f ./package.json ./dist && cd ./dist && npm i --production && rm -f package*.json && cd ../",
+    "predeploy:muilt": "rm -f ./dist/run.js && cp -rf ./tools/ ./package*.json ./dist && cd ./dist && npm i --production && npm run modclean && rm -rf tools package*.json &&  cd ../",
     "postbuild": "rm -rf ./dist/dto/ && rm -rf ./dist/interface/"
   },
   "author": "catlair",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.14.3",
     "@babel/core": "^7.14.3",
