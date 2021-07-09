@@ -93,16 +93,3 @@ export default async function loginTask() {
     throw new Error(error.message);
   }
 }
-
-export async function getBCoinBalance() {
-  try {
-    const { data, message, code } = await loginByCookie();
-    TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
-    if (code !== 0) {
-      console.log('获取用户信息失败：', code, message);
-      return;
-    }
-  } catch (error) {
-    console.log('获取用户信息异常：', error.message);
-  }
-}
