@@ -9,7 +9,11 @@ module.exports = function (path) {
       json = { account: [json] };
     }
   } catch (error) {
-    json = require(`${path}/config.temp.json`);
+    try {
+      json = require(`${path}/config.temp.json`);
+    } catch (error) {
+      console.log('未找到配置文件', error);
+    }
   }
 
   return json;

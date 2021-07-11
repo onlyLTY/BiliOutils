@@ -13,10 +13,12 @@ function resolveRootPath(targetPath) {
 
 function getConfig() {
   if (process.env.BILI_CONFIG) {
+    console.log('使用环境变量 BILI_CONFIG');
     return process.env.BILI_CONFIG;
   }
   const tempTxtPath = resolveRootPath('config/config.txt');
   if (existsSync(tempTxtPath)) {
+    console.log('使用本地文件 config.txt');
     return readFileSync(tempTxtPath, 'utf-8');
   }
   return '';
@@ -29,6 +31,7 @@ function setConfig(gzipString) {
 const gzipString = getConfig();
 if (gzipString) {
   setConfig(gzipString);
+  console.log('配置转化完成');
+} else {
+  console.log('没有可以转化的内容');
 }
-
-console.log('配置转化完成');
