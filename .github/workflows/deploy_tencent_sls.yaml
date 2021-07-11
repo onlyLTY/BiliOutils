@@ -44,7 +44,7 @@ jobs:
       - name: Build APP
         run: npm run build
 
-      - name: create config.temp.json file
+      - name: create config.json file
         timeout-minutes: ${{secrets.TIMEOUT_MINUTES || 15}} # 超时时间(分钟)
         run: |
           if [ -z "$TENCENT_SECRET_ID" ]; then
@@ -53,10 +53,10 @@ jobs:
           fi
           string="${{ secrets.BILI_CONFIG }}"
           if [ -n "$string" ]; then
-          echo "$string" >> ./config/config.temp.txt
-          echo "成功将secrets(BILI_CONFIG)内容输出到配置文件config.temp.txt"
+          echo "$string" >> ./config/config.txt
+          echo "成功将secrets(BILI_CONFIG)内容输出到配置文件config.txt"
           node ./tools/processConfig.js
-          echo "成功转换成config.temp.json"
+          echo "成功转换成config.json"
           exit 0
           fi
 

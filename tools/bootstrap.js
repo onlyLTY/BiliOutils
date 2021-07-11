@@ -1,8 +1,9 @@
 const { writeFileSync } = require('fs');
 const { resolve } = require('path');
-const json = require('../config/config.temp.json');
 const updateSLS = require('./updateSLS');
 const cp = require('child_process');
+
+const json = require('./cfgCompatibility')('../config');
 
 if (json.isRun === false) {
   console.log('不需要运行');

@@ -1,6 +1,6 @@
 const tencentcloud = require('tencentcloud-sdk-nodejs');
 const ScfClient = tencentcloud.scf.v20180416.Client;
-const config = require('../config/config.temp.json');
+const config = require('./cfgCompatibility')('../config');
 
 const clientConfig = {
   credential: {
