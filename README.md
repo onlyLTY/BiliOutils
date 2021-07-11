@@ -25,8 +25,12 @@ scf 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 
 `config/config.demo.jsonc`中进行了三个用户的配置演示，使用单用户可以只配置一个。
 
+[**获取 Cookie 的方法**](https://github.com/catlair/BiliTools/issues/23)
+
 - [手动部署到 SCF](https://github.com/catlair/BiliTools/issues/18)
 - [Action 部署到 SCF](https://github.com/catlair/BiliTools/issues/20) （不推荐）
+- [使用 Docker 运行](https://github.com/catlair/BiliTools/issues/25)
+- [使用 action 测试运行](https://github.com/catlair/BiliTools/issues/24)（体验）
 
 ### 腾讯云 serverless
 
