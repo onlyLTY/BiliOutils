@@ -1,7 +1,6 @@
 import { TaskConfig } from '../config/globalVar';
-import sendMail from './email';
 import { random as baseRandom } from 'lodash';
-import pushplus from './pushplus';
+import { sendMail, pushplus } from './sendMessage';
 export * from './cookie';
 
 /**
