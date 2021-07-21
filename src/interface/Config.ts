@@ -9,6 +9,7 @@ export interface Config {
       port?: number;
     };
     serverChan?: string;
+    pushplusToken?: string;
   };
   function?: {
     silver2Coin?: boolean;
@@ -35,7 +36,7 @@ export interface Config {
   sls: {
     appName: string;
     name: string;
-    description: string;
-    region: string;
+    description?: string;
+    region?: string;
   };
 }

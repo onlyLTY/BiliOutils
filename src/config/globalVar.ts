@@ -43,6 +43,9 @@ export abstract class TaskConfig {
   static readonly CHARGE_ID = config.chargeUpId || TaskConfig.USERID;
   /** 充电预设时间，哪一天？ */
   static readonly CHARGE_PRESET_TIME = config.chargePresetTime || 31;
+  /** pushplus token */
+  static readonly PUSHPLUS_TOKEN =
+    process.env.PUSHPLUS_TOKEN || config.message.pushplusToken;
 }
 
 //任务完成情况统计

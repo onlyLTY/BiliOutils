@@ -1,6 +1,7 @@
 import { TaskConfig } from '../config/globalVar';
 import sendMail from './email';
 import { random as baseRandom } from 'lodash';
+import pushplus from './pushplus';
 export * from './cookie';
 
 /**
@@ -35,6 +36,7 @@ export const random = baseRandom;
  */
 export async function sendMessage(title: string, text: string) {
   sendMail(title, text).catch(console.log);
+  pushplus(title, text);
 }
 
 /**
