@@ -11,7 +11,7 @@ RUN npm run build \
     && npm run modclean \
     && mkdir builddir \
     && chmod +x docker-entrypoint.sh \
-    && mv -f dist tools node_modules package.json docker-entrypoint.sh builddir \
+    && mv -f  dist tools node_modules package.json serverless.yaml docker-entrypoint.sh builddir \
     && mkdir builddir/config
 
 FROM node:lts-alpine

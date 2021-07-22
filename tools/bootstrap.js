@@ -29,6 +29,9 @@ function baseConfig(el) {
     if (message.serverChan === true) {
       message.serverChan = dMsg.serverChan;
     }
+    if (message.pushplusToken === true) {
+      message.pushplusToken = dMsg.pushplusToken;
+    }
     el.message = message;
   }
 

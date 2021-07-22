@@ -1,6 +1,5 @@
 node_modules/
 .github/
-serverless.yaml
 README.md
 .prettierrc
 .git
