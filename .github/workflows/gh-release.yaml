@@ -1,38 +1,50 @@
 name: gh-release
 
 on:
-  workflow_dispatch: # 手动触发
   push:
     tags:
       - 'v*'
 
 jobs:
-  build:
+  build-docker:
     if: github.repository == 'catlair/BiliTools'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
     environment: Build
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - name: set Docker tag
+        run: echo DOCKER_TAGS=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g"  >> $GITHUB_ENV
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Install dependencies
-        timeout-minutes: 5
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and Push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64' }}
+          tags: catlair/bilitools:latest,catlair/bilitools:${{ env.DOCKER_TAGS }}
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+  release:
+    needs: build-docker
+    if: github.repository == 'catlair/BiliTools'
+    runs-on: ubuntu-latest
+    environment: Build
+    steps:
+      - name: Copy dist
         run: |
-          npm install -g typescript modclean
-          npm install
-      - name: Build APP
-        run: npm run build
+          docker run -id --rm --name copy_dist catlair/bilitools:latest sh
+          docker cp copy_dist:/usr/src/app/node_modules .
+          docker cp copy_dist:/usr/src/app/dist .
+          mv node_modules dist
       - name: ZIP
         run: |
-          npm prune --production
-          npm run modclean
-          mv node_modules dist/node_modules
           cd dist
           zip -r -q tencent_scf.zip *
       - name: Release
