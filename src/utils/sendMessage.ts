@@ -24,7 +24,7 @@ export async function pushplus(title: string, content: string) {
     .then(res => {
       const { msg, code } = res.data;
       if (code === 200) {
-        console.log(msg);
+        console.log('pushplus 发送消息成功');
         return;
       }
       console.log('pushplus 发送消息失败');

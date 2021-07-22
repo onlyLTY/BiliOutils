@@ -34,8 +34,10 @@ export const random = baseRandom;
  * @param text 文本内容
  */
 export async function sendMessage(title: string, text: string) {
-  sendMail(title, text).catch(console.log);
-  pushplus(title, text);
+  await Promise.all([
+    sendMail(title, text).catch(console.log),
+    pushplus(title, text),
+  ]);
 }
 
 /**

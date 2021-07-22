@@ -15,8 +15,9 @@ RUN npm run build \
     && mv -f dist tools node_modules package.json docker-entrypoint.sh builddir \
     && mkdir builddir/config
 
-FROM node:lts-alpine as runtime
+FROM node:lts-alpine
 WORKDIR /usr/src/app
+ENV SERVERLESS_PLATFORM_VENDOR=tencent
 COPY --from=build /usr/src/app/builddir .
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["npm", "run", "start:muilt"]
+CMD ["npm", "run", "deploy:muilt"]
