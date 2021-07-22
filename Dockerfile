@@ -8,7 +8,6 @@ RUN npm install \
     && npm install -g typescript modclean 
 RUN npm run build \
     && npm prune --production \
-    && npm install atob@2 btoa@1 pako@1 \
     && npm run modclean \
     && mkdir builddir \
     && chmod +x docker-entrypoint.sh \
