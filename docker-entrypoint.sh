@@ -3,8 +3,12 @@ set -e
 
 node tools/processConfig.js
 
-function scfHandle(){
-  npm install -g serverless
+scfHandle(){
+  which "sls" &> /dev/null
+  if [ $? -ne 0 ]
+  then
+  npm install serverless -g
+  fi
   mv node_modules dist
 }
 

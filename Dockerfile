@@ -19,4 +19,4 @@ WORKDIR /usr/src/app
 ENV SERVERLESS_PLATFORM_VENDOR=tencent
 COPY --from=build /usr/src/app/builddir .
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["npm", "run", "deploy:muilt"]
+CMD ["npm", "run", "start:muilt"]

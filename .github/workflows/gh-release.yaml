@@ -29,6 +29,13 @@ jobs:
           push: true
           platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64' }}
           tags: catlair/bilitools:latest,catlair/bilitools:${{ env.DOCKER_TAGS }}
+      - name: Build and Push
+        uses: docker/build-push-action@v2
+        with:
+          file: ./docker/deploy.Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: catlair/bilitools-deploy:latest,catlair/bilitools-deploy:${{ env.DOCKER_TAGS }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   release:
