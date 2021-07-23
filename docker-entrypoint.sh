@@ -21,6 +21,8 @@ if [ "$3" == "deploy:muilt" ]
 then
   scfHandle
   node tools/bootstrap.js --scf
+  # 将参数后移 3 个
+  shift 3
 fi
 
 exec "$@"
