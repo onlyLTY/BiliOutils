@@ -19,6 +19,7 @@ export interface Config {
     shareAndWatch?: boolean;
     supGroupSign?: boolean;
     judgement?: boolean;
+    liveSendMessage?: boolean;
     charging?: boolean;
     getVipPrivilege?: boolean;
   };

@@ -62,7 +62,7 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 ### 配置文件路径
 
 - 全局配置（可配置多个用户）：`config/config.json`
-- 单用户配置（dist 目录会在 build 时被删除）：`dist/config.json`
+- 单用户配置：`与 index.js (ts) 同目录/config/config.json`。如 `dist`
 
 所有配置都登记在 [`interface/Config.ts`](/src/interface/Config.ts) 文件中  
 **解释：**
@@ -132,25 +132,7 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 注：
 
 - `sls` 字段是实现随机运行需要的内容（函数名和函数地域）
-- `json` 不支持注释
-
-`sls` 地域对应表
-
-```js
-[
-  ['ap-shanghai', '上海'],
-  ['ap-beijing', '北京'],
-  ['ap-guangzhou', '广州'],
-  ['ap-chengdu', '成都'],
-  ['ap-hongkong', '香港'],
-  ['ap-mumbai', '孟买'],
-  ['ap-singapore', '新加坡'],
-  ['na-siliconvalley', '硅谷'],
-  ['na-toronto', '多伦多'],
-  ['ap-seoul', '首尔'],
-  ['eu-frankfurt', '法兰克福'],
-];
-```
+- `json` 不支持注释，所以千万不要注释
 
 ### 多用户配置参考
 
