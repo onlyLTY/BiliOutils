@@ -15,6 +15,8 @@
 
 ## 使用说明
 
+访问 Github 有困难？ 可以使用 [Gitee](https://gitee.com/catlair/BiliTools) 查看文档
+
 个人使用：消息推送除邮箱暂时不再支持其他 （新增 [pushplus](http://www.pushplus.plus/)）
 
 SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次运行时间可能是在此次运行时间的后面，导致再次运行，目前只是将后面的运行都进行了跳过处理。
@@ -23,6 +25,8 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 当需要自行添加功能时，由于判断是否执行函数的机制，默认导出的 `service` 函数不能为匿名，该函数名必须和配置文件一致。
 
 ## 使用方法
+
+**为了和 Gitee 同步，文档将逐步转移至[docs 目录](./docs)**
 
 - [**获取 Cookie 的方法**](https://github.com/catlair/BiliTools/issues/23)
 - [手动部署到 SCF](https://github.com/catlair/BiliTools/issues/18) （推荐）
