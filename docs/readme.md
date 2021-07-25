@@ -1,3 +1,16 @@
+## 目录
+
+- [目录](#目录)
+- [获取 Cookie 的方法](#获取-cookie-的方法)
+  - [Firefox](#firefox)
+  - [Chrome/Chromium](#chromechromium)
+- [获取腾讯云函数（SCF）授权（ID/KEY）的方法](#获取腾讯云函数scf授权idkey的方法)
+- [配置相关](#配置相关)
+  - [配置文件路径](#配置文件路径)
+  - [在线填写表单获取配置](#在线填写表单获取配置)
+  - [单用户配置参考](#单用户配置参考)
+  - [多用户配置参考](#多用户配置参考)
+
 ## 获取 Cookie 的方法
 
 以 PC 端浏览器举例（推荐使用 Firefox/Chrome/Chromium Edge）
@@ -51,7 +64,7 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 - 全局配置（可配置多个用户）：`config/config.json`
 - 单用户配置（dist 目录会在 build 时被删除）：`dist/config.json`
 
-所有配置都登记在 [`interface/Config.ts`](/catlair/BiliTools/blob/main/src/interface/Config.ts) 文件中  
+所有配置都登记在 [`interface/Config.ts`](/src/interface/Config.ts) 文件中  
 **解释：**
 
 - `number`: 数字 例如：123。
