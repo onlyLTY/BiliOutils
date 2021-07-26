@@ -73,7 +73,7 @@
 
 | Key             | 默认值  | 说明                 |
 | --------------- | ------- | -------------------- |
-| silver2Coin     | `true`  | 银瓜子对换硬币       |
+| silver2Coin     | `true`  | 银瓜子兑换硬币       |
 | addCoins        | `true`  | 投币                 |
 | liveSignTask    | `true`  | 直播间签到           |
 | shareAndWatch   | `true`  | 观看和分享视频       |

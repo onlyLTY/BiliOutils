@@ -26,17 +26,13 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 
 ## 使用方法
 
-**为了和 Gitee 同步，文档将逐步转移至[docs 目录](./docs)**
+为了和 Gitee 同步，文档转移至 [docs 目录](./docs)  
+**若 Github 无法查看图片，请访问 [Gitee](https://gitee.com/catlair/BiliTools/tree/main/docs)**
 
-- [**获取 Cookie 的方法**](https://github.com/catlair/BiliTools/issues/23)
-- [手动部署到 SCF](https://github.com/catlair/BiliTools/issues/18) （推荐）
-- [Action 手动部署到 SCF](https://github.com/catlair/BiliTools/issues/20) （推荐）
-- [使用 Docker 运行](https://github.com/catlair/BiliTools/issues/25)
-- [使用 Action 测试运行](https://github.com/catlair/BiliTools/issues/24)（体验，不推荐）
-
-### 腾讯云 Serverless （简称 SCF）
-
-获取 key 参考[腾讯云权限管理](https://cloud.tencent.com/document/product/583/44786)
+- [手动部署到 SCF](./docs/手动部署到SCF.md) #18（推荐）
+- [Action 部署到 SCF](./docs/Action部署到SCF.md) #20（推荐）
+- [使用 Docker 运行](./docs/使用Docker运行.md) #25
+- [使用 Action 测试运行](./docs/使用Action运行.md) #24（体验，不推荐）
 
 ### Docker 镜像
 
