@@ -1,9 +1,9 @@
-import { PureData } from './BiLiAbstractClass';
+import { PureDataProp } from './BiLiBaseProp';
 
 /**
  * 自己加入的应援团
  */
-export class SupGroupsDto extends PureData {
+export interface SupGroupsDto extends PureDataProp {
   data: {
     list: {
       group_id: number;
@@ -25,7 +25,7 @@ export class SupGroupsDto extends PureData {
 /**
  * 应援团签到
  */
-export class SupGroupsSignDto extends PureData {
+export interface SupGroupsSignDto extends PureDataProp {
   data: {
     /** 增加的经验值 */
     add_num: number;

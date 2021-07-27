@@ -1,19 +1,18 @@
-import { ApiAbstract } from './BiLiAbstractClass';
-import { AccountAbstract } from './BiLiAbstractClass';
+import { AccountBaseProp, ApiBaseProp } from './BiLiBaseProp';
 
-//硬币数量
-export class CoinBalanceDto extends AccountAbstract {
+/** 硬币数量 */
+export interface CoinBalanceDto extends AccountBaseProp {
   data: { money: number };
 }
 
-//关注列表
-export class FollowingsDto extends ApiAbstract {
+/** 关注列表 */
+export interface FollowingsDto extends ApiBaseProp {
   data: Array<{ mid: number }>;
 }
 
-//获取指定up主的视频
-export class VideosByUpIdDto extends ApiAbstract {
-  'data': {
+/** 获取指定up主的视频 */
+export interface VideosByUpIdDto extends ApiBaseProp {
+  data: {
     media_list: Array<{
       id: number;
       page: number;
@@ -32,8 +31,8 @@ export class VideosByUpIdDto extends ApiAbstract {
   };
 }
 
-//用户信息
-export class UserInfoNavDto extends ApiAbstract {
+/** 用户信息 */
+export interface UserInfoNavDto extends ApiBaseProp {
   data: {
     isLogin: boolean;
     email_verified: number;
@@ -67,8 +66,8 @@ export class UserInfoNavDto extends ApiAbstract {
   };
 }
 
-//每日任务完成情况
-export class RewardDto extends ApiAbstract {
+/** 每日任务完成情况 */
+export interface RewardDto extends ApiBaseProp {
   data?: {
     login: boolean;
     watch: boolean;
@@ -81,7 +80,7 @@ export class RewardDto extends ApiAbstract {
   };
 }
 
-//获取投币获得的经验
-export class CoinTodayExpDto extends ApiAbstract {
-  'data': number;
+/** 获取投币获得的经验 */
+export interface CoinTodayExpDto extends ApiBaseProp {
+  data: number;
 }

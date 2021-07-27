@@ -1,15 +1,15 @@
-import { ApiAbstract } from './BiLiAbstractClass';
+import { ApiBaseProp } from './BiLiBaseProp';
 
 /**
  * 个人仲裁信息
  */
-export class JuryInfoDto extends ApiAbstract {
+export interface JuryInfoDto extends ApiBaseProp {
   /**
    *  0 成功
    *  25005 没有资格
    */
   code: number;
-  'data'?: {
+  data?: {
     /** 总仲裁数量 */
     caseTotal: number;
     face: string;
@@ -26,7 +26,7 @@ export class JuryInfoDto extends ApiAbstract {
 /**
  * 仲裁内容
  */
-export class JuryCaseInfoDto extends ApiAbstract {
+export interface JuryCaseInfoDto extends ApiBaseProp {
   data: {
     /** 仲裁案件id */
     id: number;
@@ -68,7 +68,7 @@ export class JuryCaseInfoDto extends ApiAbstract {
 /**
  * 获取一个仲裁案件
  */
-export class JuryCaseObtainDto extends ApiAbstract {
+export interface JuryCaseObtainDto extends ApiBaseProp {
   /**
    * 0 成功
    * 25008 没有新案件了
@@ -84,7 +84,7 @@ export class JuryCaseObtainDto extends ApiAbstract {
 /**
  * 陪审团投票意见
  */
-export class JuryVoteOpinionDto extends ApiAbstract {
+export interface JuryVoteOpinionDto extends ApiBaseProp {
   data: {
     /** 意见数量 */
     count: number;
@@ -109,14 +109,14 @@ export class JuryVoteOpinionDto extends ApiAbstract {
 /**
  * 投票返回信息
  */
-export class JuryVoteDto {
+export interface JuryVoteDto {
   /**
    * 0 成功
    * 25012 重复投票
    * -400 参数错误
    */
   code: number;
-  /** 成功时为'0' */
+  /** 成功时为 '0' */
   message: string;
   ttl: number;
 }

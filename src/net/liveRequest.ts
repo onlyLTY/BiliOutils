@@ -2,13 +2,14 @@ import {
   FansMedalDto,
   LiveSignDto,
   LiveSignInfoDto,
+  MyWalletDto,
   Silver2CoinDto,
-  SilverStatusDto
+  SilverStatusDto,
 } from '../dto/Live.dto';
 import { liveApi } from './api';
 import { stringify } from 'qs';
 import { TaskConfig } from '../config/globalVar';
-import { PureData } from '../dto/BiLiAbstractClass';
+import { PureDataProp } from '../dto/BiLiBaseProp';
 import { random } from '../utils';
 
 /**
@@ -25,7 +26,7 @@ export async function doLiveSign(): Promise<LiveSignDto> {
  */
 export async function webGetSignInfo(): Promise<LiveSignInfoDto> {
   const { data } = await liveApi.get(
-    '/xlive/web-ucenter/v1/sign/WebGetSignInfo'
+    '/xlive/web-ucenter/v1/sign/WebGetSignInfo',
   );
   return data;
 }
@@ -34,7 +35,13 @@ export async function webGetSignInfo(): Promise<LiveSignInfoDto> {
  * 银瓜子兑换硬币
  */
 export async function exchangeSilver2Coin(): Promise<Silver2CoinDto> {
-  const { data } = await liveApi.get('/pay/v1/Exchange/silver2coin');
+  const { data } = await liveApi.post(
+    '/xlive/revenue/v1/wallet/silver2coin',
+    stringify({
+      csrf_token: TaskConfig.BILIJCT,
+      csrf: TaskConfig.BILIJCT,
+    }),
+  );
   return data;
 }
 
@@ -42,7 +49,17 @@ export async function exchangeSilver2Coin(): Promise<Silver2CoinDto> {
  * 瓜子交换信息
  */
 export async function exchangeStatus(): Promise<SilverStatusDto> {
-  const { data } = await liveApi.get('/pay/v1/Exchange/getStatus');
+  const { data } = await liveApi.get('/xlive/revenue/v1/wallet/getStatus');
+  return data;
+}
+
+/**
+ * 瓜子交换信息
+ */
+export async function getMyWallet(): Promise<MyWalletDto> {
+  const { data } = await liveApi.get(
+    '/xlive/revenue/v1/wallet/myWallet?need_bp=1&need_metal=1&platform=pc',
+  );
   return data;
 }
 
@@ -53,8 +70,8 @@ export async function exchangeStatus(): Promise<SilverStatusDto> {
  */
 export async function sendMessage(
   roomid: number,
-  msg: string
-): Promise<PureData> {
+  msg: string,
+): Promise<PureDataProp> {
   const csrf = TaskConfig.BILIJCT;
   const csrf_token = csrf;
   msg || (msg = random(10).toString());
@@ -69,8 +86,8 @@ export async function sendMessage(
       roomid,
       bubble: 0,
       csrf,
-      csrf_token
-    })
+      csrf_token,
+    }),
   );
   return data;
 }
@@ -82,10 +99,10 @@ export async function sendMessage(
  */
 export async function getFansMedalList(
   page: number = 1,
-  pageSize: number = 50
+  pageSize: number = 50,
 ): Promise<FansMedalDto> {
   const { data } = await liveApi.get(
-    `/fans_medal/v5/live_fans_medal/iApiMedal?page=${page}&pageSize=${pageSize}`
+    `/fans_medal/v5/live_fans_medal/iApiMedal?page=${page}&pageSize=${pageSize}`,
   );
   return data;
 }

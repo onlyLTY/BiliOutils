@@ -1,7 +1,7 @@
 /**
  * 漫画签到
  */
-export class ClockInDto {
+export interface ClockInDto {
   msg: string;
   code: number | string;
   meta;

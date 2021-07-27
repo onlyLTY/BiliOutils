@@ -1,12 +1,12 @@
-import { ApiAbstract, PureData } from './BiLiAbstractClass';
+import { ApiBaseProp, PureDataProp } from './BiLiBaseProp';
 
-//直播签到
-export class LiveSignDto extends ApiAbstract {
+/** 直播签到 */
+export interface LiveSignDto extends ApiBaseProp {
   data?: { text: string; hadSignDays: number; specialText: string } | null;
 }
 
-//直播签到信息
-export class LiveSignInfoDto extends ApiAbstract {
+/** 直播签到信息 */
+export interface LiveSignInfoDto extends ApiBaseProp {
   data?: {
     text: string;
     hadSignDays: number;
@@ -15,27 +15,48 @@ export class LiveSignInfoDto extends ApiAbstract {
   };
 }
 
-//获取瓜子状态
-export class SilverStatusDto {
-  'code': number;
-  'msg': string;
-  'message': string;
-  'data': {
+/** 获取瓜子状态 */
+export interface SilverStatusDto extends ApiBaseProp {
+  data: {
     silver: number; //银瓜子
     gold: number; //金瓜子
     coin: number; //硬币
     coin_2_silver_left: number; //
-    silver_2_coin_left: number; // (银瓜子到硬币)
+    silver_2_coin_left: 1 | 0; // (银瓜子到硬币)
+    status: number;
+    vip: number;
   };
 }
 
-//瓜子换硬币
-export class Silver2CoinDto extends PureData {
-  'data'?: {};
+/** 瓜子换硬币 */
+export interface Silver2CoinDto extends PureDataProp {
+  /**
+   * 0 成功
+   * 403 今日兑换过
+   */
+  code: number;
+  data: {
+    coin: number;
+    gold: number;
+    silver: number;
+    /** eg: Silver2Coin00000000000000000000000 */
+    tid: string;
+  };
+}
+
+/** 我的钱包 */
+export interface MyWalletDto extends ApiBaseProp {
+  data: {
+    gold: number;
+    silver: number;
+    bp: string;
+    /** 硬币数 */
+    metal: number;
+  };
 }
 
 /** 获取有勋章的直播间 */
-export class FansMedalDto extends PureData {
+export interface FansMedalDto extends PureDataProp {
   data: {
     medalCount: number;
     count: number;

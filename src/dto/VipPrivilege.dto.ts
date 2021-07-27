@@ -1,12 +1,12 @@
-import { ApiAbstract, PureData, ResponseCode } from './BiLiAbstractClass';
+import { ApiBaseProp, PureDataProp, ResponseCode } from './BiLiBaseProp';
 
 /** 领取每月会员权益 */
-export class ReceiveVipPrivilegeDto extends ApiAbstract {
+export interface ReceiveVipPrivilegeDto extends ApiBaseProp {
   data?: null;
 }
 
 /** 给 UP 充电 */
-export class ChargingDto extends ApiAbstract {
+export interface ChargingDto extends ApiBaseProp {
   message: '0';
   data: {
     /** 用户ID */
@@ -26,7 +26,7 @@ export class ChargingDto extends ApiAbstract {
   };
 }
 
-export class ChargingMessageDto extends PureData {
+export interface ChargingMessageDto extends PureDataProp {
   message: '0';
   /** 88203：不能重复留言 */
   code: ResponseCode | 88203;

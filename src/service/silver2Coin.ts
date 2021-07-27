@@ -1,4 +1,8 @@
-import { exchangeSilver2Coin, exchangeStatus } from '../net/liveRequest';
+import {
+  exchangeSilver2Coin,
+  exchangeStatus,
+  getMyWallet,
+} from '../net/liveRequest';
 
 /**
  * 银瓜子兑换硬币
@@ -6,15 +10,19 @@ import { exchangeSilver2Coin, exchangeStatus } from '../net/liveRequest';
 export default async function silver2Coin() {
   console.log('----【银瓜子兑换硬币】----');
   try {
-    const { data, code, msg } = await exchangeStatus();
+    const { data, code, message } = await exchangeStatus();
     if (code != 0) {
-      console.log('获取瓜子详情失败', msg);
+      console.log('获取瓜子详情失败', message);
     }
-    if (data.silver > data.silver_2_coin_left) {
-      const { msg } = await exchangeSilver2Coin();
-      console.log(msg);
-    } else {
+    if (data.silver_2_coin_left === 0) {
+      console.log('今日已兑换一次');
+      // 700 是一次的价格
+    } else if (data.silver < 700) {
       console.log('兑换失败,你瓜子不够了');
+    } else {
+      const { message } = await exchangeSilver2Coin();
+      console.log(message);
+      await getMyWallet();
     }
   } catch (error) {
     console.log('操作异常', error.message);
