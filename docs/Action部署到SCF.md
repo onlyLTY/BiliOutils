@@ -25,13 +25,6 @@ jobs:
            catlair/bilitools-deploy:latest
 ```
 
-将最后一行改为下面两行，可在推送完成后运行一次每日任务
-
-```yaml
-catlair/bilitools-deploy:latest \
-node tools/bootstrap.js --scf && node tools/scfRunAll.js
-```
-
 ## Github secrets
 
 secrets 配置如下
