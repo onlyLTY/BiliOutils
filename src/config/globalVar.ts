@@ -1,15 +1,10 @@
 import { getUserId, getBiliJct } from '../utils/cookie';
 import { Config } from '../interface/Config';
+import { gzipDecode } from '../utils';
 
-let config: Config;
+const config = setConfig();
 
-try {
-  config = require('./config.json');
-} catch (error) {
-  config = require('../../config/config.json');
-}
-
-//默认的任务配置
+/** 默认的任务配置 */
 export abstract class TaskConfig {
   static readonly config = config;
   /** 直接复制全部吧 */
@@ -48,7 +43,7 @@ export abstract class TaskConfig {
     process.env.PUSHPLUS_TOKEN || config.message.pushplusToken;
 }
 
-//任务完成情况统计
+/** 任务完成情况统计 */
 export abstract class TaskModule {
   /**拥有硬币数量 */
   static money: number = 0;
@@ -70,7 +65,7 @@ export abstract class TaskModule {
   static chargeOrderNo: string;
 }
 
-//风纪委员情况
+/** 风纪委员情况 */
 export abstract class JuryTask {
   static isJury: boolean = false;
   /** 总仲裁数量 */
@@ -83,4 +78,27 @@ export abstract class JuryTask {
   static noRunMessage: string = '';
   /** 审核完成后再次调用的次数 */
   static dailyCompleteCount: number = 0;
+}
+
+function setConfig(): Config {
+  let config: Config;
+  try {
+    // 从当前目录寻找
+    config = require('./config.json');
+  } catch (error) {
+    // 寻找外层目录
+    try {
+      config = require('../../config/config.json');
+    } catch {}
+  }
+  if (!config && process.env.BILI_SCF_CONFIG) {
+    try {
+      // 是否可以从环境变量中获取
+      config = JSON.parse(gzipDecode(process.env.BILI_SCF_CONFIG));
+    } catch {}
+  }
+  if (config?.cookie) {
+    return config;
+  }
+  throw new Error('没有找到配置');
 }

@@ -138,3 +138,4 @@
 | TENCENT_SECRET_KEY         | 使用 SCF 必须的腾讯账号授权 KEY                           |
 | SERVERLESS_PLATFORM_VENDOR | Serverless 供应商，本地推送时必须，Docker 默认为`tencent` |
 | PUSHPLUS_TOKEN             | [pushplusToken](#message-配置项)                          |
+| BILI_SCF_CONFIG            | Gzip 压缩后的单个用户配置（在使用 SCF 时使用）            |

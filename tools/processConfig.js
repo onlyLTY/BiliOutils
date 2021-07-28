@@ -1,5 +1,5 @@
 const { writeFileSync, readFileSync, existsSync } = require('fs');
-const { gzipDecode } = require('./gzip');
+const { gzipDecode } = require('../dist/utils/gzip');
 const { resolve } = require('path');
 
 /**

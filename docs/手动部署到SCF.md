@@ -34,6 +34,12 @@
 
 部署后点击运行，查看是否运行成功，如若失败，请根据输出内容修改后重试
 
+当然也可以可以添加环境变量 [`BILI_SCF_CONFIG`](./configuration.md#环境变量)  
+这样就不用每次更新后都新建 `config.json` 文件  
+文件配置优先级高于 `BILI_SCF_CONFIG`
+
+![bili-scf-config](images/bili-scf-config.png)
+
 ## 4. 增加触发器
 
 ![create-trigger](images/create-trigger.png)

@@ -1,7 +1,8 @@
-import { TaskConfig } from '../config/globalVar';
 import { random as baseRandom } from 'lodash';
+import { TaskConfig } from '../config/globalVar';
 import { sendMail, pushplus } from './sendMessage';
 export * from './cookie';
+export * from './gzip';
 
 /**
  * 异步延迟函数
