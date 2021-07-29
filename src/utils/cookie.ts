@@ -1,12 +1,6 @@
-import { Config } from '../interface/Config';
+import { setConfig } from '../config/setConfig'
 
-let config: Config;
-
-try {
-  config = require('../config/config.json');
-} catch (error) {
-  config = require('../../config/config.json');
-}
+const { cookie } = setConfig()
 
 function getCookieArray(cookie: string | undefined) {
   if (!cookie) return [];
@@ -58,9 +52,9 @@ export function getCookieItem(cookie: string, key: string) {
 }
 
 export function getUserId(): number {
-  return Number(getCookieItem(config.cookie, 'DedeUserID')) || 0;
+  return Number(getCookieItem(cookie, 'DedeUserID')) || 0;
 }
 
 export function getBiliJct(): string {
-  return getCookieItem(config.cookie, 'bili_jct') || '';
+  return getCookieItem(cookie, 'bili_jct') || '';
 }
