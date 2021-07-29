@@ -1,13 +1,9 @@
 import { scf } from 'tencentcloud-sdk-nodejs';
 import { random } from 'lodash';
 import { getPRCDate } from './';
-import { Config } from '../interface/Config';
-let config: Config;
-try {
-  config = require('../config/config.json');
-} catch (error) {
-  config = require('../../config/config.json');
-}
+import { setConfig } from '../config/setConfig';
+
+const config = setConfig();
 const ScfClient = scf.v20180416.Client;
 
 const MAX_MINUTES = 59,
@@ -16,6 +12,7 @@ const MAX_MINUTES = 59,
   JURY_START_MINUTES = 5,
   JURY_RUNTIME_HOURS = 6;
 
+/** 每日任务随机时间设置 */
 function randomDailyRunTime(dailyRunTime = '17:30:00-23:40:00') {
   const taskTime = dailyRunTime.split('-');
   const startTime = taskTime[0].split(':').map(str => +str);
