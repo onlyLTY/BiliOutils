@@ -1,9 +1,8 @@
 import { scf } from 'tencentcloud-sdk-nodejs';
 import { random } from 'lodash';
 import { getPRCDate } from './';
-import { setConfig } from '../config/setConfig';
+import config from '../config/setConfig';
 
-const config = setConfig();
 const ScfClient = scf.v20180416.Client;
 
 const MAX_MINUTES = 59,

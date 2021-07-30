@@ -1,7 +1,5 @@
 import { getUserId, getBiliJct } from '../utils/cookie';
-import { setConfig } from './setConfig';
-
-const config = setConfig();
+import config from './setConfig';
 
 /** 默认的任务配置 */
 export abstract class TaskConfig {

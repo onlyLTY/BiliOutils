@@ -1,27 +1,40 @@
 import { Config } from '../interface/Config';
 import { gzipDecode } from '../utils';
 
-export function setConfig(): Config {
-  let config: Config;
+const getCurDirConfig = (): Config => {
   try {
-    // 从当前目录寻找
-    config = require('./config.json');
-  } catch (error) {
-    // 寻找外层目录
-    try {
-      config = require('../../config/config.json');
-    } catch {}
+    return require('./config.json');
+  } catch {}
+  return null;
+};
+
+const getRootDirConfig = (): Config => {
+  try {
+    return require('../../config/config.json');
+  } catch {}
+  return null;
+};
+
+const getEnvConfig = (): Config => {
+  const BILI_SCF_CONFIG = process.env.BILI_SCF_CONFIG;
+  if (!BILI_SCF_CONFIG) {
+    return null;
   }
-  if (!config && process.env.BILI_SCF_CONFIG) {
-    try {
-      // 是否可以从环境变量中获取
-      config = JSON.parse(gzipDecode(process.env.BILI_SCF_CONFIG));
-    } catch {}
+  try {
+    return JSON.parse(gzipDecode(BILI_SCF_CONFIG));
+  } catch {
+    throw new Error('BILI_SCF_CONFIG 配置不正确');
   }
+};
+
+export function setConfig(): Config {
+  const config = getCurDirConfig() || getRootDirConfig() || getEnvConfig();
   if (config?.cookie) {
     return config;
   }
-  throw new Error('没有找到配置');
+  throw new Error('配置文件不存在或不正确！！！');
 }
 
-export default { setConfig };
+export const userConfig = setConfig();
+
+export default userConfig;

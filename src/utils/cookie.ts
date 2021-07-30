@@ -1,19 +1,19 @@
-import { setConfig } from '../config/setConfig'
+import { userConfig } from '../config/setConfig';
 
-const { cookie } = setConfig()
+const { cookie } = userConfig;
 
 function getCookieArray(cookie: string | undefined) {
   if (!cookie) return [];
-  return cookie.split('; ').map((el) => el.split('='));
+  return cookie.split('; ').map(el => el.split('='));
 }
 
 function cookie2Obj(cookie: string, setCookie: any): object {
   let setCookieArr = getCookieArray(setCookie?.[0]).filter(
-    (el) => el.length === 2
+    el => el.length === 2,
   );
   let arr = getCookieArray(cookie)
     .concat(setCookieArr)
-    .filter((el) => el.length === 2);
+    .filter(el => el.length === 2);
 
   let obj = {};
   for (const it of arr) {
