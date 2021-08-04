@@ -11,7 +11,7 @@ async function baseTasks(cb?: () => void) {
     await loginTask();
   } catch (error) {
     console.log('登录失败: ', error);
-    await sendMessage('bili每日任务失败', TaskModule.appInfo);
+    await sendMessage('登录失败', TaskModule.appInfo);
     return '未完成';
   }
 
@@ -26,7 +26,7 @@ async function baseTasks(cb?: () => void) {
     await cb();
   }
 
-  await sendMessage('bili每日任务完成', TaskModule.appInfo);
+  await sendMessage('每日完成', TaskModule.appInfo);
   return '完成';
 }
 
@@ -62,7 +62,7 @@ exports.main_handler = async (event, _context) => {
 
     if (JuryTask.dailyCompleteCount === 1 && JuryTask.caseNum > 0) {
       await updateTrigger('jury');
-      await sendMessage('bili风纪任务完成', TaskModule.appInfo);
+      await sendMessage('风纪任务完成', TaskModule.appInfo);
     }
 
     return '评审任务';

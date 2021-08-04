@@ -14,7 +14,7 @@ const res = res => {
   const exit = async () => {
     console.log('运行结束：', ErrCC[code]);
     // 发送信息
-    await sendMessage('bili每日任务出现异常', TaskModule.appInfo);
+    await sendMessage(`异常：${ErrCC[code]}`, TaskModule.appInfo);
     // 结束进程
     process.exit(code);
   };

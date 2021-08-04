@@ -35,6 +35,8 @@ export const random = baseRandom;
  * @param text 文本内容
  */
 export async function sendMessage(title: string, text: string) {
+  // 处理 title
+  title = `Bili-${TaskConfig.NICKNAME}-${title}`;
   await Promise.all([
     sendMail(title, text).catch(console.log),
     pushplus(title, text),

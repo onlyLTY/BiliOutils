@@ -66,6 +66,19 @@ function setVipStatus(data: UserNavData) {
   console.log('大会员状态: ', vipTypeMsg);
 }
 
+/**
+ * 给昵称添加 ** （目的是变简短）
+ */
+function conciseNickname(nickname: string) {
+  const length = nickname.length;
+  if (length <= 3) {
+    return nickname;
+  }
+  const firstWord = nickname[0];
+  const lastWord = nickname[length - 1];
+  return `${firstWord}**${lastWord}`;
+}
+
 export default async function loginTask() {
   console.log('----【登录】----');
   try {
@@ -81,6 +94,7 @@ export default async function loginTask() {
     if (data.isLogin) {
       console.log('登录成功: ', data.uname);
       console.log('硬币余额: ', coinBalance.money);
+      TaskConfig.NICKNAME = conciseNickname(data.uname);
       TaskModule.money = coinBalance.money || 0;
       TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
 
