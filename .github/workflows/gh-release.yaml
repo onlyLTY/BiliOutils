@@ -12,7 +12,9 @@ jobs:
     environment: Build
     steps:
       - name: set Docker tag
-        run: echo DOCKER_TAGS=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g"  >> $GITHUB_ENV
+        run: |
+          echo DOCKER_TAG1=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
+          echo DOCKER_TAG2=${{ contains(env.DOCKER_TAGS, 'rc') && 'test' || 'latest' }} >> $GITHUB_ENV
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -28,14 +30,14 @@ jobs:
         with:
           push: true
           platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64' }}
-          tags: catlair/bilitools:latest,catlair/bilitools:${{ env.DOCKER_TAGS }}
+          tags: catlair/bilitools:${{ env.DOCKER_TAG2 }},catlair/bilitools:${{ env.DOCKER_TAG1 }}
       - name: Build and Push
         uses: docker/build-push-action@v2
         with:
           file: ./docker/deploy.Dockerfile
           push: true
           platforms: linux/amd64
-          tags: catlair/bilitools-deploy:latest,catlair/bilitools-deploy:${{ env.DOCKER_TAGS }}
+          tags: catlair/bilitools-deploy:${{ env.DOCKER_TAG2 }},catlair/bilitools-deploy:${{ env.DOCKER_TAG1 }}
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
   release:

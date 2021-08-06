@@ -82,36 +82,23 @@ function scfDeploy(sls) {
   }
 
   if (process.argv.includes('--start')) {
-    const { sendMessage } = require('../dist/utils');
-    let message = '',
-      errorCount = 0;
     json.account?.forEach(el => {
       if (el.isRun === false) {
         console.log('跳过');
         return;
       }
-      //多用户不再单发请求
-      delete el.message;
       baseConfig(el);
       console.log('开始运行\n');
       try {
         let stdout = cp.execSync('npm run start');
         let out = stdout.toString();
         console.log(out);
-        message += out + '\n\n';
         console.log('运行成功\n\n');
       } catch (error) {
         console.error(error);
-        message += error + '\n\n';
-        errorCount++;
         console.log('\n\n');
       }
     });
-    if (errorCount > 1) {
-      sendMessage(`bili任务存在${errorCount}个错误`, message);
-      return;
-    }
-    sendMessage('bili每日任务完成', message);
     return;
   }
 })();

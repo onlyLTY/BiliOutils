@@ -16,7 +16,7 @@ const res = res => {
     // 发送信息
     await sendMessage(`异常：${ErrCC[code]}`, TaskModule.appInfo);
     // 结束进程
-    process.exit(code);
+    process.exit(0);
   };
   switch (code) {
     case ErrCC['账号未登录']:

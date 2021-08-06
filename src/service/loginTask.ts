@@ -88,6 +88,7 @@ export default async function loginTask() {
       return;
     } else if (code !== 0) {
       console.log('登录错误', code, message);
+      return;
     }
     await apiDelay();
     const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量

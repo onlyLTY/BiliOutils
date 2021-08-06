@@ -2,6 +2,7 @@ import { scf } from 'tencentcloud-sdk-nodejs';
 import { random } from 'lodash';
 import { getPRCDate } from './';
 import config from '../config/setConfig';
+import { Constant } from 'config/globalVar';
 
 const ScfClient = scf.v20180416.Client;
 
@@ -12,7 +13,7 @@ const MAX_MINUTES = 59,
   JURY_RUNTIME_HOURS = 6;
 
 /** 每日任务随机时间设置 */
-function randomDailyRunTime(dailyRunTime = '17:30:00-23:40:00') {
+function randomDailyRunTime(dailyRunTime = Constant.DAILY_RUN_TIME) {
   const taskTime = dailyRunTime.split('-');
   const startTime = taskTime[0].split(':').map(str => +str);
   const endTime = taskTime[1].split(':').map(str => +str);
@@ -42,7 +43,7 @@ function randomDailyRunTime(dailyRunTime = '17:30:00-23:40:00') {
 }
 
 /** 风纪任务随机时间设置 */
-function randomJuryRunTime(juryRunTime = '8-12/20-40') {
+function randomJuryRunTime(juryRunTime = Constant.JURY_RUN_TIME) {
   const time = juryRunTime.split('/').map(el => el.split('-').map(el => +el));
 
   const startHours = random(time[0][0], time[0][1]), // 8 - 12
@@ -65,8 +66,8 @@ export default async function (taskName = 'daily', runningTotalNumber = 2) {
     return false;
   }
   const FUNCTION_NAME = config.sls?.name;
-  const DAILY_TRIGGER_NAME = 'daily_bili_timer';
-  const JURY_TRIGGER_NAME = 'jury_bili_timer';
+  const DAILY_TRIGGER_NAME = Constant.DAILY_TRIGGER_NAME;
+  const JURY_TRIGGER_NAME = Constant.JURY_TRIGGER_NAME;
   const clientConfig = {
     credential: {
       secretId: process.env.TENCENT_SECRET_ID,

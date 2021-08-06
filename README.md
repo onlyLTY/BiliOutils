@@ -36,8 +36,8 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 
 ### Docker 镜像
 
-- `catlair/bilitools-deploy` 用于部署到 SCF 或者直接运行使用
-- `catlair/bilitools` 用于直接运行或者部署到 SCF 使用 （与前者区别是：只有不到一半的体积，用于部署时需要消耗时间下载依赖）
+- `catlair/bilitools-deploy` 用于部署到 SCF
+- `catlair/bilitools` 用于直接运行
 
 ## API 参考
 

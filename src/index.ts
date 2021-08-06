@@ -1,5 +1,5 @@
 import { warpLog } from './utils/log';
-import { JuryTask, TaskModule } from './config/globalVar';
+import { Constant, JuryTask, TaskModule } from './config/globalVar';
 import { apiDelay, sendMessage, getPRCDate } from './utils';
 import { random } from 'lodash';
 import bili, { doOneJuryVote, loginTask } from './service';
@@ -42,7 +42,7 @@ exports.main_handler = async (event, _context) => {
     return '今日重复执行';
   }
 
-  if (event.TriggerName === 'jury-timer') {
+  if (event.TriggerName === Constant.JURY_TRIGGER_NAME) {
     if (!JuryTask.isRun && JuryTask.noRunMessage === '今日的案件已经审核完成') {
       console.log(JuryTask.noRunMessage, JuryTask.dailyCompleteCount++);
       return '跳过执行';
