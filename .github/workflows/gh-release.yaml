@@ -10,13 +10,17 @@ jobs:
     if: github.repository == 'catlair/BiliTools'
     runs-on: ubuntu-latest
     environment: Build
+    outputs:
+      DOCKER_TAG2: ${{ steps.tag2.outputs.DOCKER_TAG2 }}
     steps:
       - name: set Docker version tag
         run: |
           echo DOCKER_TAG1=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
       - name: set Docker latest tag
+        id: tag2
         run: |
           echo DOCKER_TAG2=${{ contains(env.DOCKER_TAG1, 'rc') && 'test' || 'latest' }} >> $GITHUB_ENV
+          echo "::set-output name=DOCKER_TAG2::${{ contains(env.DOCKER_TAG1, 'rc') }}"
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -65,6 +69,6 @@ jobs:
           files: |
             dist/tencent_scf.zip
           draft: false
-          prerelease: ${{ env.DOCKER_TAG2 == 'test' }}
+          prerelease: ${{ needs.build-docker.outputs.DOCKER_TAG2 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
