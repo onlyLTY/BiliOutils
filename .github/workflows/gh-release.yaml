@@ -13,6 +13,8 @@ jobs:
     outputs:
       DOCKER_TAG2: ${{ steps.tag2.outputs.DOCKER_TAG2 }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: set Docker version tag
         run: |
           echo DOCKER_TAG1=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
@@ -21,7 +23,7 @@ jobs:
         run: |
           echo DOCKER_TAG2=${{ contains(env.DOCKER_TAG1, 'rc') && 'test' || 'latest' }} >> $GITHUB_ENV
           echo "::set-output name=DOCKER_TAG2::${{ contains(env.DOCKER_TAG1, 'rc') }}"
-          sed -i 2a\echo\ version=${{ DOCKER_TAG1 }} docker-entrypoint.sh
+          sed -i 2a\echo\ version=${{ env.DOCKER_TAG1 }} docker-entrypoint.sh
           echo ${{ env.DOCKER_TAG1 }} >> src/version.txt
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -36,12 +38,14 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
+          context: .
           push: true
           platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64' }}
           tags: catlair/bilitools:${{ env.DOCKER_TAG2 }},catlair/bilitools:${{ env.DOCKER_TAG1 }}
       - name: Build and Push
         uses: docker/build-push-action@v2
         with:
+          context: .
           file: ./docker/deploy.Dockerfile
           push: true
           platforms: linux/amd64
