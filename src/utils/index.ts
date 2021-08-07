@@ -73,3 +73,13 @@ export function getMonthHasDays(now?: Date) {
     return 31;
   }
 }
+
+/**
+ * 打印版本
+ */
+export function printVersion() {
+  try {
+    const version = require('../version.txt');
+    console.log(`当前版本【${version}】`);
+  } catch {}
+}

@@ -21,6 +21,8 @@ jobs:
         run: |
           echo DOCKER_TAG2=${{ contains(env.DOCKER_TAG1, 'rc') && 'test' || 'latest' }} >> $GITHUB_ENV
           echo "::set-output name=DOCKER_TAG2::${{ contains(env.DOCKER_TAG1, 'rc') }}"
+          sed -i 2a\echo\ version=${{ DOCKER_TAG1 }} docker-entrypoint.sh
+          echo ${{ env.DOCKER_TAG1 }} >> src/version.txt
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
