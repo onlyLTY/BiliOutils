@@ -12,17 +12,26 @@ scfHandle(){
   mv node_modules dist
 }
 
-if [ "$3" == "--scf" ]
-then
-  scfHandle
-fi
+runScfAll(){
+  if [ "$RUN_SCF_ALL" == "y" ] || [ "$RUN_SCF_ALL" == "Y" ]
+  then
+    node tools/runScfAll.js
+  fi
+}
 
-if [ "$3" == "deploy:muilt" ]
+if [ "$1" == "deploy" ]
 then
   scfHandle
   node tools/bootstrap.js --scf
-  # 将参数后移 3 个
-  shift 3
+  runScfAll
+else
+  node tools/bootstrap.js --start
 fi
 
-exec "$@"
+# 下面兼容老配置 随时删除
+if [ "$3" == "--scf" ] || [ "$3" == "deploy:muilt" ]
+then
+  scfHandle
+  node tools/bootstrap.js --scf
+  runScfAll 
+fi

@@ -21,9 +21,12 @@ jobs:
            --env BILI_CONFIG="${{ secrets.BILI_CONFIG }}" \
            --env TENCENT_SECRET_ID="${{ secrets.TENCENT_SECRET_ID }}" \
            --env TENCENT_SECRET_KEY="${{ secrets.TENCENT_SECRET_KEY }}" \
+           --env RUN_SCF_ALL=y \
            -i --rm  \
            catlair/bilitools-deploy:latest
 ```
+
+此处设置环境变量 `RUN_SCF_ALL` 值为 `y`（默认 `n` ）。在部署完成后会运行自动运行一次云函数（所有用户），方便查看配置是否正确
 
 ## Github secrets
 

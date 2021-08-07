@@ -139,3 +139,4 @@
 | SERVERLESS_PLATFORM_VENDOR | Serverless 供应商，本地推送时必须，Docker 默认为`tencent` |
 | PUSHPLUS_TOKEN             | [pushplusToken](#message-配置项)                          |
 | BILI_SCF_CONFIG            | Gzip 压缩后的单个用户配置（在使用 SCF 时使用）            |
+| RUN_SCF_ALL                | 运行全部云函数（ Docker 推送至 SCF 时使用，值为需要`y`）  |
