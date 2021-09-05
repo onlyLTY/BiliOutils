@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   build-docker:
@@ -42,7 +43,11 @@ jobs:
           push: true
           platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64' }}
           tags: catlair/bilitools:${{ env.DOCKER_TAG2 }},catlair/bilitools:${{ env.DOCKER_TAG1 }}
-      - name: Build and Push
+      - name: sed latest to test
+        if: env.DOCKER_TAG2 == 'test'
+        run: sed -i s/bilitools:latest/bilitools:test/ docker/deploy.Dockerfile
+      - name: Build and Push Deploy
+        id: docker_build_deploy
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -51,7 +56,10 @@ jobs:
           platforms: linux/amd64
           tags: catlair/bilitools-deploy:${{ env.DOCKER_TAG2 }},catlair/bilitools-deploy:${{ env.DOCKER_TAG1 }}
       - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+        run: |
+          echo "镜像对应hash"
+          echo ${{ steps.docker_build.outputs.digest }}
+          echo ${{ steps.docker_build_deploy.outputs.digest }}
   release:
     needs: build-docker
     if: github.repository == 'catlair/BiliTools'
@@ -60,7 +68,8 @@ jobs:
     steps:
       - name: Copy dist
         run: |
-          docker run -id --rm --name copy_dist catlair/bilitools:latest sh
+          docker pull catlair/bilitools:latest
+          docker run -id --entrypoint sh --name copy_dist catlair/bilitools:latest
           docker cp copy_dist:/usr/src/app/node_modules .
           docker cp copy_dist:/usr/src/app/dist .
           mv node_modules dist
@@ -75,6 +84,6 @@ jobs:
           files: |
             dist/tencent_scf.zip
           draft: false
-          prerelease: ${{ needs.build-docker.outputs.DOCKER_TAG2 }}
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

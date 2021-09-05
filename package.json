@@ -6,32 +6,32 @@
   "scripts": {
     "build": "tsc && babel ./dist --out-dir ./dist",
     "deploy": "sls deploy --debug",
-    "deploy:muilt": "node tools/bootstrap.js --scf",
-    "start:muilt": "node tools/bootstrap.js --start",
+    "deploy:multi": "node tools/bootstrap.js --scf",
+    "start:multi": "node tools/bootstrap.js --start",
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js",
     "modclean": "modclean -r -a \"*.md,*LICENSE*,.github,.nycrc,*.ts,*.html,*.txt,*.js.map,*.mjs.map,browser.js,@types\" && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
-    "predeploy:muilt": "rm -f ./dist/run.js && cp -rf ./tools/ ./package*.json ./dist && cd ./dist && npm i --production && npm run modclean && rm -rf tools package*.json &&  cd ../",
+    "predeploy:multi": "rm -f ./dist/run.js && cp -rf ./tools/ ./package*.json ./dist && cd ./dist && npm i --production && npm run modclean && rm -rf tools package*.json &&  cd ../",
     "postbuild": "rm -rf ./dist/dto/ && rm -rf ./dist/interface/"
   },
   "author": "catlair",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "^7.14.8",
-    "@babel/core": "^7.14.8",
-    "@babel/preset-env": "^7.14.8",
-    "@types/lodash": "^4.14.171",
-    "@types/node": "^16.4.4",
+    "@babel/cli": "^7.15.4",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.4",
+    "@types/lodash": "^4.14.172",
+    "@types/node": "^16.7.10",
     "@types/nodemailer": "^6.4.4",
     "@types/qs": "^6.9.7"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "lodash": "^4.17.21",
     "nodemailer": "^6.6.3",
     "pako": "1.0.11",
     "qs": "^6.10.1",
-    "tencentcloud-sdk-nodejs": "^4.0.172"
+    "tencentcloud-sdk-nodejs": "^4.0.194"
   }
 }

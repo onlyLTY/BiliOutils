@@ -9,7 +9,7 @@ scfHandle(){
   then
   npm install serverless -g
   fi
-  mv node_modules dist
+  cp -rf node_modules dist
 }
 
 runScfAll(){
@@ -29,7 +29,7 @@ else
 fi
 
 # 下面兼容老配置 随时删除
-if [ "$3" == "--scf" ] || [ "$3" == "deploy:muilt" ]
+if [ "$3" == "--scf" ] || [ "$3" == "deploy:multi" ]
 then
   scfHandle
   node tools/bootstrap.js --scf
