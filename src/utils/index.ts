@@ -1,3 +1,5 @@
+import * as path from 'path';
+import * as fs from 'fs';
 import { random as baseRandom } from 'lodash';
 import { TaskConfig } from '../config/globalVar';
 import { sendMail, pushplus } from './sendMessage';
@@ -79,7 +81,11 @@ export function getMonthHasDays(now?: Date) {
  */
 export function printVersion() {
   try {
-    const version = require('../version.txt');
-    console.log(`当前版本【${version}】`);
+    const version = fs
+      .readFileSync(path.resolve(__dirname, '../version.txt'), 'utf8')
+      .trim();
+    if (version) {
+      console.log(`当前版本【${version}】`);
+    }
   } catch {}
 }

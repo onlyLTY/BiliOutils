@@ -37,3 +37,53 @@ secrets 配置如下
 ![setting-new](images/119254821-2822a580-bbeb-11eb-8b41-fd5bbac584fc.png)
 
 ![setting-new-2](images/119254825-29ec6900-bbeb-11eb-9bea-22b08d402916.png)
+
+## 错误案例
+
+### 偷懒？
+
+自己不会创建仓库？别 fork 本仓库  
+请勿直接 fork 本仓库！！！  
+请勿直接 fork 本仓库！！！  
+请勿直接 fork 本仓库！！！  
+请直接创建一个仓库！！！  
+请直接创建一个仓库！！！  
+请直接创建一个仓库！！！  
+你自己还可以创建私有仓库啊！！！  
+你自己还可以创建私有仓库啊！！！  
+你自己还可以创建私有仓库啊！！！
+
+### 未按要求压缩配置
+
+**再三强调配置需要压缩**  
+出现下面这种，BILI_CONFIG 的配置有好多行，这明显就是没有**压缩**  
+`syntax error near unexpected token ('` 错误信息也明确指出是因为特殊符号导致错误
+
+```text
+  sudo docker run \
+   --env BILI_CONFIG="***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+    ***
+  ***" \
+   --env TENCENT_SECRET_ID="***" \
+   --env TENCENT_SECRET_KEY="***" \
+   --env RUN_SCF_ALL=y \
+   -i --rm  \
+   catlair/bilitools-deploy:latest
+  shell: /usr/bin/bash -e ***0***
+/home/runner/work/_temp/5ce701de-530a-4127-8121-94b88d4abe8d.sh: line 13: syntax error near unexpected token `('
+Error: Process completed with exit code 2.
+```

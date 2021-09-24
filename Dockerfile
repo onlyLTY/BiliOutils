@@ -11,6 +11,8 @@ RUN npm run build \
     && npm run modclean \
     && mkdir builddir \
     && chmod +x docker-entrypoint.sh \
+    && if [ -e src/*.txt ];then cp -rf src/*.txt ./dist ;fi \
+    && if [ -e src/*.json ];then cp -rf src/*.json ./dist ;fi \
     && mv -f  dist tools node_modules package.json serverless.yaml docker-entrypoint.sh builddir \
     && mkdir builddir/config
 

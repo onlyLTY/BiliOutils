@@ -7,33 +7,50 @@ export async function pushplus(title: string, content: string) {
   if (!TaskConfig.PUSHPLUS_TOKEN) {
     return;
   }
-  axios
-    .post(
-      'http://www.pushplus.plus/send',
-      {
-        token: TaskConfig.PUSHPLUS_TOKEN,
-        content,
-        title,
-      },
-      {
-        headers: {
-          'content-type': 'application/json',
-        },
-      } as AxiosRequestConfig,
-    )
-    .then(res => {
-      const { msg, code } = res.data;
-      if (code === 200) {
-        console.log('pushplus 发送消息成功');
-        return;
-      }
+  const plusApi = axios.create({
+    baseURL: 'http://www.pushplus.plus',
+    headers: {
+      'content-type': 'application/json',
+    },
+  });
+  const postData = {
+    token: TaskConfig.PUSHPLUS_TOKEN,
+    content,
+    title,
+  };
+
+  try {
+    // 发送消息
+    const {
+      data: { msg, code, data: msgNumberString },
+    } = await plusApi.post('/send', postData);
+    if (code !== 200) {
       console.log('pushplus 发送消息失败');
       console.log(code, msg);
-    })
-    .catch(reason => {
-      console.log('pushplus 发送消息出现异常');
-      console.log(reason.message);
-    });
+      return;
+    }
+
+    // 获取发送结果
+    // const {
+    //   data: {
+    //     data: { errorMessage, msgMsg },
+    //   },
+    // } = await plusApi.get(
+    //   `/api/customer/message/sendMessageResult?messageId=${msgNumberString}`,
+    // );
+    // if (errorMessage) {
+    //   console.log('pushplus:', errorMessage);
+    //   return;
+    // }
+    // if (code !== 200) {
+    //   console.log('pushplus:', msgMsg);
+    //   return;
+    // }
+    // console.log('pushplus 发送成功');
+  } catch (error) {
+    console.log('pushplus 发送消息出现异常');
+    console.log(error.message);
+  }
 }
 
 // async..await is not allowed in global scope, must use a wrapper
