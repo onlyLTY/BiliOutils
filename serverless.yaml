@@ -10,7 +10,7 @@ inputs:
   region: ${env:SCF_REGION}
   description: ${env:SCF_DESCRIPTION}
   handler: index.main_handler
-  memorySize: 64
+  memorySize: ${env:SCF_MEMORY_SIZE}
   timeout: 900
   events:
     - timer: # 定时触发器

@@ -107,4 +107,12 @@ module.exports = function () {
     process.env.BILI_JURY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
     return this;
   };
+
+  /** 设置内存默认值 */
+  this.setMemorySize = (num = '128') => {
+    const SCF_MEMORY_SIZE = process.env.SCF_MEMORY_SIZE;
+    process.env.SCF_MEMORY_SIZE = SCF_MEMORY_SIZE
+      ? SCF_MEMORY_SIZE
+      : String(num);
+  };
 };
