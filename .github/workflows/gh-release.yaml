@@ -84,6 +84,6 @@ jobs:
           files: |
             dist/tencent_scf.zip
           draft: false
-          prerelease: false
+          prerelease: ${{ needs.build-docker.outputs.DOCKER_TAG2 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
