@@ -46,6 +46,7 @@ function baseConfig(el) {
 
 function scfConfig(el) {
   const sls = el.sls;
+  const memorySize = json?.memorySize || el?.memorySize || '128';
   new updateSLS()
     .isRunDailyTask(el.isRun)
     .openJuryVote(el.function?.judgement)
@@ -54,7 +55,8 @@ function scfConfig(el) {
     .updateDescription(sls?.description)
     .updateRegion(sls?.region)
     .updateComponentName(sls?.name)
-    .updateSCFName(sls?.name);
+    .updateSCFName(sls?.name)
+    .setMemorySize(memorySize);
 }
 
 function scfDeploy(sls) {
