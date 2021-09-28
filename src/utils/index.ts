@@ -39,10 +39,7 @@ export const random = baseRandom;
 export async function sendMessage(title: string, text: string) {
   // 处理 title
   title = `Bili-${TaskConfig.NICKNAME}-${title}`;
-  await Promise.all([
-    sendMail(title, text).catch(console.log),
-    pushplus(title, text),
-  ]);
+  await Promise.all([sendMail(title, text).catch(console.log), pushplus(title, text)]);
 }
 
 /**
@@ -81,9 +78,7 @@ export function getMonthHasDays(now?: Date) {
  */
 export function printVersion() {
   try {
-    const version = fs
-      .readFileSync(path.resolve(__dirname, '../version.txt'), 'utf8')
-      .trim();
+    const version = fs.readFileSync(path.resolve(__dirname, '../version.txt'), 'utf8').trim();
     if (version) {
       console.log(`当前版本【${version}】`);
     }

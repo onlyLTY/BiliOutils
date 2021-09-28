@@ -36,7 +36,7 @@ const accountApi = axios.create({
 });
 
 const liveApi = axios.create({
-  baseURL: 'https://api.live.bilibili.com',
+  baseURL: 'https://api.live.bilibili.com'
 });
 
 const biliApi = axios.create({
@@ -44,17 +44,16 @@ const biliApi = axios.create({
 });
 
 const mangaApi = axios.create({
-  baseURL: 'https://manga.bilibili.com',
+  baseURL: 'https://manga.bilibili.com'
 });
 
 const vcApi = axios.create({
   baseURL: 'https://api.vc.bilibili.com',
 });
 
-biliApi.interceptors.response.use(res, err);
-vcApi.interceptors.response.use(res, err);
-accountApi.interceptors.response.use(res, err);
-mangaApi.interceptors.response.use(res, err);
-liveApi.interceptors.response.use(res, err);
+const apiArr = [biliApi, vcApi, accountApi, mangaApi, liveApi];
+for (const api of apiArr) {
+  api.interceptors.response.use(res, err);
+}
 
 export { biliApi, vcApi, accountApi, mangaApi, liveApi };

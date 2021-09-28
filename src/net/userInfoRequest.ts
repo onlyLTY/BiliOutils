@@ -4,10 +4,13 @@ import {
   CoinBalanceDto,
   CoinTodayExpDto,
   FollowingsDto,
+  OtherUserDto,
   RewardDto,
   UserInfoNavDto,
 } from '../dto/UserInfo.dto';
 import { VideoByUpDto } from '../dto/Video.dto';
+
+type IdType = number | string;
 
 /**
  * 登录账号
@@ -54,7 +57,7 @@ export async function getFollowings(
   pageNumber: number = 1,
   pageSize: number = 50,
   order: string = 'desc',
-  order_type: string = 'attention'
+  order_type: string = 'attention',
 ): Promise<FollowingsDto> {
   const { data } = await biliApi.get('/x/relation/followings', {
     params: {
@@ -75,7 +78,7 @@ export async function getFollowings(
  */
 export async function getSpecialFollowings(
   pageNumber: number = 1,
-  pageSize: number = 50
+  pageSize: number = 50,
 ): Promise<FollowingsDto> {
   const { data } = await biliApi.get('/x/relation/tag', {
     params: {
@@ -94,7 +97,7 @@ export async function getSpecialFollowings(
  */
 export async function getVideosByUpId(
   upId: number,
-  pageSize: number = 50
+  pageSize: number = 50,
 ): Promise<VideoByUpDto> {
   const { data } = await biliApi.get('/x/v2/medialist/resource/list', {
     params: {
@@ -120,7 +123,7 @@ export async function searchVideosByUpId(
   upId: number,
   pageSize: number = 20,
   pageNumber: number = 1,
-  keyword: string = ''
+  keyword: string = '',
 ): Promise<FollowingsDto> {
   const { data } = await biliApi.get('/x/space/arc/search', {
     params: {
@@ -133,5 +136,16 @@ export async function searchVideosByUpId(
       mid: upId,
     },
   });
+  return data;
+}
+
+/**
+ * 获取用户信息（主要时直播）
+ * @param mid 用户 id
+ */
+export async function getUser(mid: IdType): Promise<OtherUserDto> {
+  const { data } = await biliApi.get(
+    `https://api.bilibili.com/x/space/acc/info?mid=${mid}&jsonp=jsonp`,
+  );
   return data;
 }

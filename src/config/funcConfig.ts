@@ -10,6 +10,7 @@ export const functionConfig = {
   taskReward: true,
   charging: false,
   getVipPrivilege: false,
+  giveGift: false,
 };
 
 export default functionConfig;

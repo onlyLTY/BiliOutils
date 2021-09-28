@@ -3,6 +3,14 @@ import config from './setConfig';
 
 config.message ||= {};
 
+/**
+ * 字符串数组转数字数组
+ * @param strArr 字符串数组
+ */
+function strArr2numArr(strArr: string[] | number[]) {
+  return strArr?.map(str => Number(str));
+}
+
 /** 默认的任务配置 */
 export abstract class TaskConfig {
   static readonly config = config;
@@ -20,13 +28,14 @@ export abstract class TaskConfig {
   static readonly BILI_TARGET_COINS: number = config.targetCoins ?? 5;
   private static biliApiDelay = config.apiDelay || [2, 6];
   /** 调用api时的延迟(单位s),默认2s至6s */
-  static readonly BILI_API_DELAY: number[] = Array.isArray(
-    TaskConfig.biliApiDelay,
-  )
+  static readonly BILI_API_DELAY: number[] = Array.isArray(TaskConfig.biliApiDelay)
     ? TaskConfig.biliApiDelay
     : [TaskConfig.biliApiDelay];
-  /**自定义高优先级用户列表 */
-  static readonly BILI_CUSTOMIZE_UP: Array<number> = config.customizeUp || [];
+  /** 自定义高优先级用户列表 */
+  static readonly BILI_CUSTOMIZE_UP: Array<number> = strArr2numArr(config.customizeUp) || [];
+  /** 自定义投喂礼物用户列表 */
+  static readonly BILI_GIFT_UP: Array<number> =
+    strArr2numArr(config.giftUp) || TaskConfig.BILI_CUSTOMIZE_UP || [];
   /** 目标等级 默认6级 */
   static readonly BILI_TARGET_LEVEL: number = config.targetLevel ?? 6;
   /** 最低剩余硬币数,默认0 */
@@ -40,8 +49,7 @@ export abstract class TaskConfig {
   /** 充电预设时间，哪一天？ */
   static readonly CHARGE_PRESET_TIME = config.chargePresetTime || 31;
   /** pushplus token */
-  static readonly PUSHPLUS_TOKEN =
-    process.env.PUSHPLUS_TOKEN || config.message?.pushplusToken;
+  static readonly PUSHPLUS_TOKEN = process.env.PUSHPLUS_TOKEN || config.message?.pushplusToken;
 }
 
 /** 任务完成情况统计 */
@@ -86,4 +94,6 @@ export abstract class Constant {
   static readonly JURY_TRIGGER_NAME = 'jury_bili_timer';
   static readonly DAILY_RUN_TIME = '17:30:00-23:40:00';
   static readonly JURY_RUN_TIME = '8-12/20-40';
+  /** 毫秒与天数进制 */
+  static readonly MS2DATE = 86400000;
 }

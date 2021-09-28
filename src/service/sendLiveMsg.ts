@@ -45,25 +45,11 @@ const kaomoji = [
   '(苦笑)',
 ];
 
-const messageArray = kaomoji.concat(
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '签到',
-  '哈哈',
-);
+const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
 
-async function getFansMealList(): Promise<
-  FansMedalDto['data']['fansMedalList']
-> {
+async function getFansMealList(): Promise<FansMedalDto['data']['fansMedalList']> {
   try {
-    const { code, message, data } = await liveRequest.getFansMedalList(1, 50);
+    const { code, message, data } = await liveRequest.getFansMedal(1, 50);
 
     if (code !== 0) {
       console.log('获取直播间失败 ', code, message);

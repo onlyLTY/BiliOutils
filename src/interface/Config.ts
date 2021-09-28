@@ -22,6 +22,7 @@ export interface Config {
     liveSendMessage?: boolean;
     charging?: boolean;
     getVipPrivilege?: boolean;
+    giveGift?: boolean;
   };
   targetLevel?: number;
   stayCoins?: number;
@@ -29,6 +30,7 @@ export interface Config {
   dailyRunTime?: string;
   targetCoins?: number;
   customizeUp?: number[];
+  giftUp?: number[];
   coinRetryNum?: number;
   apiDelay?: [number, number] | number;
   upperAccMatch?: boolean;

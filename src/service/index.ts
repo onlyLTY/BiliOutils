@@ -10,6 +10,7 @@ import judgement, { doOneJuryVote } from './judgement';
 import liveSendMessage from './sendLiveMsg';
 import charging from './charging';
 import getVipPrivilege from './getVipPrivilege';
+import giveGift from './giveGift';
 
 export { loginTask, doOneJuryVote };
 
@@ -25,4 +26,5 @@ export default {
   liveSendMessage,
   charging,
   getVipPrivilege,
+  giveGift,
 };
