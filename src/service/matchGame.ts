@@ -1,4 +1,4 @@
-import { TaskConfig, TaskModule } from 'config/globalVar';
+import { TaskConfig, TaskModule } from '../config/globalVar';
 import { getGuessCollection, guessAdd } from '../net/matchGameRequest';
 import { GuessCollectionDto } from '../dto/matchGameDto';
 
@@ -19,22 +19,18 @@ export default async function matchGame() {
 
   const count = await guessOne(list);
   console.log(`【竞猜结束】一共参与${count}次预测`);
-
-  try {
-  } catch (error) {
-    console.log('竞猜异常', error);
-  }
 }
 
 async function getOneGuessCollection() {
   try {
     const {
       code,
+      message,
       data: { list, page },
     } = await getGuessCollection();
 
-    if (!code) {
-      console.log('获取赛事异常');
+    if (code !== 0) {
+      console.log('获取赛事错误', code, message);
       return;
     }
 
@@ -57,14 +53,14 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
       const [team1, team2] = details;
 
       if (isLackOfCoin()) {
-        return;
+        return count;
       }
 
       if (is_guess) {
         continue;
       }
 
-      console.log(`${title}`);
+      console.log(`${title} <=> ${team1.odds}:${team2.odds}`);
 
       const oddResult = team1.odds > team2.odds;
       let teamSelect: typeof team1;
@@ -78,11 +74,13 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
       console.log(`预测[ ${teamSelect.option} ] ${5} 颗硬币`);
 
       const { code } = await guessAdd(contestId, questionsId, teamSelect.detail_id, 5);
-      if (code) {
+      if (code !== 0) {
         console.log('预测失败');
+      } else {
+        count++;
+        TaskModule.money -= 5;
       }
-      count++;
-      TaskModule.money -= 5;
+      return count;
     }
   } catch (error) {}
   return count;

@@ -45,6 +45,6 @@ export async function guessAdd(
     csrf,
     csrf_token,
   });
-  const { data } = await biliApi.post('api.bilibili.com/x/esports/guess/add', postData);
+  const { data } = await biliApi.post('/x/esports/guess/add', postData);
   return data;
 }
