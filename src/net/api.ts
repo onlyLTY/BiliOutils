@@ -36,7 +36,7 @@ const accountApi = axios.create({
 });
 
 const liveApi = axios.create({
-  baseURL: 'https://api.live.bilibili.com'
+  baseURL: 'https://api.live.bilibili.com',
 });
 
 const biliApi = axios.create({
@@ -44,7 +44,7 @@ const biliApi = axios.create({
 });
 
 const mangaApi = axios.create({
-  baseURL: 'https://manga.bilibili.com'
+  baseURL: 'https://manga.bilibili.com',
 });
 
 const vcApi = axios.create({
