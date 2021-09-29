@@ -1,6 +1,7 @@
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { getGuessCollection, guessAdd } from '../net/matchGameRequest';
 import { GuessCollectionDto } from '../dto/matchGameDto';
+import { apiDelay } from '../utils';
 
 // 0 反选，大于 0 正选
 const InvertSelection = 0;
@@ -13,6 +14,8 @@ export default async function matchGame() {
   }
 
   const list = await getOneGuessCollection();
+  await apiDelay();
+
   if (!list) {
     return;
   }
@@ -73,6 +76,7 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
 
       console.log(`预测[ ${teamSelect.option} ] ${5} 颗硬币`);
 
+      await apiDelay();
       const { code } = await guessAdd(contestId, questionsId, teamSelect.detail_id, 5);
       if (code !== 0) {
         console.log('预测失败');

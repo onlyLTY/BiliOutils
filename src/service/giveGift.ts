@@ -4,6 +4,7 @@ import { Constant, TaskConfig } from '../config/globalVar';
 import { getGiftBagList, sendBagGift, getFansMedal } from '../net/liveRequest';
 import { getUser } from '../net/userInfoRequest';
 import { LiveGiftBagListDto } from '../dto/Live.dto';
+import { apiDelay } from '../utils';
 
 const EXPIRE_DATE = 2;
 const { BILI_GIFT_UP } = TaskConfig;
@@ -12,6 +13,7 @@ export default async function giveGift() {
   console.log('----【投喂过期食物】----');
   try {
     const expiredGifts = await getExpiredGift();
+    await apiDelay();
     if (!expiredGifts?.length) {
       console.log(`没有${EXPIRE_DATE}天内过期的简单礼物`);
       return;
@@ -75,6 +77,7 @@ async function findOneByRandomUp() {
   const {
     data: { count, fansMedalList },
   } = await getFansMedal();
+  await apiDelay();
   if (!count) {
     return {
       roomid: 0,
@@ -93,6 +96,7 @@ async function getUserRoomId(mid: number) {
     const {
       data: { live_room },
     } = await getUser(mid);
+    await apiDelay();
     if (live_room.roomStatus) {
       return {
         roomid: live_room.roomid,
@@ -109,6 +113,7 @@ async function sendGift(
   gifts: LiveGiftBagListDto['data']['list'],
 ) {
   for (const gift of gifts) {
+    await apiDelay();
     try {
       const { code, message, data } = await sendBagGift({
         roomid,
