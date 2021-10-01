@@ -21,6 +21,7 @@
     "@babel/cli": "^7.15.7",
     "@babel/core": "^7.15.5",
     "@babel/preset-env": "^7.15.6",
+    "@types/crypto-js": "^4.0.2",
     "@types/lodash": "^4.14.173",
     "@types/node": "^16.7.10",
     "@types/nodemailer": "^6.4.4",
@@ -28,6 +29,7 @@
   },
   "dependencies": {
     "axios": "^0.21.4",
+    "crypto-js": "^4.1.1",
     "lodash": "^4.17.21",
     "nodemailer": "^6.6.5",
     "pako": "1.0.11",

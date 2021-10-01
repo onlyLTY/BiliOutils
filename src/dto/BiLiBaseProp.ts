@@ -14,6 +14,13 @@ export interface AccountBaseProp {
   data?: object;
 }
 
+export interface DoubleMessageProp {
+  code: number;
+  msg: string;
+  message: string;
+  data?: any;
+}
+
 export interface PureDataProp {
   code: number;
   message: string;

@@ -7,13 +7,13 @@
 - [x] 每日自动投币（指定数量）
 - [x] 银瓜子兑换硬币
 - [x] 基于瞎扯的风纪委员任务（默认关闭，慎用）
-- [ ] 硬币赛事竞猜（不保证胜率，支持正压、反压和随机压）
-- [ ] 直播挂机获取小心心
+- [ ] 硬币赛事竞猜（不保证胜率，支持正压、反压和随机压）（coding）
+- [ ] 直播挂机获取小心心 （test）
 - [x] 应援团签到
 - [x] 直播间弹幕（每日首次获得 100 亲密度，自动点亮灰色勋章）
 - [x] 领取年度大会员权益/B 币券（无测试条件，待测试）
 - [x] 自动使用 B 币券充电
-- [ ] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）
+- [ ] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）（test）
 - [ ] 支持 Docker 、 SCF 等方式运行，支持执行消息推送
 
 ## 使用说明
@@ -49,11 +49,13 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 - `catlair/bilitools-deploy` 用于部署到 SCF
 - `catlair/bilitools` 用于直接运行
 
-## API 参考
+## 参考项目
 
 - [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 - [catlair/bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
+- [JunzhouLiu/BILIBILI-HELPER-PRE](https://github.com/JunzhouLiu/BILIBILI-HELPER-PRE)
+- [lzghzr/TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 
 ## 责任声明
 

@@ -84,3 +84,13 @@ export function printVersion() {
     }
   } catch {}
 }
+
+/**
+ * 生成一个 UUID
+ */
+export function createUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, t => {
+    const e = (16 * Math.random()) | 0;
+    return (t === 'x' ? e : (3 & e) | 8).toString(16);
+  });
+}

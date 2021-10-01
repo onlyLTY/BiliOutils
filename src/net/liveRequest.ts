@@ -3,7 +3,9 @@ import { stringify } from 'qs';
 import {
   BagSendResDto,
   FansMedalDto,
+  LiveFansMedalDto,
   LiveGiftBagListDto,
+  LiveRoomInfoDto,
   LiveSignDto,
   LiveSignInfoDto,
   MyWalletDto,
@@ -113,6 +115,26 @@ export async function getGiftBagList(roomId: IdType = 3394945): Promise<LiveGift
   const { data } = await liveApi.get(
     `/xlive/web-room/v1/gift/bag_list?t=${time}&room_id=${roomId}`,
   );
+  return data;
+}
+
+/**
+ * 获取粉丝勋章列表
+ * @param pageNum 第几页
+ */
+export async function getLiveFansMedal(pageNum = 1): Promise<LiveFansMedalDto> {
+  const { data } = await liveApi.get(
+    `/fans_medal/v5/live_fans_medal/iApiMedal?page=${pageNum}&pageSize=10`,
+  );
+  return data;
+}
+
+/**
+ * 获取直播间信息
+ * @param roomid 直播间id
+ */
+export async function getLiveRoomInfo(roomid: number): Promise<LiveRoomInfoDto> {
+  const { data } = await liveApi.get(`/room/v1/Room/get_info?room_id=${roomid}&from=room`);
   return data;
 }
 

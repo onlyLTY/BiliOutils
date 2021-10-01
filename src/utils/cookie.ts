@@ -8,9 +8,7 @@ function getCookieArray(cookie: string | undefined) {
 }
 
 function cookie2Obj(cookie: string, setCookie: any): object {
-  let setCookieArr = getCookieArray(setCookie?.[0]).filter(
-    el => el.length === 2,
-  );
+  let setCookieArr = getCookieArray(setCookie?.[0]).filter(el => el.length === 2);
   let arr = getCookieArray(cookie)
     .concat(setCookieArr)
     .filter(el => el.length === 2);
@@ -57,4 +55,8 @@ export function getUserId(): number {
 
 export function getBiliJct(): string {
   return getCookieItem(cookie, 'bili_jct') || '';
+}
+
+export function getLIVE_BUVID(): string {
+  return getCookieItem(cookie, 'LIVE_BUVID') || '';
 }

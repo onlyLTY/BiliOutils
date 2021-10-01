@@ -1,4 +1,5 @@
-import { ApiBaseProp, PureDataProp } from './BiLiBaseProp';
+import { LiveHeartRuleId } from '../interface/LiveHeart';
+import { ApiBaseProp, DoubleMessageProp, PureDataProp } from './BiLiBaseProp';
 
 /** 直播签到 */
 export interface LiveSignDto extends ApiBaseProp {
@@ -168,5 +169,124 @@ export interface BagSendResDto extends ApiBaseProp {
     gift_action: string;
     gift_price: number;
     coin_type: string;
+  };
+}
+
+/** 心跳返回数据 */
+export interface LiveHeartEDto extends ApiBaseProp {
+  data: {
+    timestamp: number;
+    heartbeat_interval: number;
+    secret_key: string;
+    secret_rule: LiveHeartRuleId;
+    patch_status?: number;
+    reason?: string[];
+  };
+}
+
+/** 获取有牌子的 */
+export interface LiveFansMedalDto extends DoubleMessageProp {
+  data: {
+    medalCount: number;
+    count: number;
+    fansMedalList: [
+      {
+        uid: number;
+        target_id: number;
+        medal_id: number;
+        score: number;
+        level: number;
+        intimacy: number;
+        status: number;
+        source: number;
+        receive_channel: number;
+        is_receive: number;
+        master_status: number;
+        receive_time: string;
+        today_intimacy: number;
+        last_wear_time: number;
+        is_lighted: number;
+        medal_level: number;
+        next_intimacy: number;
+        day_limit: number;
+        medal_name: string;
+        master_available: number;
+        guard_type: number;
+        lpl_status: number;
+        can_delete: true;
+        target_name: string;
+        target_face: string;
+        live_stream_status: number;
+        icon_code: number;
+        icon_text: string;
+        rank: string;
+        medal_color: number;
+        medal_color_start: number;
+        medal_color_end: number;
+        guard_level: number;
+        medal_color_border: number;
+        today_feed: number;
+        todayFeed: number;
+        dayLimit: number;
+        uname: string;
+        color: number;
+        medalName: string;
+        guard_medal_title: string;
+        anchorInfo: {};
+        roomid: number;
+      },
+    ];
+    name: string;
+    pageinfo: {
+      totalpages: number;
+      curPage: number;
+    };
+  };
+}
+
+/** 获取直播间信息 */
+export interface LiveRoomInfoDto extends DoubleMessageProp {
+  data: {
+    /** 被查询者的 mid */
+    uid: number;
+    room_id: number;
+    short_id: number;
+    attention: number;
+    online: number;
+    is_portrait: false;
+    description: string;
+    live_status: number;
+    area_id: number;
+    parent_area_id: number;
+    parent_area_name: string;
+    old_area_id: number;
+    background: string;
+    title: string;
+    user_cover: string;
+    keyframe: string;
+    is_strict_room: false;
+    live_time: string;
+    tags: string;
+    is_anchor: number;
+    room_silent_type: string;
+    room_silent_level: number;
+    room_silent_second: number;
+    area_name: string;
+    pendants: string;
+    area_pendants: string;
+    hot_words: string[];
+    hot_words_status: number;
+    verify: string;
+    new_pendants: {};
+    up_session: string;
+    pk_status: number;
+    pk_id: number;
+    battle_id: number;
+    allow_change_area_time: number;
+    allow_upload_cover_time: number;
+    studio_info: {
+      status: number;
+      master_list: [];
+    };
   };
 }
