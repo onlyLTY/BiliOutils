@@ -63,6 +63,8 @@
 | upperAccMatch    | `true`或者`false`            | `true`              | 自定义投币 UP 时，合作视频的 UP 必须为指定中的 |
 | chargeUpId       | 数值                         | 自己的 mid          | 充电目标的 mid（默认自己）                     |
 | chargePresetTime | 数值                         | 每月最后一天        | 每月充电的日期                                 |
+| matchCoins       | 数值                         | `5`                 | 每次竞猜的数量                                 |
+| matchSelection   | 数值                         | `1`                 | 压赔率低的（正压）大于 0 的数，反之等于 0      |
 | sls              | SLS [↓](#腾讯云函数scf配置)  |                     |                                                |
 
 **重要配置说明**
@@ -85,6 +87,7 @@
 | charging        | `false` | 给 UP 充电           |
 | getVipPrivilege | `false` | 获取年度大会员权益   |
 | giveGift        | `false` | 赠送过期礼物         |
+| matchGame       | `false` | 赛事竞猜             |
 
 ### 腾讯云函数（SCF）配置
 

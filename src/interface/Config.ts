@@ -23,6 +23,7 @@ export interface Config {
     charging?: boolean;
     getVipPrivilege?: boolean;
     giveGift?: boolean;
+    matchGame?: boolean;
   };
   targetLevel?: number;
   stayCoins?: number;
@@ -36,6 +37,8 @@ export interface Config {
   upperAccMatch?: boolean;
   chargeUpId: number;
   chargePresetTime: number;
+  matchCoins: number;
+  matchSelection: number;
   sls: {
     appName: string;
     name: string;

@@ -50,6 +50,10 @@ export abstract class TaskConfig {
   static readonly CHARGE_PRESET_TIME = config.chargePresetTime || 31;
   /** pushplus token */
   static readonly PUSHPLUS_TOKEN = process.env.PUSHPLUS_TOKEN || config.message?.pushplusToken;
+  /** 压硬币数量 */
+  static readonly MATCH_COINS = config.matchCoins ?? 5;
+  /** 压硬币规则 大于0 是正压，小于反压 */
+  static readonly MATCH_SELECTION = config.matchSelection ?? 1;
 }
 
 /** 任务完成情况统计 */
@@ -92,6 +96,7 @@ export abstract class JuryTask {
 export abstract class Constant {
   static readonly DAILY_TRIGGER_NAME = 'daily_bili_timer';
   static readonly JURY_TRIGGER_NAME = 'jury_bili_timer';
+  static readonly HEART_TRIGGER_NAME = 'heart_bili_timer';
   static readonly DAILY_RUN_TIME = '17:30:00-23:40:00';
   static readonly JURY_RUN_TIME = '8-12/20-40';
   /** 毫秒与天数进制 */
