@@ -6,7 +6,7 @@ import bili, { doOneJuryVote, loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
 import updateTrigger from './utils/updateTrigger';
 
-async function dailyTasks(cb?: () => void) {
+async function dailyTasks(cb?: (...arg) => any, ...cbArg) {
   try {
     await loginTask();
   } catch (error) {
@@ -23,7 +23,7 @@ async function dailyTasks(cb?: () => void) {
   }
 
   if (cb) {
-    await cb();
+    await cb(...cbArg);
   }
 
   await sendMessage('每日完成', TaskModule.appInfo);
@@ -49,7 +49,7 @@ async function juryTasks() {
   }
 
   if (JuryTask.dailyCompleteCount === 1 && JuryTask.caseNum > 0) {
-    await updateTrigger('jury');
+    await updateTrigger(Constant.JURY_TRIGGER_NAME);
     await sendMessage('风纪任务完成', TaskModule.appInfo);
   }
 
@@ -65,7 +65,8 @@ exports.main_handler = async (event, _context) => {
   if (!event) {
     return await dailyTasks();
   }
-  if (event.Message === getPRCDate().getDate().toString()) {
+  const message = JSON.parse(event.Message);
+  if (message.lastTime === getPRCDate().getDate().toString()) {
     return '今日重复执行';
   }
 

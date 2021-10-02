@@ -6,10 +6,10 @@ import { getLIVE_BUVID, createUUID, getBiliJct, apiDelay } from '../utils';
 import { Constant, TaskConfig } from '../config/globalVar';
 import * as liveHeartRequest from '../net/liveHeartRequest';
 import * as liveRequest from '../net/liveRequest';
-import { LiveHeartEDto } from '../dto/Live.dto';
+import { LiveFansMedalDto, LiveHeartEDto } from '../dto/Live.dto';
 import { getGiftBagList } from '../net/liveRequest';
 
-const START_MAX_NUM = 24;
+const HEART_MAX_NUM = 24;
 /**
  * 处理数据
  */
@@ -74,7 +74,7 @@ async function getHeartNum() {
   try {
     const { data, code } = await getGiftBagList();
     if (code !== 0 || data.list?.length <= 0) {
-      return START_MAX_NUM;
+      return HEART_MAX_NUM;
     }
     data.list?.forEach(gift => {
       /** 30607 小星星 */
@@ -83,13 +83,12 @@ async function getHeartNum() {
         if (expire > 6 && expire <= 7) giftNum += gift.gift_num;
       }
     });
-    if (giftNum >= START_MAX_NUM) {
-      console.log('已获取今日小心心');
+    if (giftNum >= HEART_MAX_NUM) {
       return 0;
     }
-    return START_MAX_NUM - giftNum;
+    return HEART_MAX_NUM - giftNum;
   } catch (error) {}
-  return START_MAX_NUM;
+  return HEART_MAX_NUM;
 }
 
 async function getOneRoomInfo(roomid: number) {
@@ -172,43 +171,143 @@ async function postX(
   return data;
 }
 
-export default async function liveHeart() {
-  console.log('----【直播心跳】----');
-
+async function getFansMedalList() {
   const heartNum = await getHeartNum();
   const {
     data: { fansMedalList },
   } = await liveRequest.getLiveFansMedal();
-  // const loopNum = Math.ceil(heartNum / fansMedalList.length);
+  return {
+    fansMedalList,
+    heartNum,
+  };
+}
 
-  let count = 0;
-  for (const funsMedalData of fansMedalList) {
-    if (count >= heartNum) {
-      break;
-    }
-    const { roomid, uname } = funsMedalData;
-    const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
-    const seq = { v: 0 };
-    const baseData = createBaseData(room_id, area_id, parent_area_id, uname, seq);
+export default async function liveHeart() {
+  console.log('----【直播心跳】----');
 
-    const heartBeatTimer = setInterval(async () => {
-      await heartBeat(uname);
-    }, random(60, 200) * 1000);
+  const { heartNum, fansMedalList } = await getFansMedalList();
+  const loopNum = Math.ceil(heartNum / fansMedalList.length);
 
-    await heartBeat(uname);
-    await apiDelay(500);
-    let rData = await postE(baseData, seq);
-
-    const timer = setInterval(async () => {
-      await apiDelay(1000);
-      rData = await postX(rData, baseData, seq);
-      if (seq.v > 5) {
-        clearInterval(timer);
-        clearInterval(heartBeatTimer);
-      }
-    }, 60 * 1000);
-
-    await apiDelay(1000);
-    count++;
+  for (let i = 0; i < loopNum; i++) {
+    await runOneLoop(fansMedalList, heartNum);
   }
+}
+
+export { liveHeart };
+
+export async function runOneLoop(
+  fansMedalList: LiveFansMedalDto['data']['fansMedalList'],
+  heartNum: number,
+) {
+  return new Promise(async resolve => {
+    let count = 0;
+    for (const funsMedalData of fansMedalList) {
+      if (count >= heartNum) {
+        break;
+      }
+      const { roomid, uname } = funsMedalData;
+      const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
+      const seq = { v: 0 };
+      const baseData = createBaseData(room_id, area_id, parent_area_id, uname, seq);
+
+      const heartBeatTimer = setInterval(async () => {
+        await heartBeat(uname);
+      }, random(60, 200) * 1000);
+
+      await heartBeat(uname);
+      await apiDelay(500);
+      let rData = await postE(baseData, seq);
+
+      const timer = setInterval(async () => {
+        await apiDelay(1000);
+        rData = await postX(rData, baseData, seq);
+        if (seq.v > 5) {
+          clearInterval(timer);
+          clearInterval(heartBeatTimer);
+          resolve('done');
+        }
+      }, 60 * 1000);
+
+      await apiDelay(1000);
+      count++;
+    }
+  });
+}
+
+interface RData {
+  data: LiveHeartEDto['data'];
+  baseData: HeartBaseDateType;
+  seq: { v: number };
+}
+
+function initData(rData: RData[]) {
+  rData.forEach(item => {
+    item.baseData.ua = TaskConfig.USER_AGENT;
+    item.baseData.csrf = item.baseData.csrf_token = getBiliJct();
+    item.baseData.device[0] = getLIVE_BUVID();
+    item.baseData.id[2] = item.seq.v;
+  });
+}
+function simplifyData(rData: RData[]) {
+  rData.forEach(item => {
+    item.baseData.csrf = item.baseData.csrf_token = '';
+    item.baseData.ua = '';
+    item.baseData.device[0] = '';
+  });
+}
+
+export async function liveHeartBySCF(argData?: string) {
+  if (!argData) {
+    argData = '{"hn":{"v":0},"d":[{"seq":{"v":0}}]}';
+  }
+  console.log(argData);
+  console.log(JSON.parse(argData));
+  const {
+    d: rData,
+    hn: heartNum,
+  }: {
+    d: RData[];
+    hn: { v: number };
+  } = JSON.parse(argData);
+
+  if (!rData[0]?.seq.v) {
+    // 清空数据
+    rData.length = 0;
+    const { heartNum: hnValue, fansMedalList } = await getFansMedalList();
+    heartNum.v = hnValue;
+
+    let count = 0;
+    for (const funsMedalData of fansMedalList) {
+      if (heartNum.v === 0) return 0;
+      if (count >= heartNum.v) break;
+      const { roomid, uname } = funsMedalData;
+      const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
+      const seq = { v: 0 };
+      const baseData = createBaseData(room_id, area_id, parent_area_id, uname, seq);
+
+      await heartBeat(uname);
+      await apiDelay(500);
+      const data = await postE(baseData, seq);
+      rData.push({ data, baseData, seq });
+      count++;
+    }
+  } else {
+    initData(rData);
+    let count = 0;
+    for (const r of rData) {
+      await heartBeat(r.baseData.uname);
+      r.data = await postX(r.data, r.baseData, r.seq);
+      await apiDelay(1000);
+      if (r.seq.v > 5) {
+        r.seq.v = 0;
+        if (count >= heartNum.v) {
+          console.log(`今日获取小心心完成`);
+          return 0;
+        }
+      }
+      count++;
+    }
+  }
+  simplifyData(rData);
+  return { d: rData, hn: heartNum };
 }

@@ -1,0 +1,19 @@
+component: scf # 必填内容
+name: catlair_test_lh
+org: ''
+app: ''
+stage: production
+inputs:
+  name: catlair_123
+  src: ./dist
+  runtime: Nodejs12.16
+  region: ap-chengdu
+  description: test
+  handler: liveHeart.main_handler
+  memorySize: 128
+  timeout: 660
+  environment:
+    variables:
+      TENCENT_SECRET_ID: ${env:TENCENT_SECRET_ID}
+      TENCENT_SECRET_KEY: ${env:TENCENT_SECRET_KEY}
+  # For more information: https://github.com/serverless-components/tencent-scf/blob/master/docs/configure.md
