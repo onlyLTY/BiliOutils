@@ -61,6 +61,7 @@ function scfConfig(el) {
 }
 
 function scfConfigHeart(el) {
+  const sls = el.sls;
   const memorySize = el?.heartMemorySize || json?.heartMemorySize || '128';
   return new updateSLS()
     .randomRunTime(el.heartRunTime || '12:00:00-21:00:00')

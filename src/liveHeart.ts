@@ -4,7 +4,8 @@ import { getPRCDate, printVersion } from './utils';
 import { liveHeartBySCF, liveHeart } from './service/liveHeart';
 import updateTrigger from './utils/updateTrigger';
 
-function setCron(time = 52_000) {
+function setCron(time = 60_000) {
+  time = time || 60_000;
   const pre = getPRCDate().getTime() + time;
   const next = new Date(pre);
   const s = next.getSeconds(),
@@ -45,7 +46,6 @@ exports.main_handler = async (event, _context) => {
     );
     return '等待继续下一轮';
   }
-
-  await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron());
+  await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron(62_000 - data.d.length * 1000));
   return '等待继续下次心跳';
 };
