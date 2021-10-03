@@ -20,12 +20,6 @@ inputs:
           cronExpression: ${env:BILI_DAILY_CRON_EXPRESSION} # 每天22点43分55秒触发
           enable: ${env:BILI_DAILY_RUN}
           argument: 日常任务
-    - timer: # 定时触发器
-        parameters:
-          name: jury_bili_timer # 风纪委员触发  若要使用scf随机执行请勿修改触发器名
-          cronExpression: ${env:BILI_JURY_CRON_EXPRESSION}
-          enable: ${env:BILI_JURY_VOTE}
-          argument: 评审任务
   environment:
     variables:
       TENCENT_SECRET_ID: ${env:TENCENT_SECRET_ID}

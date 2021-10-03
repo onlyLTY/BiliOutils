@@ -4,7 +4,6 @@ export const functionConfig = {
   addCoins: true,
   mangaSign: false,
   shareAndWatch: true,
-  judgement: false,
   supGroupSign: false,
   liveSendMessage: false,
   taskReward: true,

@@ -18,7 +18,6 @@ export interface Config {
     mangaSign?: boolean;
     shareAndWatch?: boolean;
     supGroupSign?: boolean;
-    judgement?: boolean;
     liveSendMessage?: boolean;
     charging?: boolean;
     getVipPrivilege?: boolean;
@@ -29,6 +28,7 @@ export interface Config {
   stayCoins?: number;
   userAgent?: string;
   dailyRunTime?: string;
+  heartRunTime?: string;
   targetCoins?: number;
   customizeUp?: number[];
   giftUp?: number[];

@@ -6,7 +6,6 @@ import addCoins from './addCoins';
 import mangaSign from './mangaTask';
 import silver2Coin from './silver2Coin';
 import supGroupSign from './supGroupSign';
-import judgement, { doOneJuryVote } from './judgement';
 import liveSendMessage from './sendLiveMsg';
 import charging from './charging';
 import getVipPrivilege from './getVipPrivilege';
@@ -14,7 +13,7 @@ import giveGift from './giveGift';
 import matchGame from './matchGame';
 import liveHeart from './liveHeart';
 
-export { loginTask, doOneJuryVote, liveHeart };
+export { loginTask, liveHeart };
 
 export default {
   taskReward,
@@ -24,7 +23,6 @@ export default {
   addCoins,
   mangaSign,
   supGroupSign,
-  judgement,
   liveSendMessage,
   charging,
   getVipPrivilege,

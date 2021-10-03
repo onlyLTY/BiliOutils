@@ -49,7 +49,7 @@
 内部只会寻找指定名称的触发器修改下次运行时间
 
 - 每日任务的触发器名为`daily_bili_timer`
-- 风纪任务的触发器名为`jury_bili_timer`
+- 直播心跳的触发器名为`heart_bili_timer`
 
 ![create-trigger](images/create-trigger-timer.png)
 

@@ -2,15 +2,6 @@ const { randomInt } = require('crypto');
 
 module.exports = function () {
   /**
-   * 是否开启风纪委员任务执行
-   * @param {boolen} isOpenJuryVote
-   */
-  this.openJuryVote = isOpenJuryVote => {
-    process.env.BILI_JURY_VOTE = `${isOpenJuryVote || false}`;
-    return this;
-  };
-
-  /**
    * 更新组件名
    * @param {string} componentName
    */
@@ -45,8 +36,7 @@ module.exports = function () {
    * @param {string} description
    */
   this.updateDescription = description => {
-    process.env.SCF_DESCRIPTION =
-      description || '可以填写识别该函数是哪个账号用';
+    process.env.SCF_DESCRIPTION = description || '可以填写识别该函数是哪个账号用';
     return this;
   };
 
@@ -91,28 +81,9 @@ module.exports = function () {
     return this;
   };
 
-  /** 风纪任务随机时间设置 */
-  this.randomJuryRunTime = juryRunTime => {
-    juryRunTime = juryRunTime || '8-12/20-40';
-
-    const time = juryRunTime.split('/').map(el => el.split('-'));
-
-    const startHours = randomInt(+time[0][0], +time[0][1]), //10,11
-      startMinutes = randomInt(6), // 0 - 5
-      minutes = randomInt(+time[1][0], +time[1][1]),
-      seconds = randomInt(60);
-
-    const endHours = 6 + startHours;
-
-    process.env.BILI_JURY_CRON_EXPRESSION = `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
-    return this;
-  };
-
   /** 设置内存默认值 */
   this.setMemorySize = (num = '128') => {
     const SCF_MEMORY_SIZE = process.env.SCF_MEMORY_SIZE;
-    process.env.SCF_MEMORY_SIZE = SCF_MEMORY_SIZE
-      ? SCF_MEMORY_SIZE
-      : String(num);
+    process.env.SCF_MEMORY_SIZE = SCF_MEMORY_SIZE ? SCF_MEMORY_SIZE : String(num);
   };
 };

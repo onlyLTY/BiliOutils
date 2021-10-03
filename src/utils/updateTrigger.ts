@@ -8,11 +8,9 @@ const ScfClient = scf.v20180416.Client;
 
 const MAX_MINUTES = 59,
   MAX_HOURS = 23,
-  DAILY_MIN_HOURS = 19,
-  JURY_START_MINUTES = 5,
-  JURY_RUNTIME_HOURS = 6;
+  DAILY_MIN_HOURS = 19;
 
-const { DAILY_RUN_TIME, DAILY_TRIGGER_NAME, JURY_RUN_TIME, JURY_TRIGGER_NAME } = Constant;
+const { DAILY_RUN_TIME, DAILY_TRIGGER_NAME } = Constant;
 
 /** 每日任务随机时间设置 */
 function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME) {
@@ -41,20 +39,6 @@ function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME) {
   return `${seconds} ${minutes} ${hours} * * * *`;
 }
 
-/** 风纪任务随机时间设置 */
-function randomJuryRunTime(juryRunTime = JURY_RUN_TIME) {
-  const time = juryRunTime.split('/').map(el => el.split('-').map(el => +el));
-
-  const startHours = random(time[0][0], time[0][1]), // 8 - 12
-    startMinutes = random(JURY_START_MINUTES), // 0 - 5 分钟开始
-    minutes = random(time[1][0], time[1][1]),
-    seconds = random(MAX_MINUTES);
-
-  const endHours = JURY_RUNTIME_HOURS + startHours;
-
-  return `${seconds} ${startMinutes}/${minutes} ${startHours}-${endHours} * * * *`;
-}
-
 /**
  *
  * @param triggerName 定时器名
@@ -63,7 +47,7 @@ function randomJuryRunTime(juryRunTime = JURY_RUN_TIME) {
  * @param runningTotalNumber 接口重试次数
  */
 export default async function (
-  triggerName = DAILY_RUN_TIME,
+  triggerName = DAILY_TRIGGER_NAME,
   customArg?,
   triggerDesc?: string,
   runningTotalNumber = 2,
@@ -132,15 +116,6 @@ export default async function (
 
     const hasTrigger = await getHasTrigger(triggerName);
 
-    switch (triggerName) {
-      case JURY_TRIGGER_NAME:
-        {
-          params.TriggerDesc = randomJuryRunTime();
-        }
-        break;
-      default:
-        break;
-    }
     console.log(`修改时间为：${runTime}`);
 
     if (hasTrigger) {

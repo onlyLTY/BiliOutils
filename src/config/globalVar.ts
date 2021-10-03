@@ -78,27 +78,11 @@ export abstract class TaskModule {
   static chargeOrderNo: string;
 }
 
-/** 风纪委员情况 */
-export abstract class JuryTask {
-  static isJury: boolean = false;
-  /** 总仲裁数量 */
-  static caseNum: number = 0;
-  /** 仲裁胜率 */
-  static rightRadio: number = 0;
-  /** 是否继续进行 */
-  static isRun: boolean = true;
-  /** 不运行的原因 */
-  static noRunMessage: string = '';
-  /** 审核完成后再次调用的次数 */
-  static dailyCompleteCount: number = 0;
-}
-
 export abstract class Constant {
   static readonly DAILY_TRIGGER_NAME = 'daily_bili_timer';
-  static readonly JURY_TRIGGER_NAME = 'jury_bili_timer';
   static readonly HEART_TRIGGER_NAME = 'heart_bili_timer';
   static readonly DAILY_RUN_TIME = '17:30:00-23:40:00';
-  static readonly JURY_RUN_TIME = '8-12/20-40';
+  static readonly HEART_RUN_TIME = '12:00:00-20:00:00';
   /** 毫秒与天数进制 */
-  static readonly MS2DATE = 86400000;
+  static readonly MS2DATE = 86_400_000;
 }

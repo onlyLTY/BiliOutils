@@ -82,7 +82,6 @@
 | shareAndWatch   | `true`  | 观看和分享视频       |
 | mangaSign       | `false` | 漫画签到（移动端）   |
 | supGroupSign    | `false` | 应援团签到（移动端） |
-| judgement       | `false` | 风纪委员任务         |
 | liveSendMessage | `false` | 每日直播间发送弹幕   |
 | charging        | `false` | 给 UP 充电           |
 | getVipPrivilege | `false` | 获取年度大会员权益   |
