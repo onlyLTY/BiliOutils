@@ -38,8 +38,12 @@ exports.main_handler = async (event, _context) => {
   if (!event) {
     return await dailyTasks();
   }
-  const message = JSON.parse(event.Message);
-  if (message.lastTime === getPRCDate().getDate().toString()) {
+  let message;
+  try {
+    message = JSON.parse(event.Message);
+  } catch (error) {}
+
+  if (message && message.lastTime === getPRCDate().getDate().toString()) {
     return '今日重复执行';
   }
 

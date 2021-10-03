@@ -1,12 +1,11 @@
 import { warpLog } from './utils/log';
-import { Constant, JuryTask, TaskModule } from './config/globalVar';
-import { apiDelay, sendMessage, getPRCDate, printVersion } from './utils';
-import { random } from 'lodash';
-import { liveHeartBySCF } from './service/liveHeart';
+import { Constant } from './config/globalVar';
+import { getPRCDate, printVersion } from './utils';
+import { liveHeartBySCF, liveHeart } from './service/liveHeart';
 import updateTrigger from './utils/updateTrigger';
 
-function setCron() {
-  const pre = getPRCDate().getTime() + 52_000;
+function setCron(time = 52_000) {
+  const pre = getPRCDate().getTime() + time;
   const next = new Date(pre);
   const s = next.getSeconds(),
     m = next.getMinutes(),
@@ -18,13 +17,35 @@ exports.main_handler = async (event, _context) => {
   console.log = warpLog();
   printVersion();
 
+  if (!event) {
+    return await liveHeart();
+  }
+
+  let message;
+  try {
+    message = JSON.parse(event.Message);
+  } catch (error) {}
+
+  if (message && !message.d && message.lastTime === getPRCDate().getDate().toString()) {
+    return '今日重复执行';
+  }
+
   const data = await liveHeartBySCF(event.Message);
   if (data === 0) {
     // 明天再说
     await updateTrigger(Constant.HEART_TRIGGER_NAME);
-    return;
+    return '今日完成';
   }
-  // 今天继续
+
+  if (data === 1) {
+    await updateTrigger(
+      Constant.HEART_TRIGGER_NAME,
+      { hn: { v: 0 }, d: [{ seq: { v: 0 } }] },
+      setCron(5_000),
+    );
+    return '等待继续下一轮';
+  }
+
   await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron());
-  return;
+  return '等待继续下次心跳';
 };

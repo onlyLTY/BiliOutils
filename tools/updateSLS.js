@@ -41,11 +41,11 @@ module.exports = function () {
   };
 
   /**
-   * 是否执行日常任务
+   * 是否执行任务
    * @param {any} isRun
    */
-  this.isRunDailyTask = isRun => {
-    process.env.BILI_DAILY_RUN = isRun === false ? 'false' : 'true';
+  this.isRunTask = isRun => {
+    process.env.BILI_IS_RUN = isRun === false ? 'false' : 'true';
     return this;
   };
 
@@ -53,9 +53,9 @@ module.exports = function () {
    * 提交时设置执行时间
    * @param {string} dailyRunTime 每日任务时间
    */
-  this.randomDailyRunTime = dailyRunTime => {
-    const BILI_DAILY_RUN_TIME = dailyRunTime || '17:30:00-23:40:00';
-    const taskTime = BILI_DAILY_RUN_TIME.split('-');
+  this.randomRunTime = dailyRunTime => {
+    const BILI_RUN_TIME = dailyRunTime || '17:30:00-23:40:00';
+    const taskTime = BILI_RUN_TIME.split('-');
     const startTime = taskTime[0].split(':');
     const endTime = taskTime[1].split(':');
 
@@ -77,7 +77,7 @@ module.exports = function () {
       seconds = randomInt(60);
     }
 
-    process.env.BILI_DAILY_CRON_EXPRESSION = `${seconds} ${minutes} ${hours} * * * *`;
+    process.env.BILI_CRON_EXPRESSION = `${seconds} ${minutes} ${hours} * * * *`;
     return this;
   };
 
@@ -85,5 +85,33 @@ module.exports = function () {
   this.setMemorySize = (num = '128') => {
     const SCF_MEMORY_SIZE = process.env.SCF_MEMORY_SIZE;
     process.env.SCF_MEMORY_SIZE = SCF_MEMORY_SIZE ? SCF_MEMORY_SIZE : String(num);
+    return this;
+  };
+
+  /**
+   * 设置入口函数
+   * @param {String} handler
+   */
+  this.setHandler = (handler = 'index.main_handler') => {
+    process.env.SCF_HANDLER = handler;
+    return this;
+  };
+
+  /**
+   * 设置超时
+   * @param {Number} timeout
+   */
+  this.setTimeout = (timeout = 900) => {
+    process.env.SCF_TIMEOUT = timeout;
+    return this;
+  };
+
+  /**
+   * 设置定时触发器名字
+   * @param {String} timerName
+   */
+  this.setTimerName = (timerName = 'daily_bili_timer') => {
+    process.env.SCF_TIMER_NAME = timerName;
+    return this;
   };
 };

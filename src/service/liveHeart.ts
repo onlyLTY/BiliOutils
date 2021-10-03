@@ -260,8 +260,7 @@ export async function liveHeartBySCF(argData?: string) {
   if (!argData) {
     argData = '{"hn":{"v":0},"d":[{"seq":{"v":0}}]}';
   }
-  console.log(argData);
-  console.log(JSON.parse(argData));
+
   const {
     d: rData,
     hn: heartNum,
@@ -270,15 +269,19 @@ export async function liveHeartBySCF(argData?: string) {
     hn: { v: number };
   } = JSON.parse(argData);
 
+  let count = 0;
+  // seq.v === 0 时需要发送 E
   if (!rData[0]?.seq.v) {
     // 清空数据
     rData.length = 0;
     const { heartNum: hnValue, fansMedalList } = await getFansMedalList();
     heartNum.v = hnValue;
 
-    let count = 0;
     for (const funsMedalData of fansMedalList) {
-      if (heartNum.v === 0) return 0;
+      if (heartNum.v === 0) {
+        console.log('今日获取小星星已经达到 24');
+        return 0;
+      }
       if (count >= heartNum.v) break;
       const { roomid, uname } = funsMedalData;
       const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
@@ -292,20 +295,21 @@ export async function liveHeartBySCF(argData?: string) {
       count++;
     }
   } else {
+    // 需要发送 X
     initData(rData);
-    let count = 0;
     for (const r of rData) {
       await heartBeat(r.baseData.uname);
       r.data = await postX(r.data, r.baseData, r.seq);
       await apiDelay(1000);
+      count++; // 需要放在判断上面
       if (r.seq.v > 5) {
         r.seq.v = 0;
         if (count >= heartNum.v) {
           console.log(`今日获取小心心完成`);
           return 0;
         }
+        return 1;
       }
-      count++;
     }
   }
   simplifyData(rData);

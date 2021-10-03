@@ -46,15 +46,32 @@ function baseConfig(el) {
 
 function scfConfig(el) {
   const sls = el.sls;
-  const memorySize = json?.memorySize || el?.memorySize || '128';
-  new updateSLS()
-    .isRunDailyTask(el.isRun)
-    .randomDailyRunTime(el.dailyRunTime)
+  const memorySize = el?.memorySize || json?.memorySize || '128';
+  return new updateSLS()
+    .isRunTask(el.isRun)
+    .randomRunTime(el.dailyRunTime)
     .updateDescription(sls?.description)
     .updateRegion(sls?.region)
     .updateComponentName(sls?.name)
     .updateSCFName(sls?.name)
-    .setMemorySize(memorySize);
+    .setMemorySize(memorySize)
+    .setHandler()
+    .setTimeout()
+    .setTimerName();
+}
+
+function scfConfigHeart(el) {
+  const memorySize = el?.heartMemorySize || json?.heartMemorySize || '128';
+  return new updateSLS()
+    .randomRunTime(el.heartRunTime || '12:00:00-21:00:00')
+    .updateDescription(sls?.description + 'lh')
+    .updateRegion(sls?.region)
+    .updateComponentName(sls?.name + 'lh')
+    .updateSCFName(sls?.name + 'lh')
+    .setMemorySize(memorySize)
+    .setHandler('liveHeart.main_handler')
+    .setTimeout(100)
+    .setTimerName('heart_bili_timer');
 }
 
 function scfDeploy(sls) {
@@ -77,28 +94,40 @@ function scfDeploy(sls) {
       scfConfig(el);
       baseConfig(el);
       scfDeploy(sls);
+
+      // 如果需要配置liveHeart
+      if (el.function.liveHeart) {
+        scfConfigHeart(el);
+        scfDeploy(sls);
+      }
     });
-    return;
+  }
+
+  function startOne(el, command = 'npm run start', log = '任务开始') {
+    baseConfig(el);
+    console.log(`${log}\n`);
+    try {
+      let stdout = cp.execSync(command);
+      let out = stdout.toString();
+      console.log(out);
+      console.log('运行成功\n\n');
+    } catch (error) {
+      console.error(error.toString());
+      console.log('\n\n');
+    }
   }
 
   if (process.argv.includes('--start')) {
     json.account?.forEach(el => {
       if (el.isRun === false) {
-        console.log('跳过');
-        return;
+        console.log('跳过每日任务');
+      } else {
+        startOne(el);
       }
-      baseConfig(el);
-      console.log('开始运行\n');
-      try {
-        let stdout = cp.execSync('npm run start');
-        let out = stdout.toString();
-        console.log(out);
-        console.log('运行成功\n\n');
-      } catch (error) {
-        console.error(error);
-        console.log('\n\n');
+
+      if (el.function.liveHeart) {
+        startOne(el, 'npm run liveHeart', '直播心跳任务开始');
       }
     });
-    return;
   }
 })();

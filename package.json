@@ -10,6 +10,7 @@
     "start:multi": "node tools/bootstrap.js --start",
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js",
+    "liveHeart": "node ./dist/runLiveHeart.js",
     "modclean": "modclean -r -a \"*.md,*LICENSE*,.github,.nycrc,*.ts,*.html,*.txt,*.js.map,*.mjs.map,browser.js,@types\" && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
     "predeploy:multi": "rm -f ./dist/run.js && cp -rf ./tools/ ./package*.json ./dist && cd ./dist && npm i --production && npm run modclean && rm -rf tools package*.json &&  cd ../",

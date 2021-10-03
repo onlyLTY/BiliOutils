@@ -55,6 +55,7 @@
 | stayCoins        | 数值                         | `0`                 | 账号至少保留的硬币数目，低于或等于将不投币     |
 | userAgent        | 字符串                       | 固定 Chrome         | 浏览器用户代理 （建议自行配置）                |
 | dailyRunTime     | 字符串                       | `17:30:00-23:40:00` | SCF 随机运行的时间段（随机时间只会在范围内）   |
+| heartRunTime     | 字符串                       | `12:00:00-21:00:00` | 同上，不过是直播心跳的时间                     |
 | targetCoins      | 数值                         | `5`                 | 每日投币目标（超过将不投币）                   |
 | customizeUp      | 数值数组                     | `[]`                | 自定义投币 UP， 在所填中随机选取               |
 | giftUp           | 数值数组                     | customizeUp         | 自定义投喂礼物 UP， 在所填中随机选取           |
@@ -87,6 +88,7 @@
 | getVipPrivilege | `false` | 获取年度大会员权益   |
 | giveGift        | `false` | 赠送过期礼物         |
 | matchGame       | `false` | 赛事竞猜             |
+| liveHeart       | `false` | 直播心跳（小心心）   |
 
 ### 腾讯云函数（SCF）配置
 

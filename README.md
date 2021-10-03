@@ -43,6 +43,14 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 - [使用 Docker 运行](./docs/使用Docker运行.md) #25
 - [使用 Action 测试运行](./docs/使用Action运行.md) #24（体验，不推荐）
 
+### 直播心跳
+
+入口函数（执行方法）不是 `index.main_handler` 而是 `liveHeart.main,handler`，手动部署到 SCF 时需要注意
+
+使用 scf 时，直播心跳要获取 24 个小心心需要消耗至少 18 次 scf api 调用（粉丝勋章 10 以上时）， 最多 144 次 scf api 调用（粉丝勋章 1 个）。每次调用不超过 30s（极限）
+
+使用其它方式时，至少 18 分钟，至多 144 分钟。
+
 ### Docker 镜像
 
 - `catlair/bilitools-deploy` 用于部署到 SCF

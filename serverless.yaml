@@ -9,17 +9,16 @@ inputs:
   runtime: Nodejs12.16
   region: ${env:SCF_REGION}
   description: ${env:SCF_DESCRIPTION}
-  handler: index.main_handler
+  handler: ${env:SCF_HANDLER}
   memorySize: ${env:SCF_MEMORY_SIZE}
-  timeout: 900
+  timeout: ${env:SCF_TIMEOUT}
   events:
     - timer: # 定时触发器
         parameters:
           # name: timer # 触发器名称，默认timer-${name}-${stage}
-          name: daily_bili_timer # 若要使用scf随机执行请勿修改触发器名
-          cronExpression: ${env:BILI_DAILY_CRON_EXPRESSION} # 每天22点43分55秒触发
-          enable: ${env:BILI_DAILY_RUN}
-          argument: 日常任务
+          name: ${env:SCF_TIMER_NAME} # 若要使用scf随机执行请勿修改触发器名
+          cronExpression: ${env:BILI_CRON_EXPRESSION} # 每天22点43分55秒触发
+          enable: ${env:BILI_IS_RUN}
   environment:
     variables:
       TENCENT_SECRET_ID: ${env:TENCENT_SECRET_ID}
