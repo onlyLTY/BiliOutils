@@ -2,6 +2,8 @@ import { apiDelay, random } from '../utils';
 import * as liveRequest from '../net/liveRequest';
 import { FansMedalDto } from '../dto/Live.dto';
 
+type FansMedalListDto = FansMedalDto['data']['fansMedalList'];
+
 const kaomoji = [
   '(⌒▽⌒)',
   '（￣▽￣）',
@@ -47,20 +49,37 @@ const kaomoji = [
 
 const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
 
-async function getFansMealList(): Promise<FansMedalDto['data']['fansMedalList']> {
+async function getFansMeal10(
+  page: number = 1,
+  pageSize: number = 10,
+): Promise<FansMedalDto['data']> {
   try {
-    const { code, message, data } = await liveRequest.getFansMedal(1, 10);
+    const { code, message, data } = await liveRequest.getFansMedal(page, pageSize);
 
     if (code !== 0) {
-      console.log('获取直播间失败 ', code, message);
-      return [];
+      console.error('获取直播间失败 ', code, message);
+      return null;
     }
 
-    return data.fansMedalList;
+    return data;
   } catch (error) {
-    console.log('获取直播间异常', error.message);
-    return [];
+    console.error('获取直播间异常', error.message);
+    return null;
   }
+}
+
+async function getFansMealList(): Promise<FansMedalListDto> {
+  const { fansMedalList, pageinfo } = await getFansMeal10(1, 10);
+  let { totalpages } = pageinfo;
+
+  if (totalpages && totalpages > 1) {
+    for (let index = 2; index <= totalpages; index++) {
+      const medalTemp = await getFansMeal10(index, 10);
+      fansMedalList.push(...medalTemp.fansMedalList);
+    }
+  }
+
+  return fansMedalList;
 }
 
 async function sendOneMessage(roomid: number, targetName: string) {
@@ -85,7 +104,9 @@ export default async function liveSendMessage() {
   const fansMedalList = await getFansMealList();
   let count = 0,
     jumpCount = 0;
-  console.log(`一共需要发送${fansMedalList.length}个直播间发送`);
+  console.log(`一共需要发送${fansMedalList.length}个直播间`);
+  console.info(`所需时间很长，请耐心等待`);
+
   for (const medal of fansMedalList) {
     if (!medal.roomid) {
       console.log(`【${medal.target_name}】没有直播间哦`);
@@ -94,7 +115,7 @@ export default async function liveSendMessage() {
     }
     // console.log(`给【${medal.target_name}】${medal.roomid}发送弹幕`);
     (await sendOneMessage(medal.roomid, medal.target_name)) && count++;
-    await apiDelay(random(60000, 20000));
+    await apiDelay(random(6000, 25000));
   }
   console.log(`成功发送${count}个弹幕,跳过${jumpCount}个`);
 }
