@@ -49,7 +49,7 @@ const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9',
 
 async function getFansMealList(): Promise<FansMedalDto['data']['fansMedalList']> {
   try {
-    const { code, message, data } = await liveRequest.getFansMedal(1, 50);
+    const { code, message, data } = await liveRequest.getFansMedal(1, 10);
 
     if (code !== 0) {
       console.log('获取直播间失败 ', code, message);

@@ -99,7 +99,7 @@ export async function sendMessage(roomid: number, msg: string): Promise<PureData
  * @param page 页
  * @param pageSize 页大小
  */
-export async function getFansMedal(page: number = 1, pageSize: number = 50): Promise<FansMedalDto> {
+export async function getFansMedal(page: number = 1, pageSize: number = 10): Promise<FansMedalDto> {
   const { data } = await liveApi.get(
     `/fans_medal/v5/live_fans_medal/iApiMedal?page=${page}&pageSize=${pageSize}`,
   );
