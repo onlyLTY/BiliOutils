@@ -1,7 +1,7 @@
 import { random } from 'lodash';
 
 import { Constant, TaskConfig } from '../config/globalVar';
-import { getGiftBagList, sendBagGift, getFansMedal } from '../net/liveRequest';
+import { getGiftBagList, sendBagGift, getLiveFansMedal } from '../net/liveRequest';
 import { getUser } from '../net/userInfoRequest';
 import { LiveGiftBagListDto } from '../dto/Live.dto';
 import { apiDelay } from '../utils';
@@ -76,7 +76,7 @@ async function findOneRoom() {
 async function findOneByRandomUp() {
   const {
     data: { count, fansMedalList },
-  } = await getFansMedal();
+  } = await getLiveFansMedal();
   await apiDelay();
   if (!count) {
     return {

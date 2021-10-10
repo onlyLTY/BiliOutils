@@ -2,7 +2,7 @@ import { stringify } from 'qs';
 
 import {
   BagSendResDto,
-  FansMedalDto,
+  FansMedalPanelDto,
   LiveFansMedalDto,
   LiveGiftBagListDto,
   LiveRoomInfoDto,
@@ -80,7 +80,7 @@ export async function sendMessage(roomid: number, msg: string): Promise<PureData
   const { data } = await liveApi.post(
     '/msg/send',
     stringify({
-      color: 16777215,
+      color: 5566168,
       fontsize: 25,
       mode: 1,
       msg,
@@ -95,13 +95,18 @@ export async function sendMessage(roomid: number, msg: string): Promise<PureData
 }
 
 /**
- * 获取有勋章的直播间
+ * 获取勋章
  * @param page 页
  * @param pageSize 页大小
+ * @param mid 用户id （其实可以随便一个）
  */
-export async function getFansMedal(page: number = 1, pageSize: number = 10): Promise<FansMedalDto> {
+export async function getFansMedalPanel(
+  page = 1,
+  pageSize = 256,
+  mid = 1,
+): Promise<FansMedalPanelDto> {
   const { data } = await liveApi.get(
-    `/fans_medal/v5/live_fans_medal/iApiMedal?page=${page}&pageSize=${pageSize}`,
+    `/xlive/app-ucenter/v1/fansMedal/panel?page=${page}&page_size=${pageSize}&target_id=${mid}`,
   );
   return data;
 }
@@ -119,12 +124,12 @@ export async function getGiftBagList(roomId: IdType = 3394945): Promise<LiveGift
 }
 
 /**
- * 获取粉丝勋章列表
+ * 获取已有粉丝勋章的关注列表
  * @param pageNum 第几页
  */
-export async function getLiveFansMedal(pageNum = 1): Promise<LiveFansMedalDto> {
+export async function getLiveFansMedal(pageNum = 1, pageSize = 10): Promise<LiveFansMedalDto> {
   const { data } = await liveApi.get(
-    `/fans_medal/v5/live_fans_medal/iApiMedal?page=${pageNum}&pageSize=10`,
+    `/fans_medal/v5/live_fans_medal/iApiMedal?page=${pageNum}&pageSize=${pageSize}`,
   );
   return data;
 }

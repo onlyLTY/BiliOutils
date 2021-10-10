@@ -23,6 +23,7 @@ export interface Config {
     getVipPrivilege?: boolean;
     giveGift?: boolean;
     matchGame?: boolean;
+    liveHeart?: boolean;
   };
   targetLevel?: number;
   stayCoins?: number;

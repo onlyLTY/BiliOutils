@@ -1,8 +1,7 @@
 import { apiDelay, random } from '../utils';
 import * as liveRequest from '../net/liveRequest';
-import { FansMedalDto } from '../dto/Live.dto';
-
-type FansMedalListDto = FansMedalDto['data']['fansMedalList'];
+import { FansMedalPanelDto, FansMedalDto } from '../dto/Live.dto';
+import { TaskConfig } from '../config/globalVar';
 
 const kaomoji = [
   '(⌒▽⌒)',
@@ -49,37 +48,26 @@ const kaomoji = [
 
 const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
 
-async function getFansMeal10(
-  page: number = 1,
-  pageSize: number = 10,
-): Promise<FansMedalDto['data']> {
+async function getFansMedalPanel(): Promise<FansMedalPanelDto['data']> {
   try {
-    const { code, message, data } = await liveRequest.getFansMedal(page, pageSize);
+    const { code, message, data } = await liveRequest.getFansMedalPanel(1, 256, TaskConfig.USERID);
 
     if (code !== 0) {
-      console.error('获取直播间失败 ', code, message);
+      console.error('获取勋章信息失败 ', code, message);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error('获取直播间异常', error.message);
+    console.error('获取勋章异常', error.message);
     return null;
   }
 }
 
-async function getFansMealList(): Promise<FansMedalListDto> {
-  const { fansMedalList, pageinfo } = await getFansMeal10(1, 10);
-  let { totalpages } = pageinfo;
-
-  if (totalpages && totalpages > 1) {
-    for (let index = 2; index <= totalpages; index++) {
-      const medalTemp = await getFansMeal10(index, 10);
-      fansMedalList.push(...medalTemp.fansMedalList);
-    }
-  }
-
-  return fansMedalList;
+async function getFansMealList(): Promise<FansMedalDto[]> {
+  const { list, special_list } = await getFansMedalPanel();
+  list.push(...special_list);
+  return list;
 }
 
 async function sendOneMessage(roomid: number, targetName: string) {
@@ -88,8 +76,11 @@ async function sendOneMessage(roomid: number, targetName: string) {
     const { code, message } = await liveRequest.sendMessage(roomid, msg);
 
     if (code !== 0) {
+      // 11000 某种不可抗力不允许发
+      // 10030 发送过于频繁
       console.log(`【${targetName}】${roomid}-发送失败`, message);
       console.error(code);
+      return false;
     }
     // console.log('发送成功!');
     return true;
@@ -108,13 +99,14 @@ export default async function liveSendMessage() {
   console.info(`所需时间很长，请耐心等待`);
 
   for (const medal of fansMedalList) {
-    if (!medal.roomid) {
-      console.log(`【${medal.target_name}】没有直播间哦`);
+    const { room_info, anchor_info } = medal;
+    if (!room_info?.room_id) {
+      console.log(`【${anchor_info.nick_name}】没有直播间哦`);
       jumpCount++;
       break;
     }
     // console.log(`给【${medal.target_name}】${medal.roomid}发送弹幕`);
-    (await sendOneMessage(medal.roomid, medal.target_name)) && count++;
+    (await sendOneMessage(room_info.room_id, anchor_info.nick_name)) && count++;
     await apiDelay(random(6000, 25000));
   }
   console.log(`成功发送${count}个弹幕,跳过${jumpCount}个`);

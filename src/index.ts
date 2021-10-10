@@ -1,5 +1,5 @@
 import { warpLog } from './utils/log';
-import { TaskModule } from './config/globalVar';
+import { TaskConfig, TaskModule } from './config/globalVar';
 import { apiDelay, sendMessage, getPRCDate, printVersion } from './utils';
 import bili, { loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
@@ -36,6 +36,11 @@ exports.main_handler = async (event, _context) => {
 
   // 只有serverless才有event
   if (!event) {
+    // 如果需要执行 liveHeart
+    if (TaskConfig.config.function.liveHeart) {
+      const { liveHeart } = await import('./service/liveHeart');
+      return await dailyTasks(liveHeart);
+    }
     return await dailyTasks();
   }
   let message;
