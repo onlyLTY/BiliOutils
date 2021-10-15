@@ -1,5 +1,4 @@
 import * as CryptoJS from 'crypto-js';
-import { random } from 'lodash';
 
 import { HeartBaseDateType, DeviceType, HmacsData, LiveHeartRuleId } from '../interface/LiveHeart';
 import { getLIVE_BUVID, createUUID, getBiliJct, apiDelay } from '../utils';
@@ -46,14 +45,14 @@ function createBaseData(
   areaid: number,
   parentid: number,
   uname: string,
-  seq: { v: number },
+  seq: number,
 ): HeartBaseDateType {
   const csrf_token = getBiliJct(),
     csrf = csrf_token;
   const device: DeviceType = [getLIVE_BUVID(), createUUID()];
   return {
     ua: TaskConfig.USER_AGENT,
-    id: [parentid, areaid, seq.v, roomid],
+    id: [parentid, areaid, seq, roomid],
     csrf_token,
     csrf,
     device,
@@ -61,10 +60,9 @@ function createBaseData(
   };
 }
 
-async function heartBeat(uname: string) {
+async function heartBeat() {
   try {
     await liveHeartRequest.heartBeat();
-    console.log(`向【${uname}】的直播间发送一次 heartBeat`);
   } catch {}
 }
 
@@ -118,11 +116,15 @@ async function postE(baseDate: HeartBaseDateType, seq: { v: number }) {
     csrf_token: baseDate.csrf_token,
   };
 
-  const { data, code } = await liveHeartRequest.postE(postData);
-  if (code === 0) {
-    console.log(`进入【${baseDate.uname}】的直播间`);
-    seq.v++;
-    return data;
+  try {
+    const { data, code } = await liveHeartRequest.postE(postData);
+    if (code === 0) {
+      console.log(`进入【${baseDate.uname}】的直播间`);
+      seq.v++;
+      return data;
+    }
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -150,32 +152,66 @@ async function postX(
 
   const s = hmacs(postData, rData.secret_rule);
 
-  const { data, code, message } = await liveHeartRequest.postX(
-    Object.assign(
-      {
-        visit_id: '',
-        csrf: baseData.csrf,
-        csrf_token: baseData.csrf_token,
-        s,
-      },
-      postData,
-    ),
-  );
+  try {
+    const { data, code, message } = await liveHeartRequest.postX(
+      Object.assign(
+        {
+          visit_id: '',
+          csrf: baseData.csrf,
+          csrf_token: baseData.csrf_token,
+          s,
+        },
+        postData,
+      ),
+    );
 
-  if (code === 0) {
-    console.log(`向【${baseData.uname}】发送第${seq.v}次心跳`);
-    seq.v++;
-  } else {
-    console.log(`向【${baseData.uname}】发送第${seq.v}次心跳失败`, code, message);
+    if (code === 0) {
+      console.log(`向【${baseData.uname}】发送第${seq.v}次心跳`);
+      seq.v++;
+    } else {
+      console.log(`向【${baseData.uname}】发送第${seq.v}次心跳失败`, code, message);
+    }
+    return data;
+  } catch (error) {
+    console.error(error);
   }
-  return data;
+}
+
+async function getFansMeal10(page = 1, pageSize = 10): Promise<LiveFansMedalDto['data']> {
+  try {
+    const { code, message, data } = await liveRequest.getLiveFansMedal(page, pageSize);
+
+    if (code !== 0) {
+      console.error('获取直播间失败 ', code, message);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('获取直播间异常', error.message);
+    return null;
+  }
+}
+
+async function getMoreFansMedal() {
+  const { fansMedalList, pageinfo } = await getFansMeal10();
+  let { totalpages } = pageinfo;
+
+  if (totalpages && totalpages > 1) {
+    // 最多需要 3 页的
+    totalpages = totalpages > 3 ? 3 : totalpages;
+    for (let index = 2; index <= totalpages; index++) {
+      const medalTemp = await getFansMeal10(index, 10);
+      fansMedalList.push(...medalTemp.fansMedalList);
+    }
+  }
+
+  return fansMedalList;
 }
 
 async function getFansMedalList() {
   const heartNum = await getHeartNum();
-  const {
-    data: { fansMedalList },
-  } = await liveRequest.getLiveFansMedal();
+  const fansMedalList = await getMoreFansMedal();
   return {
     fansMedalList,
     heartNum,
@@ -186,54 +222,75 @@ export default async function liveHeart() {
   console.log('----【直播心跳】----');
 
   const { heartNum, fansMedalList } = await getFansMedalList();
-  const loopNum = Math.ceil(heartNum / fansMedalList.length);
+  const loopNum = Math.ceil(heartNum / fansMedalList?.length);
 
   for (let i = 0; i < loopNum; i++) {
     await runOneLoop(fansMedalList, heartNum);
   }
+  console.log('完成');
 }
 
 export { liveHeart };
+
+async function runOnePost(baseData, rDataArr, j, seq) {
+  if (seq.v && !rDataArr[j]) {
+    return;
+  }
+
+  return new Promise(async resolve => {
+    await heartBeat();
+    await apiDelay(500);
+    if (seq.v === 0) {
+      rDataArr[j] = await postE(baseData, seq);
+    } else {
+      rDataArr[j] = await postX(rDataArr[j], baseData, seq);
+    }
+    resolve('done');
+  });
+}
 
 export async function runOneLoop(
   fansMedalList: LiveFansMedalDto['data']['fansMedalList'],
   heartNum: number,
 ) {
+  const apiDelayTime = 2000;
   return new Promise(async resolve => {
-    let count = 0;
-    for (const funsMedalData of fansMedalList) {
+    const rDataArray = [];
+    for (let index = 0; index < 6; index++) {
+      let count = 0;
       if (count >= heartNum) {
         break;
       }
-      const { roomid, uname } = funsMedalData;
-      const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
-      const seq = { v: 0 };
-      const baseData = createBaseData(room_id, area_id, parent_area_id, uname, seq);
-
-      const heartBeatTimer = setInterval(async () => {
-        await heartBeat(uname);
-      }, random(60, 200) * 1000);
-
-      await heartBeat(uname);
-      await apiDelay(500);
-      let rData = await postE(baseData, seq);
-
-      const timer = setInterval(async () => {
-        await apiDelay(1000);
-        rData = await postX(rData, baseData, seq);
-        if (seq.v > 5) {
-          clearInterval(timer);
-          clearInterval(heartBeatTimer);
-          resolve('done');
+      const length = fansMedalList.length;
+      for (let j = 0; j < length; j++) {
+        if (count >= heartNum) {
+          break;
         }
-      }, 60 * 1000);
-
-      await apiDelay(1000);
-      count++;
+        const funsMedalData = fansMedalList[j];
+        const { roomid, uname } = funsMedalData;
+        const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
+        const baseData = createBaseData(room_id, area_id, parent_area_id, uname, index);
+        await runOnePost(baseData, rDataArray, j, { v: index });
+        await apiDelay(apiDelayTime);
+        count++;
+      }
+      // 最后一次不等待
+      if (index < 5) {
+        // 去掉部分延时，保证时间接近 1 分
+        await apiDelay(60000 - count * apiDelayTime);
+      }
     }
+    resolve('done');
   });
 }
 
+/**
+ * 下面是云函数相关
+ */
+
+/**
+ * 返回参数
+ */
 interface RData {
   data: LiveHeartEDto['data'];
   baseData: HeartBaseDateType;
@@ -279,16 +336,16 @@ export async function liveHeartBySCF(argData?: string) {
 
     for (const funsMedalData of fansMedalList) {
       if (heartNum.v === 0) {
-        console.log('今日获取小星星已经达到 24');
+        console.log(`今日获取小星星已经达到 ${HEART_MAX_NUM}`);
         return 0;
       }
       if (count >= heartNum.v) break;
       const { roomid, uname } = funsMedalData;
       const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
       const seq = { v: 0 };
-      const baseData = createBaseData(room_id, area_id, parent_area_id, uname, seq);
+      const baseData = createBaseData(room_id, area_id, parent_area_id, uname, seq.v);
 
-      await heartBeat(uname);
+      await heartBeat();
       await apiDelay(500);
       const data = await postE(baseData, seq);
       rData.push({ data, baseData, seq });
@@ -298,8 +355,8 @@ export async function liveHeartBySCF(argData?: string) {
     // 需要发送 X
     initData(rData);
     for (const r of rData) {
-      await heartBeat(r.baseData.uname);
-      r.data = await postX(r.data, r.baseData, r.seq);
+      await heartBeat();
+      r.data &&= await postX(r.data, r.baseData, r.seq);
       await apiDelay(1000);
       count++; // 需要放在判断上面
       if (r.seq.v > 5) {
@@ -308,8 +365,10 @@ export async function liveHeartBySCF(argData?: string) {
           console.log(`今日获取小心心完成`);
           return 0;
         }
-        return 1;
       }
+    }
+    if (rData.find(r => r.seq.v > 5)) {
+      return 1;
     }
   }
   simplifyData(rData);
