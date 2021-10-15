@@ -4,7 +4,7 @@
   "description": "this is BiliTools",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc && babel ./dist --out-dir ./dist",
+    "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
     "deploy": "sls deploy --debug",
     "deploy:multi": "node tools/bootstrap.js --scf",
     "start:multi": "node tools/bootstrap.js --start",
@@ -20,11 +20,12 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/cli": "^7.15.7",
-    "@babel/core": "^7.15.5",
-    "@babel/preset-env": "^7.15.6",
+    "@babel/core": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-typescript": "^7.15.0",
     "@types/crypto-js": "^4.0.2",
-    "@types/lodash": "^4.14.173",
-    "@types/node": "^16.7.10",
+    "@types/lodash": "^4.14.175",
+    "@types/node": "^16.10.3",
     "@types/nodemailer": "^6.4.4",
     "@types/qs": "^6.9.7"
   },
@@ -35,6 +36,6 @@
     "nodemailer": "^6.6.5",
     "pako": "1.0.11",
     "qs": "^6.10.1",
-    "tencentcloud-sdk-nodejs": "^4.0.207"
+    "tencentcloud-sdk-nodejs": "^4.0.214"
   }
 }

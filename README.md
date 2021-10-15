@@ -45,9 +45,10 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 
 运行方法：
 
-- [手动部署到 SCF](./docs/手动部署到SCF.md) #18（推荐）
-- [Action 部署到 SCF](./docs/Action部署到SCF.md) #20（推荐）
-- [使用 Docker 运行](./docs/使用Docker运行.md) #25
+- [手动部署到 SCF](./docs/手动部署到SCF.md)
+- [Action 部署到 SCF](./docs/Action部署到SCF.md)
+- [使用 Docker 运行](./docs/使用Docker运行.md)
+- [本地运行](./docs/本地运行.md)
 
 ### 直播心跳
 
