@@ -27,8 +27,15 @@ const getEnvConfig = (): Config => {
   }
 };
 
+const getDevConfig = (): Config => {
+  try {
+    return require('../../config/config.dev.json');
+  } catch {}
+  return null;
+};
+
 export function setConfig(): Config {
-  const config = getCurDirConfig() || getRootDirConfig() || getEnvConfig();
+  const config = getDevConfig() || getCurDirConfig() || getRootDirConfig() || getEnvConfig();
   if (config?.cookie) {
     return config;
   }

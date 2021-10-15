@@ -22,7 +22,8 @@ export async function pushplus(title: string, content: string) {
   try {
     // 发送消息
     const {
-      data: { msg, code, data: msgNumberString },
+      //@ts-ignore
+      data: { msg, code },
     } = await plusApi.post('/send', postData);
     if (code !== 200) {
       console.log('pushplus 发送消息失败');

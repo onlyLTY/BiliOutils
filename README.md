@@ -22,6 +22,14 @@
 - [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）（test）
 - [ ] 支持 Docker 、 SCF 等方式运行，支持执行消息推送
 
+## 云函数额度调整
+
+<https://cloud.tencent.com/document/product/583/17299>
+
+100 万次调用调整为 10 万次（事件函数只有 5 万次）  
+40 万 GBs 资源使用量调整为 2 万 GBs  
+外出流量 0.5 GB
+
 ## 使用说明
 
 访问 Github 有困难？ 可以使用 [Gitee](https://gitee.com/catlair/BiliTools) 查看文档

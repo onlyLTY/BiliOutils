@@ -78,6 +78,10 @@ async function sendOneMessage(roomid: number, targetName: string) {
     if (code !== 0) {
       // 11000 某种不可抗力不允许发
       // 10030 发送过于频繁
+      if (code === 11000) {
+        console.log(`【${targetName}】${roomid}-可能未开启评论`);
+        return false;
+      }
       console.log(`【${targetName}】${roomid}-发送失败`, message);
       console.error(code);
       return false;
@@ -107,7 +111,7 @@ export default async function liveSendMessage() {
     }
     // console.log(`给【${medal.target_name}】${medal.roomid}发送弹幕`);
     (await sendOneMessage(room_info.room_id, anchor_info.nick_name)) && count++;
-    await apiDelay(random(6000, 25000));
+    await apiDelay(random(10000, 25000));
   }
   console.log(`成功发送${count}个弹幕,跳过${jumpCount}个`);
 }

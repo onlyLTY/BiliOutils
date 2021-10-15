@@ -26,23 +26,21 @@ export default async function supGroupSign() {
 
   const myGroups = await getMyGroups();
   await apiDelay();
+  let count = 0;
   for (let i = 0; i < myGroups.length; ) {
     let group = myGroups[i];
     try {
-      console.log(`应援团${group.group_name}签到开始`);
-      const { data, code, message } = await groupSignApi(
-        group.group_id,
-        group.owner_uid
-      );
+      // console.log(`应援团${group.group_name}签到开始`);
+      const { data, code, message } = await groupSignApi(group.group_id, group.owner_uid);
       if (code === 0) {
         if (data.status === 0) {
-          console.log('签到成功: ', message);
+          count++;
+          // console.log('签到成功: ', message);
         } else {
           console.log(message);
         }
-        i++;
       } else {
-        console.log('签到失败', message);
+        console.log(`[${group.group_name}]签到失败`, message);
       }
     } catch (error) {
       console.log('签到异常', error.message);
@@ -50,4 +48,5 @@ export default async function supGroupSign() {
       await apiDelay();
     }
   }
+  console.log(`签到结束，成功${count}/${myGroups.length}`);
 }

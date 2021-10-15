@@ -102,7 +102,7 @@ module.exports = function () {
    * @param {Number} timeout
    */
   this.setTimeout = (timeout = 900) => {
-    process.env.SCF_TIMEOUT = timeout;
+    process.env.SCF_TIMEOUT = String(timeout);
     return this;
   };
 

@@ -5,11 +5,6 @@ const cp = require('child_process');
 
 const json = require('./cfgCompatibility')('../config');
 
-if (json.isRun === false) {
-  console.log('不需要运行');
-  return;
-}
-
 /**
  * 提取一个配置
  */
@@ -89,6 +84,11 @@ function scfDeploy(sls) {
 }
 
 (async () => {
+  if (json.isRun === false) {
+    console.log('不需要运行');
+    return;
+  }
+
   if (process.argv.includes('--scf')) {
     json.account?.forEach(el => {
       const sls = JSON.parse(JSON.stringify(el.sls));

@@ -2,7 +2,6 @@
 node_modules/**
 dist/
 /temp/**
-/config/config.json
-/config/config.txt
-/config/config.temp.*
+/config/
 .idea
+/src/config/config.json
