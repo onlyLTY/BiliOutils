@@ -1,7 +1,7 @@
 import * as CryptoJS from 'crypto-js';
 
 import { HeartBaseDateType, DeviceType, HmacsData, LiveHeartRuleId } from '../interface/LiveHeart';
-import { getLIVE_BUVID, createUUID, getBiliJct, apiDelay } from '../utils';
+import { getLIVE_BUVID, createUUID, getBiliJct, apiDelay, gzipDecode, gzipEncode } from '../utils';
 import { Constant, TaskConfig } from '../config/globalVar';
 import * as liveHeartRequest from '../net/liveHeartRequest';
 import * as liveRequest from '../net/liveRequest';
@@ -209,9 +209,14 @@ async function getMoreFansMedal() {
   return fansMedalList;
 }
 
-async function getFansMedalList() {
+async function getFansMedalList(more = true) {
   const heartNum = await getHeartNum();
-  const fansMedalList = await getMoreFansMedal();
+  let fansMedalList: LiveFansMedalDto['data']['fansMedalList'];
+  if (more) {
+    fansMedalList = await getMoreFansMedal();
+  } else {
+    ({ fansMedalList } = await getFansMeal10());
+  }
   return {
     fansMedalList,
     heartNum,
@@ -298,33 +303,36 @@ interface RData {
 }
 
 function initData(rData: RData[]) {
+  const buvid = getLIVE_BUVID();
+  const bilijct = getBiliJct();
+  const ua = TaskConfig.USER_AGENT;
   rData.forEach(item => {
-    item.baseData.ua = TaskConfig.USER_AGENT;
-    item.baseData.csrf = item.baseData.csrf_token = getBiliJct();
-    item.baseData.device[0] = getLIVE_BUVID();
+    item.baseData.ua = ua;
+    item.baseData.csrf = item.baseData.csrf_token = bilijct;
+    item.baseData.device[0] = buvid;
     item.baseData.id[2] = item.seq.v;
   });
 }
 function simplifyData(rData: RData[]) {
   rData.forEach(item => {
-    item.baseData.csrf = item.baseData.csrf_token = '';
-    item.baseData.ua = '';
-    item.baseData.device[0] = '';
+    delete item.baseData.csrf;
+    delete item.baseData.csrf_token;
+    delete item.baseData.ua;
+    delete item.baseData.device[0];
   });
 }
 
 export async function liveHeartBySCF(argData?: string) {
-  if (!argData) {
-    argData = '{"hn":{"v":0},"d":[{"seq":{"v":0}}]}';
-  }
+  let rData: RData[], heartNum: { v: number };
 
-  const {
-    d: rData,
-    hn: heartNum,
-  }: {
-    d: RData[];
-    hn: { v: number };
-  } = JSON.parse(argData);
+  if (!argData) {
+    rData = [{ seq: { v: 0 } }] as RData[];
+    heartNum = { v: 0 };
+  } else {
+    const { d, hn } = JSON.parse(argData);
+    rData = typeof d === 'string' ? JSON.parse(gzipDecode(d)) : d;
+    heartNum = hn;
+  }
 
   let count = 0;
   // seq.v === 0 时需要发送 E
@@ -372,5 +380,5 @@ export async function liveHeartBySCF(argData?: string) {
     }
   }
   simplifyData(rData);
-  return { d: rData, hn: heartNum };
+  return { d: gzipEncode(JSON.stringify(rData)), hn: heartNum, l: rData.length };
 }

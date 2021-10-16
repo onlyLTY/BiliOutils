@@ -46,6 +46,6 @@ exports.main_handler = async (event, _context) => {
     );
     return '等待继续下一轮';
   }
-  await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron(62_000 - data.d.length * 1000));
+  await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron(62_000 - data.l * 1000));
   return '等待继续下次心跳';
 };
