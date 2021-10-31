@@ -40,14 +40,21 @@ function init() {
 
   const presetTime = TaskConfig.CHARGE_PRESET_TIME;
 
-  if (presetTime > today || today === monthHasDays) {
-    console.log(`预设时间为${presetTime}，不符合条件`);
-    return false;
-  }
-
   // 查看余额
   if (TaskModule.bCoinCouponBalance < 2) {
     console.log(`剩余券为${TaskModule.bCoinCouponBalance},不足2跳过投币`);
+    return false;
+  }
+
+  // 今天是否是最后一天
+  if (monthHasDays === today) {
+    console.log(`今天是最后一天了`);
+    return true;
+  }
+
+  // 判断是否在指定时间内
+  if (presetTime > today) {
+    console.log(`预设时间为${presetTime}，不符合条件`);
     return false;
   }
 
@@ -107,10 +114,7 @@ async function chargeComments() {
       return false;
     }
     const comment = defaultComments[random(0, defaultComments.length - 1)];
-    const { code } = await chargingCommentsForUp(
-      TaskModule.chargeOrderNo,
-      comment,
-    );
+    const { code } = await chargingCommentsForUp(TaskModule.chargeOrderNo, comment);
     if (code === 0) {
       console.log('留言成功！');
     }
