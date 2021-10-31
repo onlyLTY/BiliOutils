@@ -41,7 +41,7 @@ jobs:
         with:
           context: .
           push: true
-          platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64' }}
+          platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64/v8' }}
           tags: catlair/bilitools:${{ env.DOCKER_TAG2 }},catlair/bilitools:${{ env.DOCKER_TAG1 }}
       - name: sed latest to test
         if: env.DOCKER_TAG2 == 'test'
@@ -53,7 +53,7 @@ jobs:
           context: .
           file: ./docker/deploy.Dockerfile
           push: true
-          platforms: linux/amd64
+          platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64/v8' }}
           tags: catlair/bilitools-deploy:${{ env.DOCKER_TAG2 }},catlair/bilitools-deploy:${{ env.DOCKER_TAG1 }}
       - name: Image digest
         run: |

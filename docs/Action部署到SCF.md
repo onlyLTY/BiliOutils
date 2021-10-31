@@ -38,6 +38,8 @@ secrets 配置如下
 
 ![setting-new-2](images/119254825-29ec6900-bbeb-11eb-9bea-22b08d402916.png)
 
+**BILI_CONFIG 是压缩了的** [在这里选择 gzip 压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
+
 ## 错误案例
 
 ### 偷懒？

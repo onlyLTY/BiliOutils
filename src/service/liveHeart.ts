@@ -318,7 +318,8 @@ function simplifyData(rData: RData[]) {
     delete item.baseData.csrf;
     delete item.baseData.csrf_token;
     delete item.baseData.ua;
-    delete item.baseData.device[0];
+    // @ts-ignore
+    item.baseData.device[0] = 0; // 0 比 null 和 '' 占用更少
   });
 }
 

@@ -1,10 +1,3 @@
-## 前言（雾）
-
-- 首先，“大会员”不会影响目前 B 站所有的现有功能和体验，也不是视频网站的去广告的付费会员。
-- 新番无广告的政策永远不会变。
-- “只有大会员才能看的新番”也不会有（除非版权方强制要求全网都付费的片子）。
-- 1、LV4 会员每年将免费获得 3 个月的“大会员”，LV5 会员每年将免费获得 6 个月的“大会员”，LV6 会员每年将免费获得 9 个月的“大会员”。
-
 ## 支持功能
 
 - [x] SCF 每日随机时间运行（可能多运行 n 次 SCF 但该 n 次运行不会调用任何 api）
@@ -19,10 +12,15 @@
 - [x] 直播间弹幕（每日首次获得 100 亲密度，自动点亮灰色勋章）
 - [x] 领取年度大会员权益/B 币券（无测试条件，待测试）
 - [x] 自动使用 B 币券充电
+- [ ] 风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）（test）
 - [ ] 支持 Docker 、 SCF 等方式运行，支持执行消息推送
 
-## 云函数额度调整
+## 使用说明
+
+由于只是个人使用，所以消息推送除邮箱暂时不再支持其他（基于微信公众号的推送总是不稳定，目前存在的暂时能用）
+
+### 云函数额度调整
 
 <https://cloud.tencent.com/document/product/583/17299>
 
@@ -30,26 +28,16 @@
 40 万 GBs 资源使用量调整为 2 万 GBs  
 外出流量 0.5 GB
 
-## 使用说明
-
-访问 Github 有困难？ 可以使用 [Gitee](https://gitee.com/catlair/BiliTools) 查看文档
-
-个人使用：消息推送除邮箱暂时不再支持其他（基于微信公众号的推送总是不稳定，目前存在的暂时能用）
-
-SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次运行时间可能是在此次运行时间的后面，导致再次运行，目前只是将后面的运行都进行了跳过处理。
-
-本地开发时 `typescript` 和 `serverless` 需自行安装。  
-当需要自行添加功能时，由于判断是否执行函数的机制，默认导出的 `service` 函数不能为匿名，该函数名必须和配置文件一致。
-
 ## 使用方法
 
-为了和 Gitee 同步，文档转移至 [docs 目录](./docs)  
+详细文档查看 [docs 目录](./docs)  
 **若 Github 无法查看图片，请访问 [Gitee](https://gitee.com/catlair/BiliTools/tree/main/docs)**
 
 使用必读：
 
 - [Cookies/UA 获取方法](./docs/readme.md)
 - [配置详情（必看）](./docs/configuration.md)
+- [参考配置](./config/config.example.json)
 
 运行方法：
 
@@ -57,14 +45,20 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 - [Action 部署到 SCF](./docs/Action部署到SCF.md)
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
+- [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
 
-### 直播心跳
+### 直播心跳（新增）
 
 入口函数（执行方法）不是 `index.main_handler` 而是 `liveHeart.main_handler`，手动部署到 SCF 时需要注意
 
 使用 scf 时，直播心跳要获取 24 个小心心需要消耗至少 6 次 scf api 调用（粉丝勋章 24 以上时）， 最多 144 次 scf api 调用（粉丝勋章 1 个）。每次调用不超过 30s（极限）
 
 使用其它方式时，至少 5 分钟，至多 144 分钟。
+
+### 风纪委员任务（删除）
+
+因为 B 站改革，以前的不能使用了，对于获取风纪委员资格，也增加了人工审核。为了避免不必要的麻烦，暂时不会增加该功能。
+如果你想使用此功能且使用 docker 或在本地执行，可以尝试 **[风纪委员 headless 版](https://github.com/catlair/bili-task-puppeteer)**
 
 ### Docker 镜像
 
@@ -88,3 +82,12 @@ SCF 每日随机时间运行多运行 n 次的原因是：随机生成的下次�
 5. 本仓库只使用 Actions 进行 Releases 构建、项目测试等操作。**请您务必遵守 Github 服务条款，不要滥用 Actions 工作流**。
 6. 仓库中内置的任何 B 站相关用户信息，都不会影响你的投币、充电、打赏，权利掌握在使用者手中。
 7. 司马陈睿，司马日（睿）站。
+
+## 提示
+
+- 小心保管 Bilibil Cookies。 泄露最后别人用你 Cookie 登录，你还看不见登录记录。
+- 别把 Bilibil Cookies 随便乱传，小心任何非 B 站官方程序，包括本项目（所以你可以选择不用），且应该特别注意闭源的软件。
+- 之前比较火的 JunzhouLiu/BILIBILI-HELPER-PRE，就因为不想被黑产品利用而删库跑路。（让黑产自己开发去吧）
+
+点名批评类似以下行为，不过还好不是本仓库发生的
+![image](https://user-images.githubusercontent.com/44313800/139539087-16bbacc7-b6b1-456a-8579-144664266ecc.png)
