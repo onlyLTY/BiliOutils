@@ -11,7 +11,8 @@ export default async function addCoins() {
     return;
   }
   let i = 0,
-    eCount = 0;
+    eCount = 0,
+    prevCode;
   //判断需要投币的数量
   while (TaskModule.coinsTask && eCount < 5) {
     /**
@@ -25,37 +26,41 @@ export default async function addCoins() {
         TaskModule.coinsTask = coins > 0 ? coins : 0;
       }
     } catch (error) {}
-    if (TaskModule.coinsTask <= 0) break;
+    if (TaskModule.coinsTask <= 0 || TaskModule.money <= 0) break;
     //这个函数不会报错的
     const { data, msg } = await getAidByByPriority();
-    if (!data?.aid) {
+    if (!data?.aid || msg != '0') {
       eCount++;
+      continue;
     }
 
     await apiDelay();
-    if (msg === '0') {
-      const { aid, title, author } = data;
-      try {
-        const coinData = await addCoinForVideo(aid, 1, 1);
-        if (coinData.code == 0) {
-          TaskModule.money--;
-          TaskModule.coinsTask--;
-          i++;
-          console.log(`给[${title}--up【${author}】]投币成功`);
-        } else {
-          eCount++;
-          if (coinData.code == -111) {
-            console.log(aid, coinData.message, '无法继续进行投币');
-            break;
-          }
-          console.log('给up投币失败 ', coinData.code, coinData.message);
-        }
-      } catch (error) {
+    const { aid, title, author } = data;
+    try {
+      const coinData = await addCoinForVideo(aid, 1, 1);
+      if (coinData.code == 0) {
+        TaskModule.money--;
+        TaskModule.coinsTask--;
+        i++;
+        console.log(`给[${title}--up【${author}】]投币成功`);
+      } else {
         eCount++;
-        console.log('投币异常 ', error.message);
-      } finally {
-        await apiDelay(1500);
+        if (coinData.code === -111 || coinData.code === -104) {
+          console.log(aid, coinData.message, '无法继续进行投币');
+          break;
+        }
+        console.log('给up投币失败 ', coinData.code, coinData.message);
+        // 如果重复错误就直接退出
+        if (prevCode === coinData.code) {
+          break;
+        }
+        prevCode = coinData.code;
       }
+    } catch (error) {
+      eCount++;
+      console.log('投币异常 ', error.message);
+    } finally {
+      await apiDelay(1500);
     }
   }
   if (eCount >= 5) console.log(`出现异常/错误5次，自动退出投币`);

@@ -2,10 +2,6 @@ import { TaskConfig } from './globalVar';
 import functionConfig from './funcConfig';
 
 function funHandle() {
-  if (!functionConfig.addCoins && !functionConfig.shareAndWatch) {
-    functionConfig.taskReward = false;
-  }
-
   for (const funName in functionConfig) {
     if (Object.prototype.hasOwnProperty.call(functionConfig, funName)) {
       const el: boolean = functionConfig[funName];
@@ -25,6 +21,10 @@ function funHandle() {
       }
     }
   }
+
+  if (!functionConfig.addCoins && !functionConfig.shareAndWatch) {
+    functionConfig.taskReward = false;
+  }
 }
 
 /**
@@ -33,7 +33,5 @@ function funHandle() {
  */
 export function offFunctions(funArr: Array<() => {}>): Array<() => {}> {
   funHandle();
-  return funArr
-    .map(el => (functionConfig[el.name] ? el : null))
-    .filter(el => el);
+  return funArr.map(el => (functionConfig[el.name] ? el : null)).filter(el => el);
 }
