@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
 import * as nodemailer from 'nodemailer';
 
 import { TaskConfig } from '../config/globalVar';
@@ -81,4 +81,13 @@ export async function sendMail(title: string, text: string) {
   });
 
   console.log('邮件消息已发送: %s', info.messageId);
+}
+
+export async function customApi(title: string, text: string) {
+  try {
+    const apiTemplate = TaskConfig.MESSAGE_API;
+    if (!apiTemplate) return;
+    const api = apiTemplate.replace('{title}', title).replace('{text}', text);
+    await axios.get(api);
+  } catch (error) {}
 }

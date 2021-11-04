@@ -54,6 +54,8 @@ export abstract class TaskConfig {
   static readonly MATCH_COINS = config.matchCoins ?? 5;
   /** 压硬币规则 大于0 是正压，小于反压 */
   static readonly MATCH_SELECTION = config.matchSelection ?? 1;
+  /** 自定义推送 Api */
+  static readonly MESSAGE_API = config.message?.api;
 }
 
 /** 任务完成情况统计 */

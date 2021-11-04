@@ -28,8 +28,41 @@ const res = res => {
 };
 
 const err = err => {
-  return Promise.reject(err);
+  return axiosRetryInterceptor(err);
 };
+
+function axiosRetryInterceptor(err) {
+  var config = err.config;
+  // 不需要重试的请求
+  if (config.retry === 0) return Promise.reject(err);
+
+  // 默认重试次数 2
+  if (!config.retry) config.retry = 2;
+
+  // 设置重试次数
+  config.__retryCount = config.__retryCount || 0;
+
+  // 检测是否超过了重试次数
+  if (config.__retryCount >= config.retry) {
+    // 错误处理
+    return Promise.reject(err);
+  }
+
+  // 已经重试过一次，增加重试次数
+  config.__retryCount += 1;
+
+  // 创建一个新的Promise来处理重试
+  var backoff = new Promise(function (resolve) {
+    setTimeout(function () {
+      resolve(void 0);
+    }, config.retryDelay || 100);
+  });
+
+  // 返回新的Promise来处理重试
+  return backoff.then(function () {
+    return axios(config);
+  });
+}
 
 const accountApi = axios.create({
   baseURL: 'https://account.bilibili.com',

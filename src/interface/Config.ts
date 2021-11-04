@@ -10,6 +10,7 @@ export interface Config {
     };
     serverChan?: string;
     pushplusToken?: string;
+    api?: string;
   };
   function?: {
     silver2Coin?: boolean;

@@ -16,7 +16,8 @@ type IdType = number | string;
  * 登录账号
  */
 export async function loginByCookie(): Promise<UserInfoNavDto> {
-  const { data } = await biliApi.get('/x/web-interface/nav');
+  // @ts-ignore
+  const { data } = await biliApi.get('/x/web-interface/nav', { retry: 3 });
   return data;
 }
 
@@ -95,10 +96,7 @@ export async function getSpecialFollowings(
  * @param upId upId
  * @param pageSize 数据数量
  */
-export async function getVideosByUpId(
-  upId: number,
-  pageSize: number = 50,
-): Promise<VideoByUpDto> {
+export async function getVideosByUpId(upId: number, pageSize: number = 50): Promise<VideoByUpDto> {
   const { data } = await biliApi.get('/x/v2/medialist/resource/list', {
     params: {
       direction: false,

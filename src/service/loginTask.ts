@@ -32,9 +32,7 @@ function setLevelInfo(data: UserNavData) {
   } else {
     const upLevelExp = levelInfo.next_exp - levelInfo.current_exp;
     //实际天数肯定会少一些
-    console.log(
-      `距离升级还需要${upLevelExp}经验,预计${estimatedDays(upLevelExp)}天`,
-    );
+    console.log(`距离升级还需要${upLevelExp}经验,预计${estimatedDays(upLevelExp)}天`);
   }
 }
 
@@ -59,8 +57,7 @@ function setVipStatus(data: UserNavData) {
 
   //判断是否过期,因为即使大会员过期,下面也会显示
   if (data.vipStatus === 0) {
-    vipTypeMsg =
-      vipTypeMsg === '无大会员' ? vipTypeMsg : vipTypeMsg + '[已过期]';
+    vipTypeMsg = vipTypeMsg === '无大会员' ? vipTypeMsg : vipTypeMsg + '[已过期]';
   }
 
   console.log('大会员状态: ', vipTypeMsg);
@@ -79,6 +76,22 @@ function conciseNickname(nickname: string) {
   return `${firstWord}**${lastWord}`;
 }
 
+async function setUserInfo(data: UserNavData) {
+  try {
+    const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
+    console.log('登录成功: ', data.uname);
+    console.log('硬币余额: ', coinBalance.money);
+    TaskConfig.NICKNAME = conciseNickname(data.uname);
+    TaskModule.money = coinBalance.money || 0;
+    TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
+
+    setLevelInfo(data);
+    setVipStatus(data);
+  } catch (error) {
+    console.log('获取硬币信息异常: ', error.message);
+  }
+}
+
 export default async function loginTask() {
   console.log('----【登录】----');
   try {
@@ -90,20 +103,11 @@ export default async function loginTask() {
       console.log('登录错误', code, message);
       return;
     }
-    await apiDelay();
-    const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
-    if (data.isLogin) {
-      console.log('登录成功: ', data.uname);
-      console.log('硬币余额: ', coinBalance.money);
-      TaskConfig.NICKNAME = conciseNickname(data.uname);
-      TaskModule.money = coinBalance.money || 0;
-      TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
-
-      setLevelInfo(data);
-      setVipStatus(data);
-    } else {
-      throw new Error(message);
+    if (!data.isLogin) {
+      throw new Error('接口返回为未登录');
     }
+    await apiDelay();
+    await setUserInfo(data);
   } catch (error) {
     throw new Error(error.message);
   }

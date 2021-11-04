@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { random as baseRandom } from 'lodash';
 import { TaskConfig } from '../config/globalVar';
-import { sendMail, pushplus } from './sendMessage';
+import { sendMail, pushplus, customApi } from './sendMessage';
 export * from './cookie';
 export * from './gzip';
 
@@ -39,7 +39,11 @@ export const random = baseRandom;
 export async function sendMessage(title: string, text: string) {
   // 处理 title
   title = `Bili-${TaskConfig.NICKNAME}-${title}`;
-  await Promise.all([sendMail(title, text).catch(console.log), pushplus(title, text)]);
+  await Promise.all([
+    sendMail(title, text).catch(console.log),
+    pushplus(title, text),
+    customApi(title, text),
+  ]);
 }
 
 /**
