@@ -1,6 +1,6 @@
 import { warpLog } from './utils/log';
 import { TaskConfig, TaskModule } from './config/globalVar';
-import { apiDelay, printVersion } from './utils';
+import { apiDelay } from './utils';
 import bili, { loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
 import { liveHeart } from './service/liveHeart';
@@ -30,7 +30,7 @@ async function dailyTasks(cb?: (...arg) => any, ...cbArg) {
 
 const main_handler = async () => {
   console.log = warpLog();
-  printVersion();
+  console.log(`当前版本【0.3.21-rc0】`);
 
   if (TaskConfig.config.function?.liveHeart) {
     return await dailyTasks(liveHeart);
