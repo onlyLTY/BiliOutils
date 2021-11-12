@@ -80,7 +80,7 @@ async function setUserInfo(data: UserNavData) {
   try {
     const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
     console.log('登录成功: ', data.uname);
-    console.log('硬币余额: ', coinBalance.money);
+    console.log('硬币余额: ', coinBalance.money || 0);
     TaskConfig.NICKNAME = conciseNickname(data.uname);
     TaskModule.money = coinBalance.money || 0;
     TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;

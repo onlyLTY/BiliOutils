@@ -14,7 +14,7 @@
 - [x] 自动使用 B 币券充电
 - [ ] 风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）（test）
-- [ ] 支持 Docker 、 SCF 等方式运行，支持执行消息推送
+- [ ] 支持 Docker 、 SCF 、青龙面板等方式运行，支持执行消息推送
 
 ## 使用说明
 
@@ -46,6 +46,7 @@
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
+- [青龙面板](https://github.com/whyour/qinglong)
 
 ### 直播心跳（新增）
 

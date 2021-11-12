@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
+    "build:ql": "rollup -c",
     "deploy": "sls deploy --debug",
     "deploy:multi": "node tools/bootstrap.js --scf",
     "start:multi": "node tools/bootstrap.js --start",
@@ -23,11 +24,15 @@
     "@babel/core": "^7.15.8",
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-typescript": "^7.15.0",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-json": "^4.1.0",
     "@types/crypto-js": "^4.0.2",
     "@types/lodash": "^4.14.175",
     "@types/node": "^16.10.3",
     "@types/nodemailer": "^6.4.4",
-    "@types/qs": "^6.9.7"
+    "@types/qs": "^6.9.7",
+    "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
     "axios": "^0.21.4",

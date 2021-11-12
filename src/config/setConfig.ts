@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import { Config } from '../interface/Config';
 import { gzipDecode } from '../utils';
 
@@ -10,7 +11,7 @@ const getCurDirConfig = (): Config => {
 
 const getRootDirConfig = (): Config => {
   try {
-    return require('../../config/config.json');
+    return require(resolve(process.cwd(), './config/config.json'));
   } catch {}
   return null;
 };
@@ -29,7 +30,7 @@ const getEnvConfig = (): Config => {
 
 const getDevConfig = (): Config => {
   try {
-    return require('../../config/config.dev.json');
+    return require(resolve(process.cwd(), './config/config.dev.json'));
   } catch {}
   return null;
 };
