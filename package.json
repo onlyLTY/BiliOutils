@@ -1,11 +1,11 @@
 {
   "name": "catlair-bilitools",
-  "version": "0.3.6",
+  "version": "0.3.20",
   "description": "this is BiliTools",
   "main": "index.ts",
   "scripts": {
     "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
-    "build:ql": "rollup -c",
+    "build:ql": "rollup -c qinglong/rollup.config.ts",
     "deploy": "sls deploy --debug",
     "deploy:multi": "node tools/bootstrap.js --scf",
     "start:multi": "node tools/bootstrap.js --start",
@@ -15,7 +15,7 @@
     "modclean": "modclean -r -a \"*.md,*LICENSE*,.github,.nycrc,*.ts,*.html,*.txt,*.js.map,*.mjs.map,browser.js,@types\" && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
     "predeploy:multi": "rm -f ./dist/run.js && cp -rf ./tools/ ./package*.json ./dist && cd ./dist && npm i --production && npm run modclean && rm -rf tools package*.json &&  cd ../",
-    "postbuild": "rm -rf ./dist/dto/ && rm -rf ./dist/interface/"
+    "postbuild": "cd ./dist && rm -rf ./dto/ ./interface/ *.d.js"
   },
   "author": "catlair",
   "license": "MIT",

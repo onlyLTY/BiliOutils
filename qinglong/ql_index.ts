@@ -1,9 +1,9 @@
-import { warpLog } from './utils/log';
-import { TaskConfig, TaskModule } from './config/globalVar';
-import { apiDelay } from './utils';
-import bili, { loginTask } from './service';
-import { offFunctions } from './config/configOffFun';
-import { liveHeart } from './service/liveHeart';
+import { warpLog } from '../src/utils/log';
+import { TaskConfig, TaskModule } from '../src/config/globalVar';
+import { apiDelay } from '../src/utils';
+import bili, { loginTask } from '../src/service';
+import { offFunctions } from '../src/config/configOffFun';
+import { liveHeart } from '../src/service/liveHeart';
 const { sendNotify } = require('./sendNotify');
 
 async function dailyTasks(cb?: (...arg) => any, ...cbArg) {

@@ -1,6 +1,6 @@
 import { resolve } from 'path';
 import { Config } from '../interface/Config';
-import { gzipDecode } from '../utils';
+import { gzipDecode } from '../utils/gzip';
 
 const getCurDirConfig = (): Config => {
   try {
