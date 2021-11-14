@@ -18,15 +18,11 @@
 
 ## 使用说明
 
-由于只是个人使用，所以消息推送除邮箱暂时不再支持其他（基于微信公众号的推送总是不稳定，目前存在的暂时能用）
+消息推送直接使用了 `青龙面板` 中的消息推送
 
 ### 云函数额度调整
 
 <https://cloud.tencent.com/document/product/583/17299>
-
-100 万次调用调整为 10 万次（事件函数只有 5 万次）  
-40 万 GBs 资源使用量调整为 2 万 GBs  
-外出流量 0.5 GB
 
 ## 使用方法
 
@@ -52,15 +48,6 @@
 
 入口函数（执行方法）不是 `index.main_handler` 而是 `liveHeart.main_handler`，手动部署到 SCF 时需要注意
 
-使用 scf 时，直播心跳要获取 24 个小心心需要消耗至少 6 次 scf api 调用（粉丝勋章 24 以上时）， 最多 144 次 scf api 调用（粉丝勋章 1 个）。每次调用不超过 30s（极限）
-
-使用其它方式时，至少 5 分钟，至多 144 分钟。
-
-### 风纪委员任务（删除）
-
-因为 B 站改革，以前的不能使用了，对于获取风纪委员资格，也增加了人工审核。为了避免不必要的麻烦，暂时不会增加该功能。
-如果你想使用此功能且使用 docker 或在本地执行，可以尝试 **[风纪委员 headless 版](https://github.com/catlair/bili-task-puppeteer)**
-
 ### Docker 镜像
 
 - `catlair/bilitools-deploy` 用于部署到 SCF
@@ -68,11 +55,15 @@
 
 ## 参考项目
 
-- [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 - [SocialSisterYi/bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)
 - [catlair/bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
-- [JunzhouLiu/BILIBILI-HELPER-PRE](https://github.com/JunzhouLiu/BILIBILI-HELPER-PRE)
 - [lzghzr/TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
+- [whyour/qinglong](https://github.com/whyour/qinglong)
+
+以下项目已经不存在：
+
+- [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
+- [JunzhouLiu/BILIBILI-HELPER-PRE](https://github.com/JunzhouLiu/BILIBILI-HELPER-PRE)
 
 ## 责任声明
 
@@ -82,12 +73,3 @@
 4. 项目只向 B 站提供 Cookies ，故任何方式的泄露都与该仓库**无直接关系**。请不要将 Cookies 上传到 Github 等**开放平台**以及其他任何**不可信**平台。
 5. 本仓库只使用 Actions 进行 Releases 构建、项目测试等操作。**请您务必遵守 Github 服务条款，不要滥用 Actions 工作流**。
 6. 仓库中内置的任何 B 站相关用户信息，都不会影响你的投币、充电、打赏，权利掌握在使用者手中。
-
-## 提示
-
-- 小心保管 Bilibil Cookies。 泄露最后别人用你 Cookie 登录，你还看不见登录记录。
-- 别把 Bilibil Cookies 随便乱传，小心任何非 B 站官方程序，包括本项目（所以你可以选择不用），且应该特别注意闭源的软件。
-- 之前比较火的 JunzhouLiu/BILIBILI-HELPER-PRE，就因为不想被黑产品利用而删库跑路。（让黑产自己开发去吧）
-
-点名批评类似以下行为，不过还好不是本仓库发生的
-![image](https://user-images.githubusercontent.com/44313800/139539087-16bbacc7-b6b1-456a-8579-144664266ecc.png)

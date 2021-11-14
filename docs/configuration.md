@@ -10,6 +10,7 @@
   - [腾讯云函数（SCF）配置](#腾讯云函数scf配置)
 - [Github Actions secrets](#github-actions-secrets)
 - [环境变量](#环境变量)
+  - [青龙面板相关](#青龙面板相关)
 
 ## 配置文件路径
 
@@ -25,11 +26,13 @@
 
 ## Message 配置项
 
-| Key               | 值类型            | 说明                                                 |
-| ----------------- | ----------------- | ---------------------------------------------------- |
-| email             | Email [↓](#email) |                                                      |
-| ~~serverChan~~    | 字符串            | 已过期 [官网](https://sct.ftqq.com/)获取 token       |
-| ~~pushplusToken~~ | 字符串            | 即将过期 [官网](http://www.pushplus.plus/)获取 token |
+| Key            | 值类型                    | 说明                                                 |
+| -------------- | ------------------------- | ---------------------------------------------------- |
+| email          | Email [↓](#email)         |                                                      |
+| ~~serverChan~~ | 字符串                    | 已过期 [官网](https://sct.ftqq.com/)获取 token       |
+| pushplusToken  | 字符串                    | 即将过期 [官网](http://www.pushplus.plus/)获取 token |
+| api            | 字符串                    | get 链接模板 例如：`http://xxxx.xxx/{title}/{text}`  |
+| 从青龙面板移植 | [环境变量](#青龙面板相关) | 对应环境变量是 `GOBOT_URL` 则写为 `gobotUrl`         |
 
 ### Email
 
@@ -143,7 +146,40 @@
 | TENCENT_SECRET_ID          | 使用 SCF 必须的腾讯账号授权 ID                                       |
 | TENCENT_SECRET_KEY         | 使用 SCF 必须的腾讯账号授权 KEY                                      |
 | SERVERLESS_PLATFORM_VENDOR | Serverless 供应商，本地推送时必须，Docker 默认为`tencent`            |
-| ~~PUSHPLUS_TOKEN~~         | ~~[pushplusToken](#message-配置项)~~                                 |
+| PUSHPLUS_TOKEN             | [pushplusToken](#message-配置项)                                     |
 | BILI_SCF_CONFIG            | Gzip 压缩后的单个用户配置（在使用 SCF 时使用）                       |
 | RUN_SCF_ALL                | 运行全部云函数（ Docker 推送至 SCF 时使用，值为需要`y`）             |
 | SCF_MEMORY_SIZE            | scf 中运行的内存大小（默认 128M，范围为 64 以及 128 的 1-24 整数倍） |
+
+### 青龙面板相关
+
+下列环境变量来自 `青龙面板`
+
+具体介绍看这里 <https://github.com/whyour/qinglong/blob/develop/sample/config.sample.sh>
+
+```js
+[
+  'GOBOT_URL',
+  'GOBOT_TOKEN',
+  'GOBOT_QQ',
+  'SCKEY',
+  'QQ_SKEY',
+  'QQ_MODE',
+  'BARK_PUSH',
+  'BARK_SOUND',
+  'BARK_GROUP',
+  'TG_BOT_TOKEN',
+  'TG_USER_ID',
+  'TG_PROXY_AUTH',
+  'TG_PROXY_HOST',
+  'TG_PROXY_PORT',
+  'TG_API_HOST',
+  'DD_BOT_TOKEN',
+  'DD_BOT_SECRET',
+  'QYWX_KEY',
+  'QYWX_AM',
+  'IGOT_PUSH_KEY',
+  'PUSH_PLUS_TOKEN',
+  'PUSH_PLUS_USER',
+];
+```

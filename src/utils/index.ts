@@ -2,9 +2,9 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { random as baseRandom } from 'lodash';
 import { TaskConfig } from '../config/globalVar';
-import { sendMail, pushplus, customApi } from './sendMessage';
 export * from './cookie';
 export * from './gzip';
+const { sendNotify } = require('./notify');
 
 /**
  * 异步延迟函数
@@ -37,13 +37,10 @@ export const random = baseRandom;
  * @param text 文本内容
  */
 export async function sendMessage(title: string, text: string) {
+  console.log('----【消息推送】----');
   // 处理 title
   title = `Bili-${TaskConfig.NICKNAME}-${title}`;
-  await Promise.all([
-    sendMail(title, text).catch(console.log),
-    pushplus(title, text),
-    customApi(title, text),
-  ]);
+  await sendNotify(title, text, undefined, '');
 }
 
 /**
@@ -66,7 +63,7 @@ export function getMonthHasDays(now?: Date) {
     month = nowTime.getMonth() + 1,
     smallMonth = [4, 6, 9, 11];
 
-  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 100 === 0;
+  const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 
   if (month === 2) {
     return isLeapYear ? 29 : 28;
