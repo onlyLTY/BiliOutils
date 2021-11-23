@@ -5,7 +5,7 @@ module.exports = function (path) {
   try {
     json = require(`${path}/config.json`);
     // 暂时使用该方法避免配置为单用户
-    if (!json.account) {
+    if (!json.account && json.cookie) {
       json = { account: [json] };
     }
   } catch (error) {

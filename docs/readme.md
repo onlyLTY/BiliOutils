@@ -136,6 +136,13 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 ### 多用户配置参考
 
+**多用户配置只用于部分情况，并不是所有都支持**
+
+- 本地/docker 运行多个用户
+- 本地/docker 推送多个到 scf
+
+其他情况填写多个只会使用第一个
+
 ```json
 {
   "message": {}, // 可以省略

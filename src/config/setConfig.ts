@@ -37,10 +37,21 @@ const getDevConfig = (): Config => {
 
 export function setConfig(): Config {
   const config = getDevConfig() || getCurDirConfig() || getRootDirConfig() || getEnvConfig();
-  if (config?.cookie) {
+  // @ts-ignore
+  if (config.account && config.account.length) {
+    // 防止错误的将 account 用在配置中
+    // @ts-ignore
+    const newConfig = (config.account as Config[]).find(cfg => cfg.cookie);
+    if (newConfig) {
+      console.log('[WARN] 在单用户场景下配置了多用户，我们将放弃多余的配置');
+      // 合并 message 配置
+      newConfig.message = Object.assign(config.message, newConfig.message);
+      return newConfig;
+    }
+  } else if (config?.cookie) {
     return config;
   }
-  throw new Error('配置文件不存在或不正确！！！');
+  throw new Error('配置文件不存（位置不正确）在或 cookie 不存在！！！');
 }
 
 export const userConfig = setConfig();

@@ -11,7 +11,10 @@ function setCron(time = 60_000) {
   const s = next.getSeconds(),
     m = next.getMinutes(),
     h = next.getHours();
-  return `${s} ${m} ${h} * * * *`;
+  return {
+    value: `${s} ${m} ${h} * * * *`,
+    string: `${h}:${m}:${s}`,
+  };
 }
 
 exports.main_handler = async (event, _context) => {

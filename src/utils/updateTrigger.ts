@@ -36,7 +36,10 @@ function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME) {
     seconds = random(MAX_MINUTES);
   }
 
-  return `${seconds} ${minutes} ${hours} * * * *`;
+  return {
+    value: `${seconds} ${minutes} ${hours} * * * *`,
+    string: `${hours}:${minutes}:${seconds}`,
+  };
 }
 
 /**
@@ -49,7 +52,7 @@ function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME) {
 export default async function (
   triggerName = DAILY_TRIGGER_NAME,
   customArg?,
-  triggerDesc?: string,
+  triggerDesc?: { value: string; string: string },
   runningTotalNumber = 2,
 ) {
   if (!config.sls) {
@@ -110,13 +113,13 @@ export default async function (
       FunctionName: FUNCTION_NAME,
       TriggerName: triggerName,
       Type: 'timer',
-      TriggerDesc: runTime,
+      TriggerDesc: runTime.value,
       Qualifier: '$DEFAULT',
     };
 
     const hasTrigger = await getHasTrigger(triggerName);
 
-    console.log(`修改时间为：${runTime}`);
+    console.log(`修改时间为：${runTime.string}`);
 
     if (hasTrigger) {
       const deleteResult = await deleteTrigger(params);
