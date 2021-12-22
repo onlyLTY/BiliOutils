@@ -4,7 +4,7 @@ import { random as baseRandom } from 'lodash';
 import { TaskConfig } from '../config/globalVar';
 export * from './cookie';
 export * from './gzip';
-const { sendNotify } = require('./notify');
+const { sendNotify } = require('./sendNotify');
 
 /**
  * 异步延迟函数
