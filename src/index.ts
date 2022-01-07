@@ -5,7 +5,7 @@ import bili, { loginTask } from './service';
 import { offFunctions } from './config/configOffFun';
 import updateTrigger from './utils/updateTrigger';
 
-async function dailyTasks(cb?: (...arg) => any, ...cbArg) {
+async function dailyTasks<T = any>(cb?: (...arg: T[]) => any, ...cbArg: T[]) {
   try {
     await loginTask();
   } catch (error) {
@@ -43,7 +43,7 @@ exports.main_handler = async (event, _context) => {
     }
     return await dailyTasks();
   }
-  let message;
+  let message: { lastTime: string; };
   try {
     message = JSON.parse(event.Message);
   } catch (error) {}

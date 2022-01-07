@@ -6,7 +6,7 @@ import babel from '@rollup/plugin-babel';
 const extensions = ['.ts', '.js'];
 
 export default {
-  input: 'qinglong/ql_index.ts',
+  input: 'qinglong/cat_bili_ql.ts',
   output: {
     dir: 'qinglong',
     format: 'cjs',
