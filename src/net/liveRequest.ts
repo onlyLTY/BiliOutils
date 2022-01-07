@@ -128,8 +128,11 @@ export async function getGiftBagList(roomId: IdType = 3394945): Promise<LiveGift
  * @param pageNum 第几页
  */
 export async function getLiveFansMedal(pageNum = 1, pageSize = 10): Promise<LiveFansMedalDto> {
+  if (pageNum > 10) {
+    pageNum = 10;
+  }
   const { data } = await liveApi.get(
-    `/fans_medal/v5/live_fans_medal/iApiMedal?page=${pageNum}&pageSize=${pageSize}`,
+    `/xlive/app-ucenter/v1/user/GetMyMedals?page=${pageNum}&page_size=${pageSize}`,
   );
   return data;
 }

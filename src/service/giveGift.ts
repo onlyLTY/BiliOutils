@@ -75,7 +75,7 @@ async function findOneRoom() {
 
 async function findOneByRandomUp() {
   const {
-    data: { count, fansMedalList },
+    data: { count, items: fansMedalList },
   } = await getLiveFansMedal();
   await apiDelay();
   if (!count) {

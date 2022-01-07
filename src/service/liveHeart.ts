@@ -5,7 +5,7 @@ import { getLIVE_BUVID, createUUID, getBiliJct, apiDelay, gzipDecode, gzipEncode
 import { Constant, TaskConfig } from '../config/globalVar';
 import * as liveHeartRequest from '../net/liveHeartRequest';
 import * as liveRequest from '../net/liveRequest';
-import { LiveFansMedalDto, LiveHeartEDto } from '../dto/Live.dto';
+import { LiveFansMedalDto, LiveFansMedalItem, LiveHeartEDto } from '../dto/Live.dto';
 import { getGiftBagList } from '../net/liveRequest';
 
 const HEART_MAX_NUM = 24;
@@ -194,15 +194,15 @@ async function getFansMeal10(page = 1, pageSize = 10): Promise<LiveFansMedalDto[
 }
 
 async function getMoreFansMedal() {
-  const { fansMedalList, pageinfo } = await getFansMeal10();
-  let { totalpages } = pageinfo;
+  const { items: fansMedalList, page_info } = await getFansMeal10();
+  let { total_page: totalpages } = page_info;
 
   if (totalpages && totalpages > 1) {
     // 最多需要 3 页的
     totalpages = totalpages > 3 ? 3 : totalpages;
     for (let index = 2; index <= totalpages; index++) {
       const medalTemp = await getFansMeal10(index, 10);
-      fansMedalList.push(...medalTemp.fansMedalList);
+      fansMedalList.push(...medalTemp.items);
     }
   }
 
@@ -211,14 +211,14 @@ async function getMoreFansMedal() {
 
 async function getFansMedalList(more = true) {
   const heartNum = await getHeartNum();
-  let fansMedalList: LiveFansMedalDto['data']['fansMedalList'];
+  let items: LiveFansMedalItem[];
   if (more) {
-    fansMedalList = await getMoreFansMedal();
+    items = await getMoreFansMedal();
   } else {
-    ({ fansMedalList } = await getFansMeal10());
+    ({ items } = await getFansMeal10());
   }
   return {
-    fansMedalList,
+    fansMedalList: items,
     heartNum,
   };
 }
@@ -254,10 +254,7 @@ async function runOnePost(baseData, rDataArr, j, seq) {
   });
 }
 
-export async function runOneLoop(
-  fansMedalList: LiveFansMedalDto['data']['fansMedalList'],
-  heartNum: number,
-) {
+export async function runOneLoop(fansMedalList: LiveFansMedalItem[], heartNum: number) {
   const apiDelayTime = 2000;
   return new Promise(async resolve => {
     const rDataArray = [];

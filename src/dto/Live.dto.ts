@@ -170,60 +170,36 @@ export interface LiveHeartEDto extends ApiBaseProp {
   };
 }
 
+export interface LiveFansMedalItem {
+  can_deleted: true;
+  day_limit: number;
+  guard_level: number;
+  guard_medal_title: string;
+  intimacy: number;
+  is_lighted: number;
+  level: number;
+  medal_name: string;
+  medal_color_border: number;
+  medal_color_end: number;
+  medal_color_start: number;
+  medal_id: number;
+  next_intimacy: number;
+  today_feed: number;
+  roomid: number;
+  status: number;
+  target_id: number;
+  target_name: string;
+  uname: string;
+}
+
 /** 获取有牌子的 */
-export interface LiveFansMedalDto extends DoubleMessageProp {
+export interface LiveFansMedalDto extends PureDataProp {
   data: {
-    medalCount: number;
     count: number;
-    fansMedalList: {
-      uid: number;
-      target_id: number;
-      medal_id: number;
-      score: number;
-      level: number;
-      intimacy: number;
-      status: number;
-      source: number;
-      receive_channel: number;
-      is_receive: number;
-      master_status: number;
-      receive_time: string;
-      today_intimacy: number;
-      last_wear_time: number;
-      is_lighted: number;
-      medal_level: number;
-      next_intimacy: number;
-      day_limit: number;
-      medal_name: string;
-      master_available: number;
-      guard_type: number;
-      lpl_status: number;
-      can_delete: true;
-      target_name: string;
-      target_face: string;
-      live_stream_status: number;
-      icon_code: number;
-      icon_text: string;
-      rank: string;
-      medal_color: number;
-      medal_color_start: number;
-      medal_color_end: number;
-      guard_level: number;
-      medal_color_border: number;
-      today_feed: number;
-      todayFeed: number;
-      dayLimit: number;
-      uname: string;
-      color: number;
-      medalName: string;
-      guard_medal_title: string;
-      anchorInfo: {};
-      roomid: number;
-    }[];
-    name: string;
-    pageinfo: {
-      totalpages: number;
-      curPage: number;
+    items: LiveFansMedalItem[];
+    page_info: {
+      cur_page: number;
+      total_page: number;
     };
   };
 }
