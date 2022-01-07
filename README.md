@@ -42,7 +42,7 @@
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
-- [青龙面板](https://github.com/whyour/qinglong): 自行添加 Node 依赖 `pako axios qs`, 执行创建 `config.json` 文件（脚本管理中）
+- [青龙面板](https://github.com/whyour/qinglong): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `config.json` 文件（脚本管理中）。并不是很了解青龙面板。
 
 ### 直播心跳（新增）
 
