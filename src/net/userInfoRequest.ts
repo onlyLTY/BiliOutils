@@ -1,5 +1,4 @@
 import { biliApi, accountApi } from './api';
-import {} from 'qs';
 import {
   CoinBalanceDto,
   CoinTodayExpDto,

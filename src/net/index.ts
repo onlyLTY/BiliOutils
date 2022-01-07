@@ -3,7 +3,7 @@ import { TaskConfig } from '../config/globalVar';
 
 const USER_AGENT =
   TaskConfig.USER_AGENT ||
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36 Edg/94.0.992.31';
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62';
 
 const defaultHeaders = {
   'User-Agent': USER_AGENT,
