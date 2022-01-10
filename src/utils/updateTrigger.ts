@@ -108,7 +108,7 @@ export default async function (
   }
 
   async function aSingleUpdate() {
-    let runTime = triggerDesc || randomDailyRunTime(config.dailyRunTime);
+    const runTime = triggerDesc || randomDailyRunTime(config.dailyRunTime);
     const params = {
       FunctionName: FUNCTION_NAME,
       TriggerName: triggerName,

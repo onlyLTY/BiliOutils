@@ -237,7 +237,7 @@ export interface LiveRoomInfoDto extends DoubleMessageProp {
     hot_words: string[];
     hot_words_status: number;
     verify: string;
-    new_pendants: {};
+    new_pendants: Record<string, unknown>;
     up_session: string;
     pk_status: number;
     pk_id: number;

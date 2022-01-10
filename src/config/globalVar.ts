@@ -19,7 +19,7 @@ export abstract class TaskConfig {
   /** bilibili账号的jct */
   static readonly BILIJCT: string = getBiliJct();
   /** bilibili 用户昵称 */
-  static NICKNAME: string = '';
+  static NICKNAME = '';
   /**操作用户的bilibili mid */
   static readonly USERID: number = getUserId();
   /**【可选】用户代理(浏览器) */
@@ -61,21 +61,21 @@ export abstract class TaskConfig {
 /** 任务完成情况统计 */
 export abstract class TaskModule {
   /**拥有硬币数量 */
-  static money: number = 0;
+  static money = 0;
   /**还需要投币数量,初值BILI_TARGET_COINS */
   static coinsTask: number = TaskConfig.BILI_TARGET_COINS;
   /**今日是否已经分享视频 */
-  static share: boolean = false;
+  static share = false;
   /**今日是否已经观看视频 */
-  static watch: boolean = false;
+  static watch = false;
   /** 执行任务产生的消息 */
-  static appInfo: string = '\n';
+  static appInfo = '\n';
   /** 确定获取aid的函数开始下标 */
-  static currentStartFun: number = 0;
+  static currentStartFun = 0;
   /** B币券余额 */
-  static bCoinCouponBalance: number = 0;
+  static bCoinCouponBalance = 0;
   /** 0为无，1为月度，2为年度 */
-  static vipType: number = 0;
+  static vipType = 0;
   /** 充电留言 token */
   static chargeOrderNo: string;
 }

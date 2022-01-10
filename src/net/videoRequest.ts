@@ -18,10 +18,7 @@ export async function addShare(aid: number | string): Promise<ShareAddDto> {
     csrf: TaskConfig.BILIJCT,
     aid,
   };
-  const { data } = await biliApi.post(
-    '/x/web-interface/share/add',
-    stringify(reqData),
-  );
+  const { data } = await biliApi.post('/x/web-interface/share/add', stringify(reqData));
 
   return data;
 }
@@ -31,10 +28,7 @@ export async function addShare(aid: number | string): Promise<ShareAddDto> {
  * @param rid 分区编号
  * @param day 排行方式
  */
-export async function getRegionRankingVideos(
-  rid: number = 1,
-  day: number = 3,
-): Promise<RegionRankingVideosDto> {
+export async function getRegionRankingVideos(rid = 1, day = 3): Promise<RegionRankingVideosDto> {
   const { data } = await biliApi.get('/x/web-interface/ranking/region', {
     params: {
       rid,
@@ -49,9 +43,7 @@ export async function getRegionRankingVideos(
  * 给该视频投币数量
  * @param aid 视频av号
  */
-export async function donatedCoinsForVideo(
-  aid: number,
-): Promise<DonatedCoinsForVideoDto> {
+export async function donatedCoinsForVideo(aid: number): Promise<DonatedCoinsForVideoDto> {
   const { data } = await biliApi.get('/x/web-interface/archive/coins', {
     params: { aid },
   });

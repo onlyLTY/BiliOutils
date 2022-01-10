@@ -22,7 +22,7 @@ export default async function addCoins() {
     try {
       const { data: coinExp, code } = await getDonateCoinExp();
       if (code == 0) {
-        let coins = TaskConfig.BILI_TARGET_COINS - coinExp / 10;
+        const coins = TaskConfig.BILI_TARGET_COINS - coinExp / 10;
         TaskModule.coinsTask = coins > 0 ? coins : 0;
       }
     } catch (error) {}

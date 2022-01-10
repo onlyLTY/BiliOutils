@@ -10,7 +10,7 @@ import { TaskModule } from '../config/globalVar';
 const _log = console.log;
 
 function warpLog() {
-  return (message?: any, ...optionalParams: any[]): void => {
+  return (message?: unknown, ...optionalParams: any[]): void => {
     let msgStr = message;
     for (const m of optionalParams) {
       msgStr += m;

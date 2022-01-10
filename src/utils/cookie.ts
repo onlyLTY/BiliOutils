@@ -7,13 +7,13 @@ function getCookieArray(cookie: string | undefined) {
   return cookie.split('; ').map(el => el.split('='));
 }
 
-function cookie2Obj(cookie: string, setCookie: any): object {
-  let setCookieArr = getCookieArray(setCookie?.[0]).filter(el => el.length === 2);
-  let arr = getCookieArray(cookie)
+function cookie2Obj(cookie: string, setCookie: unknown): object {
+  const setCookieArr = getCookieArray(setCookie?.[0]).filter(el => el.length === 2);
+  const arr = getCookieArray(cookie)
     .concat(setCookieArr)
     .filter(el => el.length === 2);
 
-  let obj = {};
+  const obj = {};
   for (const it of arr) {
     if (obj[it[0]]) {
       obj[it[0]] = it[1];
@@ -29,7 +29,7 @@ function cookie2Obj(cookie: string, setCookie: any): object {
 }
 
 function getCookieString(obj) {
-  let string = Object.keys(obj).reduce((pre, cur) => {
+  const string = Object.keys(obj).reduce((pre, cur) => {
     return pre + `${cur}=${obj[cur]}; `;
   }, '');
   return string.substring(0, string.length - 2 || 0);

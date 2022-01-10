@@ -31,7 +31,7 @@ function funHandle() {
  * 按照配置清空函数
  * @param funArr 函数数组
  */
-export function offFunctions(funArr: Array<() => {}>): Array<() => {}> {
+export function offFunctions(funArr: Array<() => unknown>): Array<() => unknown> {
   funHandle();
   return funArr.map(el => (functionConfig[el.name] ? el : null)).filter(el => el);
 }

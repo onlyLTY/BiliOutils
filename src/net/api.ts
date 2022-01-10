@@ -22,6 +22,7 @@ const res = res => {
     case ErrCC['账号未登录']:
     case ErrCC['账号被封停']:
       exit();
+      break;
     default:
       return res;
   }
@@ -32,7 +33,7 @@ const err = err => {
 };
 
 function axiosRetryInterceptor(err) {
-  var config = err.config;
+  const config = err.config;
   // 不需要重试的请求
   if (config.retry === 0) return Promise.reject(err);
 
@@ -52,7 +53,7 @@ function axiosRetryInterceptor(err) {
   config.__retryCount += 1;
 
   // 创建一个新的Promise来处理重试
-  var backoff = new Promise(function (resolve) {
+  const backoff = new Promise(function (resolve) {
     setTimeout(function () {
       resolve(void 0);
     }, config.retryDelay || 100);

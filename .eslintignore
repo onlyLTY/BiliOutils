@@ -1,0 +1,10 @@
+dist/
+/temp/**
+/config/*
+.idea
+.vscode
+.git
+.gitignore
+node_modules/**
+qinglong/**/*.js
+src/utils/sendNotify.*

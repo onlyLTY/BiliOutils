@@ -14,7 +14,7 @@ export default async function liveSignTask() {
     const { code, data, message } = await doLiveSign();
     if (code === 0) {
       console.log(
-        `直播签到成功: ${data.text}, 特别信息: ${data.specialText}, 本月签到天数: ${data.hadSignDays}天;`
+        `直播签到成功: ${data.text}, 特别信息: ${data.specialText}, 本月签到天数: ${data.hadSignDays}天;`,
       );
     } else {
       console.log('直播签到失败: ', code, message);

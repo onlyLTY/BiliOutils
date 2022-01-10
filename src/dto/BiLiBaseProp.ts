@@ -18,7 +18,7 @@ export interface DoubleMessageProp {
   code: number;
   msg: string;
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export interface PureDataProp {

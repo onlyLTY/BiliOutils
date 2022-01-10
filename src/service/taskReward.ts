@@ -1,7 +1,4 @@
-import {
-  getDailyTaskRewardInfo,
-  getDonateCoinExp,
-} from '../net/userInfoRequest';
+import { getDailyTaskRewardInfo, getDonateCoinExp } from '../net/userInfoRequest';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 
@@ -30,12 +27,12 @@ export default async function taskReward() {
       //(狗头保命)
       coins = TaskModule.coinsTask - targetCoinsDiff;
       console.log(
-        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗，忽略部分投币)`
+        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗，忽略部分投币)`,
       );
     } else {
       coins = TaskModule.coinsTask - coinExp / 10;
       console.log(
-        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`
+        `投币获取经验: ${coinExp}, 还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`,
       );
     }
 

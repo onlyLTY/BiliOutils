@@ -13,10 +13,7 @@ const csrf_token = csrf;
  * @param stime 开始时间
  * @param etime 结束时间
  */
-export async function getGuessCollection(
-  stime: string = '',
-  etime: string = '',
-): Promise<GuessCollectionDto> {
+export async function getGuessCollection(stime = '', etime = ''): Promise<GuessCollectionDto> {
   const { data } = await biliApi.get(
     `/x/esports/guess/collection/question?pn=1&ps=50&gid=&sids=&stime=${stime}&etime=${etime}`,
   );

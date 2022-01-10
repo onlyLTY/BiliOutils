@@ -9,7 +9,7 @@ import { liveHeart } from '../src/service/liveHeart';
 // 青龙面板中存在此文件，可以直接使用
 const { sendNotify } = require('./sendNotify');
 
-async function dailyTasks<T = any>(cb?: (...arg: T[]) => any, ...cbArg: T[]) {
+async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: T[]) {
   try {
     await loginTask();
   } catch (error) {

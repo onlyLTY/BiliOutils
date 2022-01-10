@@ -61,8 +61,8 @@ async function findOneRoom() {
   const upList = Object.assign([] as number[], BILI_GIFT_UP);
   const getOneUp = () => upList.splice(random(BILI_GIFT_UP.length - 1), 1)[0];
   while (upList.length) {
-    let mid = getOneUp();
-    let { roomid } = await getUserRoomId(mid);
+    const mid = getOneUp();
+    const { roomid } = await getUserRoomId(mid);
     if (roomid) {
       return {
         roomid,

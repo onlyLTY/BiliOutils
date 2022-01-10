@@ -38,7 +38,7 @@ function setLevelInfo(data: UserNavData) {
 
 function setVipStatus(data: UserNavData) {
   /**大会员信息 */
-  let vipTypeMsg: string = '';
+  let vipTypeMsg = '';
 
   TaskModule.vipType = data.vipType;
 
@@ -51,6 +51,7 @@ function setVipStatus(data: UserNavData) {
       break;
     case 2:
       vipTypeMsg = '年度大会员';
+      break;
     default:
       break;
   }

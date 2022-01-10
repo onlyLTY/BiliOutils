@@ -140,8 +140,8 @@ export interface OtherUserDto extends ApiBaseProp {
     user_honour_info: { mid: number; colour: null; tags: [] };
     is_followed: true;
     top_photo: string;
-    theme: {};
-    sys_notice: {};
+    theme: Record<string, unknown>;
+    sys_notice: Record<string, unknown>;
     live_room: {
       /** 0 未知 1 存在 */
       roomStatus: number;

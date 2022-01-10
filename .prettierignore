@@ -1,0 +1,5 @@
+node_modules/**
+/temp/**
+.idea
+dist/
+qinglong/cat_bili_ql.js

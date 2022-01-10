@@ -28,7 +28,7 @@ export default async function supGroupSign() {
   await apiDelay();
   let count = 0;
   for (let i = 0; i < myGroups.length; ) {
-    let group = myGroups[i];
+    const group = myGroups[i];
     try {
       // console.log(`应援团${group.group_name}签到开始`);
       const { data, code, message } = await groupSignApi(group.group_id, group.owner_uid);

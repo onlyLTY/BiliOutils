@@ -15,7 +15,9 @@
     "modclean": "modclean -r -a \"*.md,*LICENSE*,.github,.nycrc,*.ts,*.html,*.txt,*.js.map,*.mjs.map,browser.js,@types\" && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
     "predeploy:multi": "rm -f ./dist/run.js && cp -rf ./tools/ ./package*.json ./dist && cd ./dist && npm i --production && npm run modclean && rm -rf tools package*.json &&  cd ../",
-    "postbuild": "cd ./dist && rm -rf ./dto/ ./interface/ *.d.js"
+    "postbuild": "cd ./dist && rm -rf ./dto/ ./interface/ *.d.js",
+    "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
+    "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\""
   },
   "author": "catlair",
   "license": "MIT",
@@ -32,7 +34,14 @@
     "@types/node": "^16.10.3",
     "@types/nodemailer": "^6.4.4",
     "@types/qs": "^6.9.7",
-    "rollup-plugin-terser": "^7.0.2"
+    "@typescript-eslint/eslint-plugin": "^5.9.0",
+    "@typescript-eslint/parser": "^5.9.0",
+    "eslint": "^8.6.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "^4.5.4"
   },
   "dependencies": {
     "axios": "^0.24.0",

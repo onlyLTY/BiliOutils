@@ -1,19 +1,13 @@
 import { stringify } from 'qs';
 import { TaskConfig } from '../config/globalVar';
-import {
-  ChargingDto,
-  ChargingMessageDto,
-  ReceiveVipPrivilegeDto,
-} from '../dto/VipPrivilege.dto';
+import { ChargingDto, ChargingMessageDto, ReceiveVipPrivilegeDto } from '../dto/VipPrivilege.dto';
 import { biliApi } from './api';
 
 /**
  * 领取年度大会员权益
  * @param type 1.大会员B币券；2.大会员福利
  */
-export async function receiveVipPrivilege(
-  type: number = 1,
-): Promise<ReceiveVipPrivilegeDto> {
+export async function receiveVipPrivilege(type = 1): Promise<ReceiveVipPrivilegeDto> {
   const { data } = await biliApi.post(
     '/x/vip/privilege/receive',
     stringify({
@@ -33,8 +27,8 @@ export async function receiveVipPrivilege(
  * @param oid 充电来源代码(UID 或者 稿件 avID)
  */
 export async function chargingForUp(
-  bp_num: number = 50,
-  is_bp_remains_prior: boolean = true,
+  bp_num = 50,
+  is_bp_remains_prior = true,
   up_mid: number = TaskConfig.USERID,
   otype: 'up' | 'archive' = 'up',
   oid: number = up_mid,
@@ -60,7 +54,7 @@ export async function chargingForUp(
  */
 export async function chargingCommentsForUp(
   orderId: string,
-  message: string = '支持大佬一波',
+  message = '支持大佬一波',
 ): Promise<ChargingMessageDto> {
   const { data } = await biliApi.post(
     '/x/ugcpay/trade/elec/message',

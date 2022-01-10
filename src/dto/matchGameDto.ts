@@ -29,7 +29,7 @@ export interface GuessCollectionDto extends ApiBaseProp {
             income: number;
             correct: number;
           }[];
-          guess_season: any;
+          guess_season: unknown;
         },
       ];
     }[];

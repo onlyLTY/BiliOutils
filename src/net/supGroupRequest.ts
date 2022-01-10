@@ -14,10 +14,7 @@ export async function getMyGroupsApi(): Promise<SupGroupsDto> {
  * @param group_id 应援团id
  * @param owner_id 爱豆ID(狗头)
  */
-export async function groupSignApi(
-  group_id: number,
-  owner_id: number
-): Promise<SupGroupsSignDto> {
+export async function groupSignApi(group_id: number, owner_id: number): Promise<SupGroupsSignDto> {
   const { data } = await vcApi.get('/link_setting/v1/link_setting/sign_in', {
     params: {
       group_id,

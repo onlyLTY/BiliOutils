@@ -1,9 +1,5 @@
 import { apiDelay, random } from '../utils';
-import {
-  getFollowings,
-  getSpecialFollowings,
-  getVideosByUpId,
-} from '../net/userInfoRequest';
+import { getFollowings, getSpecialFollowings, getVideosByUpId } from '../net/userInfoRequest';
 import { getRegionRankingVideos } from '../net/videoRequest';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { FollowingsDto } from '../dto/UserInfo.dto';
@@ -21,9 +17,7 @@ class AidInfo {
  * 从关注列表随机获取一个视频
  * @param special 是否只获取特别关注列表
  */
-export async function getAidByFollowing(
-  special: boolean = true,
-): Promise<AidInfo> {
+export async function getAidByFollowing(special = true): Promise<AidInfo> {
   try {
     const uid = TaskConfig.USERID;
     let tempData: FollowingsDto;

@@ -242,48 +242,45 @@ async function runOnePost(baseData, rDataArr, j, seq) {
     return;
   }
 
-  return new Promise(async resolve => {
-    await heartBeat();
-    await apiDelay(500);
-    if (seq.v === 0) {
-      rDataArr[j] = await postE(baseData, seq);
-    } else {
-      rDataArr[j] = await postX(rDataArr[j], baseData, seq);
-    }
-    resolve('done');
-  });
+  await heartBeat();
+  await apiDelay(500);
+  if (seq.v === 0) {
+    rDataArr[j] = await postE(baseData, seq);
+  } else {
+    rDataArr[j] = await postX(rDataArr[j], baseData, seq);
+  }
+
+  return 'done';
 }
 
 export async function runOneLoop(fansMedalList: LiveFansMedalItem[], heartNum: number) {
   const apiDelayTime = 2000;
-  return new Promise(async resolve => {
-    const rDataArray = [];
-    for (let index = 0; index < 6; index++) {
-      let count = 0;
+  const rDataArray = [];
+  for (let index = 0; index < 6; index++) {
+    let count = 0;
+    if (count >= heartNum) {
+      break;
+    }
+    const length = fansMedalList.length;
+    for (let j = 0; j < length; j++) {
       if (count >= heartNum) {
         break;
       }
-      const length = fansMedalList.length;
-      for (let j = 0; j < length; j++) {
-        if (count >= heartNum) {
-          break;
-        }
-        const funsMedalData = fansMedalList[j];
-        const { roomid, uname } = funsMedalData;
-        const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
-        const baseData = createBaseData(room_id, area_id, parent_area_id, uname, index);
-        await runOnePost(baseData, rDataArray, j, { v: index });
-        await apiDelay(apiDelayTime);
-        count++;
-      }
-      // 最后一次不等待
-      if (index < 5) {
-        // 去掉部分延时，保证时间接近 1 分
-        await apiDelay(60000 - count * apiDelayTime);
-      }
+      const funsMedalData = fansMedalList[j];
+      const { roomid, uname } = funsMedalData;
+      const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
+      const baseData = createBaseData(room_id, area_id, parent_area_id, uname, index);
+      await runOnePost(baseData, rDataArray, j, { v: index });
+      await apiDelay(apiDelayTime);
+      count++;
     }
-    resolve('done');
-  });
+    // 最后一次不等待
+    if (index < 5) {
+      // 去掉部分延时，保证时间接近 1 分
+      await apiDelay(60000 - count * apiDelayTime);
+    }
+  }
+  return 'done';
 }
 
 /**

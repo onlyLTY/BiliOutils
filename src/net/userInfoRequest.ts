@@ -54,10 +54,10 @@ export async function getCoinBalance(): Promise<CoinBalanceDto> {
  */
 export async function getFollowings(
   vmid: number,
-  pageNumber: number = 1,
-  pageSize: number = 50,
-  order: string = 'desc',
-  order_type: string = 'attention',
+  pageNumber = 1,
+  pageSize = 50,
+  order = 'desc',
+  order_type = 'attention',
 ): Promise<FollowingsDto> {
   const { data } = await biliApi.get('/x/relation/followings', {
     params: {
@@ -76,10 +76,7 @@ export async function getFollowings(
  * @param pageNumber 页数 [1]
  * @param pageSize 每页数量 [50]
  */
-export async function getSpecialFollowings(
-  pageNumber: number = 1,
-  pageSize: number = 50,
-): Promise<FollowingsDto> {
+export async function getSpecialFollowings(pageNumber = 1, pageSize = 50): Promise<FollowingsDto> {
   const { data } = await biliApi.get('/x/relation/tag', {
     params: {
       tagid: -10,
@@ -95,7 +92,7 @@ export async function getSpecialFollowings(
  * @param upId upId
  * @param pageSize 数据数量
  */
-export async function getVideosByUpId(upId: number, pageSize: number = 50): Promise<VideoByUpDto> {
+export async function getVideosByUpId(upId: number, pageSize = 50): Promise<VideoByUpDto> {
   const { data } = await biliApi.get('/x/v2/medialist/resource/list', {
     params: {
       direction: false,
@@ -118,9 +115,9 @@ export async function getVideosByUpId(upId: number, pageSize: number = 50): Prom
  */
 export async function searchVideosByUpId(
   upId: number,
-  pageSize: number = 20,
-  pageNumber: number = 1,
-  keyword: string = '',
+  pageSize = 20,
+  pageNumber = 1,
+  keyword = '',
 ): Promise<FollowingsDto> {
   const { data } = await biliApi.get('/x/space/arc/search', {
     params: {

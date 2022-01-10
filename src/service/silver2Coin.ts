@@ -1,8 +1,4 @@
-import {
-  exchangeSilver2Coin,
-  exchangeStatus,
-  getMyWallet,
-} from '../net/liveRequest';
+import { exchangeSilver2Coin, exchangeStatus, getMyWallet } from '../net/liveRequest';
 
 /**
  * 银瓜子兑换硬币

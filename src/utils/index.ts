@@ -21,7 +21,8 @@ export function apiDelay(delayTime?: number) {
   }
   delay = delayTime || delay;
 
-  let startTime = new Date().getTime() + parseInt(delay, 10);
+  const startTime = new Date().getTime() + parseInt(delay, 10);
+  // eslint-disable-next-line no-empty
   while (new Date().getTime() < startTime) {}
 
   return new Promise(resolve => {

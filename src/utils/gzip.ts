@@ -7,10 +7,9 @@ const pako = require('pako');
  */
 export const gzipEncode = (str: string): string => {
   try {
-    return Buffer.from(
-      pako.gzip(escape(str), { to: 'string' }).toString(),
-      'binary',
-    ).toString('base64');
+    return Buffer.from(pako.gzip(escape(str), { to: 'string' }).toString(), 'binary').toString(
+      'base64',
+    );
   } catch (e) {
     return 'Error: 当前字符串不能被Gzip加密';
   }
@@ -23,12 +22,12 @@ export const gzipEncode = (str: string): string => {
  */
 export const gzipDecode = (str: string): string => {
   try {
-    let charData = Buffer.from(str, 'base64')
+    const charData = Buffer.from(str, 'base64')
       .toString('binary')
       .split('')
       .map(x => x.charCodeAt(0));
-    let data = pako.inflate(new Uint8Array(charData));
-    let result = String.fromCharCode.apply(null, new Uint16Array(data));
+    const data = pako.inflate(new Uint8Array(charData));
+    const result = String.fromCharCode.apply(null, new Uint16Array(data));
     try {
       return unescape(result);
     } catch (ee) {
