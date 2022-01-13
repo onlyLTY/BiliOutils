@@ -1,15 +1,15 @@
 import { resolve } from 'path';
-import { isQingLongPanel } from '../utils/env';
 import { Config } from '../interface/Config';
 import { gzipDecode } from '../utils/gzip';
+import { SystemConfig } from './systemConfig';
 
 function errorHandle(): never {
   throw new Error('配置文件不存（位置不正确）在或 cookie 不存在！！！');
 }
 
-const getCurDirConfig = (configFileName = 'config.json'): Config => {
+const getCurDirConfig = (): Config => {
   try {
-    return require(`./${configFileName}`);
+    return require(`./${SystemConfig.configFileName}`);
   } catch {
     // 暂时兼容旧版本处理
     try {
@@ -19,9 +19,9 @@ const getCurDirConfig = (configFileName = 'config.json'): Config => {
   return null;
 };
 
-const getRootDirConfig = (configFileName = 'config.json'): Config => {
+const getRootDirConfig = (): Config => {
   try {
-    return require(resolve(process.cwd(), `./config/${configFileName}`));
+    return require(resolve(process.cwd(), `./config/${SystemConfig.configFileName}`));
   } catch {
     // 暂时兼容旧版本处理
     try {
@@ -50,6 +50,9 @@ const getDevConfig = (): Config => {
   return null;
 };
 
+/**
+ * 处理青龙面板的配置，根据参数获取第几个配置
+ */
 function handleQLPanel(configArr: Config[]): Config {
   const arg2 = process.argv.find(
     arg => arg.includes('--item') || arg.includes('-i') || arg.includes('-I'),
@@ -78,7 +81,7 @@ function handleMultiUserConfig(config: Config): Config | undefined {
     return undefined;
   }
 
-  if (isQingLongPanel()) {
+  if (SystemConfig.isQingLongPanel) {
     return handleQLPanel(newConfig);
   }
 
@@ -89,17 +92,8 @@ function handleMultiUserConfig(config: Config): Config | undefined {
   return conf;
 }
 
-function setConfigFileName() {
-  if (isQingLongPanel()) {
-    return 'cat_bili_config.json';
-  }
-  return 'config.json';
-}
-
 export function setConfig(): Config {
-  const cfn = setConfigFileName();
-
-  const config = getDevConfig() || getCurDirConfig(cfn) || getRootDirConfig(cfn) || getEnvConfig();
+  const config = getDevConfig() || getCurDirConfig() || getRootDirConfig() || getEnvConfig();
   if (!config) {
     errorHandle();
   }

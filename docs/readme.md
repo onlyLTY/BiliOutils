@@ -8,7 +8,6 @@
 - [配置相关](#配置相关)
   - [配置文件路径](#配置文件路径)
   - [在线填写表单获取配置](#在线填写表单获取配置)
-  - [单用户配置参考](#单用户配置参考)
   - [多用户配置参考](#多用户配置参考)
 
 ## 获取 Cookie 的方法
@@ -76,63 +75,14 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 ### 在线填写表单获取配置
 
-**可能新增更新不及时**
+~~**可能新增更新不及时**~~  
+**好吧是不更新了（之前用 vue3 的一些语法，现在都废除了）**
 
 <https://catlair.gitee.io/bili-tools-docs-deploy/>
 
 ![docs-add-config](images/docs-add-config.png)
 
 ![docs-get-config](images/docs-get-config.png)
-
-### 单用户配置参考
-
-```json
-{
-  "function": {
-    "silver2Coin": false,
-    "liveSignTask": false,
-    "addCoins": false,
-    "mangaSign": false,
-    "shareAndWatch": false,
-    "supGroupSign": false,
-    "judgement": true,
-    "liveSendMessage": false,
-    "charging": false,
-    "getVipPrivilege": false
-  },
-  "dailyRunTime": "19:19:19-23:23:23",
-  "apiDelay": [20, 50],
-  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
-  "cookie": "哔站完整cookie，至少含有三要素",
-  "message": {
-    "email": {
-      "from": "发件邮箱",
-      "to": "收件邮箱",
-      "pass": "发件邮箱授权码",
-      "host": "例如smtp.163.com",
-      "port": 465
-    }
-  },
-  "stayCoins": 0,
-  "targetCoins": 5,
-  "targetLevel": 6,
-  "coinRetryNum": 6,
-  "upperAccMatch": true,
-  "customizeUp": [],
-  "chargeUpId": 0,
-  "chargePresetTime": 31,
-  "sls": {
-    "name": "bilitool_scf_demo",
-    "region": "ap-chengdu",
-    "description": "干什么的"
-  }
-}
-```
-
-注：
-
-- `sls` 字段是实现随机运行需要的内容（函数名和函数地域）
-- `json` 不支持注释，所以千万不要注释
 
 ### 多用户配置参考
 
@@ -143,9 +93,51 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 其他情况填写多个只会使用第一个
 
+> 可能容易搞混，所以文档现在只写多用户，单一用户环境只会取 account 中的第一个
+
 ```json
 {
   "message": {}, // 可以省略
-  "account": [{}, {}, {}] // {} 就是上面的单用户配置
+  "account": [
+    {
+      "function": {
+        "silver2Coin": false,
+        "liveSignTask": false,
+        "addCoins": false,
+        "mangaSign": false,
+        "shareAndWatch": false,
+        "supGroupSign": false,
+        "judgement": true,
+        "liveSendMessage": false,
+        "charging": false,
+        "getVipPrivilege": false
+      },
+      "dailyRunTime": "19:19:19-23:23:23",
+      "apiDelay": [20, 50],
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
+      "cookie": "哔站完整cookie，至少含有三要素",
+      "message": {},
+      "stayCoins": 0,
+      "targetCoins": 5,
+      "targetLevel": 6,
+      "coinRetryNum": 6,
+      "upperAccMatch": true,
+      "customizeUp": [],
+      "chargeUpId": 0,
+      "chargePresetTime": 31,
+      "sls": {
+        "name": "bilitool_scf_demo",
+        "region": "ap-chengdu",
+        "description": "干什么的，sls 是云函数必须"
+      }
+    },
+    {},
+    {}
+  ] // {} 同上
 }
 ```
+
+注：
+
+- `sls` 字段是实现随机运行需要的内容（函数名和函数地域）
+- `json` 不支持注释，所以千万不要注释，例子中的注释 `//` 是为了方便阅读
