@@ -1,4 +1,11 @@
-# [BiliTools](https://catlair.gitee.io/bili-tools-docs-deploy/#/) &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/catlair/BiliToolsblob/main/LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/catlair/BiliTools/pulls)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/catlair/BiliTools/blob/main/LICENSE)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/catlair/BiliTools)
+[![欢迎 PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/catlair/BiliTools/pulls)
+![GitHub issues](https://img.shields.io/github/issues/catlair/BiliTools)
+![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/catlair/bilitools)
+![Docker Pulls](https://img.shields.io/docker/pulls/catlair/bilitools)
+![Lines of code](https://img.shields.io/tokei/lines/github/catlair/BiliTools)
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/catlair/BiliTools/total)
 
 ## 支持功能
 
