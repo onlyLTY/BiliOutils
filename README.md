@@ -1,7 +1,7 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/catlair/BiliTools/blob/main/LICENSE)
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/catlair/BiliTools)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/catlair/BiliTools)](https://github.com/catlair/BiliTools/releases)
 [![欢迎 PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/catlair/BiliTools/pulls)
-![GitHub issues](https://img.shields.io/github/issues/catlair/BiliTools)
+[![GitHub issues](https://img.shields.io/github/issues/catlair/BiliTools)](https://github.com/catlair/BiliTools/issues)
 ![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/catlair/bilitools)
 ![Docker Pulls](https://img.shields.io/docker/pulls/catlair/bilitools)
 ![Lines of code](https://img.shields.io/tokei/lines/github/catlair/BiliTools)
@@ -51,7 +51,7 @@
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
-- [青龙面板](https://github.com/whyour/qinglong): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `config.json` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/46)。
+- [青龙面板](https://github.com/whyour/qinglong): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `config.json` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
 
 ### 直播心跳（新增）
 

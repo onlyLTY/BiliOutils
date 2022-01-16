@@ -84,9 +84,10 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
         count++;
         TaskModule.money -= MATCH_COINS;
       }
-      return count;
     }
-  } catch (error) {}
+  } catch (error) {
+    console.warn(error.message);
+  }
   return count;
 }
 

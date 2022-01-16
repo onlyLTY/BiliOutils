@@ -9,7 +9,7 @@ const csrf = TaskConfig.BILIJCT;
 const csrf_token = csrf;
 
 /**
- * 获取比赛集合集合
+ * 获取比赛集合
  * @param stime 开始时间
  * @param etime 结束时间
  */

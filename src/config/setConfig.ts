@@ -1,53 +1,39 @@
-import { resolve } from 'path';
+import * as path from 'path';
 import { Config } from '../interface/Config';
 import { gzipDecode } from '../utils/gzip';
 import { SystemConfig } from './systemConfig';
 
-function errorHandle(): never {
-  throw new Error('配置文件不存（位置不正确）在或 cookie 不存在！！！');
+const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
+
+function errorHandle(msg?: string): never {
+  throw new Error(msg || '配置文件不存（位置不正确）在或 cookie 不存在！！！');
 }
 
-const getCurDirConfig = (): Config => {
-  try {
-    return require(`./${SystemConfig.configFileName}`);
-  } catch {
-    // 暂时兼容旧版本处理
-    try {
-      return require(`./config.json`);
-    } catch {}
-  }
-  return null;
-};
+const configArr = [
+  () => require(resolveCWD('./config/config.dev.json')),
+  () => require(`./${SystemConfig.configFileName}`),
+  () => require(resolveCWD(`./config/${SystemConfig.configFileName}`)),
+];
 
-const getRootDirConfig = (): Config => {
-  try {
-    return require(resolve(process.cwd(), `./config/${SystemConfig.configFileName}`));
-  } catch {
-    // 暂时兼容旧版本处理
-    try {
-      return require(resolve(process.cwd(), `./config/config.json`));
-    } catch {}
-  }
-  return null;
-};
+/**
+ * 兼容，随时删除
+ */
+const qlOldConfigArr = [
+  () => require('./config.json'),
+  () => require(resolveCWD('./config/config.json')),
+];
 
 const getEnvConfig = (): Config => {
-  const BILI_CONFIG = process.env.BILI_SCF_CONFIG || process.env.BILI_CONFIG;
-  if (!BILI_CONFIG) {
-    return null;
+  const { BILITOOLS_CONFIG, BILI_SCF_CONFIG, BILI_CONFIG } = process.env;
+  const config = BILITOOLS_CONFIG || BILI_SCF_CONFIG || BILI_CONFIG;
+  if (!config) {
+    return undefined;
   }
   try {
-    return JSON.parse(gzipDecode(BILI_CONFIG));
+    return JSON.parse(gzipDecode(config));
   } catch {
-    throw new Error('BILI_SCF_CONFIG 配置不正确');
+    errorHandle('环境中的配置不是有效的 JSON 字符串！');
   }
-};
-
-const getDevConfig = (): Config => {
-  try {
-    return require(resolve(process.cwd(), './config/config.dev.json'));
-  } catch {}
-  return null;
 };
 
 /**
@@ -88,13 +74,38 @@ function handleMultiUserConfig(config: Config): Config | undefined {
   console.log('[WARN] 在单用户场景下配置了多用户，我们将放弃多余的配置');
   // 合并 message 配置
   const conf = newConfig[0];
-  conf.message = Object.assign(config.message, conf.message);
+  conf.message = Object.assign(config.message || {}, conf.message);
   return conf;
 }
 
 export function setConfig(): Config {
-  const config = getDevConfig() || getCurDirConfig() || getRootDirConfig() || getEnvConfig();
+  let config: Config,
+    loadedErrorFlag = false;
+  if (SystemConfig.isQingLongPanel) {
+    configArr.splice(0, 1, ...qlOldConfigArr);
+  }
+  for (const fn of configArr) {
+    try {
+      config = fn();
+      if (config) {
+        break;
+      }
+      loadedErrorFlag = true;
+    } catch (error) {
+      const { message = {} } = error;
+      if (message.includes && message.includes('in JSON at position')) {
+        loadedErrorFlag = true;
+      }
+      continue;
+    }
+  }
+
+  config ||= getEnvConfig();
+
   if (!config) {
+    if (loadedErrorFlag) {
+      errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
+    }
     errorHandle();
   }
 

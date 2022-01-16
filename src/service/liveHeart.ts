@@ -227,7 +227,12 @@ export default async function liveHeart() {
   console.log('----【直播心跳】----');
 
   const { heartNum, fansMedalList } = await getFansMedalList();
-  const loopNum = Math.ceil(heartNum / fansMedalList?.length);
+  const length = fansMedalList && fansMedalList.length;
+  if (!length) {
+    console.log('没有勋章列表');
+    return;
+  }
+  const loopNum = Math.ceil(heartNum / length);
 
   for (let i = 0; i < loopNum; i++) {
     await runOneLoop(fansMedalList, heartNum);
@@ -256,28 +261,34 @@ async function runOnePost(baseData, rDataArr, j, seq) {
 export async function runOneLoop(fansMedalList: LiveFansMedalItem[], heartNum: number) {
   const apiDelayTime = 2000;
   const rDataArray = [];
+  let runTime = 0;
   for (let index = 0; index < 6; index++) {
     let count = 0;
     if (count >= heartNum) {
       break;
     }
     const length = fansMedalList.length;
+    runTime = 0;
     for (let j = 0; j < length; j++) {
       if (count >= heartNum) {
         break;
       }
+      // 开始计时
+      const runStartTime = new Date().getTime();
       const funsMedalData = fansMedalList[j];
       const { roomid, uname } = funsMedalData;
       const { room_id, area_id, parent_area_id } = await getOneRoomInfo(roomid);
       const baseData = createBaseData(room_id, area_id, parent_area_id, uname, index);
       await runOnePost(baseData, rDataArray, j, { v: index });
       await apiDelay(apiDelayTime);
+      // 结束计时
+      runTime += new Date().getTime() - runStartTime;
       count++;
     }
     // 最后一次不等待
     if (index < 5) {
       // 去掉部分延时，保证时间接近 1 分
-      await apiDelay(60000 - count * apiDelayTime);
+      await apiDelay(60000 - runTime /** - 计时总时间 */);
     }
   }
   return 'done';

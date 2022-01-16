@@ -12,7 +12,7 @@ export default {
     format: 'cjs',
     chunkFileNames: '[name].js',
   },
-  external: ['crypto-js', 'lodash', 'nodemailer', 'axios', 'qs', 'pako'],
+  external: ['crypto-js', 'lodash', 'nodemailer', 'axios', 'qs', 'pako', 'path', 'fs'],
   preserveEntrySignatures: false,
   plugins: [
     babel({

@@ -5,8 +5,8 @@ module.exports = function () {
    * 更新组件名
    * @param {string} componentName
    */
-  this.updateComponentName = scfName => {
-    process.env.COMPONENT_NAME = `cbts_${scfName}`;
+  this.updateComponentName = componentName => {
+    process.env.COMPONENT_NAME = `cbts_${componentName}`;
     return this;
   };
 
@@ -61,17 +61,17 @@ module.exports = function () {
 
     const hours = randomInt(+startTime[0] ?? 19, +endTime[0] + 1 ?? 24);
     let minutes = 0;
-    if (hours == startTime[0]) {
+    if (hours === +startTime[0]) {
       minutes = randomInt(+startTime[1], 60);
-    } else if (hours == endTime[0]) {
+    } else if (hours === +endTime[0]) {
       minutes = randomInt(+endTime[1] + 1);
     } else {
       minutes = randomInt(60);
     }
     let seconds = 0;
-    if (hours == startTime[0]) {
+    if (hours === +startTime[0]) {
       seconds = randomInt(+startTime[2], 60);
-    } else if (hours == endTime[0]) {
+    } else if (hours === +endTime[0]) {
       seconds = randomInt(+endTime[2] + 1);
     } else {
       seconds = randomInt(60);

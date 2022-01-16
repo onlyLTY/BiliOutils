@@ -17,7 +17,7 @@ function writePackageFile(path) {
     /**
      * 暂时保留这些
      */
-    const { name, version, author, main } = JSON.parse(readFileSync(path));
+    const { name, version, author, main } = JSON.parse(readFileSync(path).toString());
     const newPKG = { name, version, author, main };
     writeFileSync(path, JSON.stringify(newPKG));
   } catch {}

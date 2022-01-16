@@ -49,12 +49,17 @@ import { TaskConfig } from '../config/globalVar';
     'PUSH_PLUS_TOKEN',
     'PUSH_PLUS_USER',
   ];
-  const message = TaskConfig.config?.message || [];
+  const message = TaskConfig.config?.message || {};
 
-  process.env.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
+  if (TaskConfig.PUSHPLUS_TOKEN) {
+    process.env.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
+  }
 
   envName.forEach(name => {
-    process.env[name] = message[upperCaseToHump(name)] || message[name] || process.env[name] || '';
+    const value = message[upperCaseToHump(name)] || message[name] || process.env[name];
+    if (value) {
+      process.env[name] = value;
+    }
   });
 })();
 
