@@ -68,10 +68,10 @@
 - [catlair/bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [lzghzr/TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 - [whyour/qinglong](https://github.com/whyour/qinglong)
+- [RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro)
 
 以下项目已经不存在：
 
-- [RayWangQvQ/BiliBiliTool](https://github.com/RayWangQvQ/BiliBiliTool)
 - [JunzhouLiu/BILIBILI-HELPER-PRE](https://github.com/JunzhouLiu/BILIBILI-HELPER-PRE)
 
 ## 责任声明
