@@ -1,8 +1,6 @@
 import { getUserId, getBiliJct } from '../utils/cookie';
 import config from './setConfig';
 
-config.message ||= {};
-
 /**
  * 字符串数组转数字数组
  * @param strArr 字符串数组
@@ -54,6 +52,8 @@ export abstract class TaskConfig {
   static readonly MATCH_COINS = config.matchCoins ?? 5;
   /** 压硬币规则 大于0 是正压，小于反压 */
   static readonly MATCH_SELECTION = config.matchSelection ?? 1;
+  /** 比赛赔率差距需要大于多少才压 */
+  static readonly MATCH_DIFF = config.matchDiff ?? 0;
   /** 自定义推送 Api */
   static readonly MESSAGE_API = config.message?.api;
 }

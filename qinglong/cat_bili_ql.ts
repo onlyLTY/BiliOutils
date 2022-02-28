@@ -33,7 +33,7 @@ async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: 
 
 const main_handler = async () => {
   console.log = warpLog();
-  console.log(`当前版本【0.3.22-rc0】`);
+  console.log(`当前版本【0.3.24-rc0】`);
 
   if (TaskConfig.config.function?.liveHeart) {
     return await dailyTasks(liveHeart);
