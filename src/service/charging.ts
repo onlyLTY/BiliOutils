@@ -42,7 +42,7 @@ function init() {
 
   // 查看余额
   if (TaskModule.bCoinCouponBalance < 2) {
-    console.log(`剩余券为${TaskModule.bCoinCouponBalance},不足2跳过投币`);
+    console.log(`剩余券为${TaskModule.bCoinCouponBalance},不足2跳过充电`);
     return false;
   }
 
