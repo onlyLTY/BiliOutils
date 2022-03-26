@@ -3,6 +3,7 @@ import { random } from 'lodash';
 import { getPRCDate } from './';
 import config from '../config/setConfig';
 import { Constant } from '../config/globalVar';
+import { logger } from './log';
 
 const ScfClient = scf.v20180416.Client;
 
@@ -79,7 +80,7 @@ export default async function (
     try {
       return await client.CreateTrigger(params);
     } catch ({ code, message }) {
-      console.log('创建trigger失败', `${code} => ${message}`);
+      logger.info(`创建trigger失败 ${code} => ${message}`);
       return false;
     }
   }
@@ -88,7 +89,7 @@ export default async function (
     try {
       return await client.DeleteTrigger(params);
     } catch ({ code, message }) {
-      console.log('删除trigger失败', `${code} => ${message}`);
+      logger.info(`删除trigger失败 ${code} => ${message}`);
       return false;
     }
   }
@@ -102,7 +103,7 @@ export default async function (
 
       return triggerIndex !== -1;
     } catch ({ code, message }) {
-      console.log('获取trigger失败', `${code} => ${message}`);
+      logger.info(`获取trigger失败 ${code} => ${message}`);
       return false;
     }
   }
@@ -119,7 +120,7 @@ export default async function (
 
     const hasTrigger = await getHasTrigger(triggerName);
 
-    console.log(`修改时间为：${runTime.string}`);
+    logger.info(`修改时间为：${runTime.string}`);
 
     if (hasTrigger) {
       const deleteResult = await deleteTrigger(params);
@@ -132,7 +133,7 @@ export default async function (
   }
 
   if (!process.env.TENCENT_SECRET_ID || !process.env.TENCENT_SECRET_KEY) {
-    console.log('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
+    logger.info('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
     return false;
   }
   let updateResults = false;

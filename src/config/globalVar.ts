@@ -68,8 +68,6 @@ export abstract class TaskModule {
   static share = false;
   /**今日是否已经观看视频 */
   static watch = false;
-  /** 执行任务产生的消息 */
-  static appInfo = '\n';
   /** 确定获取aid的函数开始下标 */
   static currentStartFun = 0;
   /** B币券余额 */

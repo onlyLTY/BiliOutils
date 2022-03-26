@@ -1,5 +1,5 @@
-import { warpLog } from '../src/utils/log';
-import { TaskConfig, TaskModule } from '../src/config/globalVar';
+import { logger, LogMessage } from '../src/utils/log';
+import { TaskConfig } from '../src/config/globalVar';
 import { apiDelay } from '../src/utils';
 import bili, { loginTask } from '../src/task';
 import { offFunctions } from '../src/config/configOffFun';
@@ -13,8 +13,8 @@ async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: 
   try {
     await loginTask();
   } catch (error) {
-    console.log('登录失败: ', error);
-    await sendNotify(`Bili-${TaskConfig.NICKNAME}-登录失败`, TaskModule.appInfo);
+    logger.info(`登录失败: ${error}`);
+    await sendNotify(`Bili-${TaskConfig.NICKNAME}-登录失败`, LogMessage.value);
     return '未完成';
   }
 
@@ -27,13 +27,12 @@ async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: 
 
   cb && (await cb(...cbArg));
 
-  await sendNotify(`Bili-${TaskConfig.NICKNAME}-任务完成`, TaskModule.appInfo);
+  await sendNotify(`Bili-${TaskConfig.NICKNAME}-任务完成`, LogMessage.value);
   return '完成';
 }
 
 const main_handler = async () => {
-  console.log = warpLog();
-  console.log(`当前版本【0.3.24-rc0】`);
+  logger.info(`当前版本【0.4.0-rc0】`);
 
   if (TaskConfig.config.function?.liveHeart) {
     return await dailyTasks(liveHeart);

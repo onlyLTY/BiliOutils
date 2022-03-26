@@ -15,7 +15,7 @@ import {
 import { liveApi } from './api';
 import { TaskConfig } from '../config/globalVar';
 import { PureDataProp } from '../dto/BiLiBaseProp';
-import { random } from '../utils';
+import { random } from 'lodash';
 
 type IdType = number | string;
 

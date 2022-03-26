@@ -3,34 +3,14 @@ import { TaskConfig, TaskModule } from '../config/globalVar';
 import { getPRCDate, getMonthHasDays, apiDelay } from '../utils';
 import { random } from 'lodash';
 import { updateNav } from './updateNav';
+import { logger } from '../utils/log';
+import { defaultComments } from '../constant';
 
 enum ChargeStatus {
   '成功' = 4,
   '低于20电池' = -2,
   'B币不足' = -4,
 }
-
-const defaultComments = [
-  '棒',
-  '棒唉',
-  '棒耶',
-  '加油~',
-  'UP加油!',
-  '支持~',
-  '支持支持！',
-  '催更啦',
-  '顶顶',
-  '留下脚印~',
-  '干杯',
-  'bilibili干杯',
-  'o(*￣▽￣*)o',
-  '(｡･∀･)ﾉﾞ嗨',
-  '(●ˇ∀ˇ●)',
-  '( •̀ ω •́ )y',
-  '(ง •_•)ง',
-  '>.<',
-  '^_~',
-];
 
 function init() {
   // 根据时间确定是否执行
@@ -42,19 +22,19 @@ function init() {
 
   // 查看余额
   if (TaskModule.bCoinCouponBalance < 2) {
-    console.log(`剩余券为${TaskModule.bCoinCouponBalance},不足2跳过充电`);
+    logger.info(`剩余券为${TaskModule.bCoinCouponBalance}，不足2跳过充电`);
     return false;
   }
 
   // 今天是否是最后一天
   if (monthHasDays === today) {
-    console.log(`今天是最后一天了`);
+    logger.info(`今天是最后一天了`);
     return true;
   }
 
   // 判断是否在指定时间内
   if (presetTime > today) {
-    console.log(`预设时间为${presetTime}，不符合条件`);
+    logger.info(`预设时间为${presetTime}，不符合条件`);
     return false;
   }
 
@@ -62,7 +42,7 @@ function init() {
 }
 
 export default async function charging() {
-  console.log('----【给目标充电】----');
+  logger.info('----【给目标充电】----');
 
   // 充电前获取下 nav
   await updateNav();
@@ -76,15 +56,15 @@ export default async function charging() {
     const bp_num = TaskModule.bCoinCouponBalance || 0;
     const up_mid = TaskConfig.CHARGE_ID;
     let errorCount = 0;
-    console.log(`b 币券余额${bp_num}`);
+    logger.info(`b 币券余额${bp_num}`);
     // 固定为 up 模式
     const run = async () => {
       const { code, message, data } = await chargingForUp(bp_num, true, up_mid);
       if (code !== 0) {
-        console.log('充电失败：', code, message);
+        logger.info(`充电失败：${code} ${message}`);
         return;
       }
-      console.log('【充值结果】', ChargeStatus[data.status]);
+      logger.info(`【充值结果】${ChargeStatus[data.status]}`);
 
       if (data.status === ChargeStatus['成功']) {
         TaskModule.chargeOrderNo = data.order_no;
@@ -102,7 +82,7 @@ export default async function charging() {
       }
     }
   } catch (error) {
-    console.log('充电出现异常：', error.message);
+    logger.info(`充电出现异常：${error.message}`);
   }
 }
 /**
@@ -116,7 +96,7 @@ async function chargeComments() {
     const comment = defaultComments[random(0, defaultComments.length - 1)];
     const { code } = await chargingCommentsForUp(TaskModule.chargeOrderNo, comment);
     if (code === 0) {
-      console.log('留言成功！');
+      logger.info('留言成功！');
     }
   } catch {}
 }

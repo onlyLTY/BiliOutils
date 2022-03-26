@@ -3,11 +3,12 @@ import { getAidByByPriority } from './getOneAid';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { getDonateCoinExp } from '../net/userInfoRequest';
+import { logger } from '../utils/log';
 
 export default async function addCoins() {
-  console.log('----【视频投币】----');
+  logger.info('----【视频投币】----');
   if (!TaskModule.coinsTask) {
-    console.log('跳过投币,今日已完成');
+    logger.info('跳过投币，今日已完成');
     return;
   }
   let i = 0,
@@ -42,14 +43,14 @@ export default async function addCoins() {
         TaskModule.money--;
         TaskModule.coinsTask--;
         i++;
-        console.log(`给[${title}--up【${author}】]投币成功`);
+        logger.info(`给[${title}--up【${author}】]投币成功`);
       } else {
         eCount++;
         if (coinData.code === -111 || coinData.code === -104) {
-          console.log(aid, coinData.message, '无法继续进行投币');
+          logger.info(`${aid} ${coinData.message} 无法继续进行投币`);
           break;
         }
-        console.log('给up投币失败 ', coinData.code, coinData.message);
+        logger.info(`给up投币失败 ${coinData.code} ${coinData.message}`);
         // 如果重复错误就直接退出
         if (prevCode === coinData.code) {
           break;
@@ -58,12 +59,12 @@ export default async function addCoins() {
       }
     } catch (error) {
       eCount++;
-      console.log('投币异常 ', error.message);
+      logger.info(`投币异常 ${error.message}`);
     } finally {
       await apiDelay(1500);
     }
   }
-  if (eCount >= 5) console.log(`出现异常/错误5次，自动退出投币`);
-  console.log(`一共成功投币${i}颗`);
-  console.log(`硬币还剩${TaskModule.money}颗`);
+  if (eCount >= 5) logger.info(`出现异常/错误5次，自动退出投币`);
+  logger.info(`一共成功投币${i}颗`);
+  logger.info(`硬币还剩${TaskModule.money}颗`);
 }

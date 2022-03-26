@@ -2,6 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { random as baseRandom } from 'lodash';
 import { TaskConfig } from '../config/globalVar';
+import { logger } from './log';
 export * from './cookie';
 export * from './gzip';
 const { sendNotify } = require('./sendNotify');
@@ -38,7 +39,7 @@ export const random = baseRandom;
  * @param text 文本内容
  */
 export async function sendMessage(title: string, text: string) {
-  console.log('----【消息推送】----');
+  logger.info('----【消息推送】----');
   // 处理 title
   title = `Bili-${TaskConfig.NICKNAME}-${title}`;
   await sendNotify(title, text, undefined, '');
@@ -82,7 +83,7 @@ export function printVersion() {
   try {
     const version = fs.readFileSync(path.resolve(__dirname, '../version.txt'), 'utf8').trim();
     if (version) {
-      console.log(`当前版本【${version}】`);
+      logger.info(`当前版本【${version}】`);
     }
   } catch {}
 }

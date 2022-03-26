@@ -1,10 +1,11 @@
 import { receiveVipPrivilege } from '../net/vipRequest';
 import { TaskModule } from '../config/globalVar';
 import { getPRCDate, getMonthHasDays } from '../utils';
+import { logger } from '../utils/log';
 
 function init() {
   if (TaskModule.vipType !== 2) {
-    console.log(`账号非年度大会员，不需要领取权益`);
+    logger.info(`账号非年度大会员，不需要领取权益`);
     return false;
   }
   // 根据时间确定是否执行
@@ -14,7 +15,7 @@ function init() {
 
   // 本月的第一天和最后一天
   if (today !== 1 && monthHasDays !== today) {
-    console.log('今天非预订领取时间，跳过领取');
+    logger.info('今天非预订领取时间，跳过领取');
     return false;
   }
 
@@ -41,11 +42,11 @@ async function getOnePrivilege(type: number): Promise<boolean> {
     if (code === 0) {
       status = `失败 ${message}`;
     }
-    console.log(`领取${name} ${status}`);
+    logger.info(`领取${name} ${status}`);
 
     return true;
   } catch (error) {
-    console.log('领取权益出现异常：', error.message);
+    logger.info(`领取权益出现异常：${error.message}`);
   }
   return false;
 }
@@ -66,7 +67,7 @@ async function getPrivilege(type: number) {
 }
 
 export default async function getVipPrivilege() {
-  console.log('----【领取大会员权益】----');
+  logger.info('----【领取大会员权益】----');
 
   if (!init()) {
     return;

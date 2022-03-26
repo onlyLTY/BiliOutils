@@ -1,8 +1,9 @@
 import axios from './index';
-import { TaskConfig, TaskModule } from '../config/globalVar';
+import { TaskConfig } from '../config/globalVar';
 import getCookie from '../utils/cookie';
 import { ErrorCodeCommon as ErrCC } from '../config/ErrorCode';
 import { sendMessage } from '../utils';
+import { logger, LogMessage } from '../utils/log';
 
 const res = res => {
   // 设置 cookie 的变化
@@ -12,9 +13,9 @@ const res = res => {
   // 结果异常检测
   const code = res.data?.code;
   const exit = async () => {
-    console.log('运行结束：', ErrCC[code]);
+    logger.info(`运行结束：${ErrCC[code]}`);
     // 发送信息
-    await sendMessage(`异常：${ErrCC[code]}`, TaskModule.appInfo);
+    await sendMessage(`异常：${ErrCC[code]}`, LogMessage.value);
     // 结束进程
     process.exit(0);
   };

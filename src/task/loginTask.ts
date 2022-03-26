@@ -3,6 +3,7 @@ import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { functionConfig } from '../config/funcConfig';
 import { UserInfoNavDto } from '../dto/UserInfo.dto';
+import { logger } from '../utils/log';
 
 type UserNavData = UserInfoNavDto['data'];
 
@@ -13,7 +14,7 @@ function estimatedDays(upLevelExp: number): number {
   const coinSupportDays = TaskModule.money / (TaskConfig.BILI_TARGET_COINS - 1);
   if (idealDays < coinSupportDays) return Math.floor(idealDays);
   const needExp = upLevelExp - coinSupportDays * dailyExp;
-  return Math.floor(needExp / 25 + coinSupportDays);
+  return needExp / 25 + coinSupportDays;
 }
 
 function setLevelInfo(data: UserNavData) {
@@ -24,15 +25,17 @@ function setLevelInfo(data: UserNavData) {
   if (currentLevel >= TaskConfig.BILI_TARGET_LEVEL) {
     TaskModule.coinsTask = 0;
   }
-  console.log('当前等级: ', levelInfo.current_level);
+  logger.info(`当前等级: ${levelInfo.current_level}`);
   if (currentLevel >= 6) {
     functionConfig.shareAndWatch = false;
     functionConfig.addCoins = false;
-    console.log('已经满级,不需要再投币了,做个白嫖怪吧');
+    logger.info('已经满级，不需要再投币了，做个白嫖怪吧');
   } else {
     const upLevelExp = levelInfo.next_exp - levelInfo.current_exp;
     //实际天数肯定会少一些
-    console.log(`距离升级还需要${upLevelExp}经验,预计${estimatedDays(upLevelExp)}天`);
+    logger.info(
+      `距离升级还需要 ${upLevelExp} 经验，预计 ${estimatedDays(upLevelExp).toFixed(2)} 天`,
+    );
   }
 }
 
@@ -61,7 +64,7 @@ function setVipStatus(data: UserNavData) {
     vipTypeMsg = vipTypeMsg === '无大会员' ? vipTypeMsg : vipTypeMsg + '[已过期]';
   }
 
-  console.log('大会员状态: ', vipTypeMsg);
+  logger.info(`大会员状态: ${vipTypeMsg}`);
 }
 
 /**
@@ -80,8 +83,8 @@ function conciseNickname(nickname: string) {
 async function setUserInfo(data: UserNavData) {
   try {
     const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
-    console.log('登录成功: ', data.uname);
-    console.log('硬币余额: ', coinBalance.money || 0);
+    logger.info(`登录成功: ${data.uname}`);
+    logger.info(`硬币余额: ${coinBalance.money || 0}`);
     TaskConfig.NICKNAME = conciseNickname(data.uname);
     TaskModule.money = coinBalance.money || 0;
     TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
@@ -89,19 +92,19 @@ async function setUserInfo(data: UserNavData) {
     setLevelInfo(data);
     setVipStatus(data);
   } catch (error) {
-    console.log('获取硬币信息异常: ', error.message);
+    logger.info(`获取硬币信息异常: ${error.message}`);
   }
 }
 
 export default async function loginTask() {
-  console.log('----【登录】----');
+  logger.info('----【登录】----');
   try {
     const { data, message, code } = await loginByCookie();
     if (code === 65006 || code === -404) {
-      console.log('登录错误', code, message);
+      logger.info(`登录错误 ${code} ${message}`);
       return;
     } else if (code !== 0) {
-      console.log('登录错误', code, message);
+      logger.info(`登录错误 ${code} ${message}`);
       return;
     }
     if (!data.isLogin) {

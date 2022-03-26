@@ -2,6 +2,7 @@ import { apiDelay, random } from '../utils';
 import * as liveRequest from '../net/liveRequest';
 import { FansMedalPanelDto, FansMedalDto } from '../dto/Live.dto';
 import { TaskConfig } from '../config/globalVar';
+import { logger } from '../utils/log';
 
 const kaomoji = [
   '(⌒▽⌒)',
@@ -79,14 +80,14 @@ async function sendOneMessage(roomid: number, targetName: string) {
       // 11000 某种不可抗力不允许发
       // 10030 发送过于频繁
       if (code === 11000) {
-        console.log(`【${targetName}】${roomid}-可能未开启评论`);
+        logger.info(`【${targetName}】${roomid}-可能未开启评论`);
         return false;
       }
-      console.log(`【${targetName}】${roomid}-发送失败`, message);
+      logger.info(`【${targetName}】${roomid}-发送失败 ${message}`);
       console.error(code);
       return false;
     }
-    // console.log('发送成功!');
+    // logger.info('发送成功!');
     return true;
   } catch (error) {
     console.error('发送弹幕异常', error.message);
@@ -94,24 +95,24 @@ async function sendOneMessage(roomid: number, targetName: string) {
 }
 
 export default async function liveSendMessage() {
-  console.log('----【发送直播弹幕】----');
+  logger.info('----【发送直播弹幕】----');
 
   const fansMedalList = await getFansMealList();
   let count = 0,
     jumpCount = 0;
-  console.log(`一共需要发送${fansMedalList.length}个直播间`);
+  logger.info(`一共需要发送${fansMedalList.length}个直播间`);
   console.info(`所需时间很长，请耐心等待`);
 
   for (const medal of fansMedalList) {
     const { room_info, anchor_info } = medal;
     if (!room_info?.room_id) {
-      console.log(`【${anchor_info.nick_name}】没有直播间哦`);
+      logger.info(`【${anchor_info.nick_name}】没有直播间哦`);
       jumpCount++;
       break;
     }
-    // console.log(`给【${medal.target_name}】${medal.roomid}发送弹幕`);
+    // logger.info(`给【${medal.target_name}】${medal.roomid}发送弹幕`);
     (await sendOneMessage(room_info.room_id, anchor_info.nick_name)) && count++;
     await apiDelay(random(10000, 25000));
   }
-  console.log(`成功发送${count}个弹幕,跳过${jumpCount}个`);
+  logger.info(`成功发送${count}个弹幕，跳过${jumpCount}个`);
 }

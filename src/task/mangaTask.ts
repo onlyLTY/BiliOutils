@@ -1,13 +1,14 @@
+import { logger } from '../utils/log';
 import { clockIn } from '../net/mangaRequest';
 
 export default async function mangaSign() {
-  console.log('----【漫画签到】----');
+  logger.info('----【漫画签到】----');
   try {
     const { code } = await clockIn();
     if (code == 0) {
-      console.log('漫画签到成功');
+      logger.info('漫画签到成功');
     } else {
-      console.log('漫画签到失败');
+      logger.info('漫画签到失败');
     }
   } catch (error) {
     /**
@@ -15,9 +16,9 @@ export default async function mangaSign() {
      * 所以将签到成功的情况忽略掉
      */
     if (error.response.status === 400) {
-      console.log('已经签到过了,跳过任务');
+      logger.info('已经签到过了，跳过任务');
     } else {
-      console.log('漫画签到异常', error.message);
+      logger.info(`漫画签到异常 ${error.message}`);
     }
   }
 }

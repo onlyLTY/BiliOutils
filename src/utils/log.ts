@@ -1,29 +1,21 @@
-/**
- * 临时解决日志问题
- */
+import * as winston from 'winston';
 
-import { TaskModule } from '../config/globalVar';
-
-/**
- * 保留真正的log函数
- */
-const _log = console.log;
-
-function warpLog() {
-  return (message?: unknown, ...optionalParams: any[]): void => {
-    let msgStr = message;
-    for (const m of optionalParams) {
-      msgStr += m;
-    }
-    const ISO_TIME = new Date().toISOString().match(/\w{2}:\w{2}:\w{2}/)[0],
-      HOURS = Number(ISO_TIME.split(':')[0]) + 8,
-      bjHoursNum = HOURS > 24 ? HOURS - 24 : HOURS < 0 ? HOURS + 24 : HOURS,
-      bjHoursStr = bjHoursNum.toString(),
-      bjHours = bjHoursStr.length === 1 ? '0' + bjHoursStr : bjHoursStr,
-      TIME = `[${bjHours + ISO_TIME.replace(/^\w{2}/, '')}] `;
-    _log(TIME, message, ...optionalParams);
-    TaskModule.appInfo += TIME + msgStr + '\n';
-  };
+function formatTime(isoStr: string) {
+  return isoStr.match(/\w{2}:\w{2}:\w{2}/)[0];
 }
 
-export { _log, warpLog };
+export const LogMessage = {
+  value: '',
+};
+
+export const logger = winston.createLogger({
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(({ message, timestamp }) => {
+      const msgStr = `[${formatTime(timestamp)}] ${message}`;
+      LogMessage.value += msgStr + '\n';
+      return msgStr;
+    }),
+  ),
+  transports: [new winston.transports.Console()],
+});

@@ -1,5 +1,6 @@
 import * as path from 'path';
-import { Config } from '../interface/Config';
+import { logger } from '../utils/log';
+import type { Config } from '../interface/Config';
 import { gzipDecode } from '../utils/gzip';
 import { SystemConfig } from './systemConfig';
 
@@ -49,7 +50,7 @@ function handleQLPanel(configArr: Config[]): Config {
   // 下标从 1 开始
   const index = Number(arg2.split('=')[1]) - 1;
   if (!index || index >= configArr.length || index < 0) {
-    console.log('[WARN] 似乎想要指定一个不存在的用户，我们将指定第一个用户');
+    logger.info('[WARN] 似乎想要指定一个不存在的用户，我们将指定第一个用户');
     return configArr[0];
   }
   return configArr[index];
@@ -70,8 +71,7 @@ function handleMultiUserConfig(config: Config): Config | undefined {
   if (SystemConfig.isQingLongPanel) {
     return handleQLPanel(newConfig);
   }
-
-  console.log('[WARN] 在单用户场景下配置了多用户，我们将放弃多余的配置');
+  logger.info('[WARN] 在单用户场景下配置了多用户，我们将放弃多余的配置');
   // 合并 message 配置
   const conf = newConfig[0];
   conf.message = Object.assign(config.message || {}, conf.message);

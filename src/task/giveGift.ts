@@ -5,30 +5,31 @@ import { getGiftBagList, sendBagGift, getLiveFansMedal } from '../net/liveReques
 import { getUser } from '../net/userInfoRequest';
 import { LiveGiftBagListDto } from '../dto/Live.dto';
 import { apiDelay } from '../utils';
+import { logger } from '../utils/log';
 
 const EXPIRE_DATE = 2;
 const { BILI_GIFT_UP } = TaskConfig;
 
 export default async function giveGift() {
-  console.log('----【投喂过期食物】----');
+  logger.info('----【投喂过期食物】----');
   try {
     const expiredGifts = await getExpiredGift();
     await apiDelay();
     if (!expiredGifts?.length) {
-      console.log(`没有${EXPIRE_DATE}天内过期的简单礼物`);
+      logger.info(`没有${EXPIRE_DATE}天内过期的简单礼物`);
       return;
     }
 
     const { roomid, mid } = await findOneRoom();
     if (!roomid) {
-      console.log(`没有找到投喂目标`);
+      logger.info(`没有找到投喂目标`);
       return;
     }
 
     // 投喂
     await sendGift({ roomid, mid }, expiredGifts);
   } catch (error) {
-    console.log('投喂过期食物异常', error);
+    logger.info(`投喂过期食物异常 ${error}`);
   }
 }
 
@@ -124,9 +125,9 @@ async function sendGift(
       });
 
       if (code !== 0) {
-        console.log(`给[ ${data.uname} ]投喂${data.gift_name}: `, message);
+        logger.info(`给[ ${data.uname} ]投喂${data.gift_name}: ${message}`);
       } else {
-        console.log(`成功给[ ${data.uname} ]投喂${data.gift_num}${data.gift_name}`);
+        logger.info(`成功给[ ${data.uname} ]投喂${data.gift_num}${data.gift_name}`);
       }
     } catch {}
   }

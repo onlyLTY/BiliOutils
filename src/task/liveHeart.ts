@@ -7,6 +7,7 @@ import * as liveHeartRequest from '../net/liveHeartRequest';
 import * as liveRequest from '../net/liveRequest';
 import { LiveFansMedalDto, LiveFansMedalItem, LiveHeartEDto } from '../dto/Live.dto';
 import { getGiftBagList } from '../net/liveRequest';
+import { logger } from '../utils/log';
 
 const HEART_MAX_NUM = 24;
 /**
@@ -119,7 +120,7 @@ async function postE(baseDate: HeartBaseDateType, seq: { v: number }) {
   try {
     const { data, code } = await liveHeartRequest.postE(postData);
     if (code === 0) {
-      console.log(`进入【${baseDate.uname}】的直播间`);
+      logger.info(`进入【${baseDate.uname}】的直播间`);
       seq.v++;
       return data;
     }
@@ -166,10 +167,10 @@ async function postX(
     );
 
     if (code === 0) {
-      console.log(`向【${baseData.uname}】发送第${seq.v}次心跳`);
+      logger.info(`向【${baseData.uname}】发送第${seq.v}次心跳`);
       seq.v++;
     } else {
-      console.log(`向【${baseData.uname}】发送第${seq.v}次心跳失败`, code, message);
+      logger.info(`向【${baseData.uname}】发送第${seq.v}次心跳失败 ${code} ${message}`);
     }
     return data;
   } catch (error) {
@@ -224,12 +225,12 @@ async function getFansMedalList(more = true) {
 }
 
 export default async function liveHeart() {
-  console.log('----【直播心跳】----');
+  logger.info('----【直播心跳】----');
 
   const { heartNum, fansMedalList } = await getFansMedalList();
   const length = fansMedalList && fansMedalList.length;
   if (!length) {
-    console.log('没有勋章列表');
+    logger.info('没有勋章列表');
     return;
   }
   const loopNum = Math.ceil(heartNum / length);
@@ -237,7 +238,7 @@ export default async function liveHeart() {
   for (let i = 0; i < loopNum; i++) {
     await runOneLoop(fansMedalList, heartNum);
   }
-  console.log('完成');
+  logger.info('完成');
 }
 
 export { liveHeart };
@@ -350,7 +351,7 @@ export async function liveHeartBySCF(argData?: string) {
 
     for (const funsMedalData of fansMedalList) {
       if (heartNum.v === 0) {
-        console.log(`今日获取小星星已经达到 ${HEART_MAX_NUM}`);
+        logger.info(`今日获取小星星已经达到 ${HEART_MAX_NUM}`);
         return 0;
       }
       if (count >= heartNum.v) break;
@@ -376,7 +377,7 @@ export async function liveHeartBySCF(argData?: string) {
       if (r.seq.v > 5) {
         r.seq.v = 0;
         if (count >= heartNum.v) {
-          console.log(`今日获取小心心完成`);
+          logger.info(`今日获取小心心完成`);
           return 0;
         }
       }

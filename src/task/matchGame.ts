@@ -2,15 +2,16 @@ import { TaskConfig, TaskModule } from '../config/globalVar';
 import { getGuessCollection, guessAdd } from '../net/matchGameRequest';
 import { GuessCollectionDto } from '../dto/matchGameDto';
 import { apiDelay } from '../utils';
+import { logger } from '../utils/log';
 
 // 0 反选，大于 0 正选
 const { MATCH_SELECTION, MATCH_COINS } = TaskConfig;
 
 export default async function matchGame() {
-  console.log('----【赛事硬币竞猜】----');
+  logger.info('----【赛事硬币竞猜】----');
 
   if (MATCH_COINS <= 0) {
-    console.log('硬币数量不能小于 0');
+    logger.info('硬币数量不能小于 0');
     return;
   }
 
@@ -26,7 +27,7 @@ export default async function matchGame() {
   }
 
   const count = await guessOne(filterList(list, TaskConfig.MATCH_DIFF));
-  console.log(`【竞猜结束】一共参与${count}次预测`);
+  logger.info(`【竞猜结束】一共参与${count}次预测`);
 }
 
 /**
@@ -54,12 +55,12 @@ async function getOneGuessCollection() {
     } = await getGuessCollection();
 
     if (code !== 0) {
-      console.log('获取赛事错误', code, message);
+      logger.info(`获取赛事错误 ${code} ${message}`);
       return;
     }
 
     if (page.total === 0) {
-      console.log('今日已经无法获取赛事');
+      logger.info('今日已经无法获取赛事');
       return null;
     }
 
@@ -84,7 +85,7 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
         continue;
       }
 
-      console.log(`${title} <=> ${team1.odds}:${team2.odds}`);
+      logger.info(`${title} <=> ${team1.odds}:${team2.odds}`);
 
       const oddResult = team1.odds > team2.odds;
       let teamSelect: typeof team1;
@@ -95,12 +96,12 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
         teamSelect = oddResult ? team1 : team2;
       }
 
-      console.log(`预测[ ${teamSelect.option} ] ${MATCH_COINS} 颗硬币`);
+      logger.info(`预测[ ${teamSelect.option} ] ${MATCH_COINS} 颗硬币`);
 
       await apiDelay();
       const { code } = await guessAdd(contestId, questionsId, teamSelect.detail_id, MATCH_COINS);
       if (code !== 0) {
-        console.log('预测失败');
+        logger.info('预测失败');
       } else {
         count++;
         TaskModule.money -= MATCH_COINS;
@@ -114,7 +115,7 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
 
 function isLackOfCoin() {
   if (TaskModule.money - MATCH_COINS < TaskConfig.BILI_TARGET_COINS) {
-    console.log(`需要保留${TaskConfig.BILI_TARGET_COINS}个硬币，任务结束`);
+    logger.info(`需要保留${TaskConfig.BILI_TARGET_COINS}个硬币，任务结束`);
     return true;
   }
   return false;

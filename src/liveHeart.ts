@@ -1,4 +1,3 @@
-import { warpLog } from './utils/log';
 import { Constant } from './config/globalVar';
 import { getPRCDate, printVersion } from './utils';
 import { liveHeartBySCF, liveHeart } from './task/liveHeart';
@@ -18,7 +17,6 @@ function setCron(time = 60_000) {
 }
 
 exports.main_handler = async (event, _context) => {
-  console.log = warpLog();
   printVersion();
 
   if (!event) {

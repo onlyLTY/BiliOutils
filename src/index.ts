@@ -1,5 +1,5 @@
-import { warpLog } from './utils/log';
-import { TaskConfig, TaskModule } from './config/globalVar';
+import { logger, LogMessage } from './utils/log';
+import { TaskConfig } from './config/globalVar';
 import { apiDelay, sendMessage, getPRCDate, printVersion } from './utils';
 import bili, { loginTask } from './task';
 import { offFunctions } from './config/configOffFun';
@@ -9,8 +9,8 @@ async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: 
   try {
     await loginTask();
   } catch (error) {
-    console.log('登录失败: ', error);
-    await sendMessage('登录失败', TaskModule.appInfo);
+    logger.info(`登录失败: ${error}`);
+    await sendMessage('登录失败', LogMessage.value);
     return '未完成';
   }
 
@@ -21,17 +21,13 @@ async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: 
     await apiDelay();
   }
 
-  if (cb) {
-    await cb(...cbArg);
-  }
+  cb && (await cb(...cbArg));
 
-  await sendMessage('每日完成', TaskModule.appInfo);
+  await sendMessage('每日完成', LogMessage.value);
   return '完成';
 }
 
 exports.main_handler = async (event, _context) => {
-  //必须得写在main_handler中,否则serverless无效
-  console.log = warpLog();
   printVersion();
 
   // 只有serverless才有event
