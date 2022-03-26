@@ -46,13 +46,14 @@
   "dependencies": {
     "axios": "^0.26.0",
     "crypto-js": "^4.1.1",
-    "got": "^12.0.1",
+    "got": "^11.8.3",
     "lodash": "^4.17.21",
     "nodemailer": "^6.7.2",
     "pako": "1.0.11",
     "qs": "^6.10.3",
     "tencentcloud-sdk-nodejs": "^4.0.297",
     "tough-cookie": "^4.0.0",
-    "tunnel": "^0.0.6"
+    "tunnel": "^0.0.6",
+    "winston": "^3.6.0"
   }
 }
