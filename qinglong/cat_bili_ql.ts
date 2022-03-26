@@ -1,9 +1,9 @@
 import { warpLog } from '../src/utils/log';
 import { TaskConfig, TaskModule } from '../src/config/globalVar';
 import { apiDelay } from '../src/utils';
-import bili, { loginTask } from '../src/service';
+import bili, { loginTask } from '../src/task';
 import { offFunctions } from '../src/config/configOffFun';
-import { liveHeart } from '../src/service/liveHeart';
+import { liveHeart } from '../src/task/liveHeart';
 
 // 使用 require 加载是为了防止被打包
 // 青龙面板中存在此文件，可以直接使用

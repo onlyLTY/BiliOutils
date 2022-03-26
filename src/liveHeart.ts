@@ -1,7 +1,7 @@
 import { warpLog } from './utils/log';
 import { Constant } from './config/globalVar';
 import { getPRCDate, printVersion } from './utils';
-import { liveHeartBySCF, liveHeart } from './service/liveHeart';
+import { liveHeartBySCF, liveHeart } from './task/liveHeart';
 import updateTrigger from './utils/updateTrigger';
 
 function setCron(time = 60_000) {

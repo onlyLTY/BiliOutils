@@ -1,7 +1,7 @@
 import { warpLog } from './utils/log';
 import { TaskConfig, TaskModule } from './config/globalVar';
 import { apiDelay, sendMessage, getPRCDate, printVersion } from './utils';
-import bili, { loginTask } from './service';
+import bili, { loginTask } from './task';
 import { offFunctions } from './config/configOffFun';
 import updateTrigger from './utils/updateTrigger';
 
@@ -38,7 +38,7 @@ exports.main_handler = async (event, _context) => {
   if (!event) {
     // 如果需要执行 liveHeart
     if (TaskConfig.config.function.liveHeart) {
-      const { liveHeart } = await import('./service/liveHeart');
+      const { liveHeart } = await import('./task/liveHeart');
       return await dailyTasks(liveHeart);
     }
     return await dailyTasks();
