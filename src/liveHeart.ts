@@ -1,5 +1,6 @@
 import { Constant } from './config/globalVar';
-import { getPRCDate, printVersion } from './utils';
+import { getPRCDate } from './utils';
+import { printVersion } from './utils/effect';
 import { liveHeartBySCF, liveHeart } from './task/liveHeart';
 import updateTrigger from './utils/updateTrigger';
 

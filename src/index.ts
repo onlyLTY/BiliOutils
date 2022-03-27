@@ -1,15 +1,16 @@
 import { logger, LogMessage } from './utils/log';
 import { TaskConfig } from './config/globalVar';
-import { apiDelay, sendMessage, getPRCDate, printVersion } from './utils';
+import { apiDelay, getPRCDate } from './utils';
 import bili, { loginTask } from './task';
 import { offFunctions } from './config/configOffFun';
 import updateTrigger from './utils/updateTrigger';
+import { printVersion, sendMessage } from './utils/effect';
 
 async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: T[]) {
   try {
     await loginTask();
   } catch (error) {
-    logger.info(`登录失败: ${error}`);
+    logger.error(`登录失败: ${error}`);
     await sendMessage('登录失败', LogMessage.value);
     return '未完成';
   }

@@ -2,7 +2,7 @@ import axios from './index';
 import { TaskConfig } from '../config/globalVar';
 import getCookie from '../utils/cookie';
 import { ErrorCodeCommon as ErrCC } from '../config/ErrorCode';
-import { sendMessage } from '../utils';
+import { sendMessage } from '../utils/effect';
 import { logger, LogMessage } from '../utils/log';
 
 const res = res => {
@@ -13,7 +13,7 @@ const res = res => {
   // 结果异常检测
   const code = res.data?.code;
   const exit = async () => {
-    logger.info(`运行结束：${ErrCC[code]}`);
+    logger.error(`运行结束：${ErrCC[code]}`);
     // 发送信息
     await sendMessage(`异常：${ErrCC[code]}`, LogMessage.value);
     // 结束进程

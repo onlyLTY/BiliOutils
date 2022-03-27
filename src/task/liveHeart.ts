@@ -1,7 +1,8 @@
 import * as CryptoJS from 'crypto-js';
 
 import { HeartBaseDateType, DeviceType, HmacsData, LiveHeartRuleId } from '../interface/LiveHeart';
-import { getLIVE_BUVID, createUUID, getBiliJct, apiDelay, gzipDecode, gzipEncode } from '../utils';
+import { createUUID, apiDelay, gzipDecode, gzipEncode } from '../utils';
+import { getLIVE_BUVID, getBiliJct } from '../utils/cookie';
 import { Constant, TaskConfig } from '../config/globalVar';
 import * as liveHeartRequest from '../net/liveHeartRequest';
 import * as liveRequest from '../net/liveRequest';
@@ -125,7 +126,7 @@ async function postE(baseDate: HeartBaseDateType, seq: { v: number }) {
       return data;
     }
   } catch (error) {
-    console.error(error);
+    logger.verbose(error);
   }
 }
 
@@ -170,11 +171,11 @@ async function postX(
       logger.info(`向【${baseData.uname}】发送第${seq.v}次心跳`);
       seq.v++;
     } else {
-      logger.info(`向【${baseData.uname}】发送第${seq.v}次心跳失败 ${code} ${message}`);
+      logger.warn(`向【${baseData.uname}】发送第${seq.v}次心跳失败 ${code} ${message}`);
     }
     return data;
   } catch (error) {
-    console.error(error);
+    logger.verbose(error);
   }
 }
 
@@ -183,13 +184,13 @@ async function getFansMeal10(page = 1, pageSize = 10): Promise<LiveFansMedalDto[
     const { code, message, data } = await liveRequest.getLiveFansMedal(page, pageSize);
 
     if (code !== 0) {
-      console.error('获取直播间失败 ', code, message);
+      logger.verbose(`获取直播间失败 ${code} ${message}`);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error('获取直播间异常', error.message);
+    logger.verbose(`获取直播间异常 ${error.message}`);
     return null;
   }
 }

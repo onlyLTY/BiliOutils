@@ -1,3 +1,4 @@
+import { getPRCDate } from './pure';
 import * as winston from 'winston';
 
 function formatTime(isoStr: string) {
@@ -9,13 +10,22 @@ export const LogMessage = {
 };
 
 export const logger = winston.createLogger({
+  level: 'debug',
   format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.printf(({ message, timestamp }) => {
-      const msgStr = `[${formatTime(timestamp)}] ${message}`;
-      LogMessage.value += msgStr + '\n';
-      return msgStr;
+    winston.format.colorize(),
+    winston.format.timestamp({
+      format: () => getPRCDate().toString(),
     }),
   ),
-  transports: [new winston.transports.Console()],
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.printf(({ message, timestamp, level }) => {
+        const msgStr = `[${formatTime(timestamp)}] ${message}`;
+        if (!['debug', 'verbose'].includes(level)) {
+          LogMessage.value += msgStr + '\n';
+        }
+        return msgStr;
+      }),
+    }),
+  ],
 });
