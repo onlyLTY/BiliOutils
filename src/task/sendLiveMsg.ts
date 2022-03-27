@@ -3,49 +3,7 @@ import * as liveRequest from '../net/liveRequest';
 import { FansMedalPanelDto, FansMedalDto } from '../dto/Live.dto';
 import { TaskConfig } from '../config/globalVar';
 import { logger } from '../utils/log';
-
-const kaomoji = [
-  '(⌒▽⌒)',
-  '（￣▽￣）',
-  '(=・ω・=)',
-  '(｀・ω・´)',
-  '(〜￣△￣)〜',
-  '(･∀･)',
-  '(°∀°)ﾉ',
-  '(￣3￣)',
-  '╮(￣▽￣)╭',
-  '_(:3」∠)_',
-  '( ´_ゝ｀)',
-  '←_←',
-  '→_→',
-  '(<_<)',
-  '(>_>)',
-  '(;¬_¬)',
-  '(ﾟДﾟ≡ﾟдﾟ)!?',
-  'Σ(ﾟдﾟ;)',
-  'Σ( ￣□￣||)',
-  '(´；ω；`)',
-  '（/TДT)/',
-  '(^・ω・^ )',
-  '(｡･ω･｡)',
-  '(●￣(ｴ)￣●)',
-  'ε=ε=(ノ≧∇≦)ノ',
-  '(´･_･`)',
-  '(-_-#)',
-  '（￣へ￣）',
-  '(￣ε(#￣) Σ',
-  'ヽ(`Д´)ﾉ',
-  '（#-_-)┯━┯',
-  '(╯°口°)╯(┴—┴',
-  '←◡←',
-  '( ♥д♥)',
-  'Σ>―(〃°ω°〃)♡→',
-  '⁄(⁄ ⁄•⁄ω⁄•⁄ ⁄)⁄',
-  '(╬ﾟдﾟ)▄︻┻┳═一',
-  '･*･:≡(　ε:)',
-  '(汗)',
-  '(苦笑)',
-];
+import { kaomoji } from '../constant';
 
 const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
 
@@ -54,13 +12,13 @@ async function getFansMedalPanel(): Promise<FansMedalPanelDto['data']> {
     const { code, message, data } = await liveRequest.getFansMedalPanel(1, 256, TaskConfig.USERID);
 
     if (code !== 0) {
-      console.error('获取勋章信息失败 ', code, message);
+      logger.verbose(`获取勋章信息失败 ${code} ${message}`);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error('获取勋章异常', error.message);
+    logger.error(`获取勋章异常 ${error.message}`);
     return null;
   }
 }
@@ -80,17 +38,17 @@ async function sendOneMessage(roomid: number, targetName: string) {
       // 11000 某种不可抗力不允许发
       // 10030 发送过于频繁
       if (code === 11000) {
-        logger.info(`【${targetName}】${roomid}-可能未开启评论`);
+        logger.warn(`【${targetName}】${roomid}-可能未开启评论`);
         return false;
       }
-      logger.info(`【${targetName}】${roomid}-发送失败 ${message}`);
-      console.error(code);
+      logger.warn(`【${targetName}】${roomid}-发送失败 ${message}`);
+      logger.verbose(`code: ${code}`);
       return false;
     }
     // logger.info('发送成功!');
     return true;
   } catch (error) {
-    console.error('发送弹幕异常', error.message);
+    logger.verbose(`发送弹幕异常 ${error.message}`);
   }
 }
 
@@ -101,7 +59,7 @@ export default async function liveSendMessage() {
   let count = 0,
     jumpCount = 0;
   logger.info(`一共需要发送${fansMedalList.length}个直播间`);
-  console.info(`所需时间很长，请耐心等待`);
+  logger.verbose(`所需时间可能很长，请耐心等待`);
 
   for (const medal of fansMedalList) {
     const { room_info, anchor_info } = medal;

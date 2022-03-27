@@ -55,7 +55,7 @@ async function getOneGuessCollection() {
     } = await getGuessCollection();
 
     if (code !== 0) {
-      logger.info(`获取赛事错误 ${code} ${message}`);
+      logger.warn(`获取赛事错误 ${code} ${message}`);
       return;
     }
 

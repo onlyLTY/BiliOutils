@@ -13,12 +13,12 @@ export async function updateNav() {
   try {
     const { data, message, code } = await loginByCookie();
     if (code !== 0) {
-      logger.info(`获取用户信息失败：${code} ${message}`);
+      logger.warn(`获取用户信息失败：${code} ${message}`);
       return;
     }
     getBCoinBalance(data);
   } catch (error) {
-    logger.info(`获取用户信息异常：${error.message}`);
+    logger.error(`获取用户信息异常：${error.message}`);
   }
 }
 

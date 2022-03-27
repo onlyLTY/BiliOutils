@@ -10,7 +10,7 @@ export default async function taskReward() {
     await apiDelay();
     const { data: coinExp } = await getDonateCoinExp(); //获取更精准的已投币数
     if (code != 0) {
-      logger.info(`状态获取失败: ${code} ${message}`);
+      logger.warn(`状态获取失败: ${code} ${message}`);
       return;
     }
 
@@ -45,6 +45,6 @@ export default async function taskReward() {
     TaskModule.share = data.share;
     TaskModule.watch = data.watch;
   } catch (error) {
-    logger.info(`状态获取异常 ${error.message}`);
+    logger.error(`状态获取异常 ${error.message}`);
   }
 }

@@ -12,10 +12,10 @@ async function getMyGroups(): Promise<SupGroupsDto['data']['list']> {
     if (code === 0) {
       return data?.list || [];
     }
-    logger.info(`获取自己的应援团异常失败: ${message}`);
+    logger.warn(`获取自己的应援团异常失败: ${message}`);
     return [];
   } catch (error) {
-    logger.info(`获取自己的应援团异常: ${error}`);
+    logger.error(`获取自己的应援团异常: ${error}`);
   }
 }
 
@@ -41,10 +41,10 @@ export default async function supGroupSign() {
           logger.info(message);
         }
       } else {
-        logger.info(`[${group.group_name}]签到失败 ${message}`);
+        logger.warn(`[${group.group_name}]签到失败 ${message}`);
       }
     } catch (error) {
-      logger.info(`签到异常 ${error.message}`);
+      logger.error(`签到异常 ${error.message}`);
     } finally {
       await apiDelay();
     }

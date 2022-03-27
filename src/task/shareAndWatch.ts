@@ -24,11 +24,11 @@ export default async function shareAndWatch() {
       gAid = aid;
       logger.info(`获取视频: ${title} --up【${author}】`);
     } else {
-      logger.info(`获取视频失败 ${biliav.msg}`);
+      logger.warn(`获取视频失败 ${biliav.msg}`);
       return false;
     }
   } catch (error) {
-    logger.info(`获取视频出现异常: ${error.message}`);
+    logger.error(`获取视频出现异常: ${error.message}`);
     return false; //不再执行
   }
 
@@ -40,10 +40,10 @@ export default async function shareAndWatch() {
       if (code === 0) {
         logger.info(`分享视频成功!`);
       } else {
-        logger.info(`分享视频失败: ${code} ${message}`);
+        logger.warn(`分享视频失败: ${code} ${message}`);
       }
     } catch (error) {
-      logger.info(`分享视频异常: ${error.message}`);
+      logger.error(`分享视频异常: ${error.message}`);
     }
   }
 
@@ -56,10 +56,10 @@ export default async function shareAndWatch() {
       if (code === 0) {
         logger.info(`播放视频成功!`);
       } else {
-        logger.info(`播放视频失败: ${code} ${message}`);
+        logger.warn(`播放视频失败: ${code} ${message}`);
       }
     } catch (error) {
-      logger.info(`播放视频异常: ${error.message}`);
+      logger.error(`播放视频异常: ${error.message}`);
     }
   }
 }

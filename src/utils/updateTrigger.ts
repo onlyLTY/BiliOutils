@@ -80,7 +80,7 @@ export default async function (
     try {
       return await client.CreateTrigger(params);
     } catch ({ code, message }) {
-      logger.info(`创建trigger失败 ${code} => ${message}`);
+      logger.error(`创建trigger失败 ${code} => ${message}`);
       return false;
     }
   }
@@ -89,7 +89,7 @@ export default async function (
     try {
       return await client.DeleteTrigger(params);
     } catch ({ code, message }) {
-      logger.info(`删除trigger失败 ${code} => ${message}`);
+      logger.warn(`删除trigger失败 ${code} => ${message}`);
       return false;
     }
   }
@@ -103,7 +103,7 @@ export default async function (
 
       return triggerIndex !== -1;
     } catch ({ code, message }) {
-      logger.info(`获取trigger失败 ${code} => ${message}`);
+      logger.error(`获取trigger失败 ${code} => ${message}`);
       return false;
     }
   }

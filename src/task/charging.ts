@@ -61,7 +61,7 @@ export default async function charging() {
     const run = async () => {
       const { code, message, data } = await chargingForUp(bp_num, true, up_mid);
       if (code !== 0) {
-        logger.info(`充电失败：${code} ${message}`);
+        logger.warn(`充电失败：${code} ${message}`);
         return;
       }
       logger.info(`【充值结果】${ChargeStatus[data.status]}`);
@@ -82,7 +82,7 @@ export default async function charging() {
       }
     }
   } catch (error) {
-    logger.info(`充电出现异常：${error.message}`);
+    logger.error(`充电出现异常：${error.message}`);
   }
 }
 /**

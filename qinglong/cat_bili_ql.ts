@@ -13,7 +13,7 @@ async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: 
   try {
     await loginTask();
   } catch (error) {
-    logger.info(`登录失败: ${error}`);
+    logger.error(`登录失败: ${error}`);
     await sendNotify(`Bili-${TaskConfig.NICKNAME}-登录失败`, LogMessage.value);
     return '未完成';
   }

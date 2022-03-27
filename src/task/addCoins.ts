@@ -47,10 +47,10 @@ export default async function addCoins() {
       } else {
         eCount++;
         if (coinData.code === -111 || coinData.code === -104) {
-          logger.info(`${aid} ${coinData.message} 无法继续进行投币`);
+          logger.warn(`${aid} ${coinData.message} 无法继续进行投币`);
           break;
         }
-        logger.info(`给up投币失败 ${coinData.code} ${coinData.message}`);
+        logger.warn(`给up投币失败 ${coinData.code} ${coinData.message}`);
         // 如果重复错误就直接退出
         if (prevCode === coinData.code) {
           break;
@@ -59,7 +59,7 @@ export default async function addCoins() {
       }
     } catch (error) {
       eCount++;
-      logger.info(`投币异常 ${error.message}`);
+      logger.error(`投币异常 ${error.message}`);
     } finally {
       await apiDelay(1500);
     }

@@ -22,6 +22,6 @@ export default async function silver2Coin() {
       await getMyWallet();
     }
   } catch (error) {
-    logger.info(`操作异常 ${error.message}`);
+    logger.error(`操作异常 ${error.message}`);
   }
 }

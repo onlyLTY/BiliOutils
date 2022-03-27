@@ -46,7 +46,7 @@ async function getOnePrivilege(type: number): Promise<boolean> {
 
     return true;
   } catch (error) {
-    logger.info(`领取权益出现异常：${error.message}`);
+    logger.error(`领取权益出现异常：${error.message}`);
   }
   return false;
 }

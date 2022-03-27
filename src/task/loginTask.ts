@@ -92,7 +92,7 @@ async function setUserInfo(data: UserNavData) {
     setLevelInfo(data);
     setVipStatus(data);
   } catch (error) {
-    logger.info(`获取硬币信息异常: ${error.message}`);
+    logger.error(`获取硬币信息异常: ${error.message}`);
   }
 }
 
@@ -101,10 +101,10 @@ export default async function loginTask() {
   try {
     const { data, message, code } = await loginByCookie();
     if (code === 65006 || code === -404) {
-      logger.info(`登录错误 ${code} ${message}`);
+      logger.error(`登录错误 ${code} ${message}`);
       return;
     } else if (code !== 0) {
-      logger.info(`登录错误 ${code} ${message}`);
+      logger.error(`登录错误 ${code} ${message}`);
       return;
     }
     if (!data.isLogin) {

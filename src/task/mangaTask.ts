@@ -8,7 +8,7 @@ export default async function mangaSign() {
     if (code == 0) {
       logger.info('漫画签到成功');
     } else {
-      logger.info('漫画签到失败');
+      logger.warn('漫画签到失败');
     }
   } catch (error) {
     /**
@@ -18,7 +18,7 @@ export default async function mangaSign() {
     if (error.response.status === 400) {
       logger.info('已经签到过了，跳过任务');
     } else {
-      logger.info(`漫画签到异常 ${error.message}`);
+      logger.error(`漫画签到异常 ${error.message}`);
     }
   }
 }

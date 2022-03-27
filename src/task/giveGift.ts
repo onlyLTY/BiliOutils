@@ -125,7 +125,7 @@ async function sendGift(
       });
 
       if (code !== 0) {
-        logger.info(`给[ ${data.uname} ]投喂${data.gift_name}: ${message}`);
+        logger.warn(`给[ ${data.uname} ]投喂${data.gift_name}: ${message}`);
       } else {
         logger.info(`成功给[ ${data.uname} ]投喂${data.gift_num}${data.gift_name}`);
       }
