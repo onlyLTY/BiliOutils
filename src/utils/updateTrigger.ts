@@ -1,6 +1,6 @@
 import { scf } from 'tencentcloud-sdk-nodejs';
 import { random } from 'lodash';
-import { getPRCDate } from './';
+import { getPRCDate } from './pure';
 import config from '../config/setConfig';
 import { Constant } from '../config/globalVar';
 import { logger } from './log';
