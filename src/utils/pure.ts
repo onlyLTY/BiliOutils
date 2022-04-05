@@ -42,3 +42,20 @@ export function getPRCDate(): Date {
   // 3600000 为每小时毫秒数
   return new Date(nowTime + (timezone + 8) * 3_600_000);
 }
+
+/**
+ * 将 JSONP 返回的数据转换为对象
+ */
+export function jsonp2Object(jsonp: string) {
+  const jsonpData = jsonp.replace(/^\w+\(/, '').replace(/\)$/, '');
+  return JSON.parse(jsonpData);
+}
+
+/**
+ * 一页有 n 条数据，第 m 个数据在第几页
+ * @param n 每页数据条数
+ * @param m 第几条数据
+ */
+export function getPageNum(n: number, m: number) {
+  return Math.ceil(m / n);
+}

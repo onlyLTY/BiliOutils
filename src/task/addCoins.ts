@@ -1,5 +1,4 @@
-import { addCoinForVideo } from '../net/video.request';
-import { getAidByByPriority } from './getOneAid';
+import { coinToId, getAidByByPriority } from '../service/coin.service';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { getDonateCoinExp } from '../net/user-info.request';
@@ -30,15 +29,15 @@ export default async function addCoins() {
     if (TaskModule.coinsTask <= 0 || TaskModule.money <= 0) break;
     //这个函数不会报错的
     const { data, msg } = await getAidByByPriority();
-    if (!data?.aid || msg != '0') {
+    if (!data?.id || msg != '0') {
       eCount++;
       continue;
     }
 
     await apiDelay();
-    const { aid, title, author } = data;
+    const { id, title, author, type } = data;
     try {
-      const coinData = await addCoinForVideo(aid, 1, 1);
+      const coinData = await coinToId(id, 1, type);
       if (coinData.code == 0) {
         TaskModule.money--;
         TaskModule.coinsTask--;
@@ -47,7 +46,7 @@ export default async function addCoins() {
       } else {
         eCount++;
         if (coinData.code === -111 || coinData.code === -104) {
-          logger.warn(`${aid} ${coinData.message} 无法继续进行投币`);
+          logger.warn(`${id} ${coinData.message} 无法继续进行投币`);
           break;
         }
         logger.warn(`给up投币失败 ${coinData.code} ${coinData.message}`);

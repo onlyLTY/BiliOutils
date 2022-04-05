@@ -45,7 +45,7 @@ export interface RegionRankingVideosDto extends ApiBaseProp {
   }>;
 }
 
-/** 或取指定up的视频 */
+/** 指定up的视频 */
 export interface VideoByUpDto extends ApiBaseProp {
   data: {
     media_list: Array<{

@@ -86,9 +86,6 @@ const vcApi = axios.create({
   baseURL: 'https://api.vc.bilibili.com',
 });
 
-const apiArr = [biliApi, vcApi, accountApi, mangaApi, liveApi];
-for (const api of apiArr) {
-  api.interceptors.response.use(res, err);
-}
+axios.interceptors.response.use(res, err);
 
-export { biliApi, vcApi, accountApi, mangaApi, liveApi };
+export { biliApi, vcApi, accountApi, mangaApi, liveApi, axios };

@@ -1,6 +1,6 @@
 import { apiDelay, random } from '../utils';
 import { addShare, uploadVideoHeartbeat } from '../net/video.request';
-import { getAidByCustomizeUp, getAidByRegionRank } from './getOneAid';
+import { getAidByCustomizeUp, getAidByRegionRank } from '../service/coin.service';
 import { TaskModule } from '../config/globalVar';
 import { logger } from '../utils/log';
 
@@ -20,8 +20,8 @@ export default async function shareAndWatch() {
     if (biliav.msg === '-1') biliav = await getAidByRegionRank();
 
     if (biliav.msg === '0') {
-      const { aid, author, title } = biliav.data;
-      gAid = aid;
+      const { id, author, title } = biliav.data;
+      gAid = id;
       logger.info(`获取视频: ${title} --up【${author}】`);
     } else {
       logger.warn(`获取视频失败 ${biliav.msg}`);

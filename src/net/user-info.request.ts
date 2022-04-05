@@ -1,6 +1,6 @@
 import type { IdType } from '../types';
 import { biliApi, accountApi } from './api';
-import {
+import type {
   CoinBalanceDto,
   CoinTodayExpDto,
   FollowingsDto,
@@ -8,7 +8,7 @@ import {
   RewardDto,
   UserInfoNavDto,
 } from '../dto/user-info.dto';
-import { VideoByUpDto } from '../dto/video.dto';
+import type { VideoByUpDto } from '../dto/video.dto';
 
 /**
  * 登录账号
@@ -100,33 +100,6 @@ export async function getVideosByUpId(upId: number, pageSize = 50): Promise<Vide
       bvid: '',
       ps: pageSize,
       biz_id: upId,
-    },
-  });
-  return data;
-}
-
-/**
- * 获取指定up主视频
- * @param upId upId
- * @param pageSize 页面数据条数
- * @param pageNumber 页数
- * @param keyword 搜索关键词
- */
-export async function searchVideosByUpId(
-  upId: number,
-  pageSize = 20,
-  pageNumber = 1,
-  keyword = '',
-): Promise<FollowingsDto> {
-  const { data } = await biliApi.get('/x/space/arc/search', {
-    params: {
-      jsonp: 'jsonp',
-      order: 'pubdate',
-      keyword,
-      pn: pageNumber,
-      tid: 0,
-      ps: pageSize,
-      mid: upId,
     },
   });
   return data;

@@ -1,11 +1,10 @@
 import { biliApi } from './api';
 import { stringify } from 'qs';
-import {
+import type {
   ShareAddDto,
   RegionRankingVideosDto,
   DonatedCoinsForVideoDto,
   HeartbeatDto,
-  AddCoinDto,
 } from '../dto/video.dto';
 import { TaskConfig } from '../config/globalVar';
 
@@ -65,31 +64,6 @@ export async function uploadVideoHeartbeat(
     stringify({
       aid,
       played_time: playedTime,
-    }),
-  );
-
-  return data;
-}
-
-/**
- * 投币
- * @param aid av号
- * @param multiply 硬币数
- * @param selectLike 是否点赞
- */
-export async function addCoinForVideo(
-  aid: number | string,
-  multiply: 1 | 2,
-  selectLike: 1 | 2,
-): Promise<AddCoinDto> {
-  const { data } = await biliApi.post(
-    '/x/web-interface/coin/add',
-    stringify({
-      aid,
-      multiply,
-      selectLike,
-      csrf: TaskConfig.BILIJCT,
-      // cross_domain: true,
     }),
   );
 
