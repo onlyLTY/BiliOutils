@@ -1,4 +1,4 @@
-import { chargingForUp, chargingCommentsForUp } from '../net/vipRequest';
+import { chargingForUp, chargingCommentsForUp } from '../net/vip.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { getPRCDate, getMonthHasDays, apiDelay } from '../utils';
 import { random } from 'lodash';

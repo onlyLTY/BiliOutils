@@ -1,3 +1,4 @@
+import type { IdType } from '../types';
 import { biliApi, accountApi } from './api';
 import {
   CoinBalanceDto,
@@ -6,10 +7,8 @@ import {
   OtherUserDto,
   RewardDto,
   UserInfoNavDto,
-} from '../dto/UserInfo.dto';
-import { VideoByUpDto } from '../dto/Video.dto';
-
-type IdType = number | string;
+} from '../dto/user-info.dto';
+import { VideoByUpDto } from '../dto/video.dto';
 
 /**
  * 登录账号
@@ -134,12 +133,10 @@ export async function searchVideosByUpId(
 }
 
 /**
- * 获取用户信息（主要时直播）
+ * 获取用户信息（主要是直播）
  * @param mid 用户 id
  */
 export async function getUser(mid: IdType): Promise<OtherUserDto> {
-  const { data } = await biliApi.get(
-    `https://api.bilibili.com/x/space/acc/info?mid=${mid}&jsonp=jsonp`,
-  );
+  const { data } = await biliApi.get(`/x/space/acc/info?mid=${mid}&jsonp=jsonp`);
   return data;
 }

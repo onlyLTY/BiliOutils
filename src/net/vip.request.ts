@@ -1,6 +1,6 @@
 import { stringify } from 'qs';
 import { TaskConfig } from '../config/globalVar';
-import { ChargingDto, ChargingMessageDto, ReceiveVipPrivilegeDto } from '../dto/VipPrivilege.dto';
+import { ChargingDto, ChargingMessageDto, ReceiveVipPrivilegeDto } from '../dto/vip-privilege.dto';
 import { biliApi } from './api';
 
 /**

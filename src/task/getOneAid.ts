@@ -1,8 +1,8 @@
 import { apiDelay, random } from '../utils';
-import { getFollowings, getSpecialFollowings, getVideosByUpId } from '../net/userInfoRequest';
-import { getRegionRankingVideos } from '../net/videoRequest';
+import { getFollowings, getSpecialFollowings, getVideosByUpId } from '../net/user-info.request';
+import { getRegionRankingVideos } from '../net/video.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { FollowingsDto } from '../dto/UserInfo.dto';
+import { FollowingsDto } from '../dto/user-info.dto';
 
 class AidInfo {
   msg: string;

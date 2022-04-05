@@ -1,5 +1,5 @@
-import { LiveHeartRuleId } from '../interface/LiveHeart';
-import { ApiBaseProp, DoubleMessageProp, PureDataProp } from './BiLiBaseProp';
+import { LiveHeartRuleId } from '../types/LiveHeart';
+import { ApiBaseProp, DoubleMessageProp, PureDataProp } from './bili-base-prop';
 
 /** 直播签到 */
 export interface LiveSignDto extends ApiBaseProp {

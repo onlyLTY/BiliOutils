@@ -1,5 +1,5 @@
+import type { IdType } from '../types';
 import { stringify } from 'qs';
-
 import {
   BagSendResDto,
   FansMedalPanelDto,
@@ -11,13 +11,11 @@ import {
   MyWalletDto,
   Silver2CoinDto,
   SilverStatusDto,
-} from '../dto/Live.dto';
+} from '../dto/live.dto';
 import { liveApi } from './api';
 import { TaskConfig } from '../config/globalVar';
-import { PureDataProp } from '../dto/BiLiBaseProp';
+import { PureDataProp } from '../dto/bili-base-prop';
 import { random } from 'lodash';
-
-type IdType = number | string;
 
 /**
  * 直播签到

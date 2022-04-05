@@ -1,8 +1,8 @@
 import { stringify } from 'qs';
 
 import { biliApi } from './api';
-import { GuessCollectionDto } from '../dto/matchGameDto';
-import { ApiBaseProp } from '../dto/BiLiBaseProp';
+import { GuessCollectionDto } from '../dto/match-game.dto';
+import { ApiBaseProp } from '../dto/bili-base-prop';
 import { TaskConfig } from '../config/globalVar';
 
 const csrf = TaskConfig.BILIJCT;

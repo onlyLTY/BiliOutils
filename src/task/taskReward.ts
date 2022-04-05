@@ -1,4 +1,4 @@
-import { getDailyTaskRewardInfo, getDonateCoinExp } from '../net/userInfoRequest';
+import { getDailyTaskRewardInfo, getDonateCoinExp } from '../net/user-info.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { logger } from '../utils/log';

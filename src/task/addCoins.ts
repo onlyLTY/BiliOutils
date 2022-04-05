@@ -1,8 +1,8 @@
-import { addCoinForVideo } from '../net/videoRequest';
+import { addCoinForVideo } from '../net/video.request';
 import { getAidByByPriority } from './getOneAid';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
-import { getDonateCoinExp } from '../net/userInfoRequest';
+import { getDonateCoinExp } from '../net/user-info.request';
 import { logger } from '../utils/log';
 
 export default async function addCoins() {

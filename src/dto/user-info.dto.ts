@@ -1,4 +1,4 @@
-import { AccountBaseProp, ApiBaseProp } from './BiLiBaseProp';
+import { AccountBaseProp, ApiBaseProp } from './bili-base-prop';
 
 /** 硬币数量 */
 export interface CoinBalanceDto extends AccountBaseProp {

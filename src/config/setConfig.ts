@@ -1,6 +1,6 @@
+import type { Config } from '../types';
 import * as path from 'path';
 import { logger } from '../utils/log';
-import type { Config } from '../interface/Config';
 import { gzipDecode } from '../utils/gzip';
 import { SystemConfig } from './systemConfig';
 

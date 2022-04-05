@@ -1,9 +1,9 @@
 import { random } from 'lodash';
 
 import { Constant, TaskConfig } from '../config/globalVar';
-import { getGiftBagList, sendBagGift, getLiveFansMedal } from '../net/liveRequest';
-import { getUser } from '../net/userInfoRequest';
-import { LiveGiftBagListDto } from '../dto/Live.dto';
+import { getGiftBagList, sendBagGift, getLiveFansMedal } from '../net/live.request';
+import { getUser } from '../net/user-info.request';
+import { LiveGiftBagListDto } from '../dto/live.dto';
 import { apiDelay } from '../utils';
 import { logger } from '../utils/log';
 

@@ -1,13 +1,12 @@
 import * as CryptoJS from 'crypto-js';
-
-import { HeartBaseDateType, DeviceType, HmacsData, LiveHeartRuleId } from '../interface/LiveHeart';
+import type { HeartBaseDateType, DeviceType, HmacsData, LiveHeartRuleId } from '../types';
 import { createUUID, apiDelay, gzipDecode, gzipEncode } from '../utils';
 import { getLIVE_BUVID, getBiliJct } from '../utils/cookie';
 import { Constant, TaskConfig } from '../config/globalVar';
-import * as liveHeartRequest from '../net/liveHeartRequest';
-import * as liveRequest from '../net/liveRequest';
-import { LiveFansMedalDto, LiveFansMedalItem, LiveHeartEDto } from '../dto/Live.dto';
-import { getGiftBagList } from '../net/liveRequest';
+import * as liveHeartRequest from '../net/live-heart.request';
+import * as liveRequest from '../net/live.request';
+import { LiveFansMedalDto, LiveFansMedalItem, LiveHeartEDto } from '../dto/live.dto';
+import { getGiftBagList } from '../net/live.request';
 import { logger } from '../utils/log';
 
 const HEART_MAX_NUM = 24;

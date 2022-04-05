@@ -1,5 +1,5 @@
 import { logger } from '../utils/log';
-import { clockIn } from '../net/mangaRequest';
+import { clockIn } from '../net/manga.request';
 
 export default async function mangaSign() {
   logger.info('----【漫画签到】----');

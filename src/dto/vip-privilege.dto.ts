@@ -1,4 +1,4 @@
-import { ApiBaseProp, PureDataProp, ResponseCode } from './BiLiBaseProp';
+import { ApiBaseProp, PureDataProp, ResponseCode } from './bili-base-prop';
 
 /** 领取每月会员权益 */
 export interface ReceiveVipPrivilegeDto extends ApiBaseProp {

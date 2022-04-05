@@ -1,6 +1,6 @@
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { getGuessCollection, guessAdd } from '../net/matchGameRequest';
-import { GuessCollectionDto } from '../dto/matchGameDto';
+import { getGuessCollection, guessAdd } from '../net/match-game.request';
+import { GuessCollectionDto } from '../dto/match-game.dto';
 import { apiDelay } from '../utils';
 import { logger } from '../utils/log';
 

@@ -1,4 +1,4 @@
-import { SupGroupsDto, SupGroupsSignDto } from '../dto/SupGroup.dto';
+import { SupGroupsDto, SupGroupsSignDto } from '../dto/sup-group.dto';
 import { vcApi } from './api';
 
 /**

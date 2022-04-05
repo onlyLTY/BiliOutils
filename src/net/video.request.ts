@@ -6,7 +6,7 @@ import {
   DonatedCoinsForVideoDto,
   HeartbeatDto,
   AddCoinDto,
-} from '../dto/Video.dto';
+} from '../dto/video.dto';
 import { TaskConfig } from '../config/globalVar';
 
 /**

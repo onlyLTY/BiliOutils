@@ -1,5 +1,5 @@
 import { logger } from '../utils/log';
-import { exchangeSilver2Coin, exchangeStatus, getMyWallet } from '../net/liveRequest';
+import { exchangeSilver2Coin, exchangeStatus, getMyWallet } from '../net/live.request';
 
 /**
  * 银瓜子兑换硬币

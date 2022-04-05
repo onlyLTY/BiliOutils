@@ -1,5 +1,5 @@
 import { stringify } from 'qs';
-import { ClockInDto } from '../dto/Manga.dto';
+import { ClockInDto } from '../dto/manga.dto';
 import { mangaApi } from './api';
 
 /**

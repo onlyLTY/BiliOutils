@@ -1,8 +1,8 @@
-import { loginByCookie, getCoinBalance } from '../net/userInfoRequest';
+import { loginByCookie, getCoinBalance } from '../net/user-info.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { functionConfig } from '../config/funcConfig';
-import { UserInfoNavDto } from '../dto/UserInfo.dto';
+import { UserInfoNavDto } from '../dto/user-info.dto';
 import { logger } from '../utils/log';
 
 type UserNavData = UserInfoNavDto['data'];

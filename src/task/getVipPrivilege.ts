@@ -1,4 +1,4 @@
-import { receiveVipPrivilege } from '../net/vipRequest';
+import { receiveVipPrivilege } from '../net/vip.request';
 import { TaskModule } from '../config/globalVar';
 import { getPRCDate, getMonthHasDays } from '../utils';
 import { logger } from '../utils/log';

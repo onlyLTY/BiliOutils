@@ -1,5 +1,5 @@
 import { logger } from '../utils/log';
-import { doLiveSign, webGetSignInfo } from '../net/liveRequest';
+import { doLiveSign, webGetSignInfo } from '../net/live.request';
 
 export default async function liveSignTask() {
   logger.info('----【直播签到】----');

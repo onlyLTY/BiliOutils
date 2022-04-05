@@ -1,6 +1,6 @@
-import { UserInfoNavDto } from '../dto/UserInfo.dto';
+import { UserInfoNavDto } from '../dto/user-info.dto';
 import { TaskModule } from '../config/globalVar';
-import { loginByCookie } from '../net/userInfoRequest';
+import { loginByCookie } from '../net/user-info.request';
 import { logger } from '../utils/log';
 
 type UserNav = UserInfoNavDto['data'];

@@ -1,6 +1,6 @@
-import { SupGroupsDto } from '../dto/SupGroup.dto';
+import { SupGroupsDto } from '../dto/sup-group.dto';
 import { apiDelay } from '../utils';
-import { getMyGroupsApi, groupSignApi } from '../net/supGroupRequest';
+import { getMyGroupsApi, groupSignApi } from '../net/sup-group.request';
 import { logger } from '../utils/log';
 
 /**

@@ -1,8 +1,8 @@
 import { stringify } from 'qs';
 
 import axios from '.';
-import { LiveHeartERequest, LiveHeartXRequest } from '../interface/LiveHeart';
-import { LiveHeartEDto } from '../dto/Live.dto';
+import { LiveHeartERequest, LiveHeartXRequest } from '../types/LiveHeart';
+import { LiveHeartEDto } from '../dto/live.dto';
 
 /**
  * 发送 E 请求

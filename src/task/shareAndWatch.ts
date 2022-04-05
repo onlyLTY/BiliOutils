@@ -1,5 +1,5 @@
 import { apiDelay, random } from '../utils';
-import { addShare, uploadVideoHeartbeat } from '../net/videoRequest';
+import { addShare, uploadVideoHeartbeat } from '../net/video.request';
 import { getAidByCustomizeUp, getAidByRegionRank } from './getOneAid';
 import { TaskModule } from '../config/globalVar';
 import { logger } from '../utils/log';

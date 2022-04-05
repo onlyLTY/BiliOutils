@@ -1,4 +1,4 @@
-import { PureDataProp } from './BiLiBaseProp';
+import { PureDataProp } from './bili-base-prop';
 
 /**
  * 自己加入的应援团

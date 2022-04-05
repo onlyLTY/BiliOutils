@@ -1,6 +1,6 @@
 import { apiDelay, random } from '../utils';
-import * as liveRequest from '../net/liveRequest';
-import { FansMedalPanelDto, FansMedalDto } from '../dto/Live.dto';
+import * as liveRequest from '../net/live.request';
+import { FansMedalPanelDto, FansMedalDto } from '../dto/live.dto';
 import { TaskConfig } from '../config/globalVar';
 import { logger } from '../utils/log';
 import { kaomoji } from '../constant';
