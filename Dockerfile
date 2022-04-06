@@ -5,7 +5,7 @@ COPY ./ .
 # RUN npm config set registry https://registry.npm.taobao.org \
 #     && npm install \
 RUN npm install \
-    && npm install -g typescript modclean 
+    && npm install -g typescript 
 RUN npm run build \
     && npm prune --production \
     && npm run autoclean \
