@@ -12,9 +12,9 @@
     "dev": "ts-node ./src/run.ts",
     "start": "node ./dist/run.js",
     "liveHeart": "node ./dist/runLiveHeart.js",
-    "modclean": "modclean -r -a \"*.md,*LICENSE*,.github,.nycrc,*.ts,*.html,*.txt,*.js.map,*.mjs.map,browser.js,@types\" && node tools/pkgclean.js",
+    "autoclean": "yarn autoclean -F && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
-    "predeploy:multi": "rm -f ./dist/run.js && cp -rf ./tools/ ./package*.json ./dist && cd ./dist && npm i --production && npm run modclean && rm -rf tools package*.json &&  cd ../",
+    "predeploy:multi": "cp -rf ./tools/ ./package*.json ./.yarnclean ./dist && cd ./dist && yarn install --production && npm run autoclean && rm -rf tools package*.json .yarnclean &&  cd ../",
     "postbuild": "cd ./dist && rm -rf ./dto/ ./interface/ *.d.js",
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
     "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\""

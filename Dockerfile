@@ -8,7 +8,7 @@ RUN npm install \
     && npm install -g typescript modclean 
 RUN npm run build \
     && npm prune --production \
-    && npm run modclean \
+    && npm run autoclean \
     && mkdir builddir \
     && chmod +x docker-entrypoint.sh \
     && if [ -e src/*.txt ];then cp -rf src/*.txt ./dist ;fi \
