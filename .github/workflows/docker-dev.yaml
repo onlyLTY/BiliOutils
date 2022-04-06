@@ -1,0 +1,66 @@
+name: docker-dev
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-docker:
+    if: github.repository == 'catlair/BiliTools'
+    runs-on: ubuntu-latest
+    environment: Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: set Docker tag
+        run: |
+          sed -i 2a\echo\ version=dev docker-entrypoint.sh
+          echo dev >> src/version.txt
+          sed -i s/bilitools:latest/bilitools:dev/ docker/deploy.Dockerfile
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and Push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          platforms: 'linux/amd64'
+          tags: catlair/bilitools:dev
+      - name: Build and Push Deploy
+        id: docker_build_deploy
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/deploy.Dockerfile
+          push: true
+          platforms: 'linux/amd64'
+          tags: catlair/bilitools-deploy:dev
+  release:
+    needs: build-docker
+    if: github.repository == 'catlair/BiliTools'
+    runs-on: ubuntu-latest
+    environment: Build
+    steps:
+      - name: Copy dist
+        run: |
+          docker pull catlair/bilitools:dev
+          docker run -id --entrypoint sh --name copy_dist catlair/bilitools:dev
+          docker cp copy_dist:/usr/src/app/node_modules .
+          docker cp copy_dist:/usr/src/app/dist .
+          mv node_modules dist
+      - name: ZIP
+        run: |
+          cd dist
+          zip -r -q tencent_scf.zip *
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/tencent_scf.zip
+          draft: true
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -85,18 +85,21 @@ export async function searchArticlesByUpId(
   pageSize = 12,
   pageNumber = 1,
 ): Promise<ArticleSearchDto> {
-  const { data: jsonpText } = await biliApi.get('/x/space/article', {
-    params: {
-      callback: '__test',
-      jsonp: 'jsonp',
-      sort: 'publish_time',
-      order: 1,
-      pn: pageNumber,
-      ps: pageSize,
-      mid,
-    },
-  });
-  return jsonp2Object(jsonpText);
+  try {
+    const { data: jsonpText } = await biliApi.get('/x/space/article', {
+      params: {
+        callback: '__test',
+        jsonp: 'jsonp',
+        sort: 'publish_time',
+        pn: pageNumber,
+        ps: pageSize,
+        mid,
+      },
+    });
+    return jsonp2Object(jsonpText);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 /**
@@ -147,7 +150,7 @@ export async function addCoinForVideo(
       multiply,
       selectLike,
       csrf: TaskConfig.BILIJCT,
-      cross_domain: true,
+      // cross_domain: true,
     }),
   );
 
@@ -173,14 +176,16 @@ export async function addCoinForAudio(sid: number, coin = 1): Promise<AudioCoinD
 
 /**
  * 给专栏投币
+ * @param upid
  * @param aid
  * @param coin
  */
-export async function addCoinForArticle(aid: number, coin = 1): Promise<AddCoinDto> {
+export async function addCoinForArticle(upid: number, aid: number, coin = 1): Promise<AddCoinDto> {
   const { data } = await biliApi.post(
     '/x/web-interface/coin/add',
     stringify({
       aid,
+      upid,
       avtype: 2,
       multiply: coin,
       csrf: TaskConfig.BILIJCT,

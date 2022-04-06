@@ -1,4 +1,5 @@
 import { coinToId, getAidByByPriority } from '../service/coin.service';
+import type { CoinToIdParams } from '../service/coin.service';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { getDonateCoinExp } from '../net/user-info.request';
@@ -35,10 +36,10 @@ export default async function addCoins() {
     }
 
     await apiDelay();
-    const { id, title, author, type } = data;
+    const { id, title, author, type, mid } = data;
     try {
-      const coinData = await coinToId(id, 1, type);
-      if (coinData.code == 0) {
+      const coinData = await coinToId({ id, type, mid } as CoinToIdParams);
+      if (coinData.code === 0) {
         TaskModule.money--;
         TaskModule.coinsTask--;
         i++;

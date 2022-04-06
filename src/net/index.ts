@@ -11,13 +11,11 @@ const defaultHeaders = {
   'accept-language': 'accept-language: zh-CN,zh;q=0.9,en-GB;q=0.8,en;q=0.7',
 };
 
-axios.defaults.headers['Cookie'] = TaskConfig.COOKIE;
-
+axios.defaults.headers.common['Cookie'] = TaskConfig.COOKIE;
 axios.defaults.withCredentials = true;
-
-axios.defaults.headers['User-Agent'] = defaultHeaders['User-Agent'];
-axios.defaults.headers['content-type'] = defaultHeaders['content-type'];
-axios.defaults.headers['accept-language'] = defaultHeaders['accept-language'];
+axios.defaults.headers.common['User-Agent'] = defaultHeaders['User-Agent'];
+axios.defaults.headers.post['content-type'] = defaultHeaders['content-type'];
+axios.defaults.headers.common['accept-language'] = defaultHeaders['accept-language'];
 
 export default axios;
 

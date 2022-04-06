@@ -66,6 +66,8 @@ function axiosRetryInterceptor(err) {
   });
 }
 
+axios.interceptors.response.use(res, err);
+
 const accountApi = axios.create({
   baseURL: 'https://account.bilibili.com',
 });
@@ -76,6 +78,10 @@ const liveApi = axios.create({
 
 const biliApi = axios.create({
   baseURL: 'https://api.bilibili.com',
+  headers: {
+    Referer: 'https://www.bilibili.com/',
+    Origin: 'https://www.bilibili.com',
+  },
 });
 
 const mangaApi = axios.create({
@@ -85,7 +91,5 @@ const mangaApi = axios.create({
 const vcApi = axios.create({
   baseURL: 'https://api.vc.bilibili.com',
 });
-
-axios.interceptors.response.use(res, err);
 
 export { biliApi, vcApi, accountApi, mangaApi, liveApi, axios };

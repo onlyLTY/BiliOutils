@@ -1,4 +1,4 @@
-import { apiDelay, getPageNum, random } from '../utils';
+import { apiDelay, getPageNum, logger, random } from '../utils';
 import { getFollowings, getSpecialFollowings } from '../net/user-info.request';
 import { getRegionRankingVideos } from '../net/video.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
@@ -23,10 +23,11 @@ interface AidInfo {
   msg: string;
   data: {
     type?: string;
-    id?: number | string;
+    id?: number;
     title?: string;
     author?: string;
     message?: string;
+    mid?: number; // article 需要
   };
 }
 
@@ -119,7 +120,7 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
       return {
         msg: '0',
         data: {
-          id: aid,
+          id: Number(aid),
           title,
           author,
         },
@@ -150,6 +151,7 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
     };
   }
   const mid = customizeUp[random(customizeUp.length - 1)];
+  console.log('mid', mid);
   return await getIdByRandom(mid);
 }
 
@@ -187,6 +189,7 @@ export async function getIdByRandom(mid: number) {
       data: handleData,
     };
   } catch (error) {
+    logger.debug(error);
     return {
       msg: error.message,
       data: {},
@@ -224,7 +227,7 @@ async function getArticleByRandom(mid: number, page: number, index: number) {
     title,
     author: { name },
   } = articles[index];
-  return { type: TypeEnum.article, id, title, author: name };
+  return { type: TypeEnum.article, id, title, author: name, mid };
 }
 
 /**
@@ -274,16 +277,22 @@ export async function getAidByByPriority() {
   };
 }
 
+// 参数
+export interface CoinToIdParams {
+  id: number;
+  type?: keyof typeof TypeEnum;
+  coin?: 1 | 2;
+  mid?: number;
+}
+
 /**
  * 投币给稿件
- * @param id
- * @param coin
  */
-export async function coinToId(id: number | string, coin: 1 | 2 = 1, type = TypeEnum.video) {
+export async function coinToId({ id, coin = 1, type = 'video', mid }: CoinToIdParams) {
   const handle = {
     [TypeEnum.video]: addCoinForVideo,
     [TypeEnum.audio]: addCoinForAudio,
-    [TypeEnum.article]: addCoinForArticle,
+    [TypeEnum.article]: (id: number, coin = 1) => addCoinForArticle(mid, id, coin),
   };
 
   const handleData = await handle[type](Number(id), coin);
