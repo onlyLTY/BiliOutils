@@ -52,7 +52,3 @@
 - 直播心跳的触发器名为`heart_bili_timer`
 
 ![create-trigger](images/create-trigger-timer.png)
-
-由于缺少相关配置，风纪委员不会填写时间的可以按照下面写。
-
-![create-trigger](images/create-trigger-open.png)

@@ -51,11 +51,7 @@
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
-- [青龙面板](https://github.com/whyour/qinglong): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `config.json` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
-
-### 直播心跳（新增）
-
-入口函数（执行方法）不是 `index.main_handler` 而是 `liveHeart.main_handler`，手动部署到 SCF 时需要注意
+- [青龙面板](https://github.com/whyour/qinglong): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `cat_bili_ql.js` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
 
 ### Docker 镜像
 
@@ -68,11 +64,7 @@
 - [catlair/bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [lzghzr/TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 - [whyour/qinglong](https://github.com/whyour/qinglong)
-- [RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro)
-
-以下项目已经不存在：
-
-- [JunzhouLiu/BILIBILI-HELPER-PRE](https://github.com/JunzhouLiu/BILIBILI-HELPER-PRE)
+- [RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro) （推荐转用）
 
 ## 责任声明
 
