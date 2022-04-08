@@ -4,6 +4,7 @@ import getCookie from '../utils/cookie';
 import { ErrorCodeCommon as ErrCC } from '../config/ErrorCode';
 import { sendMessage } from '../utils/effect';
 import { logger, LogMessage } from '../utils/log';
+import { baseURLs, RefererURLs } from '../constant/biliUri';
 
 const res = res => {
   // 设置 cookie 的变化
@@ -69,27 +70,29 @@ function axiosRetryInterceptor(err) {
 axios.interceptors.response.use(res, err);
 
 const accountApi = axios.create({
-  baseURL: 'https://account.bilibili.com',
+  baseURL: baseURLs.account,
 });
 
 const liveApi = axios.create({
-  baseURL: 'https://api.live.bilibili.com',
+  baseURL: baseURLs.live,
+  headers: {
+    Referer: RefererURLs.www,
+  },
 });
 
 const biliApi = axios.create({
-  baseURL: 'https://api.bilibili.com',
+  baseURL: baseURLs.api,
   headers: {
-    Referer: 'https://www.bilibili.com/',
-    Origin: 'https://www.bilibili.com',
+    Referer: RefererURLs.www,
   },
 });
 
 const mangaApi = axios.create({
-  baseURL: 'https://manga.bilibili.com',
+  baseURL: baseURLs.manga,
 });
 
 const vcApi = axios.create({
-  baseURL: 'https://api.vc.bilibili.com',
+  baseURL: baseURLs.vc,
 });
 
 export { biliApi, vcApi, accountApi, mangaApi, liveApi, axios };

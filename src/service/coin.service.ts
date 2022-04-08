@@ -151,7 +151,6 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
     };
   }
   const mid = customizeUp[random(customizeUp.length - 1)];
-  console.log('mid', mid);
   return await getIdByRandom(mid);
 }
 

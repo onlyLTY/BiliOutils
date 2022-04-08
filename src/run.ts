@@ -1,2 +1,6 @@
 // require('dotenv').config();
-require('./index').main_handler();
+import { dailyMain } from './main';
+
+(async () => {
+  await dailyMain();
+})();

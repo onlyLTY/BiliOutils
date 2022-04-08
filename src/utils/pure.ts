@@ -59,3 +59,20 @@ export function jsonp2Object(jsonp: string) {
 export function getPageNum(n: number, m: number) {
   return Math.ceil(m / n);
 }
+
+/**
+ * 设置 cron 表达式
+ * @param time 时间戳
+ */
+export function setCron(time = 60_000) {
+  time = time || 60_000;
+  const pre = getPRCDate().getTime() + time;
+  const next = new Date(pre);
+  const s = next.getSeconds(),
+    m = next.getMinutes(),
+    h = next.getHours();
+  return {
+    value: `${s} ${m} ${h} * * * *`,
+    string: `${h}:${m}:${s}`,
+  };
+}

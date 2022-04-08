@@ -1,2 +1,6 @@
 // require('dotenv').config();
-require('./liveHeart').main_handler();
+import { liveHeartMain } from './main';
+
+(async () => {
+  await liveHeartMain();
+})();
