@@ -9,13 +9,18 @@ import type {
   UserInfoNavDto,
 } from '../dto/user-info.dto';
 import type { VideoByUpDto } from '../dto/video.dto';
+import { OriginURLs } from '../constant/biliUri';
 
 /**
  * 登录账号
  */
 export async function loginByCookie(): Promise<UserInfoNavDto> {
-  // @ts-ignore
-  const { data } = await biliApi.get('/x/web-interface/nav', { retry: 3 });
+  const { data } = await biliApi.get('/x/web-interface/nav', {
+    retry: 3,
+    headers: {
+      Origin: OriginURLs.account,
+    },
+  });
   return data;
 }
 

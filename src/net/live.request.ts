@@ -16,13 +16,13 @@ import { liveApi } from './api';
 import { TaskConfig } from '../config/globalVar';
 import { PureDataProp } from '../dto/bili-base-prop';
 import { random } from 'lodash';
+import { OriginURLs } from '../constant/biliUri';
 
 /**
  * 直播签到
  */
 export async function doLiveSign(): Promise<LiveSignDto> {
   const { data } = await liveApi.get('/xlive/web-ucenter/v1/sign/DoSign');
-
   return data;
 }
 
@@ -180,9 +180,9 @@ export async function sendBagGift({
     csrf_token,
     uid: TaskConfig.USERID,
   });
-  const { data } = await liveApi.post('/xlive/revenue/v1/gift/sendBag', postData, {
+  const { data } = await liveApi.post('/xlive/revenue/v2/gift/sendBag', postData, {
     headers: {
-      referer: 'https://www.bilibili.com/',
+      Origin: OriginURLs.live,
     },
   });
   return data;

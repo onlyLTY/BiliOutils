@@ -83,7 +83,10 @@ export interface FansMedalDto {
     avatar: string;
     verify: number;
   };
-  superscript: null;
+  superscript: null | {
+    type: number;
+    content: string;
+  };
   room_info: {
     room_id: number;
     living_status: number;
@@ -104,6 +107,7 @@ export interface FansMedalPanelDto extends ApiBaseProp {
       next_light_status: number;
     };
     total_number: number;
+    has_medal: number;
   };
 }
 

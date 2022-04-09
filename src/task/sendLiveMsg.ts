@@ -56,21 +56,25 @@ export default async function liveSendMessage() {
   logger.info('----【发送直播弹幕】----');
 
   const fansMedalList = await getFansMealList();
+  const fansMedalLength = fansMedalList.length;
   let count = 0,
     jumpCount = 0;
-  logger.info(`一共需要发送${fansMedalList.length}个直播间`);
+  logger.info(`一共需要发送${fansMedalLength}个直播间`);
   logger.verbose(`所需时间可能很长，请耐心等待`);
 
-  for (const medal of fansMedalList) {
-    const { room_info, anchor_info } = medal;
+  for (let i = 0; i < fansMedalLength; i++) {
+    const { room_info, anchor_info, medal } = fansMedalList[i];
     if (!room_info?.room_id) {
       logger.info(`【${anchor_info.nick_name}】没有直播间哦`);
       jumpCount++;
-      break;
+      continue;
     }
-    // logger.info(`给【${medal.target_name}】${medal.roomid}发送弹幕`);
-    (await sendOneMessage(room_info.room_id, anchor_info.nick_name)) && count++;
-    await apiDelay(random(10000, 25000));
+    if (medal.today_feed === 100) {
+      jumpCount++;
+      continue;
+    }
+    if (await sendOneMessage(room_info.room_id, anchor_info.nick_name)) count++;
+    if (i < fansMedalLength - 1) await apiDelay(random(10000, 25000));
   }
   logger.info(`成功发送${count}个弹幕，跳过${jumpCount}个`);
 }
