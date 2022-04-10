@@ -1,28 +1,28 @@
 import { Constant } from './config/globalVar';
-import { getPRCDate } from './utils';
-import { printVersion } from './utils/effect';
-import { liveHeartBySCF, liveHeart } from './task/liveHeart';
+import { getPRCDate, setCron } from './utils';
 import updateTrigger from './utils/updateTrigger';
+import { printVersion } from './utils/effect';
+import { liveHeartBySCF } from './task/liveHeart';
+import type { SCFEvent } from './types/scf';
+import { dailyTasks } from './task/dailyTask';
 
-function setCron(time = 60_000) {
-  time = time || 60_000;
-  const pre = getPRCDate().getTime() + time;
-  const next = new Date(pre);
-  const s = next.getSeconds(),
-    m = next.getMinutes(),
-    h = next.getHours();
-  return {
-    value: `${s} ${m} ${h} * * * *`,
-    string: `${h}:${m}:${s}`,
-  };
-}
-
-exports.main_handler = async (event, _context) => {
+async function dailyMain(event: SCFEvent) {
   printVersion();
 
-  if (!event) {
-    return await liveHeart();
+  let message: { lastTime: string };
+  try {
+    message = JSON.parse(event.Message);
+  } catch (error) {}
+
+  if (message && message.lastTime === getPRCDate().getDate().toString()) {
+    return '今日重复执行';
   }
+
+  return await dailyTasks(updateTrigger);
+}
+
+async function liveHeartMain(event: SCFEvent) {
+  printVersion();
 
   let message;
   try {
@@ -50,4 +50,11 @@ exports.main_handler = async (event, _context) => {
   }
   await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron(62_000 - data.l * 1000));
   return '等待继续下次心跳';
-};
+}
+
+export function main_handler(event: SCFEvent) {
+  if (event.TriggerName === Constant.HEART_TRIGGER_NAME) {
+    return liveHeartMain(event);
+  }
+  return dailyMain(event);
+}

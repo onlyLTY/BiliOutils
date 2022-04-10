@@ -1,4 +1,4 @@
-const pako = require('pako');
+import * as pako from 'pako';
 
 /**
  * gzip加密

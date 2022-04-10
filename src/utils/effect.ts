@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import { logger } from './log';
 import { TaskConfig } from '../config/globalVar';
 import { random } from 'lodash';
-const { sendNotify } = require('./sendNotify');
+import { sendNotify } from './sendNotify';
 
 /**
  * 打印版本

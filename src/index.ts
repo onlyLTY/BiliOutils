@@ -1,10 +1,14 @@
-import type { SCFEvent } from './types/scf';
-import { dailyMain, liveHeartMain } from './main';
-import { Constant } from './config/globalVar';
+import { TaskConfig } from './config/globalVar';
+import { printVersion } from './utils/effect';
+import liveHeart from './task/liveHeart';
+import { dailyTasks } from './task/dailyTask';
 
-exports.main_handler = async (event: SCFEvent) => {
-  if (event.TriggerName === Constant.HEART_TRIGGER_NAME) {
-    return await liveHeartMain(event);
+(async function dailyMain() {
+  printVersion();
+
+  // 如果需要执行 liveHeart
+  if (TaskConfig.config.function.liveHeart) {
+    return await dailyTasks(liveHeart);
   }
-  return await dailyMain(event);
-};
+  return await dailyTasks();
+})();
