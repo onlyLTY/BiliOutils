@@ -8,6 +8,7 @@ RUN npm install \
     && npm install -g typescript 
 RUN npm run build \
     && npm prune --production \
+    && cp docker/.yarnclean . \
     && npm run autoclean \
     && mkdir builddir \
     && chmod +x docker-entrypoint.sh \
