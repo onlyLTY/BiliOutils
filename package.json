@@ -14,7 +14,7 @@
     "autoclean": "yarn autoclean -F && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
     "predeploy:multi": "cp -rf ./tools/ ./package*.json ./.yarnclean ./dist && cd ./dist && yarn install --production && npm run autoclean && rm -rf tools package*.json .yarnclean &&  cd ../",
-    "postbuild": "cd ./dist && rm -rf ./dto/ ./interface/ *.d.js",
+    "postbuild": "cd ./dist && rm -rf ./dto/ ./types/ *.d.js",
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
     "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\""
   },

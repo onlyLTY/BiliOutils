@@ -63,7 +63,7 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 - 全局配置（可配置多个用户）：`config/config.json`
 - 单用户配置：`与 index.js (ts) 同目录/config/config.json`。如 `dist`
 
-所有配置都登记在 [`interface/Config.ts`](/src/interface/Config.ts) 文件中  
+所有配置都登记在 [`types/config.ts`](/src/types/config.ts) 文件中  
 **解释：**
 
 - `number`: 数字 例如：123。
@@ -97,7 +97,7 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 ```json
 {
-  "message": {}, // 可以省略
+  "message": {},
   "account": [
     {
       "function": {

@@ -19,6 +19,11 @@ inputs:
           name: ${env:SCF_TIMER_NAME} # 若要使用scf随机执行请勿修改触发器名
           cronExpression: ${env:BILI_CRON_EXPRESSION} # 每天22点43分55秒触发
           enable: ${env:BILI_IS_RUN}
+    - timer: # 定时触发器
+        parameters:
+          name: heart_bili_timer
+          cronExpression: ${env:BILI_CRON_EXPRESSION}
+          enable: ${env:BILI_IS_RUN_LH}
   environment:
     variables:
       TENCENT_SECRET_ID: ${env:TENCENT_SECRET_ID}

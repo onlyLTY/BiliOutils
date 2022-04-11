@@ -51,7 +51,8 @@
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
-- [青龙面板](https://github.com/whyour/qinglong): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `cat_bili_ql.js` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
+- [青龙面板](./docs/%E9%9D%92%E9%BE%99%E9%9D%A2%E6%9D%BF.md): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `cat_bili_ql.js` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
+- [以编译文件下载](./docs/%E7%BC%96%E8%AF%91%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D.md)
 
 ### Docker 镜像
 

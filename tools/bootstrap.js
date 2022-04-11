@@ -55,21 +55,6 @@ function scfConfig(el) {
     .setTimerName();
 }
 
-function scfConfigHeart(el) {
-  const sls = el.sls;
-  const memorySize = el?.heartMemorySize || json?.heartMemorySize || '128';
-  return new updateSLS()
-    .randomRunTime(el.heartRunTime || '12:00:00-21:00:00')
-    .updateDescription(sls?.description + 'lh')
-    .updateRegion(sls?.region)
-    .updateComponentName(sls?.name + 'lh')
-    .updateSCFName(sls?.name + 'lh')
-    .setMemorySize(memorySize)
-    .setHandler('liveHeart.main_handler')
-    .setTimeout(100)
-    .setTimerName('heart_bili_timer');
-}
-
 function scfDeploy(sls) {
   console.log('开始部署', sls?.name);
   console.log('地区', sls?.region);
@@ -92,13 +77,13 @@ function scfDeploy(sls) {
   if (process.argv.includes('--scf')) {
     json.account?.forEach(el => {
       const sls = JSON.parse(JSON.stringify(el.sls));
-      scfConfig(el);
+      const config = scfConfig(el);
       baseConfig(el);
       scfDeploy(sls);
 
       // 如果需要配置liveHeart
       if (el.function.liveHeart) {
-        scfConfigHeart(el);
+        config.isRunLiveHeartTask(true);
         scfDeploy(sls);
       }
     });
@@ -124,10 +109,6 @@ function scfDeploy(sls) {
         console.log('跳过每日任务');
       } else {
         startOne(el);
-      }
-
-      if (el.function.liveHeart) {
-        startOne(el, 'npm run liveHeart', '直播心跳任务开始');
       }
     });
   }

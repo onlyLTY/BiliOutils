@@ -96,6 +96,7 @@ jobs:
         run: |
           yarn build:rollup
           cp dist/rollup gh-release -r
+          cp package.json gh-release
       - name: Commit files to gh-release branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:

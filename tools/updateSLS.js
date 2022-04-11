@@ -1,6 +1,9 @@
 const { randomInt } = require('crypto');
 
 module.exports = function () {
+  process.env.BILI_IS_RUN_LH = 'false';
+  process.env.BILI_IS_RUN = 'false';
+
   /**
    * 更新组件名
    * @param {string} componentName
@@ -46,6 +49,15 @@ module.exports = function () {
    */
   this.isRunTask = isRun => {
     process.env.BILI_IS_RUN = isRun === false ? 'false' : 'true';
+    return this;
+  };
+
+  /**
+   * 是否执行 liveHeart 任务
+   * @param {any} isRun
+   */
+  this.isRunLiveHeartTask = isRun => {
+    process.env.BILI_IS_RUN_LH = isRun === false ? 'false' : 'true';
     return this;
   };
 
