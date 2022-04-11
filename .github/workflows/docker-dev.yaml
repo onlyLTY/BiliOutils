@@ -44,6 +44,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: Build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Copy dist
         run: |
           docker pull catlair/bilitools:dev
@@ -55,11 +57,40 @@ jobs:
         run: |
           cd dist
           zip -r -q tencent_scf.zip *
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 'lts/fermium'
+      - name: Install dependencies
+        run: |
+          rm yarn.lock
+          yarn
+          npm install -g typescript rollup
+      - name: Build
+        run: |
+          yarn build:rollup
+          cp dist/rollup gh-release-dev -r
+      - name: Commit files to gh-release branch
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'release: Commit from GitHub Actions (dev)'
+          branch: gh-release
+          commit_options: '--no-verify --signoff'
+          file_pattern: gh-release-dev/**
+          push_options: '--force'
+          skip_fetch: true
+          skip_checkout: true
+          create_branch: true
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             dist/tencent_scf.zip
+            gh-release-dev/index.js
+            gh-release-dev/cat_bili_ql.js
+            gh-release-dev/index.scf.js
+            gh-release-dev/index.scf.min.js
+            package.json
           draft: true
           prerelease: true
         env:
