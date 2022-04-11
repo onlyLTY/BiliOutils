@@ -1,4 +1,4 @@
-import * as CryptoJS from 'crypto-js';
+import * as crypto from 'crypto';
 import type { HeartBaseDateType, DeviceType, HmacsData, LiveHeartRuleId } from '../types';
 import { createUUID, apiDelay, gzipDecode, gzipEncode } from '../utils';
 import { getLIVE_BUVID, getBiliJct } from '../utils/cookie';
@@ -36,7 +36,7 @@ function hmacs(hmacsData: HmacsData, rule: LiveHeartRuleId) {
   let s = JSON.stringify(newData);
 
   for (const r of rule) {
-    s = CryptoJS[`Hmac${HmacFuncString[r]}`](s, key).toString(CryptoJS.enc.Hex);
+    s = crypto.createHmac(HmacFuncString[r], key).update(s).digest('hex');
   }
   return s;
 }
