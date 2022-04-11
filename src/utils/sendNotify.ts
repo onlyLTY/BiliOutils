@@ -223,7 +223,7 @@ async function sendNotify(
     pushPlusNotify(text, desp), //pushplus(推送加)
   ]);
   //由于上述两种微信通知需点击进去才能查看到详情，故text(标题内容)携带了账号序号以及昵称信息，方便不点击也可知道是哪个京东哪个活动
-  text = text.match(/.*?(?=\s?-)/g) ? text.match(/.*?(?=\s?-)/g)[0] : text;
+  // text = text.match(/.*?(?=\s?-)/g) ? text.match(/.*?(?=\s?-)/g)[0] : text;
   await Promise.all([
     BarkNotify(text, desp, params), //iOS Bark APP
     tgBotNotify(text, desp), //telegram 机器人
@@ -255,11 +255,14 @@ async function sendMail(title: string, text: string) {
   });
 
   const info = await transporter.sendMail({
-    from: `"BiliTools任务" <${user.from}>`, // sender address
+    from: `${title} <${user.from}>`, // sender address
     to: user.to, // list of receivers
     subject: title, // Subject line
-    text: text, // plain text body
-    // html: '<b>Hello world?</b>', // html body
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+    },
+    text, // plain text body
+    // html: text, // html body
   });
 
   logger.info(`邮件消息已发送: ${info.messageId}`);

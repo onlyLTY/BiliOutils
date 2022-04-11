@@ -30,7 +30,7 @@ function log(level: LevelType, message: MessageType) {
   const time = formatTime(getPRCDate().toString());
   if (getLevelValues().includes(level)) {
     const msgStr = `[${time}] ${message}`;
-    LogMessage.value += msgStr + '\n';
+    LogMessage.value += msgStr + '\r\n';
   }
   console.log('[%s %s] %s', level, time, message);
 }
