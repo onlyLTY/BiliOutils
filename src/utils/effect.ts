@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { logger } from './log';
 import { TaskConfig } from '../config/globalVar';
-import { random } from 'lodash';
+import { random } from './pure';
 import { sendNotify } from './sendNotify';
 
 /**

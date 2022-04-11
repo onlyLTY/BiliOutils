@@ -1,11 +1,8 @@
-import { random } from 'lodash';
-
 import { Constant, TaskConfig } from '../config/globalVar';
 import { getGiftBagList, sendBagGift, getLiveFansMedal } from '../net/live.request';
 import { getUser } from '../net/user-info.request';
 import { LiveGiftBagListDto } from '../dto/live.dto';
-import { apiDelay } from '../utils';
-import { logger } from '../utils/log';
+import { apiDelay, random, logger } from '../utils';
 
 const EXPIRE_DATE = 2;
 const { BILI_GIFT_UP } = TaskConfig;

@@ -1,5 +1,3 @@
-import { random as baseRandom } from 'lodash';
-
 /**
  * 返回本月天数
  */
@@ -29,8 +27,6 @@ export function createUUID() {
     return (t === 'x' ? e : (3 & e) | 8).toString(16);
   });
 }
-
-export const random = baseRandom;
 
 /**
  * 不同时区获取北京时间
@@ -75,4 +71,45 @@ export function setCron(time = 60_000) {
     value: `${s} ${m} ${h} * * * *`,
     string: `${h}:${m}:${s}`,
   };
+}
+
+/**
+ * 生成随机数
+ * @param lower
+ * @param upper
+ * @param floating
+ */
+export function random(lower?: number, upper?: number, floating?: boolean) {
+  if (floating && typeof floating !== 'boolean') {
+    upper = floating = undefined;
+  }
+  if (floating === undefined) {
+    if (typeof upper === 'boolean') {
+      floating = upper;
+      upper = undefined;
+    } else if (typeof lower === 'boolean') {
+      floating = lower;
+      lower = undefined;
+    }
+  }
+  if (lower === undefined && upper === undefined) {
+    lower = 0;
+    upper = 1;
+  } else if (upper === undefined) {
+    upper = lower;
+    lower = 0;
+  }
+  if (lower > upper) {
+    const temp = lower;
+    lower = upper;
+    upper = temp;
+  }
+  if (floating || lower % 1 || upper % 1) {
+    const rand = Math.random();
+    return Math.min(
+      lower + rand * (upper - lower + parseFloat('1e-' + ((rand + '').length - 1))),
+      upper,
+    );
+  }
+  return lower + Math.floor(Math.random() * (upper - lower + 1));
 }

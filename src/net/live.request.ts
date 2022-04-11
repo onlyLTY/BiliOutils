@@ -15,7 +15,7 @@ import {
 import { liveApi } from './api';
 import { TaskConfig } from '../config/globalVar';
 import { PureDataProp } from '../dto/bili-base-prop';
-import { random } from 'lodash';
+import { random } from '../utils';
 import { OriginURLs } from '../constant/biliUri';
 
 /**

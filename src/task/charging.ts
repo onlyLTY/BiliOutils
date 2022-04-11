@@ -1,9 +1,7 @@
 import { chargingForUp, chargingCommentsForUp } from '../net/vip.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { getPRCDate, getMonthHasDays, apiDelay } from '../utils';
-import { random } from 'lodash';
+import { getPRCDate, getMonthHasDays, apiDelay, logger, random } from '../utils';
 import { updateNav } from './updateNav';
-import { logger } from '../utils/log';
 import { defaultComments } from '../constant';
 
 enum ChargeStatus {
