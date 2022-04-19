@@ -148,17 +148,38 @@ export interface BagSendResDto extends ApiBaseProp {
     guard_level: number;
     ruid: number;
     room_id: number;
+    rcost: number;
     total_coin: number;
     pay_coin: number;
     blow_switch: number;
     send_tips: string;
-    gift_id: number;
-    gift_type: number;
-    gift_name: string;
-    gift_num: number;
-    gift_action: string;
-    gift_price: number;
-    coin_type: string;
+    discount_id: number;
+    send_master: null;
+    button_combo_type: number;
+    send_gift_countdown: number;
+    blind_gift: null;
+    fulltext: '';
+    crit_prob: number;
+    price: number;
+    left_num: number;
+    need_num: number;
+    available_num: number;
+    bp_cent_balance: number;
+    gift_list: [
+      {
+        tid: string;
+        gift_id: number;
+        gift_type: number;
+        gift_name: string;
+        gift_num: number;
+        gift_action: string;
+        gift_price: number;
+        coin_type: string;
+        tag_image: string;
+        effect_block: number;
+      },
+    ];
+    send_id: string;
   };
 }
 

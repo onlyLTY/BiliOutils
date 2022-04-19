@@ -17,14 +17,14 @@ export default async function giveGift() {
       return;
     }
 
-    const { roomid, mid } = await findOneRoom();
-    if (!roomid) {
+    const room = await findOneRoom();
+    if (!room) {
       logger.info(`没有找到投喂目标`);
       return;
     }
 
     // 投喂
-    await sendGift({ roomid, mid }, expiredGifts);
+    await sendGift(room, expiredGifts);
   } catch (error) {
     logger.info(`投喂过期食物异常 ${error}`);
   }
@@ -40,6 +40,7 @@ async function getExpiredGift() {
     return list.filter(gift => {
       // 判断 是否是辣条或者小星星
       if (![1, 30607].includes(gift.gift_id)) {
+        logger.info(`${gift.gift_name} 即将过期请尽快投喂`);
         return false;
       }
       return (gift.expire_at * 1000 - new Date().getTime()) / Constant.MS2DATE < EXPIRE_DATE;
@@ -60,11 +61,11 @@ async function findOneRoom() {
   const getOneUp = () => upList.splice(random(BILI_GIFT_UP.length - 1), 1)[0];
   while (upList.length) {
     const mid = getOneUp();
-    const { roomid } = await getUserRoomId(mid);
-    if (roomid) {
+    const room = await getUserRoom(mid);
+    if (room) {
       return {
-        roomid,
         mid,
+        ...room,
       };
     }
   }
@@ -77,37 +78,33 @@ async function findOneByRandomUp() {
   } = await getLiveFansMedal();
   await apiDelay();
   if (!count) {
-    return {
-      roomid: 0,
-      mid: 0,
-    };
+    return;
   }
   const target = fansMedalList[random(fansMedalList.length - 1)];
   return {
     mid: target.target_id,
-    roomid: target?.roomid || 0,
+    roomid: target.roomid || 0,
+    name: target.uname,
   };
 }
 
-async function getUserRoomId(mid: number) {
+async function getUserRoom(mid: number) {
   try {
     const {
-      data: { live_room },
+      data: { live_room, name },
     } = await getUser(mid);
     await apiDelay();
     if (live_room.roomStatus) {
       return {
         roomid: live_room.roomid,
+        name,
       };
     }
   } catch {}
-  return {
-    roomid: 0,
-  };
 }
 
 async function sendGift(
-  { roomid, mid }: { roomid: number; mid: number },
+  { roomid, mid, name }: { roomid: number; mid: number; name: string },
   gifts: LiveGiftBagListDto['data']['list'],
 ) {
   for (const gift of gifts) {
@@ -122,10 +119,12 @@ async function sendGift(
       });
 
       if (code !== 0) {
-        logger.warn(`给[ ${data.uname} ]投喂${data.gift_name}: ${message}`);
-      } else {
-        logger.info(`成功给[ ${data.uname} ]投喂${data.gift_num}${data.gift_name}`);
+        logger.warn(`向[${name}]投喂[${gift.gift_name}]，${message}`);
+        continue;
       }
+      data.gift_list.forEach(gift => {
+        logger.info(`成功给 [${name}] 投喂${gift.gift_name}`);
+      });
     } catch {}
   }
 }
