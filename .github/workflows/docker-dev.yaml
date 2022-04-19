@@ -55,7 +55,10 @@ jobs:
           mv node_modules dist
       - name: ZIP
         run: |
+          cp config/config.single.json dist/config/config.json
           cd dist
+          mv index.js index.local.js
+          mv index.scf.js index.js
           zip -r -q tencent_scf.zip *
       - name: Use Node.js
         uses: actions/setup-node@v2
@@ -71,11 +74,16 @@ jobs:
           yarn build:rollup
           cp dist/rollup gh-release-dev -r
           cp package.json gh-release-dev
-      - name: Commit files to gh-release branch
+          cp config/config.single.json gh-release-dev/config.json
+          cd gh-release-dev
+          cp ../dist/version.txt .
+          zip -r -q tencent_scf_min.zip index.scf.js config.json version.txt
+          rm config.json index.scf.js version.txt
+      - name: Commit files to gh-release-dev branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'release: Commit from GitHub Actions (dev)'
-          branch: gh-release
+          branch: gh-release-dev
           commit_options: '--no-verify --signoff'
           file_pattern: gh-release-dev/**
           push_options: '--force'
@@ -89,9 +97,7 @@ jobs:
             dist/tencent_scf.zip
             gh-release-dev/index.js
             gh-release-dev/cat_bili_ql.js
-            gh-release-dev/index.scf.js
-            gh-release-dev/index.scf.min.js
-            package.json
+            gh-release-dev/tencent_scf_min.zip
           draft: true
           prerelease: true
         env:

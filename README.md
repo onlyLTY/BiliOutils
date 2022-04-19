@@ -23,6 +23,7 @@
 - [x] 自动使用 B 币券充电
 - [ ] 风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）（test）
+- [x] 多账号独立配置
 - [ ] 支持 Docker 、 SCF 、青龙面板等方式运行，支持执行消息推送
 
 ## 使用说明
@@ -52,7 +53,7 @@
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
 - [青龙面板](./docs/%E9%9D%92%E9%BE%99%E9%9D%A2%E6%9D%BF.md): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `cat_bili_ql.js` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
-- [以编译文件下载](./docs/%E7%BC%96%E8%AF%91%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D.md)
+- [已编译文件下载](./docs/%E7%BC%96%E8%AF%91%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D.md)
 
 ### Docker 镜像
 

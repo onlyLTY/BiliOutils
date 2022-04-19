@@ -67,13 +67,4 @@ export default [
     },
     plugins: plugins(),
   },
-  {
-    input: 'src/index.scf.ts',
-    external,
-    output: {
-      file: 'dist/rollup/index.scf.min.js',
-      format: 'cjs',
-    },
-    plugins: plugins(),
-  },
 ];
