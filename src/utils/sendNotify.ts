@@ -261,7 +261,7 @@ async function sendMail(title: string, text: string) {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
     },
-    text, // plain text body
+    text: text.replaceAll('\n', '\r\n'), // plain text body
     // html: text, // html body
   });
 
