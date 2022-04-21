@@ -1,6 +1,6 @@
 import { apiDelay, random } from '../utils';
 import { addShare, uploadVideoHeartbeat } from '../net/video.request';
-import { getAidByCustomizeUp, getAidByRegionRank } from '../service/coin.service';
+import { getAidByByPriority, getAidByRegionRank } from '../service/coin.service';
 import { TaskModule } from '../config/globalVar';
 import { logger } from '../utils/log';
 
@@ -16,7 +16,7 @@ export default async function shareAndWatch() {
   let gAid: number | string = 0;
   //获取aid
   try {
-    let biliav = await getAidByCustomizeUp();
+    let biliav = await getAidByByPriority();
     if (biliav.msg === '-1') biliav = await getAidByRegionRank();
 
     if (biliav.msg === '0') {
