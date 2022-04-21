@@ -329,6 +329,11 @@ function simplifyData(rData: RData[]) {
   });
 }
 
+/**
+ * scf 运行 liveHeart
+ * @param argData scf 附带信息
+ * @returns 0 是完成，1 是等待继续下一轮心跳，json 数据等待继续下次心跳
+ */
 export async function liveHeartBySCF(argData?: string) {
   let rData: RData[], heartNum: { v: number };
 
@@ -337,13 +342,13 @@ export async function liveHeartBySCF(argData?: string) {
     heartNum = { v: 0 };
   } else {
     const { d, hn } = JSON.parse(argData);
-    rData = typeof d === 'string' ? JSON.parse(gzipDecode(d)) : d;
-    heartNum = hn;
+    rData = typeof d === 'string' ? JSON.parse(gzipDecode(d)) : d || [{ seq: { v: 0 } }];
+    heartNum = hn || { v: 0 };
   }
 
   let count = 0;
   // seq.v === 0 时需要发送 E
-  if (!rData[0]?.seq.v) {
+  if (rData[0] && !rData[0].seq.v) {
     // 清空数据
     rData.length = 0;
     const { heartNum: hnValue, fansMedalList } = await getFansMedalList();

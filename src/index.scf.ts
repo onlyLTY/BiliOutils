@@ -34,6 +34,11 @@ async function liveHeartMain(event: SCFEvent) {
   }
 
   const data = await liveHeartBySCF(event.Message);
+  /**
+   * 0 今日完成，不再需要执行
+   * 1 等待继续下一轮心跳，可能一轮无法获取 24 个小心心，所以需要多轮
+   * data 等待继续下次心跳，要 5 次心跳才能获取到小心心
+   */
   if (data === 0) {
     // 明天再说
     await updateTrigger(Constant.HEART_TRIGGER_NAME);
@@ -46,7 +51,7 @@ async function liveHeartMain(event: SCFEvent) {
       { hn: { v: 0 }, d: [{ seq: { v: 0 } }] },
       setCron(5_000),
     );
-    return '等待继续下一轮';
+    return '等待继续下一轮心跳';
   }
   await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron(62_000 - data.l * 1000));
   return '等待继续下次心跳';
