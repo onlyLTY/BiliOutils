@@ -7,6 +7,8 @@ interface State {
   eCount: number;
   num: number;
   prevCode: number;
+  fillCount: number;
+  priority: number;
 }
 
 export default async function addCoins() {
@@ -16,7 +18,7 @@ export default async function addCoins() {
     return;
   }
 
-  const state: State = { eCount: 0, num: 0, prevCode: 0 };
+  const state: State = { eCount: 0, num: 0, prevCode: 0, fillCount: 0, priority: 0 };
   let isReturn = false;
   // 判断需要投币的数量
   while (TaskModule.coinsTask && !isReturn && state.eCount < 5) {
@@ -37,16 +39,14 @@ async function coinHandle(state: State) {
     return true;
   }
   //这个函数不会报错的
-  const { data, msg } = await getAidByByPriority();
+  const { data, msg } = await getAidByByPriority(state.priority);
   if (!data?.id || msg != '0') {
     state.eCount++;
     return false;
   }
 
   await apiDelay();
-  await coinToIdOnce(data, state);
-
-  return false;
+  return await coinToIdOnce(data, state);
 }
 
 /**
@@ -75,8 +75,12 @@ async function coinToIdOnce(data: AidInfo['data'], state: State) {
       state.num++;
       logger.info(`给[${title}--up【${author}】]投币成功`);
     } else if (coinData.code === 34005) {
-      state.eCount++;
-      logger.warn(`当前稿件[${id}]不能再投币了`);
+      state.fillCount++;
+      logger.verbose(`当前稿件[${id}]不能再投币了`);
+      if (state.fillCount >= 3) {
+        logger.warn(`自定义用户组投币似乎没有币可投了`);
+        state.priority++;
+      }
     } else if (coinData.code === -111 || coinData.code === -104) {
       logger.warn(`${id} ${coinData.message} 无法继续进行投币`);
       return true;
@@ -95,4 +99,5 @@ async function coinToIdOnce(data: AidInfo['data'], state: State) {
   } finally {
     await apiDelay(1500);
   }
+  return false;
 }

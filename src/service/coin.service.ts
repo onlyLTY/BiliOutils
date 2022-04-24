@@ -2,7 +2,7 @@ import { apiDelay, getPageNum, logger, random } from '../utils';
 import { getFollowings, getSpecialFollowings } from '../net/user-info.request';
 import { getRegionRankingVideos } from '../net/video.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import type { FollowingsDto } from '../dto/user-info.dto';
+import type { FollowingsDto, SpecialFollowingsDto } from '../dto/user-info.dto';
 import {
   addCoinForVideo,
   addCoinForArticle,
@@ -12,6 +12,7 @@ import {
   searchAudiosByUpId,
   searchVideosByUpId,
 } from '../net/coin.request';
+import type { ApiBaseProp } from '../dto/bili-base-prop';
 
 const TypeEnum = {
   video: 'video',
@@ -73,25 +74,26 @@ function getRandmonNum([video, audio, article]: number[]) {
 export async function getAidByFollowing(special = true): Promise<AidInfo> {
   try {
     const uid = TaskConfig.USERID;
-    let tempData: FollowingsDto;
-    if (special) {
-      tempData = await getSpecialFollowings();
-    } else {
-      tempData = await getFollowings(uid);
-    }
+    const { data, message, code }: ApiBaseProp = await (special
+      ? getSpecialFollowings()
+      : getFollowings(uid));
 
-    const { data, message, code } = tempData;
+    const followList = special
+      ? (data as SpecialFollowingsDto['data'])
+      : (data as FollowingsDto['data']).list;
 
-    if (code === 0 && data.length > 0) {
-      await apiDelay();
-      const { mid } = data[random(data.length - 1)];
-      return await getIdByRandom(mid);
-    }
-    if (data.length === 0)
+    if (!followList || followList.length === 0) {
       return {
         msg: '-1',
         data: {},
       };
+    }
+
+    if (code === 0) {
+      await apiDelay();
+      const { mid } = followList[random(followList.length - 1)] || {};
+      return await getIdByRandom(mid);
+    }
     return {
       msg: special
         ? `未获取到特别关注列表: ${code}-${message}`
@@ -230,35 +232,38 @@ async function getArticleByRandom(mid: number, page: number, index: number) {
 }
 
 /**
- * 按照优先顺序调用不同函数获取aid
+ * 获取 id 的函数数组
  */
-export async function getAidByByPriority() {
-  let data: AidInfo;
-  const aidFunArray: Array<() => Promise<AidInfo>> = [
+function getIdFuncArray(): Array<() => Promise<AidInfo>> {
+  const arr = [
     getAidByCustomizeUp,
     getAidByFollowing,
     () => getAidByFollowing(false),
     getAidByRegionRank,
   ];
-
   //如果没有自定义up则直接删除
   if (!TaskConfig.BILI_CUSTOMIZE_UP) {
-    aidFunArray.shift();
+    arr.shift();
   }
+  return arr;
+}
 
+export const idFuncArray = getIdFuncArray();
+
+/**
+ * 按照优先顺序调用不同函数获取aid
+ */
+export async function getAidByByPriority(start = 0) {
   //从指定下标开始调用函数
-  aidFunArray.splice(0, TaskModule.currentStartFun);
+  idFuncArray.splice(0, TaskModule.currentStartFun + start);
 
-  for (let index = 0; index < aidFunArray.length; index++) {
-    const fun = aidFunArray[index];
-    data = await fun();
-    if (data.msg === '0') return data;
-
+  for (let index = 0; index < idFuncArray.length; index++) {
+    const fun = idFuncArray[index];
     let i = Number(TaskConfig.BILI_COIN_RETRY_NUM ?? 4);
     i = i < 1 ? 1 : i > 8 ? 8 : i;
     while (i--) {
       await apiDelay();
-      data = await fun();
+      const data = await fun();
       if (data.msg === '-1') i = 0;
       if (data.msg === '0') return data;
     }
@@ -268,6 +273,10 @@ export async function getAidByByPriority() {
     if (i <= 0) {
       TaskModule.currentStartFun = index;
     }
+  }
+
+  if (!idFuncArray.length) {
+    throw new Error('没有可用的函数');
   }
 
   return {

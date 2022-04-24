@@ -5,9 +5,47 @@ export interface CoinBalanceDto extends AccountBaseProp {
   data: { money: number };
 }
 
+/** 特别关注列表 */
+export interface SpecialFollowingsDto extends ApiBaseProp {
+  data: {
+    mid: number;
+    attribute: number;
+    tag: number;
+    special: number;
+    uname: string;
+    sign: string;
+    official_verify: {
+      type: number;
+      desc: string;
+    };
+    vip: unknown;
+    live: {
+      live_status: number;
+      jump_url: string;
+    };
+  }[];
+}
+
 /** 关注列表 */
 export interface FollowingsDto extends ApiBaseProp {
-  data: Array<{ mid: number }>;
+  data: {
+    total: number;
+    re_version: number;
+    list: {
+      mid: number;
+      attribute: number;
+      mtime: number;
+      tag: string;
+      special: number;
+      uname: string;
+      sign: string;
+      official_verify: {
+        type: number;
+        desc: string;
+      };
+      vip: unknown;
+    }[];
+  };
 }
 
 /** 获取指定up主的视频 */

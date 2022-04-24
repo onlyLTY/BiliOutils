@@ -6,6 +6,7 @@ import type {
   FollowingsDto,
   OtherUserDto,
   RewardDto,
+  SpecialFollowingsDto,
   UserInfoNavDto,
 } from '../dto/user-info.dto';
 import type { VideoByUpDto } from '../dto/video.dto';
@@ -80,7 +81,10 @@ export async function getFollowings(
  * @param pageNumber 页数 [1]
  * @param pageSize 每页数量 [50]
  */
-export async function getSpecialFollowings(pageNumber = 1, pageSize = 50): Promise<FollowingsDto> {
+export async function getSpecialFollowings(
+  pageNumber = 1,
+  pageSize = 50,
+): Promise<SpecialFollowingsDto> {
   const { data } = await biliApi.get('/x/relation/tag', {
     params: {
       tagid: -10,
