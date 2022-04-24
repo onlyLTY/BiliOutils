@@ -1,13 +1,21 @@
 import { Constant } from './config/globalVar';
-import { getPRCDate, setCron } from './utils';
+import { getPRCDate, logger, setCron } from './utils';
 import updateTrigger from './utils/updateTrigger';
 import { printVersion } from './utils/effect';
 import { liveHeartBySCF } from './task/liveHeart';
 import type { SCFEvent } from './types/scf';
 import { dailyTasks } from './task/dailyTask';
 
+/**
+ * 公告
+ */
+const notice = async () => {
+  logger.warn(`SCF从5.23号其将不再拥有免费额度，如有需要请停止使用，届时产生费用不予负责。`);
+};
+
 async function dailyMain(event: SCFEvent) {
   printVersion();
+  notice();
 
   let message: { lastTime: string };
   try {
@@ -23,6 +31,7 @@ async function dailyMain(event: SCFEvent) {
 
 async function liveHeartMain(event: SCFEvent) {
   printVersion();
+  notice();
 
   let message;
   try {
