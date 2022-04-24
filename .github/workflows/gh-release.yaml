@@ -100,7 +100,7 @@ jobs:
           yarn build:rollup
           cp dist/rollup gh-release -r
           cp package.json gh-release
-          cp config/config.single.json dist/config/config.json
+          cp config/config.single.json gh-release/config.json
           cd gh-release
           cp ../dist/version.txt .
           zip -r -q tencent_scf_min.zip index.scf.js config.json version.txt
