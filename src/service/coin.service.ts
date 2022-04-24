@@ -19,7 +19,7 @@ const TypeEnum = {
   article: 'article',
 };
 
-interface AidInfo {
+export interface AidInfo {
   msg: string;
   data: {
     type?: string;
