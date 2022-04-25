@@ -6,7 +6,7 @@ import config from './setConfig';
  * @param strArr 字符串数组
  */
 function strArr2numArr(strArr: string[] | number[]) {
-  return strArr?.map(str => Number(str));
+  return strArr && strArr.map(str => Number(str)).filter(num => num > 0 && num % 1 === 0);
 }
 
 /** 默认的任务配置 */

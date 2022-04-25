@@ -38,12 +38,16 @@ async function getExpiredGift() {
     } = await getGiftBagList();
 
     return list.filter(gift => {
-      // 判断 是否是辣条或者小星星
-      if (![1, 30607].includes(gift.gift_id)) {
-        logger.info(`${gift.gift_name} 即将过期请尽快投喂`);
+      if (gift.expire_at <= 0) {
         return false;
       }
-      return (gift.expire_at * 1000 - new Date().getTime()) / Constant.MS2DATE < EXPIRE_DATE;
+      const time = (gift.expire_at * 1000 - new Date().getTime()) / Constant.MS2DATE < EXPIRE_DATE;
+      const isSimple = ![1, 30607].includes(gift.gift_id);
+      if (!isSimple && time) {
+        logger.info(`${gift.gift_name} 即将过期请尽快投喂`);
+      }
+      // 判断 是否是辣条或者小星星
+      return !isSimple ? false : time;
     });
   } catch (error) {
     // 重试一次

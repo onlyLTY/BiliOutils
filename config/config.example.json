@@ -25,7 +25,7 @@
       "targetLevel": 6,
       "coinRetryNum": 5,
       "upperAccMatch": true,
-      "customizeUp": [1],
+      "customizeUp": [],
       "sls": {
         "appName": "catlair_Bilibili",
         "name": "biliExp_test",
