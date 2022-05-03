@@ -1,3 +1,4 @@
+import type { SCFEvent, SCFContext } from '../types/scf';
 import { scf } from 'tencentcloud-sdk-nodejs';
 import { getPRCDate, random } from './pure';
 import config from '../config/setConfig';
@@ -10,7 +11,7 @@ const MAX_MINUTES = 59,
   MAX_HOURS = 23,
   DAILY_MIN_HOURS = 19;
 
-const { DAILY_RUN_TIME, DAILY_TRIGGER_NAME } = Constant;
+const { DAILY_RUN_TIME } = Constant;
 
 /** 每日任务随机时间设置 */
 function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME) {
@@ -43,28 +44,28 @@ function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME) {
 }
 
 /**
- *
- * @param triggerName 定时器名
+ * 更新触发器
+ * @param event SCF 事件
+ * @param context SCF 上下文
  * @param customArg 自定义 scf 参数
  * @param triggerDesc cron 表达式
  * @param runningTotalNumber 接口重试次数
  */
 export default async function (
-  triggerName = DAILY_TRIGGER_NAME,
-  customArg?,
+  event: SCFEvent,
+  context: SCFContext,
+  customArg?: Record<string, unknown>,
   triggerDesc?: { value: string; string: string },
   runningTotalNumber = 2,
 ) {
-  if (!config.sls) {
-    return false;
-  }
-  const FUNCTION_NAME = config.sls?.name;
+  const FUNCTION_NAME = context.tencentcloud_region;
+  const TRIGGER_NAME = event.TriggerName;
   const clientConfig = {
     credential: {
       secretId: process.env.TENCENT_SECRET_ID,
       secretKey: process.env.TENCENT_SECRET_KEY,
     },
-    region: config.sls.region,
+    region: context.tencentcloud_region,
     profile: {
       httpProfile: {
         endpoint: 'scf.tencentcloudapi.com',
@@ -93,12 +94,12 @@ export default async function (
     }
   }
 
-  async function getHasTrigger(triggerName) {
+  async function getHasTrigger() {
     try {
       const { Triggers } = await client.ListTriggers({
         FunctionName: FUNCTION_NAME,
       });
-      const triggerIndex = Triggers?.findIndex(trigger => trigger.TriggerName === triggerName);
+      const triggerIndex = Triggers?.findIndex(trigger => trigger.TriggerName === TRIGGER_NAME);
 
       return triggerIndex !== -1;
     } catch ({ code, message }) {
@@ -111,13 +112,13 @@ export default async function (
     const runTime = triggerDesc || randomDailyRunTime(config.dailyRunTime);
     const params = {
       FunctionName: FUNCTION_NAME,
-      TriggerName: triggerName,
+      TriggerName: TRIGGER_NAME,
       Type: 'timer',
       TriggerDesc: runTime.value,
       Qualifier: '$DEFAULT',
     };
 
-    const hasTrigger = await getHasTrigger(triggerName);
+    const hasTrigger = await getHasTrigger();
 
     logger.info(`修改时间为：${runTime.string}`);
 

@@ -3,7 +3,7 @@ import { getPRCDate, logger, setCron } from './utils';
 import updateTrigger from './utils/updateTrigger';
 import { printVersion } from './utils/effect';
 import { liveHeartBySCF } from './task/liveHeart';
-import type { SCFEvent } from './types/scf';
+import type { SCFContext, SCFEvent } from './types/scf';
 import { dailyTasks } from './task/dailyTask';
 
 /**
@@ -13,7 +13,7 @@ const notice = async () => {
   logger.warn(`SCF从5.23号其将不再拥有免费额度，如有需要请停止使用，届时产生费用不予负责。`);
 };
 
-async function dailyMain(event: SCFEvent) {
+async function dailyMain(event: SCFEvent, context: SCFContext) {
   printVersion();
   notice();
 
@@ -26,10 +26,10 @@ async function dailyMain(event: SCFEvent) {
     return '今日重复执行';
   }
 
-  return await dailyTasks(updateTrigger);
+  return await dailyTasks(() => updateTrigger(event, context));
 }
 
-async function liveHeartMain(event: SCFEvent) {
+async function liveHeartMain(event: SCFEvent, context: SCFContext) {
   printVersion();
   notice();
 
@@ -50,25 +50,21 @@ async function liveHeartMain(event: SCFEvent) {
    */
   if (data === 0) {
     // 明天再说
-    await updateTrigger(Constant.HEART_TRIGGER_NAME);
+    await updateTrigger(event, context);
     return '今日完成';
   }
 
   if (data === 1) {
-    await updateTrigger(
-      Constant.HEART_TRIGGER_NAME,
-      { hn: { v: 0 }, d: [{ seq: { v: 0 } }] },
-      setCron(5_000),
-    );
+    await updateTrigger(event, context, { hn: { v: 0 }, d: [{ seq: { v: 0 } }] }, setCron(5_000));
     return '等待继续下一轮心跳';
   }
-  await updateTrigger(Constant.HEART_TRIGGER_NAME, data, setCron(62_000 - data.l * 1000));
+  await updateTrigger(event, context, data, setCron(62_000 - data.l * 1000));
   return '等待继续下次心跳';
 }
 
-export function main_handler(event: SCFEvent) {
+export function main_handler(event: SCFEvent, context: SCFContext) {
   if (event.TriggerName === Constant.HEART_TRIGGER_NAME) {
-    return liveHeartMain(event);
+    return liveHeartMain(event, context);
   }
-  return dailyMain(event);
+  return dailyMain(event, context);
 }
