@@ -13,7 +13,7 @@
     "start": "node ./dist/index.js",
     "autoclean": "yarn autoclean -F && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
-    "predeploy:multi": "cp -rf ./tools/ ./package*.json ./.yarnclean ./dist && cd ./dist && yarn install --production && npm run autoclean && rm -rf tools package*.json .yarnclean &&  cd ../",
+    "predeploy:multi": "cp -rf ./tools/ ./package*.json ./docker/.yarnclean ./dist && cd ./dist && yarn install --production && npm run autoclean && rm -rf tools package*.json yarn.lock .yarnclean &&  cd ../",
     "postbuild": "cd ./dist && rm -rf ./dto/ ./types/ *.d.js",
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
     "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\""
@@ -44,6 +44,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "@alicloud/fc2": "^2.5.4",
     "axios": "^0.26.0",
     "got": "^11.8.3",
     "nodemailer": "^6.7.2",

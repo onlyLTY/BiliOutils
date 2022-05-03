@@ -6,6 +6,8 @@ declare global {
       BILI_SCF_CONFIG?: string;
       TENCENT_SECRET_ID?: string;
       TENCENT_SECRET_KEY?: string;
+      ALI_SECRET_ID?: string;
+      ALI_SECRET_KEY?: string;
     }
   }
 }

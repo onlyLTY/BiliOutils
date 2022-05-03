@@ -275,10 +275,6 @@ export async function getAidByByPriority(start = 0) {
     }
   }
 
-  if (!idFuncArray.length) {
-    throw new Error('没有可用的函数');
-  }
-
   return {
     msg: '-1',
     data: { id: 0 },

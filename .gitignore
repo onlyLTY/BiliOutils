@@ -7,3 +7,4 @@ dist/
 !config/config.single.json
 .idea
 /src/config/config.json
+yarn-error.log

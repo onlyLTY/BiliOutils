@@ -1,3 +1,9 @@
+import { Constant } from '../config/globalVar';
+
+const MAX_MINUTES = 59,
+  MAX_HOURS = 23,
+  DAILY_MIN_HOURS = 19;
+
 /**
  * 返回本月天数
  */
@@ -112,4 +118,38 @@ export function random(lower?: number, upper?: number, floating?: boolean) {
     );
   }
   return lower + Math.floor(Math.random() * (upper - lower + 1));
+}
+
+/**
+ * 每日任务随机时间设置
+ * @param dailyRunTime 每日任务执行时间
+ */
+export function randomDailyRunTime(dailyRunTime = Constant.DAILY_RUN_TIME, len6?: boolean) {
+  const taskTime = dailyRunTime.split('-');
+  const startTime = taskTime[0].split(':').map(str => +str);
+  const endTime = taskTime[1].split(':').map(str => +str);
+
+  const hours = random(startTime[0] ?? DAILY_MIN_HOURS, endTime[0] ?? MAX_HOURS);
+  let minutes = 0;
+  if (hours == startTime[0]) {
+    minutes = random(startTime[1], MAX_MINUTES);
+  } else if (hours == endTime[0]) {
+    minutes = random(endTime[1]);
+  } else {
+    minutes = random(MAX_MINUTES);
+  }
+  let seconds = 0;
+  if (hours == startTime[0]) {
+    seconds = random(startTime[2], MAX_MINUTES);
+  } else if (hours == endTime[0]) {
+    seconds = random(endTime[2]);
+  } else {
+    seconds = random(MAX_MINUTES);
+  }
+
+  const suffix = len6 ? '' : ' *';
+  return {
+    value: `${seconds} ${minutes} ${hours} * * *` + suffix,
+    string: `${hours}:${minutes}:${seconds}`,
+  };
 }

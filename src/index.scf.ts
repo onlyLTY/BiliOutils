@@ -1,6 +1,6 @@
 import { Constant } from './config/globalVar';
 import { getPRCDate, logger, setCron } from './utils';
-import updateTrigger from './utils/updateTrigger';
+import updateTrigger from './utils/updateScfTrigger';
 import { printVersion } from './utils/effect';
 import { liveHeartBySCF } from './task/liveHeart';
 import type { SCFContext, SCFEvent } from './types/scf';

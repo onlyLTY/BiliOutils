@@ -24,7 +24,7 @@
 - [ ] 风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）（test）
 - [x] 多账号独立配置
-- [ ] 支持 Docker 、 SCF 、青龙面板等方式运行，支持执行消息推送
+- [ ] 支持 Docker 、腾讯 SCF 、阿里 FC、青龙面板等方式运行，支持执行消息推送
 
 ## 使用说明
 

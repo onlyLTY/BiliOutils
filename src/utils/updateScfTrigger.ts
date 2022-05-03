@@ -1,53 +1,16 @@
 import type { SCFEvent, SCFContext } from '../types/scf';
 import { scf } from 'tencentcloud-sdk-nodejs';
-import { getPRCDate, random } from './pure';
+import { getPRCDate, randomDailyRunTime } from './pure';
 import config from '../config/setConfig';
-import { Constant } from '../config/globalVar';
 import { logger } from './log';
 
 const ScfClient = scf.v20180416.Client;
-
-const MAX_MINUTES = 59,
-  MAX_HOURS = 23,
-  DAILY_MIN_HOURS = 19;
-
-const { DAILY_RUN_TIME } = Constant;
-
-/** 每日任务随机时间设置 */
-function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME) {
-  const taskTime = dailyRunTime.split('-');
-  const startTime = taskTime[0].split(':').map(str => +str);
-  const endTime = taskTime[1].split(':').map(str => +str);
-
-  const hours = random(startTime[0] ?? DAILY_MIN_HOURS, endTime[0] ?? MAX_HOURS);
-  let minutes = 0;
-  if (hours == startTime[0]) {
-    minutes = random(startTime[1], MAX_MINUTES);
-  } else if (hours == endTime[0]) {
-    minutes = random(endTime[1]);
-  } else {
-    minutes = random(MAX_MINUTES);
-  }
-  let seconds = 0;
-  if (hours == startTime[0]) {
-    seconds = random(startTime[2], MAX_MINUTES);
-  } else if (hours == endTime[0]) {
-    seconds = random(endTime[2]);
-  } else {
-    seconds = random(MAX_MINUTES);
-  }
-
-  return {
-    value: `${seconds} ${minutes} ${hours} * * * *`,
-    string: `${hours}:${minutes}:${seconds}`,
-  };
-}
 
 /**
  * 更新触发器
  * @param event SCF 事件
  * @param context SCF 上下文
- * @param customArg 自定义 scf 参数
+ * @param customArg 自定义 SCF 参数
  * @param triggerDesc cron 表达式
  * @param runningTotalNumber 接口重试次数
  */
@@ -58,6 +21,14 @@ export default async function (
   triggerDesc?: { value: string; string: string },
   runningTotalNumber = 2,
 ) {
+  if (!event.TriggerName) {
+    return false;
+  }
+  if (!process.env.TENCENT_SECRET_ID || !process.env.TENCENT_SECRET_KEY) {
+    logger.info('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
+    return false;
+  }
+
   const FUNCTION_NAME = context.tencentcloud_region;
   const TRIGGER_NAME = event.TriggerName;
   const clientConfig = {
@@ -132,10 +103,6 @@ export default async function (
     return !!(await createTrigger(params));
   }
 
-  if (!process.env.TENCENT_SECRET_ID || !process.env.TENCENT_SECRET_KEY) {
-    logger.info('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
-    return false;
-  }
   let updateResults = false;
   while (!updateResults && runningTotalNumber) {
     updateResults = await aSingleUpdate();
