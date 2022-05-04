@@ -47,8 +47,9 @@ SCF 将在 5.23 号改版，正式取消免费额度，如有需要请停止使�
 
 运行方法：
 
-- [手动部署到 SCF](./docs/手动部署到SCF.md)
-- [Action 部署到 SCF](./docs/Action部署到SCF.md)
+- [手动部署到腾讯 SCF（即将收费）](./docs/手动部署到SCF.md)
+- [手动部署到阿里 FC（外网流量收费）](./docs/手动部署到FC.md)
+- ~~[Action 部署到 SCF](./docs/Action部署到SCF.md)~~（使用量一直为 0，再加上收费的原因，取消该方法）
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
@@ -57,7 +58,7 @@ SCF 将在 5.23 号改版，正式取消免费额度，如有需要请停止使�
 
 ### Docker 镜像
 
-- `catlair/bilitools-deploy` 用于部署到 SCF
+- ~~`catlair/bilitools-deploy` 用于部署到 SCF~~
 - `catlair/bilitools` 用于直接运行
 
 ## 参考项目

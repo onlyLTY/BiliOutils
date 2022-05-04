@@ -1,6 +1,9 @@
 ## 1. 下载最新版的 [tencent_scf.zip 压缩包](https://github.com/catlair/BiliTools/releases/latest)
 
 [Gitee 备份下载地址](https://gitee.com/catlair/BiliTools/releases/)
+加速下载
+<https://ghproxy.com/https://github.com/catlair/BiliTools/releases/download/v0.4.3/tencent_scf.zip>
+把 v0.4.3 替换成最新版本号即可
 
 ![image](./images/tencent_scf.png)
 
@@ -12,9 +15,9 @@
 
 填写基本的信息
 
-- 运行环境选择最新的 `Nodejs`
+- 运行环境选择最新的 `Nodejs`（目前是 16，最低请选择 14）
 
-![Snipaste_2021-05-23_14-41-45](images/119252549-8b0e3f80-bbdf-11eb-9ea1-efb14cbd5f2c.png)
+![SCF基础配置](images/scf-base-config.png)
 
 选择上传刚才下载的压缩包
 
@@ -44,11 +47,6 @@
 
 ![create-trigger](images/create-trigger.png)
 
-**若要使用随机执行须注意**
+- 直播心跳的触发器名必须为`heart_bili_timer`，否则无法调用
 
-内部只会寻找指定名称的触发器修改下次运行时间
-
-- 每日任务的触发器名为`daily_bili_timer`
-- 直播心跳的触发器名为`heart_bili_timer`
-
-![create-trigger](images/create-trigger-timer.png)
+![create-trigger](images/scf-trigger-config.png)
