@@ -15,7 +15,6 @@ jobs:
         run: |
           sed -i 2a\echo\ version=dev docker-entrypoint.sh
           echo $(date)-dev >> src/version.txt
-          sed -i s/bilitools:latest/bilitools:dev/ docker/deploy.Dockerfile
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
@@ -29,56 +28,66 @@ jobs:
           push: true
           platforms: 'linux/amd64'
           tags: catlair/bilitools:dev
-      - name: Build and Push Deploy
-        id: docker_build_deploy
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./docker/deploy.Dockerfile
-          push: true
-          platforms: 'linux/amd64'
-          tags: catlair/bilitools-deploy:dev
   release:
-    needs: build-docker
     if: github.repository == 'catlair/BiliTools'
     runs-on: ubuntu-latest
     environment: Build
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Copy dist
-        run: |
-          docker pull catlair/bilitools:dev
-          docker run -id --entrypoint sh --name copy_dist catlair/bilitools:dev
-          docker cp copy_dist:/usr/src/app/node_modules .
-          docker cp copy_dist:/usr/src/app/dist .
-          mv node_modules dist
-      - name: ZIP
-        run: |
-          cp config/config.single.json dist/config/config.json
-          cd dist
-          mv index.js index.local.js
-          mv index.scf.js index.js
-          zip -r -q tencent_scf.zip *
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 'lts/fermium'
+          node-version: 'lts/*'
       - name: Install dependencies
         run: |
           rm yarn.lock
-          yarn
-          npm install -g typescript rollup
-      - name: Build
+          jq '( .optionalDependencies )' package.json > optionalDependencies.json
+          jq 'del( .optionalDependencies )' package.json > temp.json
+          mv temp.json package.json
+          yarn install
+          npm install -g rollup
+      - name: Build Babel
         run: |
+          yarn build
+          echo $(date)-dev >> dist/version.txt
+          cp config/config.single.json dist/config/config.json
+          cd dist
+          mv index.js index.local.js
+          mv index.scf.js ../
+          mv index.fc.js ../
+          cd ..
+      - name: ZIP SCF
+        run: |
+          cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
+          mv ./index.scf.js ./dist/index.js
+          cd dist
+          yarn add tencentcloud-sdk-nodejs
+          npm prune --production
+          npm run autoclear
+          rm -rf tools package*.json yarn.lock .yarnclean
+          zip -r -q tencent_scf.zip *
+          mv tencent_scf.zip ../
+          cd ..
+      - name: ZIP FC
+        run: |
+          cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
+          mv ./index.fc.js ./dist/index.js
+          cd dist
+          yarn add @alicloud/fc2
+          npm prune --production
+          npm run autoclear
+          rm -rf tools package*.json yarn.lock .yarnclean
+          zip -r -q aliyun_fc.zip *
+          mv aliyun_fc.zip ../
+          cd ..
+      - name: Build Rollup
+        run: |
+          cat package.json | jq .optionalDependencies="$(cat optionalDependencies.json)" > demo.json
+          mv demo.json package.json
+          yarn
           yarn build:rollup
           cp dist/rollup gh-release-dev -r
-          cp package.json gh-release-dev
-          cp config/config.single.json gh-release-dev/config.json
-          cd gh-release-dev
-          cp ../dist/version.txt .
-          zip -r -q tencent_scf_min.zip index.scf.js config.json version.txt
-          rm config.json index.scf.js version.txt
       - name: Commit files to gh-release-dev branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -94,10 +103,10 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            dist/tencent_scf.zip
+            tencent_scf.zip
+            aliyun_fc.zip
             gh-release-dev/index.js
             gh-release-dev/cat_bili_ql.js
-            gh-release-dev/tencent_scf_min.zip
           draft: true
           prerelease: true
         env:

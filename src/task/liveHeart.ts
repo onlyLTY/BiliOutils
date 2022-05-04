@@ -2,12 +2,13 @@ import * as crypto from 'crypto';
 import type { HeartBaseDateType, DeviceType, HmacsData, LiveHeartRuleId } from '../types';
 import { createUUID, apiDelay, gzipDecode, gzipEncode } from '../utils';
 import { getLIVE_BUVID, getBiliJct } from '../utils/cookie';
-import { Constant, TaskConfig } from '../config/globalVar';
+import { TaskConfig } from '../config/globalVar';
 import * as liveHeartRequest from '../net/live-heart.request';
 import * as liveRequest from '../net/live.request';
 import { LiveFansMedalDto, LiveFansMedalItem, LiveHeartEDto } from '../dto/live.dto';
 import { getGiftBagList } from '../net/live.request';
 import { logger } from '../utils/log';
+import { MS2DATE } from '../constant';
 
 const HEART_MAX_NUM = 24;
 /**
@@ -78,7 +79,7 @@ async function getHeartNum() {
     data.list?.forEach(gift => {
       /** 30607 小星星 */
       if (gift.gift_id === 30607) {
-        const expire = (gift.expire_at * 1000 - new Date().getTime()) / Constant.MS2DATE;
+        const expire = (gift.expire_at * 1000 - new Date().getTime()) / MS2DATE;
         if (expire > 6 && expire <= 7) giftNum += gift.gift_num;
       }
     });

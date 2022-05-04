@@ -1,5 +1,5 @@
+import { HEART_TRIGGER_NAME } from './constant';
 import type { SCFContext, SCFEvent } from './types/scf';
-import { Constant } from './config/globalVar';
 import { logger } from './utils';
 import { printVersion } from './utils/effect';
 import { dailyHandle, liveHeartHandle } from './utils/sls';
@@ -34,7 +34,7 @@ async function liveHeartMain(event: SCFEvent, context: SCFContext) {
 export function main_handler(event: SCFEvent, context: SCFContext) {
   printVersion();
 
-  if (event.TriggerName === Constant.HEART_TRIGGER_NAME) {
+  if (event.TriggerName === HEART_TRIGGER_NAME) {
     return liveHeartMain(event, context);
   }
   return dailyMain(event, context);

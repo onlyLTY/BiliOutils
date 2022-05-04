@@ -87,3 +87,4 @@ LICENSE.
 LICENSE.BSD
 .jscsrc
 AUTHORS
+.package-lock.json

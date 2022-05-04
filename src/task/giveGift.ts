@@ -1,8 +1,9 @@
-import { Constant, TaskConfig } from '../config/globalVar';
+import { TaskConfig } from '../config/globalVar';
 import { getGiftBagList, sendBagGift, getLiveFansMedal } from '../net/live.request';
 import { getUser } from '../net/user-info.request';
 import { LiveGiftBagListDto } from '../dto/live.dto';
 import { apiDelay, random, logger } from '../utils';
+import { MS2DATE } from '../constant';
 
 const EXPIRE_DATE = 2;
 const { BILI_GIFT_UP } = TaskConfig;
@@ -41,7 +42,7 @@ async function getExpiredGift() {
       if (gift.expire_at <= 0) {
         return false;
       }
-      const time = (gift.expire_at * 1000 - new Date().getTime()) / Constant.MS2DATE < EXPIRE_DATE;
+      const time = (gift.expire_at * 1000 - new Date().getTime()) / MS2DATE < EXPIRE_DATE;
       const isSimple = ![1, 30607].includes(gift.gift_id);
       if (!isSimple && time) {
         logger.info(`${gift.gift_name} 即将过期请尽快投喂`);

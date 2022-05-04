@@ -1,7 +1,7 @@
+import { HEART_TRIGGER_NAME } from './constant';
 import type { FCCallback, FCContext, FCEvent } from './types/fc';
 import { logger } from './utils';
 import { printVersion } from './utils/effect';
-import { Constant } from './config/globalVar';
 import { dailyHandle, liveHeartHandle } from './utils/sls';
 
 type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
@@ -35,7 +35,7 @@ export function handler(event: Buffer, context: FCContext, callback: FCCallback)
   printVersion();
   const eventJson: FCEvent = JSON.parse(event.toString());
   let caller: MainFuncType = dailyMain;
-  if (eventJson.triggerName === Constant.HEART_TRIGGER_NAME) {
+  if (eventJson.triggerName === HEART_TRIGGER_NAME) {
     caller = liveHeartMain;
   }
   caller(eventJson, context)

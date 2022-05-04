@@ -8,7 +8,7 @@ import typescript from '@rollup/plugin-typescript';
 const pkgJson = require('./package.json');
 
 const extensions = ['.ts', '.js'];
-const plugins = (config = { node: '12' }) => [
+const plugins = () => [
   nodeResolve({
     preferBuiltins: true,
   }),
@@ -25,7 +25,7 @@ const plugins = (config = { node: '12' }) => [
         '@babel/env',
         {
           targets: {
-            node: config.node,
+            node: '14',
           },
           modules: false,
         },
@@ -39,7 +39,8 @@ const plugins = (config = { node: '12' }) => [
   terser(),
   sizes(),
 ];
-const external = Object.keys(pkgJson.dependencies);
+const optionalDependencies = ['@alicloud/fc2', 'tencentcloud-sdk-nodejs'];
+const external = [...Object.keys(pkgJson.dependencies), ...optionalDependencies];
 
 export default [
   {
@@ -49,22 +50,15 @@ export default [
       file: 'dist/rollup/index.js',
       format: 'cjs',
     },
+    external: optionalDependencies,
   },
   {
-    plugins: plugins({ node: '14' }),
+    plugins: plugins(),
     input: 'src/index.ts',
     output: {
       file: 'dist/rollup/cat_bili_ql.js',
       format: 'cjs',
     },
     external,
-  },
-  {
-    input: 'src/index.scf.ts',
-    output: {
-      file: 'dist/rollup/index.scf.js',
-      format: 'cjs',
-    },
-    plugins: plugins(),
   },
 ];

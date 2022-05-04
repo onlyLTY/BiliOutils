@@ -62,3 +62,11 @@ export const kaomoji = [
   '(汗)',
   '(苦笑)',
 ];
+
+export const HEART_TRIGGER_NAME = 'heart_bili_timer';
+export const DAILY_RUN_TIME = '17:30:00-23:40:00';
+export const HEART_RUN_TIME = '12:00:00-20:00:00';
+/** 毫秒与天数进制 */
+export const MS2DATE = 86_400_000;
+/** 毫秒与小时进制 */
+export const MS2HOUR = 3_600_000;

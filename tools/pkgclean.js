@@ -6,7 +6,7 @@
  */
 
 const { resolve } = require('path');
-const { readFileSync, readdirSync, statSync, writeFileSync } = require('fs');
+const { readFileSync, readdirSync, statSync, writeFileSync, rmdirSync } = require('fs');
 
 const nodeModulesPath = resolve(__dirname, '../node_modules');
 packageClean(nodeModulesPath);
@@ -29,15 +29,18 @@ function packageClean(rootPath) {
 
   const dirPath = [],
     filePath = [];
-  // 判断是文件还是文件夹
   allPath.forEach(p => {
     // 只处理 package.json 文件
-    if (statSync(p).isDirectory()) {
-      dirPath.push(p);
-      return;
-    }
-    if (p.endsWith('package.json')) {
-      filePath.push(p);
+    try {
+      if (statSync(p).isDirectory()) {
+        !delEmptyDir(p) && dirPath.push(p);
+        return;
+      }
+      if (p.endsWith('package.json')) {
+        filePath.push(p);
+      }
+    } catch (error) {
+      console.warn(error);
     }
   });
 
@@ -45,4 +48,21 @@ function packageClean(rootPath) {
   filePath.forEach(file => writePackageFile(file));
   // 递归处理目录
   dirPath.forEach(dir => packageClean(dir));
+}
+
+/**
+ * 删除空文件夹
+ * @param {*} dirPath 文件夹路径
+ */
+function delEmptyDir(dirPath) {
+  // 判断是否为空文件夹
+  if (readdirSync(dirPath).length === 0) {
+    // 删除空文件夹
+    try {
+      rmdirSync(dirPath);
+      return true;
+    } catch (error) {
+      console.warn('删除空文件夹失败', error);
+    }
+  }
 }

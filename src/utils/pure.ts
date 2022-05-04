@@ -1,4 +1,4 @@
-import { Constant } from '../config/globalVar';
+import { DAILY_RUN_TIME, MS2HOUR } from '../constant';
 
 const MAX_MINUTES = 59,
   MAX_HOURS = 23,
@@ -42,7 +42,7 @@ export function getPRCDate(): Date {
     nowTime = now.getTime(),
     timezone = now.getTimezoneOffset() / 60;
   // 3600000 为每小时毫秒数
-  return new Date(nowTime + (timezone + 8) * Constant.MS2HOUR);
+  return new Date(nowTime + (timezone + 8) * MS2HOUR);
 }
 
 /**
@@ -124,7 +124,7 @@ export function random(lower?: number, upper?: number, floating?: boolean) {
  * 每日任务随机时间设置
  * @param dailyRunTime 每日任务执行时间
  */
-export function randomDailyRunTime(dailyRunTime = Constant.DAILY_RUN_TIME, len6?: boolean) {
+export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, len6?: boolean) {
   const taskTime = dailyRunTime.split('-');
   const startTime = taskTime[0].split(':').map(str => +str);
   const endTime = taskTime[1].split(':').map(str => +str);
