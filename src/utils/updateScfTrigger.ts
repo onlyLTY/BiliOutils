@@ -29,7 +29,7 @@ export default async function (
     return false;
   }
 
-  const FUNCTION_NAME = context.tencentcloud_region;
+  const FUNCTION_NAME = context.function_name;
   const TRIGGER_NAME = event.TriggerName;
   const clientConfig = {
     credential: {
