@@ -77,3 +77,13 @@ CopyrightNotice.txt
 .prettierignore
 .prettierrc
 .eslintignore
+.eslintrc.js
+MIT-LICENSE.txt
+.zuul.yml
+.prettierrc.yaml
+LICENSE.MIT
+LICENSE.APACHE2
+LICENSE.
+LICENSE.BSD
+.jscsrc
+AUTHORS

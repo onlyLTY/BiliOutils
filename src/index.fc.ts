@@ -1,35 +1,44 @@
-import { getPRCDate, logger } from './utils';
-import { printVersion } from './utils/effect';
-import updateTrigger from './utils/updateFcTrigger';
-import { dailyTasks } from './task/dailyTask';
 import type { FCCallback, FCContext, FCEvent } from './types/fc';
+import { logger } from './utils';
+import { printVersion } from './utils/effect';
+import { Constant } from './config/globalVar';
+import { dailyHandle, liveHeartHandle } from './utils/sls';
+
+type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
 
 /**
  * 公告
  */
-const notice = async () => {
-  logger.info(`阿里云 FC 测试ing`);
+const notice = async (msg?: string) => {
+  logger.info(msg || `阿里云 FC 测试ing`);
 };
 
 async function dailyMain(event: FCEvent, context: FCContext) {
-  printVersion();
   notice();
+  return await dailyHandle({
+    event,
+    context,
+    slsType: 'fc',
+  });
+}
 
-  let message: { lastTime: string };
-  try {
-    message = JSON.parse(event.payload);
-  } catch (error) {}
-
-  if (message && message.lastTime === getPRCDate().getDate().toString()) {
-    return '今日重复执行';
-  }
-
-  return await dailyTasks(() => updateTrigger(event, context));
+async function liveHeartMain(event: FCEvent, context: FCContext) {
+  notice('功能开发中，敬请期待');
+  return await liveHeartHandle({
+    event,
+    context,
+    slsType: 'fc',
+  });
 }
 
 export function handler(event: Buffer, context: FCContext, callback: FCCallback) {
+  printVersion();
   const eventJson: FCEvent = JSON.parse(event.toString());
-  dailyMain(eventJson, context)
+  let caller: MainFuncType = dailyMain;
+  if (eventJson.triggerName === Constant.HEART_TRIGGER_NAME) {
+    caller = liveHeartMain;
+  }
+  caller(eventJson, context)
     .then(message => {
       callback(null, message);
     })

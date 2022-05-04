@@ -79,10 +79,11 @@ export abstract class TaskModule {
 }
 
 export abstract class Constant {
-  static readonly DAILY_TRIGGER_NAME = 'daily_bili_timer';
   static readonly HEART_TRIGGER_NAME = 'heart_bili_timer';
   static readonly DAILY_RUN_TIME = '17:30:00-23:40:00';
   static readonly HEART_RUN_TIME = '12:00:00-20:00:00';
   /** 毫秒与天数进制 */
   static readonly MS2DATE = 86_400_000;
+  /** 毫秒与小时进制 */
+  static readonly MS2HOUR = 3_600_000;
 }

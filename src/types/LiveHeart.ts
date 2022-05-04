@@ -38,3 +38,14 @@ export interface HeartBaseDateType {
   device: DeviceType;
   uname: string;
 }
+
+export interface HeartSLSDateType {
+  /** 压缩的数据 */
+  d: string;
+  /** 心跳数 */
+  hn: {
+    v: number;
+  };
+  /** 数据长度 */
+  l: number;
+}

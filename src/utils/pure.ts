@@ -42,7 +42,7 @@ export function getPRCDate(): Date {
     nowTime = now.getTime(),
     timezone = now.getTimezoneOffset() / 60;
   // 3600000 为每小时毫秒数
-  return new Date(nowTime + (timezone + 8) * 3_600_000);
+  return new Date(nowTime + (timezone + 8) * Constant.MS2HOUR);
 }
 
 /**
