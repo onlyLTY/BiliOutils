@@ -1,7 +1,3 @@
-import { userConfig } from '../config/setConfig';
-
-const { cookie } = userConfig;
-
 function getCookieArray(cookie: string | undefined) {
   if (!cookie) return [];
   return cookie.split('; ').map(el => el.split('='));
@@ -28,7 +24,7 @@ function cookie2Obj(cookie: string, setCookie: unknown): object {
   return obj;
 }
 
-function getCookieString(obj) {
+function getCookieString(obj: object): string {
   const string = Object.keys(obj).reduce((pre, cur) => {
     return pre + `${cur}=${obj[cur]}; `;
   }, '');
@@ -49,14 +45,14 @@ export function getCookieItem(cookie: string, key: string) {
   return r ? r[1] : null;
 }
 
-export function getUserId(): number {
+export function getUserId(cookie: string): number {
   return Number(getCookieItem(cookie, 'DedeUserID')) || 0;
 }
 
-export function getBiliJct(): string {
+export function getBiliJct(cookie: string): string {
   return getCookieItem(cookie, 'bili_jct') || '';
 }
 
-export function getLIVE_BUVID(): string {
+export function getLIVE_BUVID(cookie: string): string {
   return getCookieItem(cookie, 'LIVE_BUVID') || '';
 }

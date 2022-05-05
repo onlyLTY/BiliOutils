@@ -1,6 +1,6 @@
 import FCClient from '@alicloud/fc2';
 import { getPRCDate, randomDailyRunTime } from './pure';
-import config from '../config/setConfig';
+import { TaskConfig } from '../config/globalVar';
 import { logger } from './log';
 import type { FCContext, FCEvent } from '../types/fc';
 
@@ -56,7 +56,7 @@ export default async function (
   }
 
   async function aSingleUpdate() {
-    const runTime = triggerDesc || randomDailyRunTime(config.dailyRunTime, true);
+    const runTime = triggerDesc || randomDailyRunTime(TaskConfig.config.dailyRunTime, true);
     logger.info(`修改时间为：${runTime.string}`);
     return !!(await updateTrigger(runTime.value));
   }

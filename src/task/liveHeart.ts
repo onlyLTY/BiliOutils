@@ -49,9 +49,9 @@ function createBaseData(
   uname: string,
   seq: number,
 ): HeartBaseDateType {
-  const csrf_token = getBiliJct(),
+  const csrf_token = getBiliJct(TaskConfig.COOKIE),
     csrf = csrf_token;
-  const device: DeviceType = [getLIVE_BUVID(), createUUID()];
+  const device: DeviceType = [getLIVE_BUVID(TaskConfig.COOKIE), createUUID()];
   return {
     ua: TaskConfig.USER_AGENT,
     id: [parentid, areaid, seq, roomid],
@@ -310,8 +310,8 @@ interface RData {
 }
 
 function initData(rData: RData[]) {
-  const buvid = getLIVE_BUVID();
-  const bilijct = getBiliJct();
+  const buvid = getLIVE_BUVID(TaskConfig.COOKIE);
+  const bilijct = getBiliJct(TaskConfig.COOKIE);
   const ua = TaskConfig.USER_AGENT;
   rData.forEach(item => {
     item.baseData.ua = ua;

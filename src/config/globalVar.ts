@@ -15,11 +15,11 @@ export abstract class TaskConfig {
   /** 直接复制全部吧 */
   static COOKIE: string = config.cookie;
   /** bilibili账号的jct */
-  static readonly BILIJCT: string = getBiliJct();
+  static readonly BILIJCT: string = getBiliJct(config.cookie);
   /** bilibili 用户昵称 */
   static NICKNAME = '';
   /**操作用户的bilibili mid */
-  static readonly USERID: number = getUserId();
+  static readonly USERID: number = getUserId(config.cookie);
   /**【可选】用户代理(浏览器) */
   static readonly USER_AGENT: string = config.userAgent;
   /** 预计投币数,默认5 */

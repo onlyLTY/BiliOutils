@@ -1,7 +1,7 @@
 import type { SCFEvent, SCFContext } from '../types/scf';
 import { scf } from 'tencentcloud-sdk-nodejs';
 import { getPRCDate, randomDailyRunTime } from './pure';
-import config from '../config/setConfig';
+import { TaskConfig } from '../config/globalVar';
 import { logger } from './log';
 
 const ScfClient = scf.v20180416.Client;
@@ -80,7 +80,7 @@ export default async function (
   }
 
   async function aSingleUpdate() {
-    const runTime = triggerDesc || randomDailyRunTime(config.dailyRunTime);
+    const runTime = triggerDesc || randomDailyRunTime(TaskConfig.config.dailyRunTime);
     const params = {
       FunctionName: FUNCTION_NAME,
       TriggerName: TRIGGER_NAME,
