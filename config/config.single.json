@@ -14,11 +14,5 @@
   "targetLevel": 6,
   "coinRetryNum": 5,
   "upperAccMatch": true,
-  "customizeUp": [],
-  "sls": {
-    "appName": "catlair_Bilibili",
-    "name": "biliExp_test",
-    "description": "测试账号",
-    "region": "ap-chengdu"
-  }
+  "customizeUp": []
 }

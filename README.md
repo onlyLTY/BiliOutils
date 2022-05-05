@@ -24,7 +24,7 @@
 - [ ] 风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）（test）
 - [x] 多账号独立配置
-- [ ] 支持 Docker 、腾讯 SCF 、阿里 FC、青龙面板等方式运行，支持执行消息推送
+- [ ] 支持 Docker 、腾讯 SCF 、阿里 FC、百度 CFC、青龙面板等方式运行，支持执行消息推送
 
 ## 使用说明
 
@@ -49,6 +49,7 @@ SCF 将在 5.23 号改版，正式取消免费额度，如有需要请停止使�
 
 - [手动部署到腾讯 SCF（即将收费）](./docs/手动部署到SCF.md)
 - [手动部署到阿里 FC（外网流量收费）](./docs/手动部署到FC.md)
+- [手动部署到百度 CFC](./docs/手动部署到CFC.md)
 - ~~[Action 部署到 SCF](./docs/Action部署到SCF.md)~~（使用量一直为 0，再加上收费的原因，取消该方法）
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
