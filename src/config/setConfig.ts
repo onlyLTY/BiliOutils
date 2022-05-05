@@ -78,34 +78,36 @@ function handleMultiUserConfig(config: Config): Config | undefined {
   return conf;
 }
 
-export function setConfig(): Config {
-  let config: Config,
-    loadedErrorFlag = false;
+/** 设置 config */
+function setConfig() {
   if (SystemConfig.isQingLongPanel) {
     configArr.splice(0, 1, ...qlOldConfigArr);
   }
   for (const fn of configArr) {
     try {
-      config = fn();
+      const config = fn();
       if (config) {
-        break;
+        return config;
       }
-      loadedErrorFlag = true;
+      errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
     } catch (error) {
       const { message = {} } = error;
       if (message.includes && message.includes('in JSON at position')) {
-        loadedErrorFlag = true;
+        errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
       }
       continue;
     }
   }
+  return getEnvConfig();
+}
 
-  config ||= getEnvConfig();
+export function getConfig(): Config {
+  return checkConfig(setConfig());
+}
 
+/** 检查 config */
+export function checkConfig(config: Config) {
   if (!config) {
-    if (loadedErrorFlag) {
-      errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
-    }
     errorHandle();
   }
 
@@ -124,7 +126,3 @@ export function setConfig(): Config {
 
   return config;
 }
-
-export const userConfig = setConfig();
-
-export default userConfig;

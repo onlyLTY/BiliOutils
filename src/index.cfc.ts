@@ -1,3 +1,5 @@
+import { TaskConfig } from './config/globalVar';
+TaskConfig.config = null;
 import { dailyTasks } from './task/dailyTask';
 
 export function handler(_event, _context, callback) {

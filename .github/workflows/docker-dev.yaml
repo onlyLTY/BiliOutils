@@ -47,6 +47,18 @@ jobs:
           mv temp.json package.json
           yarn install
           npm install -g rollup
+      - name: Build and ZIP CFC
+        run: |
+          yarn build:baidu
+          echo $(date)-dev >> dist/version.txt
+          cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
+          cd dist
+          npm prune --production
+          yarn autoclear
+          mv index.cfc.js cfc
+          rm -rf index*.js tools package*.json yarn.lock .yarnclean
+          mv cfc index.js
+          zip -r -q ../baidu_cfc.zip .
       - name: Build Babel
         run: |
           yarn build
@@ -56,7 +68,6 @@ jobs:
           mv index.js index.local.js
           mv index.scf.js ../
           mv index.fc.js ../
-          cd ..
       - name: ZIP SCF
         run: |
           cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
@@ -64,23 +75,20 @@ jobs:
           cd dist
           yarn add tencentcloud-sdk-nodejs
           npm prune --production
-          npm run autoclear
+          yarn autoclear
           rm -rf tools package*.json yarn.lock .yarnclean
-          zip -r -q tencent_scf.zip *
-          mv tencent_scf.zip ../
-          cd ..
+          zip -r -q ../tencent_scf.zip *
+          rm -rf node_modules
       - name: ZIP FC
         run: |
           cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
           mv ./index.fc.js ./dist/index.js
           cd dist
-          yarn add @alicloud/fc2
+          # yarn add @alicloud/fc2 # 自带 fc2
           npm prune --production
-          npm run autoclear
+          yarn autoclear
           rm -rf tools package*.json yarn.lock .yarnclean
-          zip -r -q aliyun_fc.zip *
-          mv aliyun_fc.zip ../
-          cd ..
+          zip -r -q ../aliyun_fc.zip *
       - name: Build Rollup
         run: |
           cat package.json | jq .optionalDependencies="$(cat optionalDependencies.json)" > demo.json
@@ -105,6 +113,7 @@ jobs:
           files: |
             tencent_scf.zip
             aliyun_fc.zip
+            baidu_cfc.zip
             gh-release-dev/index.js
             gh-release-dev/cat_bili_ql.js
           draft: true

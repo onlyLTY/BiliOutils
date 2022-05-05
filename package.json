@@ -5,6 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
+    "build:baidu": "babel --config-file ./build/.baidu.babelrc ./src --out-dir ./dist --extensions \".ts\"",
     "build:rollup": "rollup -c rollup.config.js",
     "deploy": "sls deploy --debug",
     "deploy:multi": "node tools/bootstrap.js --scf",
@@ -15,6 +16,7 @@
     "prebuild": "rm -rf dist/",
     "predeploy:multi": "cp -rf ./tools/ ./package*.json ./docker/.yarnclean ./dist && cd ./dist && yarn install --production && npm run autoclear && rm -rf tools package*.json yarn.lock .yarnclean &&  cd ../",
     "postbuild": "cd ./dist && rm -rf ./dto/ ./types/ *.d.js",
+    "postbuild:baidu": "npm run postbuild && awk 'NR==10{s=$0;getline;s=$0\"\\n\"s;getline;print;print s;next;}1' dist/index.cfc.js > dist/index.cfc && mv dist/index.cfc dist/index.cfc.js",
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
     "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\""
   },
