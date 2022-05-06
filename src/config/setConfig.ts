@@ -7,7 +7,7 @@ import { SystemConfig } from './systemConfig';
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 
 function errorHandle(msg?: string): never {
-  throw new Error(msg || '配置文件不存（位置不正确）在或 cookie 不存在！！！');
+  throw new Error(msg || '获取配置失败！');
 }
 
 const configArr = [
@@ -83,20 +83,23 @@ function setConfig() {
   if (SystemConfig.isQingLongPanel) {
     configArr.splice(0, 1, ...qlOldConfigArr);
   }
+  let hasTag = false;
   for (const fn of configArr) {
     try {
       const config = fn();
       if (config) {
         return config;
       }
-      errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
+      hasTag = true;
     } catch (error) {
-      const { message = {} } = error;
+      const { message = '' } = error;
       if (message.includes && message.includes('in JSON at position')) {
         errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
       }
-      continue;
     }
+  }
+  if (hasTag) {
+    errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
   }
   return getEnvConfig();
 }
@@ -121,7 +124,7 @@ export function checkConfig(config: Config) {
   }
 
   if (!config.cookie) {
-    errorHandle();
+    errorHandle('配置文件中没有 cookie！');
   }
 
   return config;

@@ -91,7 +91,7 @@ export const TaskConfig = new Proxy({} as TaskConfigTemplate, {
   set(_target, key, value) {
     if (key === 'config') {
       initialize(value);
-      return; // 否则 config 会被覆盖
+      return true; // 否则 config 会被覆盖
     }
     return Reflect.set(_taskConfig, key, value);
   },
