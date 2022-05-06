@@ -61,4 +61,13 @@ export default [
     },
     external,
   },
+  {
+    plugins: plugins(),
+    input: 'src/index.cfc.ts',
+    output: {
+      file: 'dist/rollup/index.agc.js',
+      format: 'cjs',
+    },
+    external: optionalDependencies,
+  },
 ];

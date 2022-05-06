@@ -114,6 +114,12 @@ jobs:
           yarn
           yarn build:rollup
           cp dist/rollup gh-release -r
+      - name: ZIP huawei AGC
+        run: |
+          mkdir temp
+          cp dist/rollup/index.agc.js temp/index.js
+          cd temp
+          zip -r -q ../huawei_agc.zip index.js
       - name: Commit files to gh-release branch
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -132,6 +138,7 @@ jobs:
             tencent_scf.zip
             aliyun_fc.zip
             baidu_cfc.zip
+            huawei_agc.zip
             gh-release/index.js
             gh-release/cat_bili_ql.js
           draft: false
