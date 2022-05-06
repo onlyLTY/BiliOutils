@@ -54,8 +54,6 @@ class TaskConfigTemplate {
   /** 自定义推送 Api */
   readonly MESSAGE_API: string;
 
-  private biliApiDelay: number[] | number;
-
   constructor(config: Config) {
     this.config = config;
     this.COOKIE = config.cookie;
@@ -64,9 +62,8 @@ class TaskConfigTemplate {
     this.USERID = getUserId(config.cookie);
     this.USER_AGENT = config.userAgent;
     this.BILI_TARGET_COINS = config.targetCoins ?? 5;
-    this.BILI_API_DELAY = Array.isArray(this.biliApiDelay)
-      ? this.biliApiDelay
-      : [this.biliApiDelay];
+    const apiDelay = config.apiDelay ?? [2, 6];
+    this.BILI_API_DELAY = Array.isArray(apiDelay) ? strArr2numArr(apiDelay) : [Number(apiDelay)];
     this.BILI_CUSTOMIZE_UP = strArr2numArr(config.customizeUp) || [];
     this.BILI_GIFT_UP = strArr2numArr(config.giftUp) || this.BILI_CUSTOMIZE_UP || [];
     this.BILI_TARGET_LEVEL = config.targetLevel ?? 6;
@@ -94,6 +91,7 @@ export const TaskConfig = new Proxy({} as TaskConfigTemplate, {
   set(_target, key, value) {
     if (key === 'config') {
       initialize(value);
+      return; // 否则 config 会被覆盖
     }
     return Reflect.set(_taskConfig, key, value);
   },
