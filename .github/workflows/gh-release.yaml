@@ -4,48 +4,16 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
-  build-docker:
-    if: github.repository == 'catlair/BiliTools'
-    runs-on: ubuntu-latest
-    environment: Build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: set Docker version tag
-        run: |
-          echo DOCKER_TAG1=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
-      - name: set Docker latest tag
-        run: |
-          echo DOCKER_TAG2=${{ contains(env.DOCKER_TAG1, 'rc') && 'test' || 'latest' }} >> $GITHUB_ENV
-          sed -i 2a\echo\ version=${{ env.DOCKER_TAG1 }} docker-entrypoint.sh
-          echo ${{ env.DOCKER_TAG1 }} >> src/version.txt
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and Push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          platforms: ${{ secrets.DOCKER_PLATFORMS || 'linux/amd64,linux/arm64/v8' }}
-          tags: catlair/bilitools:${{ env.DOCKER_TAG2 }},catlair/bilitools:${{ env.DOCKER_TAG1 }}
-      - name: Image digest
-        run: |
-          echo "镜像对应hash"
-          echo ${{ steps.docker_build.outputs.digest }}
   release:
     if: github.repository == 'catlair/BiliTools'
     runs-on: ubuntu-latest
     environment: Build
+    env:
+      IS_PROD: ${{ startsWith(github.ref, 'refs/tags/v') }}
+      IS_RC: ${{ contains(github.ref, '-rc') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -61,14 +29,18 @@ jobs:
           mv temp.json package.json
           yarn install
           npm install -g rollup
-      - name: set Docker version tag
+      - name: set Docker version tag for prod
+        if: ${{ env.IS_PROD == 'true' }}
         run: |
-          echo DOCKER_TAG1=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
-          echo DOCKER_TAG2=${{ contains(env.DOCKER_TAG1, 'rc') && 'test' || 'latest' }} >> $GITHUB_ENV
+          echo DOCKER_TAG=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
+      - name: set Docker version tag for dev
+        if: ${{ env.IS_PROD == 'false' }}
+        run: |
+          echo DOCKER_TAG=$(date)-dev >> $GITHUB_ENV
       - name: Build and ZIP CFC
         run: |
           yarn build:baidu
-          echo ${{ env.DOCKER_TAG1 }} >> dist/version.txt
+          echo ${{ env.DOCKER_TAG }} >> dist/version.txt
           cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
           cd dist
           npm prune --production
@@ -80,7 +52,7 @@ jobs:
       - name: Build Babel
         run: |
           yarn build
-          echo ${{ env.DOCKER_TAG1 }} >> dist/version.txt
+          echo ${{ env.DOCKER_TAG }} >> dist/version.txt
           cp config/config.single.json dist/config/config.json
           cd dist
           mv index.js index.local.js
@@ -120,11 +92,11 @@ jobs:
           cp dist/rollup/index.agc.js temp/index.js
           cd temp
           zip -r -q ../huawei_agc.zip index.js
-      - name: Commit files to gh-release branch
+      - name: Commit files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'release: Commit from GitHub Actions (gh-release)'
-          branch: gh-release
+          branch: ${{ env.IS_PROD && 'gh-release' || 'gh-release-dev' }}
           commit_options: '--no-verify --signoff'
           file_pattern: gh-release/**
           push_options: '--force'
@@ -141,7 +113,7 @@ jobs:
             huawei_agc.zip
             gh-release/index.js
             gh-release/cat_bili_ql.js
-          draft: false
-          prerelease: ${{ env.DOCKER_TAG == 'test' }}
+          draft: ${{ env.IS_PROD == 'false' }}
+          prerelease: ${{ env.IS_PROD == 'true' && env.IS_RC == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
