@@ -2,9 +2,14 @@
 
 [Gitee 备份下载地址](https://gitee.com/catlair/BiliTools/releases/)
 
+加速下载：
+<https://ghproxy.com/https://github.com/catlair/BiliTools/releases/download/v0.4.5/aliyun_fc.zip>
+
+把 v0.4.5 替换成最新版本号即可
+
 ![aliyun_fc](./images/aliyun_fc.png)
 
-## 2. 新增 scf
+## 2. 新增 fc
 
 [点击进入云函数控制台](https://fcnext.console.aliyun.com/cn-chengdu/services)
 

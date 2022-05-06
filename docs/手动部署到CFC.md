@@ -1,8 +1,10 @@
 ## 1. 下载最新版的 [baidu_cfc.zip 压缩包](https://github.com/catlair/BiliTools/releases/latest)
 
 [Gitee 备份下载地址](https://gitee.com/catlair/BiliTools/releases/)
-加速下载
+
+加速下载：
 <https://ghproxy.com/https://github.com/catlair/BiliTools/releases/download/v0.4.5/baidu_cfc.zip>
+
 把 v0.4.5 替换成最新版本号即可
 
 详细过程略，请参考 [手动部署到 SCF](./手动部署到SCF.md)
