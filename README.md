@@ -51,6 +51,7 @@ SCF 将在 5.23 号改版，正式取消免费额度，如有需要请停止使�
 - [手动部署到阿里 FC（外网流量收费）](./docs/手动部署到FC.md)
 - [手动部署到百度 CFC](./docs/手动部署到CFC.md)
 - [手动部署到华为 FG](./docs/手动部署到FG.md)
+- [手动部署到华为 AGC-FC](./docs/手动部署到AGC-FC.md)
 - ~~[Action 部署到 SCF](./docs/Action部署到SCF.md)~~（使用量一直为 0，再加上收费的原因，取消该方法）
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
