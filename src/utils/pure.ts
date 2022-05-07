@@ -1,3 +1,4 @@
+import type { CronDateType, SLSType } from '../types';
 import { DAILY_RUN_TIME, MS2HOUR } from '../constant';
 
 const MAX_MINUTES = 59,
@@ -66,14 +67,14 @@ export function getPageNum(n: number, m: number) {
  * 设置 cron 表达式
  * @param time 时间戳
  */
-export function setCron(time = 60_000, len6?: boolean) {
+export function setCron(time = 60_000, slsType?: SLSType) {
   time = time || 60_000;
   const pre = getPRCDate().getTime() + time;
   const next = new Date(pre);
-  const s = next.getSeconds(),
-    m = next.getMinutes(),
-    h = next.getHours();
-  return formatCron(s, m, h, len6);
+  const seconds = next.getSeconds(),
+    minutes = next.getMinutes(),
+    hours = next.getHours();
+  return formatCron({ hours, minutes, seconds }, slsType);
 }
 
 /**
@@ -121,7 +122,7 @@ export function random(lower?: number, upper?: number, floating?: boolean) {
  * 每日任务随机时间设置
  * @param dailyRunTime 每日任务执行时间
  */
-export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, len6?: boolean) {
+export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, slsType?: SLSType) {
   const taskTime = dailyRunTime.split('-');
   const startTime = taskTime[0].split(':').map(str => +str);
   const endTime = taskTime[1].split(':').map(str => +str);
@@ -144,21 +145,33 @@ export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, len6?: boolean
     seconds = random(MAX_MINUTES);
   }
 
-  return formatCron(hours, minutes, seconds, len6);
+  return formatCron({ seconds, hours, minutes }, slsType);
 }
 
 /**
  * 格式化 cron 表达式
- * @param hours
- * @param minutes
- * @param seconds
- * @param len6 是否需要 6 位表达式
+ * @param Date
+ * @param type
  */
-export function formatCron(hours: number, minutes: number, seconds?: number, len6?: boolean) {
-  const suffix = len6 ? '' : ' *';
+export function formatCron({ hours, minutes, seconds }: CronDateType, type?: SLSType) {
   seconds = seconds || 0;
+  let value: string;
+  switch (type) {
+    case 'scf':
+      value = `${seconds} ${minutes} ${hours} * * * *`;
+      break;
+    case 'fc':
+      value = `${seconds} ${minutes} ${hours} * * *`;
+      break;
+    case 'cfc':
+      value = `corn(${minutes} ${hours} * * *)`;
+      break;
+    default:
+      value = `${seconds} ${minutes} ${hours} * * * *`;
+      return;
+  }
   return {
-    value: `${seconds} ${minutes} ${hours} * * *` + suffix,
+    value,
     string: `${hours}:${minutes}:${seconds}`,
   };
 }

@@ -2,9 +2,7 @@ import { getPRCDate, setCron } from './pure';
 import { dailyTasks } from '../task/dailyTask';
 import type { FCContext, FCEvent } from '../types/fc';
 import { liveHeartBySCF } from '../task/liveHeart';
-import type { HeartSLSDateType, SCFContext, SCFEvent } from '../types';
-
-type SLSType = 'scf' | 'fc';
+import type { HeartSLSDateType, SCFContext, SCFEvent, SLSType } from '../types';
 
 interface Params {
   event: FCEvent | SCFEvent;
@@ -45,8 +43,7 @@ export async function dailyHandle({ event, context, slsType }: Params) {
 
 export async function liveHeartHandle({ event, context, slsType }: Params) {
   const payload = getPayload(slsType, event),
-    updateTrigger = await getUpdateTrigger(slsType, event, context),
-    isLen6 = slsType !== 'scf';
+    updateTrigger = await getUpdateTrigger(slsType, event, context);
   let message: HeartSLSDateType & { lastTime: string };
   try {
     message = JSON.parse(payload);
@@ -69,9 +66,9 @@ export async function liveHeartHandle({ event, context, slsType }: Params) {
   }
 
   if (data === 1) {
-    await updateTrigger({ hn: { v: 0 }, d: [{ seq: { v: 0 } }] }, setCron(5_000, isLen6));
+    await updateTrigger({ hn: { v: 0 }, d: [{ seq: { v: 0 } }] }, setCron(5_000, slsType));
     return '等待继续下一轮心跳';
   }
-  await updateTrigger(data, setCron(62_000 - data.l * 1000, isLen6));
+  await updateTrigger(data, setCron(62_000 - data.l * 1000, slsType));
   return '等待继续下次心跳';
 }
