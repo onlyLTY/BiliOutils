@@ -45,7 +45,8 @@ export async function dailyHandle({ event, context, slsType }: Params) {
 
 export async function liveHeartHandle({ event, context, slsType }: Params) {
   const payload = getPayload(slsType, event),
-    updateTrigger = await getUpdateTrigger(slsType, event, context);
+    updateTrigger = await getUpdateTrigger(slsType, event, context),
+    isLen6 = slsType !== 'scf';
   let message: HeartSLSDateType & { lastTime: string };
   try {
     message = JSON.parse(payload);
@@ -68,9 +69,9 @@ export async function liveHeartHandle({ event, context, slsType }: Params) {
   }
 
   if (data === 1) {
-    await updateTrigger({ hn: { v: 0 }, d: [{ seq: { v: 0 } }] }, setCron(5_000));
+    await updateTrigger({ hn: { v: 0 }, d: [{ seq: { v: 0 } }] }, setCron(5_000, isLen6));
     return '等待继续下一轮心跳';
   }
-  await updateTrigger(data, setCron(62_000 - data.l * 1000));
+  await updateTrigger(data, setCron(62_000 - data.l * 1000, isLen6));
   return '等待继续下次心跳';
 }

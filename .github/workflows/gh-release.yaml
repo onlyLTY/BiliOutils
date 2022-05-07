@@ -55,9 +55,8 @@ jobs:
           echo ${{ env.DOCKER_TAG }} >> dist/version.txt
           cp config/config.single.json dist/config/config.json
           cd dist
+          mv index.*.js ../
           mv index.js index.local.js
-          mv index.scf.js ../
-          mv index.fc.js ../
       - name: ZIP SCF
         run: |
           cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/

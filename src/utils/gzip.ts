@@ -7,9 +7,10 @@ import * as pako from 'pako';
  */
 export const gzipEncode = (str: string): string => {
   try {
-    return Buffer.from(pako.gzip(escape(str), { to: 'string' }).toString(), 'binary').toString(
-      'base64',
-    );
+    return Buffer.from(
+      pako.gzip(encodeURIComponent(str), { to: 'string' }).toString(),
+      'binary',
+    ).toString('base64');
   } catch (e) {
     return 'Error: 当前字符串不能被Gzip加密';
   }
@@ -29,7 +30,7 @@ export const gzipDecode = (str: string): string => {
     const data = pako.inflate(new Uint8Array(charData));
     const result = String.fromCharCode.apply(null, new Uint16Array(data));
     try {
-      return unescape(result);
+      return decodeURIComponent(result);
     } catch (ee) {
       return result;
     }

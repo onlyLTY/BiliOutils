@@ -66,17 +66,14 @@ export function getPageNum(n: number, m: number) {
  * 设置 cron 表达式
  * @param time 时间戳
  */
-export function setCron(time = 60_000) {
+export function setCron(time = 60_000, len6?: boolean) {
   time = time || 60_000;
   const pre = getPRCDate().getTime() + time;
   const next = new Date(pre);
   const s = next.getSeconds(),
     m = next.getMinutes(),
     h = next.getHours();
-  return {
-    value: `${s} ${m} ${h} * * * *`,
-    string: `${h}:${m}:${s}`,
-  };
+  return formatCron(s, m, h, len6);
 }
 
 /**
@@ -147,7 +144,19 @@ export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, len6?: boolean
     seconds = random(MAX_MINUTES);
   }
 
+  return formatCron(hours, minutes, seconds, len6);
+}
+
+/**
+ * 格式化 cron 表达式
+ * @param hours
+ * @param minutes
+ * @param seconds
+ * @param len6 是否需要 6 位表达式
+ */
+export function formatCron(hours: number, minutes: number, seconds?: number, len6?: boolean) {
   const suffix = len6 ? '' : ' *';
+  seconds = seconds || 0;
   return {
     value: `${seconds} ${minutes} ${hours} * * *` + suffix,
     string: `${hours}:${minutes}:${seconds}`,
