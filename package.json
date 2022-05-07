@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
     "build:baidu": "babel --config-file ./build/.baidu.babelrc ./src --out-dir ./dist --extensions \".ts\"",
-    "build:rollup": "rollup -c rollup.config.js",
+    "build:rollup": "rollup -c rollup.config.ts",
     "deploy": "sls deploy --debug",
     "deploy:multi": "node tools/bootstrap.js --scf",
     "start:multi": "node tools/bootstrap.js --start",
