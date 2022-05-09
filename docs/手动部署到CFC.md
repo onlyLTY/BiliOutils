@@ -9,6 +9,8 @@
 
 详细过程略，请参考 [手动部署到 SCF](./手动部署到SCF.md)
 
+[点击访问百度 CFC](https://cloud.baidu.com/product/cfc.html)
+
 - Nodejs 版本请选择 12.x 及以上
 - 暂时只支持每日任务
 - 暂时不支持随机时间运行

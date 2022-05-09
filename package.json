@@ -18,7 +18,8 @@
     "postbuild": "cd ./dist && rm -rf ./dto/ ./types/ *.d.js",
     "postbuild:baidu": "npm run postbuild && awk 'NR==10{s=$0;getline;s=$0\"\\n\"s;getline;print;print s;next;}1' dist/index.cfc.js > dist/index.cfc && mv dist/index.cfc dist/index.cfc.js",
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
-    "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\""
+    "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\"",
+    "gitee": "ts-node tools/download.ts && ts-node tools/giteeRelease.ts"
   },
   "author": "catlair",
   "license": "MIT",
@@ -57,6 +58,8 @@
   },
   "optionalDependencies": {
     "@alicloud/fc2": "^2.5.4",
+    "dotenv": "^16.0.0",
+    "puppeteer": "^13.1.1",
     "tencentcloud-sdk-nodejs": "^4.0.297"
   }
 }

@@ -3,6 +3,8 @@ import { printVersion } from './utils/effect';
 import liveHeart from './task/liveHeart';
 import { dailyTasks } from './task/dailyTask';
 
+process.env.IS_LOCAL = 'true';
+
 (async function dailyMain() {
   printVersion();
 

@@ -9,7 +9,7 @@
 
 ## 2. 新增 AGC CF
 
-[点击进入 AGC](https://developer.huawei.com/consumer/cn/service/josp/agc/index.htm)
+[点击进入 AGC](https://developer.huawei.com/consumer/cn/service/josp/agc/index.html)
 
 先创建一个项目，打开项目后开通云函数
 

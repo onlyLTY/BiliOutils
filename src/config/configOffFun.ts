@@ -25,6 +25,14 @@ function funHandle() {
   if (!functionConfig.addCoins && !functionConfig.shareAndWatch) {
     functionConfig.taskReward = false;
   }
+  /**
+   * 非本地环境下，无法执行 liveHeart
+   * Serveless 支持的除外
+   */
+  const { LIVE_HEART_FORCE, IS_LOCAL } = process.env;
+  if (!LIVE_HEART_FORCE && IS_LOCAL !== 'true') {
+    functionConfig.liveHeart = false;
+  }
 }
 
 /**

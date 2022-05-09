@@ -94,6 +94,8 @@
 | matchGame       | `false` | 赛事竞猜             |
 | liveHeart       | `false` | 直播心跳（小心心）   |
 
+- liveHeart 在使用 Serverless 时即使配置为 true，也不会运行。但是在 SCF、FC 等环境中配置 `heart_bili_timer` 触发器即可正常运行，具体情况请参考对应平台的配置文档。若要强制使用请配置 `LIVE_HEART_FORCE` 环境变量为任意值（由此可能导致云函数超时等异常，一概不知）。
+
 ### 腾讯云函数（SCF）配置
 
 - 使用 Github Action 推送必须配置

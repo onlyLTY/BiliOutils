@@ -8,7 +8,7 @@
     "target": "esnext",
     "outDir": "./dist",
     "baseUrl": "./",
-    "lib": ["esnext"],
+    "lib": ["esnext", "DOM"],
     "skipLibCheck": true,
     "moduleResolution": "node"
   },
