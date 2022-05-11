@@ -5,8 +5,8 @@ export interface CoinBalanceDto extends AccountBaseProp {
   data: { money: number };
 }
 
-/** 特别关注列表 */
-export interface SpecialFollowingsDto extends ApiBaseProp {
+/** 关注列表 */
+export interface TagsFollowingsDto extends ApiBaseProp {
   data: {
     mid: number;
     attribute: number;
@@ -199,4 +199,20 @@ export interface OtherUserDto extends ApiBaseProp {
     tags: [string];
     series: { user_upgrade_status: number; show_upgrade_window: false };
   };
+}
+
+/**
+ * 创建 Tag 的返回值
+ */
+export interface CreateTagDto extends ApiBaseProp {
+  /** 0 成功 22106 已存在 */
+  code: number;
+  data: { tagid: number };
+}
+
+/**
+ * 分组列表
+ */
+export interface TagListDto extends ApiBaseProp {
+  data: { tagid: number; name: string; count: number; tip: string }[];
 }

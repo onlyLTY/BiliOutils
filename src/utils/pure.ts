@@ -175,3 +175,51 @@ export function formatCron({ hours, minutes, seconds }: CronDateType, type?: SLS
     string: `${hours}:${minutes}:${seconds}`,
   };
 }
+
+/**
+ * 随机字符串
+ * @param length
+ * @param lower
+ */
+export function randomString(length: number, lower?: boolean) {
+  const chars = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += chars[random(chars.length - 1)];
+  }
+  if (lower) {
+    return result.toLowerCase();
+  }
+  return result;
+}
+
+/**
+ * 获取 visitorId
+ * @description 获取 visitorId，部分请求需要
+ */
+export function getVisitId() {
+  // 1 ~ 9
+  const randomNum = random(1, 9);
+  // 10 位随机数字字母字符串
+  const randomStr = randomString(10, true);
+  return `${randomNum}${randomStr}0`;
+}
+
+/**
+ * 不存在于数组就添加它
+ * @param array
+ * @param item
+ */
+export function pushIfNotExist<T = unknown>(array: T[], item: T) {
+  if (!array.includes(item)) {
+    array.push(item);
+  }
+}
+
+/**
+ * 生成新对象，即使原对象是 undefined，获取属性也不会报错
+ * @param object 值
+ */
+export function getNewObject<T = unknown>(object: T): T {
+  return object || ({} as T);
+}

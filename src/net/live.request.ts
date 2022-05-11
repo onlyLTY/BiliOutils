@@ -3,8 +3,12 @@ import { stringify } from 'qs';
 import {
   BagSendResDto,
   FansMedalPanelDto,
+  JoinLotteryDto,
+  LiveAreaDto,
+  LiveCheckLotteryRes,
   LiveFansMedalDto,
   LiveGiftBagListDto,
+  LiveRoomDto,
   LiveRoomInfoDto,
   LiveSignDto,
   LiveSignInfoDto,
@@ -15,7 +19,7 @@ import {
 import { liveApi } from './api';
 import { TaskConfig } from '../config/globalVar';
 import { PureDataProp } from '../dto/bili-base-prop';
-import { random } from '../utils';
+import { getVisitId, random } from '../utils';
 import { OriginURLs } from '../constant/biliUri';
 
 /**
@@ -185,5 +189,60 @@ export async function sendBagGift({
       Origin: OriginURLs.live,
     },
   });
+  return data;
+}
+
+/**
+ * 获取分区信息
+ */
+export async function getArea(): Promise<LiveAreaDto> {
+  const { data } = await liveApi.get('/xlive/web-interface/v1/index/getWebAreaList?source_id=2');
+  return data;
+}
+
+/**
+ * 获取直播间列表
+ * @param parentArea
+ * @param areaId
+ * @param page
+ */
+export async function getLiveRoom(
+  parentArea: IdType,
+  areaId: IdType,
+  page = 1,
+): Promise<LiveRoomDto> {
+  const { data } = await liveApi.get(
+    `/xlive/web-interface/v1/second/getList?platform=web&parent_area_id=${parentArea}&area_id=${areaId}&page=${page}`,
+  );
+  return data;
+}
+
+/**
+ * 检查天选时刻状态（lottery）
+ * @param roomId 直播间id
+ */
+export async function checkLottery(roomId: IdType): Promise<LiveCheckLotteryRes> {
+  const { data } = await liveApi.get(`/xlive/lottery-interface/v1/Anchor/Check?roomid=${roomId}`);
+  return data;
+}
+
+/**
+ * 天选抽奖
+ */
+export async function joinLottery(options: {
+  id: IdType;
+  gift_id: IdType;
+  gift_num: number;
+}): Promise<JoinLotteryDto> {
+  const { data } = await liveApi.post(
+    `/xlive/lottery-interface/v1/Anchor/Join`,
+    stringify({
+      ...options,
+      csrf: TaskConfig.BILIJCT,
+      csrf_token: TaskConfig.BILIJCT,
+      visit_id: getVisitId(),
+      platform: 'pc',
+    }),
+  );
   return data;
 }

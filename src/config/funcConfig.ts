@@ -12,6 +12,9 @@ export const functionConfig = {
   giveGift: false,
   matchGame: false,
   liveHeart: false,
+  liveLottery: false,
 };
 
 export default functionConfig;
+
+export type FunctionConfig = typeof functionConfig;

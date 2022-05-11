@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { logger } from './log';
-import { TaskConfig } from '../config/globalVar';
+import { TaskConfig, TaskModule } from '../config/globalVar';
 import { random } from './pure';
 import { sendNotify } from './sendNotify';
 
@@ -25,7 +25,7 @@ export function printVersion() {
 export async function sendMessage(title: string, text: string) {
   logger.info('----【消息推送】----');
   // 处理 title
-  title = `Bili-${TaskConfig.NICKNAME}-${title}`;
+  title = `Bili-${TaskModule.nickname}-${title}`;
   await sendNotify(title, text, undefined, '');
 }
 

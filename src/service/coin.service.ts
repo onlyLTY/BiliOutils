@@ -2,7 +2,7 @@ import { apiDelay, getPageNum, logger, random } from '../utils';
 import { getFollowings, getSpecialFollowings } from '../net/user-info.request';
 import { getRegionRankingVideos } from '../net/video.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import type { FollowingsDto, SpecialFollowingsDto } from '../dto/user-info.dto';
+import type { FollowingsDto, TagsFollowingsDto } from '../dto/user-info.dto';
 import {
   addCoinForVideo,
   addCoinForArticle,
@@ -79,7 +79,7 @@ export async function getAidByFollowing(special = true): Promise<AidInfo> {
       : getFollowings(uid));
 
     const followList = special
-      ? (data as SpecialFollowingsDto['data'])
+      ? (data as TagsFollowingsDto['data'])
       : (data as FollowingsDto['data']).list;
 
     if (!followList || followList.length === 0) {

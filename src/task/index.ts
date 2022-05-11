@@ -12,8 +12,9 @@ import getVipPrivilege from './getVipPrivilege';
 import giveGift from './giveGift';
 import matchGame from './matchGame';
 import liveHeart from './liveHeart';
+import liveLottery from './liveLottery';
 
-export { loginTask, liveHeart };
+export { loginTask, liveHeart, liveLottery };
 
 export default {
   taskReward,

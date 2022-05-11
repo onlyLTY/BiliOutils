@@ -85,8 +85,9 @@ async function setUserInfo(data: UserNavData) {
     const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
     logger.info(`登录成功: ${data.uname}`);
     logger.info(`硬币余额: ${coinBalance.money || 0}`);
-    TaskConfig.NICKNAME = conciseNickname(data.uname);
+    TaskModule.nickname = conciseNickname(data.uname);
     TaskModule.money = coinBalance.money || 0;
+    TaskModule.userLevel = data.level_info.current_level;
     TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
 
     setLevelInfo(data);

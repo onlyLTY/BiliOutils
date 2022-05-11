@@ -70,3 +70,25 @@ export const HEART_RUN_TIME = '12:00:00-20:00:00';
 export const MS2DATE = 86_400_000;
 /** 毫秒与小时进制 */
 export const MS2HOUR = 3_600_000;
+
+/** 天选排除奖品 */
+export const LOTTERY_EXCLUDE = [
+  '舰',
+  '船',
+  '航海',
+  '代金券',
+  '优惠券',
+  '自拍',
+  '照',
+  '写真',
+  '图',
+  '提督',
+  '车车一局',
+  '再来一局',
+];
+
+export const LOTTERY_INCLUDE = ['谢'];
+
+// https://github.com/RayWangQvQ/BiliBiliToolPro/blob/main/docs/configuration.md#344-%E5%A4%A9%E9%80%89%E7%AD%B9%E6%8A%BD%E5%A5%96%E4%B8%BB%E6%92%ADuid%E9%BB%91%E5%90%8D%E5%8D%95
+/** up 黑名单 */
+export const LOTTERY_UP_BLACKLIST = [65566781, 1277481241, 1643654862, 603676925];

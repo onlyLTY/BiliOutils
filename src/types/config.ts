@@ -1,3 +1,5 @@
+import type { FunctionConfig } from '../config/funcConfig';
+
 export interface Config {
   cookie: string;
   message?: {
@@ -12,20 +14,7 @@ export interface Config {
     pushplusToken?: string;
     api?: string;
   };
-  function?: {
-    silver2Coin?: boolean;
-    liveSignTask?: boolean;
-    addCoins?: boolean;
-    mangaSign?: boolean;
-    shareAndWatch?: boolean;
-    supGroupSign?: boolean;
-    liveSendMessage?: boolean;
-    charging?: boolean;
-    getVipPrivilege?: boolean;
-    giveGift?: boolean;
-    matchGame?: boolean;
-    liveHeart?: boolean;
-  };
+  function?: FunctionConfig;
   targetLevel?: number;
   stayCoins?: number;
   userAgent?: string;
@@ -53,7 +42,7 @@ export interface Config {
     presetTime?: number;
   };
   gift?: {
-    mid?: number;
+    mids?: number[];
   };
   coin?: {
     customizeUp?: number[];
@@ -70,5 +59,12 @@ export interface Config {
     region?: string;
     dailyRunTime?: string;
     heartRunTime?: string;
+  };
+  lottery?: {
+    excludeAward?: string[];
+    includeAward?: string[];
+    blackUid?: number[];
+    moveTag?: string;
+    pageNum?: number;
   };
 }

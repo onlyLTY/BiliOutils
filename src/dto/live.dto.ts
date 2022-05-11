@@ -275,3 +275,112 @@ export interface LiveRoomInfoDto extends DoubleMessageProp {
     };
   };
 }
+
+export interface LiveAreaList {
+  id: string;
+  parent_id: string;
+  parent_name: string;
+  old_area_id: string;
+  name: string;
+  pinyin: string;
+  act_id: string;
+  hot_status: number;
+  pk_status: string;
+  lock_status: string;
+  pic: string;
+  area_type: number;
+}
+
+/**
+ * 分区列表
+ */
+export interface LiveAreaDto extends ApiBaseProp {
+  data: {
+    data: {
+      id: number;
+      name: string;
+      list: LiveAreaList[];
+    }[];
+  };
+}
+
+export interface LiveRoomList {
+  roomid: number;
+  uid: number;
+  title: string;
+  uname: string;
+  pendant_info: {
+    [key: number]: {
+      /** 504 天选 1096 红包*/
+      pendent_id: number;
+      content: string;
+      position: number;
+      type: string;
+      name: string;
+    };
+  };
+}
+
+/**
+ * 直播间列表
+ */
+export interface LiveRoomDto extends ApiBaseProp {
+  data: {
+    banner: unknown[];
+    new_tags: unknown[];
+    list: LiveRoomList[];
+    count: number;
+    has_more: number;
+    vajra: unknown;
+  };
+}
+
+/**
+ * 检查天选时刻状态（lottery）
+ */
+export interface LiveCheckLotteryDto {
+  id: number;
+  room_id: number;
+  status: number;
+  award_name: string;
+  award_num: number;
+  award_image: string;
+  danmu: string;
+  time: number;
+  current_time: number;
+  join_type: number;
+  require_type: number;
+  require_value: number;
+  require_text: string;
+  gift_id: number;
+  gift_name: string;
+  gift_num: number;
+  gift_price: number;
+  cur_gift_num: number;
+  goaway_time: number;
+  award_users: any[];
+  show_panel: number;
+  lot_status: number;
+  send_gift_ensure: number;
+  goods_id: number;
+}
+/**
+ * 检查天选时刻状态（lottery）
+ */
+export interface LiveCheckLotteryRes extends DoubleMessageProp {
+  data: LiveCheckLotteryDto;
+}
+
+/**
+ * 天选时刻返回
+ */
+export interface JoinLotteryDto extends DoubleMessageProp {
+  data: {
+    discount_id: number;
+    gold: number;
+    silver: number;
+    cur_gift_num: number;
+    goods_id: number;
+    new_order_id: string;
+  };
+}
