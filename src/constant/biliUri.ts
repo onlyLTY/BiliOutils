@@ -1,6 +1,7 @@
 export const OriginURLs = {
   account: 'https://account.bilibili.com',
   live: 'https://live.bilibili.com',
+  space: 'https://space.bilibili.com',
 };
 
 export const RefererURLs = {

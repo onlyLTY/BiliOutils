@@ -29,4 +29,6 @@ export default {
   getVipPrivilege,
   giveGift,
   matchGame,
+  liveHeart,
+  liveLottery,
 };

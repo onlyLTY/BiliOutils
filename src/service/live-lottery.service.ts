@@ -45,7 +45,7 @@ async function getLotteryRoomList(
   page = 1,
 ): Promise<LiveRoomList[]> {
   try {
-    await apiDelay(300);
+    await apiDelay(100);
     const { data, code, message } = await getLiveRoom(parentId, areaId, page);
     if (code !== 0) {
       logger.info(`获取直播间列表失败: ${code}-${message}`);
@@ -77,7 +77,7 @@ async function checkLotteryRoomList(areaId: string, parentId: string, page = 1) 
         uid: room.uid,
         uname: room.uname,
       });
-      await apiDelay(300);
+      await apiDelay(100);
     }
   }
   return checkedRoomList;

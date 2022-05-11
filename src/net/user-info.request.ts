@@ -183,15 +183,20 @@ export async function unFollow(mid: IdType): Promise<ApiBaseProp> {
  * @param tagId 分组 id
  */
 export async function moveToTag(mid: IdType, tagId: number): Promise<ApiBaseProp> {
-  const { data } = await biliApi.post(
+  const res = await biliApi.post(
     '/x/relation/tags/addUsers?cross_domain=true',
     stringify({
-      fid: mid,
+      fids: mid,
       tagids: tagId,
       csrf: TaskConfig.BILIJCT,
     }),
+    {
+      headers: {
+        Origin: OriginURLs.space,
+      },
+    },
   );
-  return data;
+  return res.data;
 }
 
 /**
