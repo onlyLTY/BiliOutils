@@ -196,7 +196,7 @@ export interface LiveHeartEDto extends ApiBaseProp {
 }
 
 export interface LiveFansMedalItem {
-  can_deleted: true;
+  can_deleted: boolean;
   day_limit: number;
   guard_level: number;
   guard_medal_title: string;

@@ -69,7 +69,7 @@ export default async function liveSendMessage() {
       jumpCount++;
       continue;
     }
-    if (medal.today_feed === 100) {
+    if (medal.today_feed === 100 || medal.guard_level > 0) {
       jumpCount++;
       continue;
     }
