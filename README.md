@@ -22,6 +22,8 @@
 - [x] 自动使用 B 币券充电
 - [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）
 - [x] 多账号独立配置
+- [ ] 直播天选时刻（测试）
+- [ ] 直播礼物红包（测试）
 - [ ] 支持 Docker 、腾讯 SCF 、阿里 FC、百度 CFC、华为 FG、青龙面板等方式运行，支持执行消息推送
 - [x] ~~应援团签到~~
 - [ ] ~~风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)~~（没有资格）

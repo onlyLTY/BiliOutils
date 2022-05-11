@@ -38,7 +38,7 @@
 | ~~serverChan~~ | 字符串                    | 已过期 [官网](https://sct.ftqq.com/)获取 token       |
 | pushplusToken  | 字符串                    | 即将过期 [官网](http://www.pushplus.plus/)获取 token |
 | api            | 字符串                    | get 链接模板 例如：`http://xxxx.xxx/{title}/{text}`  |
-| 从青龙面板移植 | [环境变量](#青龙面板相关) | 对应环境变量是 `GOBOT_URL` 则写为 `gobotUrl`         |
+| 从青龙面板移植 | [环境变量](#青龙面板相关) |                                                      |
 
 ### Email
 
@@ -55,21 +55,21 @@
 
 ## Account 配置项 （新版本）
 
-| Key          | 值类型                          | 默认值              | 说明                                         |
-| ------------ | ------------------------------- | ------------------- | -------------------------------------------- |
-| message      | Message [↑](#message-配置项)    | 无配置              |                                              |
-| **cookie**   | 字符串                          | 无，必须手动添加    | **必须** 完整的 Cookie                       |
-| function     | Function [↓](#功能配置)         |                     |                                              |
-| userAgent    | 字符串                          | 固定 Chrome         | 浏览器用户代理 （建议自行配置）              |
-| dailyRunTime | 字符串                          | `17:30:00-23:40:00` | SCF 随机运行的时间段（随机时间只会在范围内） |
-| heartRunTime | 字符串                          | `12:00:00-21:00:00` | 同上，不过是直播心跳的时间                   |
-| apiDelay     | `[数值, 数值]`或者数值          | `[2, 6]`            | 单位 S，区间中随机，或固定一个值             |
-| ~~sls~~      | SLS [↓](#腾讯云函数scf配置)     |                     | 手动部署不再需要，仅批量部署到 SCF 可用      |
-| coin         | 投币 [↓](#投币任务配置)         |                     | 投币相关                                     |
-| gift         | 礼物[↓](#直播间礼物任务配置)    |                     | 直播礼物相关                                 |
-| charge       | 充电 [↓](#充电任务配置)         |                     | 充电相关                                     |
-| match        | 竞猜 [↓](#竞猜任务配置)         |                     | 竞猜相关                                     |
-| lottery      | 天选时刻 [↓](#天选时刻任务配置) |                     | 天选时刻相关                                 |
+| Key          | 值类型                          | 默认值              | 说明                                    |
+| ------------ | ------------------------------- | ------------------- | --------------------------------------- |
+| message      | Message [↑](#message-配置项)    | 无配置              |                                         |
+| **cookie**   | 字符串                          | 无，必须手动添加    | **必须** 完整的 Cookie                  |
+| function     | Function [↓](#功能配置)         |                     |                                         |
+| userAgent    | 字符串                          | 固定 Chrome         | 浏览器用户代理 （建议自行配置）         |
+| dailyRunTime | 字符串                          | `17:30:00-23:40:00` | Serveless 随机运行的时间段              |
+| heartRunTime | 字符串                          | `12:00:00-21:00:00` | 同上，不过是直播心跳的时间              |
+| apiDelay     | `[数值, 数值]`或者数值          | `[2, 6]`            | 单位 S，区间中随机，或固定一个值        |
+| ~~sls~~      | SLS [↓](#腾讯云函数scf配置)     |                     | 手动部署不再需要，仅批量部署到 SCF 可用 |
+| coin         | 投币 [↓](#投币任务配置)         |                     | 投币相关                                |
+| gift         | 礼物[↓](#直播间礼物任务配置)    |                     | 直播礼物相关                            |
+| charge       | 充电 [↓](#充电任务配置)         |                     | 充电相关                                |
+| match        | 竞猜 [↓](#竞猜任务配置)         |                     | 竞猜相关                                |
+| lottery      | 天选时刻 [↓](#天选时刻任务配置) |                     | 天选时刻相关                            |
 
 **重要配置说明**
 
@@ -92,6 +92,7 @@
 | giveGift        | `false` | 赠送过期礼物         |
 | matchGame       | `false` | 赛事竞猜             |
 | liveHeart       | `false` | 直播心跳（小心心）   |
+| liveLottery     | `false` | 直播天选时刻         |
 
 - liveHeart 在使用 Serverless 时即使配置为 true，也不会运行。但是在 SCF、FC 等环境中配置 `heart_bili_timer` 触发器即可正常运行，具体情况请参考对应平台的配置文档。若要强制使用请配置 `LIVE_HEART_FORCE` 环境变量为任意值（由此可能导致云函数超时等异常，一概不知）。
 
@@ -185,10 +186,11 @@
 | 名字                       | 说明                                                                 |
 | -------------------------- | -------------------------------------------------------------------- |
 | BILI_CONFIG                | Gzip 压缩后的配置（使用 Docker 时必须）                              |
-| TENCENT_SECRET_ID          | 使用 SCF 必须的腾讯账号授权 ID                                       |
-| TENCENT_SECRET_KEY         | 使用 SCF 必须的腾讯账号授权 KEY                                      |
+| TENCENT_SECRET_ID          | 使用 SCF 随机执行需要腾讯账号授权 ID                                 |
+| TENCENT_SECRET_KEY         | 使用 SCF 随机执行需要腾讯账号授权 KEY                                |
+| ALI_SECRET_ID              | 使用 FC 随机执行需要阿里账号授权 ID                                  |
+| ALI_SECRET_KEY             | 使用 FC 随机执行需要阿里账号授权 KEY                                 |
 | SERVERLESS_PLATFORM_VENDOR | Serverless 供应商，本地推送时必须，Docker 默认为`tencent`            |
-| ~~PUSHPLUS_TOKEN~~         | [pushplusToken](#message-配置项)                                     |
 | BILITOOLS_CONFIG           | Gzip 压缩后的单个用户配置（在需要通过环境变量时使用）                |
 | RUN_SCF_ALL                | 运行全部云函数（ Docker 推送至 SCF 时使用，值为需要`y`）             |
 | SCF_MEMORY_SIZE            | scf 中运行的内存大小（默认 128M，范围为 64 以及 128 的 1-24 整数倍） |
@@ -199,6 +201,19 @@
 > 下列环境变量来自 `青龙面板`
 >
 > 具体介绍看这里 <https://github.com/whyour/qinglong/blob/develop/sample/config.sample.sh>
+
+支持以下三种方式填写：
+
+- 环境变量，如 `PUSH_PLUS_TOKEN`
+- 通过在配置中的 message 字段中配置，以下两种方式都可以。
+  ```json
+  {
+    "message": {
+      "PUSH_PLUS_TOKEN": "xxxxxxxx",
+      "pushPlusToken": "xxxxxxxx"
+    }
+  }
+  ```
 
 ```js
 [
@@ -231,30 +246,17 @@
 
 请不要再按照老版本的配置项写法，而是使用新版本的配置项。
 
-| Key              | 值类型                       | 默认值              | 说明                                           |
-| ---------------- | ---------------------------- | ------------------- | ---------------------------------------------- |
-| message          | Message [↑](#message-配置项) | 无配置              |                                                |
-| **cookie**       | 字符串                       | 无，必须手动添加    | **必须** 完整的 Cookie                         |
-| function         | Function [↓](#功能配置)      |                     |                                                |
-| targetLevel      | 数值                         | `6`                 | 目标等级，达到或大于将不投币、分享、观看视频   |
-| stayCoins        | 数值                         | `0`                 | 账号至少保留的硬币数目，低于或等于将不投币     |
-| userAgent        | 字符串                       | 固定 Chrome         | 浏览器用户代理 （建议自行配置）                |
-| dailyRunTime     | 字符串                       | `17:30:00-23:40:00` | SCF 随机运行的时间段（随机时间只会在范围内）   |
-| heartRunTime     | 字符串                       | `12:00:00-21:00:00` | 同上，不过是直播心跳的时间                     |
-| targetCoins      | 数值                         | `5`                 | 每日投币目标（超过将不投币）                   |
-| customizeUp      | 数值数组                     | `[]`                | 自定义投币 UP， 在所填中随机选取               |
-| giftUp           | 数值数组                     | customizeUp         | 自定义投喂礼物 UP， 在所填中随机选取           |
-| coinRetryNum     | 数值                         | `4`                 | 投币失败重试次数                               |
-| apiDelay         | `[数值, 数值]`或者数值       | `[2, 6]`            | 单位 S，区间中随机，或固定一个值               |
-| upperAccMatch    | `true`或者`false`            | `true`              | 自定义投币 UP 时，合作视频的 UP 必须为指定中的 |
-| chargeUpId       | 数值                         | 自己的 mid          | 充电目标的 mid（默认自己）                     |
-| chargePresetTime | 数值                         | 每月最后一天        | 每月充电的日期                                 |
-| matchCoins       | 数值                         | `5`                 | 每次竞猜的数量                                 |
-| matchSelection   | 数值                         | `1`                 | 压赔率低的（正压）大于 0 的数，反之等于 0      |
-| matchDiff        | 数值（可以是小数）           | `0.0`               | 赔率需要达到的差距                             |
-| ~~sls~~          | SLS [↓](#腾讯云函数scf配置)  |                     | 手动部署不再需要                               |
-
-**重要配置说明**
-
-- cookie 详见 [获取 Cookie 的方法](./readme.md#获取-cookie-的方法)
-- userAgent - 固定唯一 UA `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.150 Safari/537.36` 请尽量自行设置
+| Key              | 值类型             | 默认值       | 说明                                           |
+| ---------------- | ------------------ | ------------ | ---------------------------------------------- |
+| targetLevel      | 数值               | `6`          | 目标等级，达到或大于将不投币、分享、观看视频   |
+| stayCoins        | 数值               | `0`          | 账号至少保留的硬币数目，低于或等于将不投币     |
+| targetCoins      | 数值               | `5`          | 每日投币目标（超过将不投币）                   |
+| customizeUp      | 数值数组           | `[]`         | 自定义投币 UP， 在所填中随机选取               |
+| giftUp           | 数值数组           | customizeUp  | 自定义投喂礼物 UP， 在所填中随机选取           |
+| coinRetryNum     | 数值               | `4`          | 投币失败重试次数                               |
+| upperAccMatch    | `true`或者`false`  | `true`       | 自定义投币 UP 时，合作视频的 UP 必须为指定中的 |
+| chargeUpId       | 数值               | 自己的 mid   | 充电目标的 mid（默认自己）                     |
+| chargePresetTime | 数值               | 每月最后一天 | 每月充电的日期                                 |
+| matchCoins       | 数值               | `5`          | 每次竞猜的数量                                 |
+| matchSelection   | 数值               | `1`          | 压赔率低的（正压）大于 0 的数，反之等于 0      |
+| matchDiff        | 数值（可以是小数） | `0.0`        | 赔率需要达到的差距                             |
