@@ -31,8 +31,8 @@ async function liveHeartMain(event: SCFEvent, context: SCFContext) {
   });
 }
 
-export function main_handler(event: SCFEvent, context: SCFContext) {
-  printVersion();
+export async function main_handler(event: SCFEvent, context: SCFContext) {
+  await printVersion();
 
   if (event.TriggerName === HEART_TRIGGER_NAME) {
     return liveHeartMain(event, context);

@@ -31,8 +31,8 @@ async function liveHeartMain(event: FCEvent, context: FCContext) {
   });
 }
 
-export function handler(event: Buffer, context: FCContext, callback: FCCallback) {
-  printVersion();
+export async function handler(event: Buffer, context: FCContext, callback: FCCallback) {
+  await printVersion();
   const eventJson: FCEvent = JSON.parse(event.toString());
   let caller: MainFuncType = dailyMain;
   if (eventJson.triggerName === HEART_TRIGGER_NAME) {

@@ -4,15 +4,20 @@ import { logger } from './log';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { random } from './pure';
 import { sendNotify } from './sendNotify';
+import { getLatestVersion } from '../net/releases.request';
 
 /**
  * 打印版本
  */
-export function printVersion() {
+export async function printVersion() {
   try {
     const version = fs.readFileSync(path.resolve(__dirname, '../version.txt'), 'utf8').trim();
     if (version) {
-      logger.info(`当前版本【${version}】`);
+      logger.info(`当前版本【v${version}】`);
+    }
+    const latestTag = await getLatestVersion();
+    if (version && latestTag && latestTag !== `v${version}`) {
+      logger.info(`可更新：最新版本【${latestTag}】`);
     }
   } catch {}
 }
