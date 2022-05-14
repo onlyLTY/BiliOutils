@@ -1,5 +1,4 @@
 import type { IdType } from '../types';
-import { biliApi, accountApi } from './api';
 import type {
   CoinBalanceDto,
   CoinTodayExpDto,
@@ -11,48 +10,42 @@ import type {
   TagsFollowingsDto,
   UserInfoNavDto,
 } from '../dto/user-info.dto';
-import type { VideoByUpDto } from '../dto/video.dto';
-import { OriginURLs } from '../constant/biliUri';
-import { stringify } from 'qs';
-import { TaskConfig } from '../config/globalVar';
 import type { ApiBaseProp } from '../dto/bili-base-prop';
-import { jsonp2Object } from '../utils';
+import type { VideoByUpDto } from '../dto/video.dto';
+import { biliApi, accountApi } from './api';
+import { OriginURLs } from '../constant/biliUri';
+import { TaskConfig } from '../config/globalVar';
 
 /**
  * 登录账号
  */
-export async function loginByCookie(): Promise<UserInfoNavDto> {
-  const { data } = await biliApi.get('/x/web-interface/nav', {
-    retry: 3,
+export function loginByCookie(): Promise<UserInfoNavDto> {
+  return biliApi.get('/x/web-interface/nav', {
     headers: {
       Origin: OriginURLs.account,
     },
   });
-  return data;
 }
 
 /**
  * 每日任务完成情况
  */
-export async function getDailyTaskRewardInfo(): Promise<RewardDto> {
-  const { data } = await biliApi.get('/x/member/web/exp/reward');
-  return data;
+export function getDailyTaskRewardInfo(): Promise<RewardDto> {
+  return biliApi.get('/x/member/web/exp/reward');
 }
 
 /**
  * 获取投币获得的经验
  */
-export async function getDonateCoinExp(): Promise<CoinTodayExpDto> {
-  const { data } = await biliApi.get('/x/web-interface/coin/today/exp');
-  return data;
+export function getDonateCoinExp(): Promise<CoinTodayExpDto> {
+  return biliApi.get('/x/web-interface/coin/today/exp');
 }
 
 /**
  * 硬币数量
  */
-export async function getCoinBalance(): Promise<CoinBalanceDto> {
-  const { data } = await accountApi.get('/site/getCoin');
-  return data;
+export function getCoinBalance(): Promise<CoinBalanceDto> {
+  return accountApi.get('/site/getCoin');
 }
 
 /**
@@ -63,14 +56,14 @@ export async function getCoinBalance(): Promise<CoinBalanceDto> {
  * @param order 分组
  * @param order_type 分组类型
  */
-export async function getFollowings(
+export function getFollowings(
   vmid: number,
   pageNumber = 1,
   pageSize = 50,
   order = 'desc',
   order_type = 'attention',
 ): Promise<FollowingsDto> {
-  const { data } = await biliApi.get('/x/relation/followings', {
+  return biliApi.get('/x/relation/followings', {
     params: {
       vmid,
       pn: pageNumber,
@@ -79,7 +72,6 @@ export async function getFollowings(
       order_type,
     },
   });
-  return data;
 }
 
 /**
@@ -88,19 +80,18 @@ export async function getFollowings(
  * @param pageSize 每页数量 [50]
  * @param tagId 分组 id [-10] 特别关注
  */
-export async function getFollowingsByTag(
+export function getFollowingsByTag(
   pageNumber = 1,
   pageSize = 50,
   tagId = -10,
 ): Promise<TagsFollowingsDto> {
-  const { data } = await biliApi.get('/x/relation/tag', {
+  return biliApi.get('/x/relation/tag', {
     params: {
       tagid: tagId,
       pn: pageNumber,
       ps: pageSize,
     },
   });
-  return data;
 }
 
 /**
@@ -108,11 +99,8 @@ export async function getFollowingsByTag(
  * @param pageNumber 页数 [1]
  * @param pageSize 每页数量 [50]
  */
-export async function getSpecialFollowings(
-  pageNumber = 1,
-  pageSize = 50,
-): Promise<TagsFollowingsDto> {
-  return await getFollowingsByTag(pageNumber, pageSize, -10);
+export function getSpecialFollowings(pageNumber = 1, pageSize = 50): Promise<TagsFollowingsDto> {
+  return getFollowingsByTag(pageNumber, pageSize, -10);
 }
 
 /**
@@ -120,8 +108,8 @@ export async function getSpecialFollowings(
  * @param upId upId
  * @param pageSize 数据数量
  */
-export async function getVideosByUpId(upId: number, pageSize = 50): Promise<VideoByUpDto> {
-  const { data } = await biliApi.get('/x/v2/medialist/resource/list', {
+export function getVideosByUpId(upId: number, pageSize = 50): Promise<VideoByUpDto> {
+  return biliApi.get('/x/v2/medialist/resource/list', {
     params: {
       direction: false,
       mobi_app: 'web',
@@ -131,50 +119,40 @@ export async function getVideosByUpId(upId: number, pageSize = 50): Promise<Vide
       biz_id: upId,
     },
   });
-  return data;
 }
 
 /**
  * 获取用户信息（主要是直播）
  * @param mid 用户 id
  */
-export async function getUser(mid: IdType): Promise<OtherUserDto> {
-  const { data } = await biliApi.get(`/x/space/acc/info?mid=${mid}&jsonp=jsonp`);
-  return data;
+export function getUser(mid: IdType): Promise<OtherUserDto> {
+  return biliApi.get(`/x/space/acc/info?mid=${mid}&jsonp=jsonp`);
 }
 
 /**
  * 创建一个关注分组
  */
-export async function createTag(name: string): Promise<CreateTagDto> {
-  const { data } = await biliApi.post(
-    '/x/relation/tag/create',
-    stringify({
-      tag: name,
-      jsonp: 'jsonp',
-      csrf: TaskConfig.BILIJCT,
-    }),
-  );
-  return data;
+export function createTag(name: string): Promise<CreateTagDto> {
+  return biliApi.post('/x/relation/tag/create', {
+    tag: name,
+    jsonp: 'jsonp',
+    csrf: TaskConfig.BILIJCT,
+  });
 }
 
 /**
  * 取关
  * @param mid 用户 id
  */
-export async function unFollow(mid: IdType): Promise<ApiBaseProp> {
-  const { data } = await biliApi.post(
-    '/x/relation/modify',
-    stringify({
-      fid: mid,
-      act: 2,
-      re_src: 11,
-      spmid: '333.999.0.0',
-      jsonp: 'jsonp',
-      csrf: TaskConfig.BILIJCT,
-    }),
-  );
-  return data;
+export function unFollow(mid: IdType): Promise<ApiBaseProp> {
+  return biliApi.post('/x/relation/modify', {
+    fid: mid,
+    act: 2,
+    re_src: 11,
+    spmid: '333.999.0.0',
+    jsonp: 'jsonp',
+    csrf: TaskConfig.BILIJCT,
+  });
 }
 
 /**
@@ -182,31 +160,32 @@ export async function unFollow(mid: IdType): Promise<ApiBaseProp> {
  * @param mid 用户 id
  * @param tagId 分组 id
  */
-export async function moveToTag(mid: IdType, tagId: number): Promise<ApiBaseProp> {
-  const res = await biliApi.post(
+export function moveToTag(mid: IdType, tagId: number): Promise<ApiBaseProp> {
+  return biliApi.post(
     '/x/relation/tags/addUsers?cross_domain=true',
-    stringify({
+    {
       fids: mid,
       tagids: tagId,
       csrf: TaskConfig.BILIJCT,
-    }),
+    },
     {
       headers: {
         Origin: OriginURLs.space,
       },
     },
   );
-  return res.data;
 }
 
 /**
  * 获取分组列表
  */
-export async function getTags(): Promise<TagListDto> {
-  const { data } = await biliApi.get('/x/relation/tags?jsonp=jsonp&callback=__jp3', {
+export function getTags(): Promise<TagListDto> {
+  return biliApi.get('/x/relation/tags?jsonp=jsonp&callback=__jp3', {
     headers: {
       Referer: 'https://space.bilibili.com/1/fans/follow?tagid=0',
     },
+    requestOptions: {
+      isJsonp: true,
+    },
   });
-  return jsonp2Object(data);
 }

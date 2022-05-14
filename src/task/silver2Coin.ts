@@ -18,7 +18,7 @@ export default async function silver2Coin() {
       logger.info('兑换失败，你瓜子不够了');
     } else {
       const { message } = await exchangeSilver2Coin();
-      logger.info(message);
+      logger.info(`兑换硬币： ${message}`);
       await getMyWallet();
     }
   } catch (error) {

@@ -1,4 +1,8 @@
-export enum ErrorCodeCommon {
+/**
+ * 响应状态码
+ */
+export enum ResultEnum {
+  SUCCESS = 0,
   '应用程序不存在或已被封禁' = -1,
   'Access Key错误' = -2,
   'API校验密匙错误' = -3,
@@ -19,3 +23,22 @@ export enum ErrorCodeCommon {
   '请先绑定手机' = -114,
   '请先完成实名认证' = -115,
 }
+
+/**
+ * 请求方法
+ */
+export const RequestEnum = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  PATCH: 'PATCH',
+  DELETE: 'DELETE',
+};
+
+/**
+ * 数据类型
+ */
+export const ContentTypeEnum = {
+  // form-data qs
+  FORM_URLENCODED: 'application/x-www-form-urlencoded; charset=UTF-8',
+};

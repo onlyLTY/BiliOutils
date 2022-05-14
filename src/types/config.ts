@@ -15,14 +15,15 @@ export interface Config {
     api?: string;
   };
   function?: FunctionConfig;
-  targetLevel?: number;
-  stayCoins?: number;
+  apiDelay?: [number, number] | number;
   userAgent?: string;
   dailyRunTime?: string;
   heartRunTime?: string;
+  // 老的配置
+  targetLevel?: number;
+  stayCoins?: number;
   targetCoins?: number;
   customizeUp?: number[];
-  apiDelay?: [number, number] | number;
   giftUp?: number[];
   coinRetryNum?: number;
   upperAccMatch?: boolean;
@@ -31,7 +32,7 @@ export interface Config {
   matchCoins?: number;
   matchSelection?: number;
   matchDiff?: number;
-  /** 新的配置方式 */
+  // 新的配置方式
   match?: {
     coins?: number;
     selection?: number;
@@ -66,5 +67,7 @@ export interface Config {
     blackUid?: number[];
     moveTag?: string;
     pageNum?: number;
+    /** 关注回复处理方式  */
+    actFollowMsg?: 'read' | 'del' | 'delete' | 'none' | undefined;
   };
 }

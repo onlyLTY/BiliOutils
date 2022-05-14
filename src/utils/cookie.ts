@@ -31,7 +31,7 @@ function getCookieString(obj: object): string {
   return string.substring(0, string.length - 2 || 0);
 }
 
-export default function (cookie: string, setCookie: []) {
+export default function (cookie: string, setCookie: string[]) {
   if (!cookie) return '';
   if (!setCookie || setCookie.length === 0) return cookie;
 

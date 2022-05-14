@@ -1,7 +1,6 @@
 import { loginByCookie, getCoinBalance } from '../net/user-info.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
-import { functionConfig } from '../config/funcConfig';
 import { UserInfoNavDto } from '../dto/user-info.dto';
 import { logger } from '../utils/log';
 
@@ -27,8 +26,10 @@ function setLevelInfo(data: UserNavData) {
   }
   logger.info(`当前等级: ${levelInfo.current_level}`);
   if (currentLevel >= 6) {
-    functionConfig.shareAndWatch = false;
-    functionConfig.addCoins = false;
+    const funcs = TaskConfig.config.function;
+    funcs.shareAndWatch = false;
+    funcs.addCoins = false;
+    funcs.taskReward = false;
     logger.info('已经满级，不需要再投币了，做个白嫖怪吧');
   } else {
     const upLevelExp = levelInfo.next_exp - levelInfo.current_exp;
@@ -94,6 +95,7 @@ async function setUserInfo(data: UserNavData) {
     setVipStatus(data);
   } catch (error) {
     logger.error(`获取硬币信息异常: ${error.message}`);
+    logger.debug(error);
   }
 }
 

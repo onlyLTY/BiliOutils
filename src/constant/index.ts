@@ -85,6 +85,7 @@ export const LOTTERY_EXCLUDE = [
   '提督',
   '车车一局',
   '再来一局',
+  '游戏道具',
 ];
 
 export const LOTTERY_INCLUDE = ['谢'];
