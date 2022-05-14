@@ -223,3 +223,42 @@ export function pushIfNotExist<T = unknown>(array: T[], item: T) {
 export function getNewObject<T = unknown>(object: T): T {
   return object || ({} as T);
 }
+
+/**
+ * 克隆对象
+ * @param object
+ * @param deep
+ */
+export function cloneObject<T = unknown>(object: T, deep = false): T {
+  if (typeof object !== 'object') {
+    return object;
+  }
+  if (Array.isArray(object)) {
+    return object.map(item => cloneObject(item, deep)) as unknown as T;
+  }
+  if (deep) {
+    return Object.keys(object).reduce((result, key) => {
+      result[key] = cloneObject(object[key], deep);
+      return result;
+    }, {} as T);
+  }
+  return Object.assign({}, object);
+}
+
+/**
+ * 深度合并对象
+ * @param target
+ * @param source
+ */
+export function deepMergeObject<T = unknown>(target: T, source: T): T {
+  if (typeof target !== 'object' || typeof source !== 'object') {
+    return source;
+  }
+  if (Array.isArray(target) && Array.isArray(source)) {
+    return target.concat(source) as unknown as T;
+  }
+  return Object.keys(source).reduce((result, key) => {
+    result[key] = deepMergeObject(target[key], source[key]);
+    return result;
+  }, target);
+}

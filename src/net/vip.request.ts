@@ -1,21 +1,20 @@
-import { stringify } from 'qs';
+import type {
+  ChargingDto,
+  ChargingMessageDto,
+  ReceiveVipPrivilegeDto,
+} from '../dto/vip-privilege.dto';
 import { TaskConfig } from '../config/globalVar';
-import { ChargingDto, ChargingMessageDto, ReceiveVipPrivilegeDto } from '../dto/vip-privilege.dto';
 import { biliApi } from './api';
 
 /**
  * 领取年度大会员权益
  * @param type 1.大会员B币券；2.大会员福利
  */
-export async function receiveVipPrivilege(type = 1): Promise<ReceiveVipPrivilegeDto> {
-  const { data } = await biliApi.post(
-    '/x/vip/privilege/receive',
-    stringify({
-      csrf: TaskConfig.BILIJCT,
-      type,
-    }),
-  );
-  return data;
+export function receiveVipPrivilege(type = 1): Promise<ReceiveVipPrivilegeDto> {
+  return biliApi.post('/x/vip/privilege/receive', {
+    csrf: TaskConfig.BILIJCT,
+    type,
+  });
 }
 
 /**
@@ -26,25 +25,21 @@ export async function receiveVipPrivilege(type = 1): Promise<ReceiveVipPrivilege
  * @param otype 充电来源 空间充电/视频充电
  * @param oid 充电来源代码(UID 或者 稿件 avID)
  */
-export async function chargingForUp(
+export function chargingForUp(
   bp_num = 50,
   is_bp_remains_prior = true,
   up_mid: number = TaskConfig.USERID,
   otype: 'up' | 'archive' = 'up',
   oid: number = up_mid,
 ): Promise<ChargingDto> {
-  const { data } = await biliApi.post(
-    '/x/ugcpay/web/v2/trade/elec/pay/quick',
-    stringify({
-      csrf: TaskConfig.BILIJCT,
-      bp_num,
-      is_bp_remains_prior,
-      up_mid,
-      otype,
-      oid,
-    }),
-  );
-  return data;
+  return biliApi.post('/x/ugcpay/web/v2/trade/elec/pay/quick', {
+    csrf: TaskConfig.BILIJCT,
+    bp_num,
+    is_bp_remains_prior,
+    up_mid,
+    otype,
+    oid,
+  });
 }
 
 /**
@@ -52,17 +47,13 @@ export async function chargingForUp(
  * @param orderId 留言token
  * @param message 留言内容
  */
-export async function chargingCommentsForUp(
+export function chargingCommentsForUp(
   orderId: string,
   message = '支持大佬一波',
 ): Promise<ChargingMessageDto> {
-  const { data } = await biliApi.post(
-    '/x/ugcpay/trade/elec/message',
-    stringify({
-      csrf: TaskConfig.BILIJCT,
-      message,
-      order_id: orderId,
-    }),
-  );
-  return data;
+  return biliApi.post('/x/ugcpay/trade/elec/message', {
+    csrf: TaskConfig.BILIJCT,
+    message,
+    order_id: orderId,
+  });
 }

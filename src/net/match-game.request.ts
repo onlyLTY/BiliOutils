@@ -1,5 +1,3 @@
-import { stringify } from 'qs';
-
 import { biliApi } from './api';
 import { GuessCollectionDto } from '../dto/match-game.dto';
 import { ApiBaseProp } from '../dto/bili-base-prop';
@@ -13,11 +11,10 @@ const csrf_token = csrf;
  * @param stime 开始时间
  * @param etime 结束时间
  */
-export async function getGuessCollection(stime = '', etime = ''): Promise<GuessCollectionDto> {
-  const { data } = await biliApi.get(
+export function getGuessCollection(stime = '', etime = ''): Promise<GuessCollectionDto> {
+  return biliApi.get(
     `/x/esports/guess/collection/question?pn=1&ps=50&gid=&sids=&stime=${stime}&etime=${etime}`,
   );
-  return data;
 }
 
 /**
@@ -27,13 +24,13 @@ export async function getGuessCollection(stime = '', etime = ''): Promise<GuessC
  * @param detail_id team.detail_id
  * @param count 硬币数量
  */
-export async function guessAdd(
+export function guessAdd(
   oid: number,
   main_id: number,
   detail_id: number,
   count: number,
 ): Promise<ApiBaseProp> {
-  const postData = stringify({
+  const postData = {
     is_fav: 0,
     main_id,
     oid,
@@ -41,7 +38,6 @@ export async function guessAdd(
     count,
     csrf,
     csrf_token,
-  });
-  const { data } = await biliApi.post('/x/esports/guess/add', postData);
-  return data;
+  };
+  return biliApi.post('/x/esports/guess/add', postData);
 }

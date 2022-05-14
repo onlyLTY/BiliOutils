@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { baseHttp } from './api';
 
 /**
  * 获取最新版本
@@ -8,11 +8,11 @@ export async function getLatestVersion(): Promise<string> {
     timeout: 6000,
   };
   try {
-    const res = await Promise.any([
-      axios.get('https://api.github.com/repos/catlair/BiliTools/releases/latest', options),
-      axios.get('https://gitee.com/api/v5/repos/catlair/BiliTools/releases/latest', options),
+    const data = await Promise.any([
+      baseHttp.get('https://api.github.com/repos/catlair/BiliTools/releases/latest', options),
+      baseHttp.get('https://gitee.com/api/v5/repos/catlair/BiliTools/releases/latest', options),
     ]);
-    return res.data.tag_name;
+    return data.tag_name;
   } catch (error) {
     return;
   }
