@@ -1,0 +1,35 @@
+name: Publish Package to npmjs
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      IS_RC: ${{ contains(github.ref, '-rc') }}
+    steps:
+      - uses: actions/checkout@v3
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
+      - name: set Docker version tag
+        run: |
+          echo DOCKER_TAG=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
+      - name: Install dependencies
+        run: |
+          rm yarn.lock
+          cat package.json | jq "del( .optionalDependencies ) | .version = \"${{ env.DOCKER_TAG }}\"" > temp.json
+          mv temp.json package.json
+          yarn install
+      - name: Build and Handle
+        run: |
+          yarn build
+          rm dist/index*.js
+      - run: yarn publish ${{ env.IS_RC == 'true' && '--tag beta' || '' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

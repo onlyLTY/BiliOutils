@@ -6,7 +6,7 @@ import { AxiosCanceler } from './axiosCancel';
 import { isFunction, isString } from '../is';
 import { cloneObject } from '../pure';
 import { ContentTypeEnum, RequestEnum } from '../../enums/http.enum';
-import qs = require('qs');
+import { stringify } from 'qs';
 
 /**
  * @description axios 封装
@@ -134,7 +134,7 @@ export class VAxios {
 
     return {
       ...config,
-      data: qs.stringify(config.data, { arrayFormat: 'brackets' }),
+      data: stringify(config.data, { arrayFormat: 'brackets' }),
     };
   }
 

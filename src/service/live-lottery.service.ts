@@ -98,6 +98,9 @@ async function checkLotteryRoom(room: LiveRoomList) {
   if (code !== 0) {
     logger.debug(`直播间${room.roomid}检测失败: ${code}-${message}`);
     return;
+  } else if (data === null) {
+    // 可能直播间没有天选
+    return;
   }
   const isExclude = TaskConfig.LOTTERY_EXCLUDE.some(text => data.award_name.match(text)),
     isInclude = TaskConfig.LOTTERY_INCLUDE.some(text => data.award_name.match(text));

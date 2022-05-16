@@ -10,6 +10,12 @@ function errorHandle(msg?: string): never {
   throw new Error(msg || '获取配置失败！');
 }
 
+function jsonErrorHandle(message: string) {
+  if (message.includes && message.includes('in JSON at position')) {
+    errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
+  }
+}
+
 const configArr = [
   () => require(resolveCWD('./config/config.dev.json')),
   () => require(`./${SystemConfig.configFileName}`),
@@ -78,6 +84,16 @@ function handleMultiUserConfig(config: Config): Config | undefined {
   return conf;
 }
 
+export function getArgsConfigFile(filepath: string) {
+  try {
+    const config = require(filepath);
+    return checkConfig(config);
+  } catch (error) {
+    jsonErrorHandle(error.message);
+    errorHandle('配置文件不存在！');
+  }
+}
+
 /** 设置 config */
 function setConfig() {
   if (SystemConfig.isQingLongPanel) {
@@ -93,13 +109,11 @@ function setConfig() {
       hasTag = true;
     } catch (error) {
       const { message = '' } = error;
-      if (message.includes && message.includes('in JSON at position')) {
-        errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
-      }
+      jsonErrorHandle(message);
     }
   }
   if (hasTag) {
-    errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
+    errorHandle('配置文件不存在！');
   }
   return getEnvConfig();
 }

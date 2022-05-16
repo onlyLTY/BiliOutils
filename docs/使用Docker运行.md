@@ -21,5 +21,5 @@ docker run -v $(pwd)/config:/usr/src/app/config -i --rm  catlair/bilitools:lates
 使用环境变量的方式
 
 ```bash
-docker run --env BILI_CONFIG="xxxxxxxxxxxxx" -i --rm  catlair/bilitools:latest
+docker run --env BILITOOLS_CONFIG="xxxxxxxxxxxxx" -i --rm  catlair/bilitools:latest
 ```

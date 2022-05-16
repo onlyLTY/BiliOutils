@@ -65,6 +65,14 @@ SCF 将在 5.23 号改版，正式取消免费额度，如有需要请停止使�
 - [青龙面板](./docs/%E9%9D%92%E9%BE%99%E9%9D%A2%E6%9D%BF.md): 自行添加 Node 依赖 `pako axios qs`, 自行创建 `cat_bili_ql.js` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
 - [已编译文件下载](./docs/%E7%BC%96%E8%AF%91%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D.md)
 
+### npm 包
+
+```bash
+npm install -g @catlair/bilitools
+bilitools -h
+bilitools -c ./config.json
+```
+
 ### Docker 镜像
 
 - ~~`catlair/bilitools-deploy` 用于部署到 SCF~~
