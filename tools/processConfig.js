@@ -12,9 +12,10 @@ function resolveRootPath(targetPath) {
 }
 
 function getConfig() {
-  if (process.env.BILI_CONFIG) {
-    console.log('使用环境变量 BILI_CONFIG');
-    return process.env.BILI_CONFIG;
+  const { BILI_CONFIG, BILITOOLS_CONFIG } = process.env;
+  if (BILITOOLS_CONFIG || BILI_CONFIG) {
+    console.log('使用环境变量 BILITOOLS_CONFIG');
+    return BILITOOLS_CONFIG || BILI_CONFIG;
   }
   const tempTxtPath = resolveRootPath('config/config.txt');
   if (existsSync(tempTxtPath)) {

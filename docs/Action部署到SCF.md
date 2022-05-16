@@ -18,7 +18,7 @@ jobs:
         timeout-minutes: ${{secrets.TIMEOUT_MINUTES || 15}} # 超时时间(分钟)
         run: |
           sudo docker run \
-           --env BILI_CONFIG="${{ secrets.BILI_CONFIG }}" \
+           --env BILITOOLS_CONFIG="${{ secrets.BILITOOLS_CONFIG }}" \
            --env TENCENT_SECRET_ID="${{ secrets.TENCENT_SECRET_ID }}" \
            --env TENCENT_SECRET_KEY="${{ secrets.TENCENT_SECRET_KEY }}" \
            --env RUN_SCF_ALL=y \
@@ -38,7 +38,7 @@ secrets 配置如下
 
 ![setting-new-2](images/119254825-29ec6900-bbeb-11eb-9bea-22b08d402916.png)
 
-**BILI_CONFIG 是压缩了的** [在这里选择 gzip 压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
+**BILITOOLS_CONFIG 是压缩了的** [在这里选择 gzip 压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
 
 ## 错误案例
 
@@ -58,12 +58,12 @@ secrets 配置如下
 ### 未按要求压缩配置
 
 **再三强调配置需要压缩**  
-出现下面这种，BILI_CONFIG 的配置有好多行，这明显就是没有**压缩**  
+出现下面这种，BILITOOLS_CONFIG 的配置有好多行，这明显就是没有**压缩**  
 `syntax error near unexpected token ('` 错误信息也明确指出是因为特殊符号导致错误
 
 ```text
   sudo docker run \
-   --env BILI_CONFIG="***
+   --env BILITOOLS_CONFIG="***
     ***
     ***
     ***

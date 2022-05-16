@@ -1,8 +1,8 @@
 {
-  "name": "catlair-bilitools",
-  "version": "0.3.20",
+  "name": "@catlair/bilitools",
+  "version": "0.4.11",
   "description": "this is BiliTools",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
     "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
     "build:baidu": "babel --config-file ./build/.baidu.babelrc ./src --out-dir ./dist --extensions \".ts\"",
@@ -21,6 +21,18 @@
     "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\"",
     "gitee": "ts-node tools/download.ts && ts-node tools/giteeRelease.ts"
   },
+  "bin": {
+    "bilitools": "./dist/bin.js"
+  },
+  "repository": "catlair/BiliTools",
+  "keywords": [
+    "BiliTools",
+    "bilibili"
+  ],
+  "bugs": {
+    "url": "https://github.com/catlair/BiliTools/issues"
+  },
+  "homepage": "https://gitee.com/catlair/BiliTools#readme",
   "author": "catlair",
   "license": "MIT",
   "devDependencies": {
@@ -61,5 +73,14 @@
     "dotenv": "^16.0.0",
     "puppeteer": "^13.1.1",
     "tencentcloud-sdk-nodejs": "^4.0.297"
+  },
+  "files": [
+    "dist",
+    "package*.json",
+    "yarn.lock"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }

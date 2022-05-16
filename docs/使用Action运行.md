@@ -6,15 +6,7 @@
 
 ## 创建一个仓库
 
-请勿直接 fork 本仓库！！！  
-请勿直接 fork 本仓库！！！  
-请勿直接 fork 本仓库！！！  
-请直接创建一个仓库！！！  
-请直接创建一个仓库！！！  
-请直接创建一个仓库！！！  
-你自己还可以创建私有仓库啊！！！  
-你自己还可以创建私有仓库啊！！！  
-你自己还可以创建私有仓库啊！！！
+请直接创建一个仓库！！！
 
 ![创建参考](images/125164385-81a75980-e1c4-11eb-9cda-79e0192ba894.png)
 
@@ -52,7 +44,7 @@ jobs:
         timeout-minutes: ${{secrets.TIMEOUT_MINUTES || 15}} # 超时时间(分钟)
         run: |
           sudo docker run \
-           --env BILI_CONFIG="${{ secrets.BILI_CONFIG }}" \
+           --env BILITOOLS_CONFIG="${{ secrets.BILITOOLS_CONFIG }}" \
            -i --rm \
            catlair/bilitools:latest
 ```

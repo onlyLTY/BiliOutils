@@ -156,3 +156,13 @@ export function initialize(config?: Config) {
   _taskConfig = new TaskConfigTemplate(checkConfig(config));
   TaskModule.coinsTask = _taskConfig.BILI_TARGET_COINS;
 }
+
+/**
+ * 改变配置
+ */
+export function changeConfig(index: string) {
+  const config = getConfig();
+  if (config[index]) {
+    initialize(config[index]);
+  }
+}

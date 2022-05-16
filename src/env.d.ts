@@ -2,14 +2,14 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       PUSHPLUS_TOKEN?: string;
-      IS_LOCAL: string;
-      LIVE_HEART_FORCE: string;
-      /** 使用 SCF 时直接通过环境变量配置 */
-      BILI_SCF_CONFIG?: string;
+      IS_LOCAL?: string;
+      BILITOOLS_CONFIG?: string;
+      LIVE_HEART_FORCE?: string;
       TENCENT_SECRET_ID?: string;
       TENCENT_SECRET_KEY?: string;
       ALI_SECRET_ID?: string;
       ALI_SECRET_KEY?: string;
+      CONFIG_ITEM_INDEX?: string;
     }
   }
 }
