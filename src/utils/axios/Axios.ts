@@ -120,7 +120,7 @@ export class VAxios {
   /**
    * 支持 form-data
    */
-  supportFormData(config: AxiosRequestConfig) {
+  private supportFormData(config: AxiosRequestConfig) {
     const headers = config.headers || this.options.headers;
     const contentType = headers?.['Content-Type'] || headers?.['content-type'];
     if (
@@ -138,12 +138,26 @@ export class VAxios {
     };
   }
 
-  get<T = any>(url: string, config?: CreateAxiosOptions): Promise<T> {
-    return this.request({ ...config, method: 'GET', url });
+  get<T = any>(config: CreateAxiosOptions): Promise<T>;
+  get<T = any>(url: string, config?: CreateAxiosOptions): Promise<T>;
+  get<T = any>(options: string | CreateAxiosOptions, config?: CreateAxiosOptions): Promise<T> {
+    if (isString(options)) {
+      return this.request({ ...config, method: 'GET', url: options });
+    }
+    return this.request({ ...options, method: 'GET' });
   }
 
-  post<T = any, D = any>(url: string, data?: D, config?: CreateAxiosOptions): Promise<T> {
-    return this.request({ ...config, method: 'POST', url, data });
+  post<T = any>(config: CreateAxiosOptions): Promise<T>;
+  post<T = any, D = any>(url: string, data?: D, config?: CreateAxiosOptions): Promise<T>;
+  post<T = any, D = any>(
+    options: string | CreateAxiosOptions,
+    data?: D,
+    config?: CreateAxiosOptions,
+  ): Promise<T> {
+    if (isString(options)) {
+      return this.request({ ...config, method: 'POST', url: options, data });
+    }
+    return this.request({ ...options, method: 'POST' });
   }
 
   put<T = any, D = any>(url: string, data?: D, config?: CreateAxiosOptions): Promise<T> {

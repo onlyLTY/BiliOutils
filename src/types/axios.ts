@@ -17,6 +17,8 @@ export interface RequestOptions {
   retryDelay?: number;
   // 是否携带 cookie
   withCredentials?: boolean;
+  // 是否携带 bili cookie
+  withBiliCookie?: boolean;
 }
 
 export interface Result<T = any> {
