@@ -9,7 +9,7 @@ import type {
 import type { AddCoinDto } from '../dto/video.dto';
 import type { IdType } from '../types';
 import type { UserNavNumDto } from '../dto/coin.dto';
-import { defHttp, biliApi } from './api';
+import { biliApi, biliHttp } from './api';
 import { TaskConfig } from '../config/globalVar';
 
 /**
@@ -148,7 +148,7 @@ export function addCoinForVideo(
  * @param coin
  */
 export function addCoinForAudio(sid: number, coin = 1): Promise<AudioCoinDto> {
-  return defHttp.post('https://www.bilibili.com/audio/music-service-c/web/coin/add', {
+  return biliHttp.post('https://www.bilibili.com/audio/music-service-c/web/coin/add', {
     sid,
     multiply: coin,
     csrf: TaskConfig.BILIJCT,

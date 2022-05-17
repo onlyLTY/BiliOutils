@@ -1,5 +1,5 @@
 import { baseURLs, RefererURLs } from '../constant/biliUri';
-import { createAxios, defHttp } from '../utils/axios';
+import { biliHttp, createAxios, defHttp } from '../utils/axios';
 
 const accountApi = createAxios({
   baseURL: baseURLs.account,
@@ -27,8 +27,4 @@ const vcApi = createAxios({
   baseURL: baseURLs.vc,
 });
 
-const baseHttp = createAxios({
-  requestOptions: { withCredentials: false },
-});
-
-export { biliApi, vcApi, accountApi, mangaApi, liveApi, baseHttp, defHttp };
+export { biliApi, vcApi, accountApi, mangaApi, liveApi, biliHttp, defHttp };

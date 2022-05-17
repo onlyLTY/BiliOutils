@@ -80,7 +80,7 @@ const transform: AxiosTransform = {
    */
   requsetInterceptors: (config: CreateAxiosOptions) => {
     const { requestOptions } = config;
-    if (requestOptions.withCredentials !== false) {
+    if (requestOptions.withBiliCookie === true) {
       config.headers['Cookie'] = TaskConfig.COOKIE;
     }
     return config;
@@ -90,9 +90,8 @@ const transform: AxiosTransform = {
    * 响应拦截器处理
    */
   responseInterceptors: (res: AxiosResponse<any>) => {
-    if (res.config.requestOptions.withCredentials) {
-      const setCookie = res.headers?.['set-cookie'] || [];
-      TaskConfig.COOKIE = getCookie(TaskConfig.COOKIE, setCookie);
+    if (res.config.requestOptions.withBiliCookie) {
+      TaskConfig.COOKIE = getCookie(TaskConfig.COOKIE, res.headers?.['set-cookie'] || []);
     }
     // 结果异常检测
     const code = res.data && res.data.code;
@@ -137,7 +136,7 @@ const transform: AxiosTransform = {
     options.__retryCount += 1;
     await apiDelay(options.retryDelay || 100);
     // 返回新的Promise来处理重试
-    return await defHttp.request(error.config);
+    return await biliHttp.request(error.config);
   },
 };
 
@@ -163,6 +162,8 @@ export function createAxios(opt?: Partial<CreateAxiosOptions>) {
           ignoreCancelToken: true,
           // 重试
           retry: 2,
+          // 是否携带 bili cookie
+          withBiliCookie: true,
         },
         withCredentials: true,
       } as CreateAxiosOptions,
@@ -171,4 +172,10 @@ export function createAxios(opt?: Partial<CreateAxiosOptions>) {
   );
 }
 
-export const defHttp = createAxios();
+export const defHttp = createAxios({
+  requestOptions: {
+    withBiliCookie: false,
+  },
+});
+
+export const biliHttp = createAxios();
