@@ -12,7 +12,7 @@ interface LiveAreaType {
 type CheckedLottery = LiveCheckLotteryDto & { uid: number; uname: string };
 
 // 可能是新关注的UP
-const newFollowUp: number[] = [];
+let newFollowUp: number[];
 
 /**
  * 获取直播分区
@@ -168,6 +168,7 @@ async function doLotteryArea(areaId: string, parentId: string, num = 2) {
  * 进行天选
  */
 export async function liveLotteryService() {
+  newFollowUp = [];
   // 获取直播分区
   const areaList = await getLiveArea();
   // 遍历大区

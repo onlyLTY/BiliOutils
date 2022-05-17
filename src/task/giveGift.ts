@@ -6,7 +6,6 @@ import { apiDelay, random, logger } from '../utils';
 import { MS2DATE } from '../constant';
 
 const EXPIRE_DATE = 2;
-const { BILI_GIFT_UP } = TaskConfig;
 
 export default async function giveGift() {
   logger.info('----【投喂过期食物】----');
@@ -62,8 +61,8 @@ async function getExpiredGift() {
 }
 
 async function findOneRoom() {
-  const upList = Object.assign([] as number[], BILI_GIFT_UP);
-  const getOneUp = () => upList.splice(random(BILI_GIFT_UP.length - 1), 1)[0];
+  const upList = Object.assign([] as number[], TaskConfig.BILI_GIFT_UP);
+  const getOneUp = () => upList.splice(random(TaskConfig.BILI_GIFT_UP.length - 1), 1)[0];
   while (upList.length) {
     const mid = getOneUp();
     const room = await getUserRoom(mid);
