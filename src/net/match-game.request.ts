@@ -3,9 +3,6 @@ import { GuessCollectionDto } from '../dto/match-game.dto';
 import { ApiBaseProp } from '../dto/bili-base-prop';
 import { TaskConfig } from '../config/globalVar';
 
-const csrf = TaskConfig.BILIJCT;
-const csrf_token = csrf;
-
 /**
  * 获取比赛集合
  * @param stime 开始时间
@@ -30,6 +27,7 @@ export function guessAdd(
   detail_id: number,
   count: number,
 ): Promise<ApiBaseProp> {
+  const csrf = TaskConfig.BILIJCT;
   const postData = {
     is_fav: 0,
     main_id,
@@ -37,7 +35,7 @@ export function guessAdd(
     detail_id,
     count,
     csrf,
-    csrf_token,
+    csrf_token: csrf,
   };
   return biliApi.post('/x/esports/guess/add', postData);
 }

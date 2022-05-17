@@ -4,13 +4,10 @@ import { GuessCollectionDto } from '../dto/match-game.dto';
 import { apiDelay } from '../utils';
 import { logger } from '../utils/log';
 
-// 0 反选，大于 0 正选
-const { MATCH_SELECTION, MATCH_COINS } = TaskConfig;
-
 export default async function matchGame() {
   logger.info('----【赛事硬币竞猜】----');
 
-  if (MATCH_COINS <= 0) {
+  if (TaskConfig.MATCH_COINS <= 0) {
     logger.info('硬币数量不能小于 0');
     return;
   }
@@ -90,21 +87,26 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
       const oddResult = team1.odds > team2.odds;
       let teamSelect: typeof team1;
       // 正选，赔率越小越选
-      if (MATCH_SELECTION > 0) {
+      if (TaskConfig.MATCH_SELECTION > 0) {
         teamSelect = oddResult ? team2 : team1;
       } else {
         teamSelect = oddResult ? team1 : team2;
       }
 
-      logger.info(`预测[ ${teamSelect.option} ] ${MATCH_COINS} 颗硬币`);
+      logger.info(`预测[ ${teamSelect.option} ] ${TaskConfig.MATCH_COINS} 颗硬币`);
 
       await apiDelay();
-      const { code } = await guessAdd(contestId, questionsId, teamSelect.detail_id, MATCH_COINS);
+      const { code } = await guessAdd(
+        contestId,
+        questionsId,
+        teamSelect.detail_id,
+        TaskConfig.MATCH_COINS,
+      );
       if (code !== 0) {
         logger.info('预测失败');
       } else {
         count++;
-        TaskModule.money -= MATCH_COINS;
+        TaskModule.money -= TaskConfig.MATCH_COINS;
       }
     }
   } catch (error) {
@@ -114,7 +116,7 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
 }
 
 function isLackOfCoin() {
-  if (TaskModule.money - MATCH_COINS < TaskConfig.BILI_TARGET_COINS) {
+  if (TaskModule.money - TaskConfig.MATCH_COINS < TaskConfig.BILI_TARGET_COINS) {
     logger.info(`需要保留${TaskConfig.BILI_TARGET_COINS}个硬币，任务结束`);
     return true;
   }
