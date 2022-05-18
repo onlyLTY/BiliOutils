@@ -11,7 +11,6 @@ export const functionConfig = {
   getVipPrivilege: false,
   giveGift: false,
   matchGame: false,
-  liveHeart: false,
   liveLottery: false,
 };
 
