@@ -9,12 +9,12 @@
  * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
  */
-import * as querystring from 'querystring';
 import * as nodemailer from 'nodemailer';
 import * as tunnel from 'tunnel';
 import { TaskConfig } from '../config/globalVar';
 import { defHttp } from './axios';
 import { logger } from './log';
+import { stringify } from './pure';
 
 /**
  * 配置处理为 env
@@ -399,7 +399,7 @@ function BarkNotify(text, desp, params = {}) {
       const options = {
         url: `${BARK_PUSH}/${encodeURIComponent(text)}/${encodeURIComponent(
           desp,
-        )}?sound=${BARK_SOUND}&group=${BARK_GROUP}&${querystring.stringify(params)}`,
+        )}?sound=${BARK_SOUND}&group=${BARK_GROUP}&${stringify(params)}`,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -411,7 +411,7 @@ function BarkNotify(text, desp, params = {}) {
           if (data.code === 200) {
             logger.info('Bark APP发送通知消息成功🎉\n');
           } else {
-            logger.info(`${data.message}\n`);
+            logger.info(`Bark APP发送通失败：${data.message}\n`);
           }
         })
         .catch(err => {
@@ -486,6 +486,7 @@ function ddBotNotify(text, desp) {
     };
     if (!DD_BOT_TOKEN) {
       resolve('');
+      return;
     }
     if (DD_BOT_SECRET) {
       const crypto = require('crypto');
@@ -501,7 +502,7 @@ function ddBotNotify(text, desp) {
         if (data.errcode === 0) {
           logger.info('钉钉发送通知消息成功🎉。\n');
         } else {
-          logger.info(`${data.errmsg}\n`);
+          logger.info(`钉钉发送通知失败：${data.errmsg}\n`);
         }
       })
       .catch(err => {
@@ -534,7 +535,7 @@ function qywxBotNotify(text, desp) {
           if (data.errcode === 0) {
             logger.info('企业微信发送通知消息成功🎉。\n');
           } else {
-            logger.info(`${data.errmsg}\n`);
+            logger.info(`企业微信发送通知失败：${data.errmsg}\n`);
           }
         })
         .catch(err => {
@@ -659,7 +660,7 @@ function qywxamNotify(text, desp) {
                   '成员ID:' + ChangeUserId(desp) + '企业微信应用消息发送通知消息成功🎉。\n',
                 );
               } else {
-                logger.info(`${data.errmsg}\n`);
+                logger.info(`企业微信应用：${data.errmsg}\n`);
               }
             })
             .catch(err => {
@@ -693,7 +694,7 @@ function iGotNotify(text, desp, params = {}) {
       }
       const options = {
         url: `https://push.hellyw.com/${IGOT_PUSH_KEY.toLowerCase()}`,
-        params: `title=${text}&content=${desp}&${querystring.stringify(params)}`,
+        params: `title=${text}&content=${desp}&${stringify(params)}`,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },

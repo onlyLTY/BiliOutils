@@ -262,3 +262,15 @@ export function deepMergeObject<T = unknown>(target: T, source: T): T {
     return result;
   }, target);
 }
+
+/**
+ *  stringify
+ * @param obj
+ */
+export function stringify(obj: Record<string, string | number | boolean>) {
+  const searchParams = new URLSearchParams();
+  Object.keys(obj).forEach(key => {
+    searchParams.append(key, String(obj[key]));
+  });
+  return searchParams.toString();
+}

@@ -4,9 +4,8 @@ import type { RequestOptions, Result } from '../../types/axios';
 import axios from 'axios';
 import { AxiosCanceler } from './axiosCancel';
 import { isFunction, isString } from '../is';
-import { cloneObject } from '../pure';
+import { cloneObject, stringify } from '../pure';
 import { ContentTypeEnum, RequestEnum } from '../../enums/http.enum';
-import { stringify } from 'qs';
 
 /**
  * @description axios 封装
@@ -134,7 +133,7 @@ export class VAxios {
 
     return {
       ...config,
-      data: stringify(config.data, { arrayFormat: 'brackets' }),
+      data: stringify(config.data),
     };
   }
 
