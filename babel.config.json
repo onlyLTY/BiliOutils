@@ -10,5 +10,16 @@
     ],
     "@babel/preset-typescript"
   ],
-  "comments": false
+  "comments": false,
+  "plugins": [
+    [
+      "module-resolver",
+      {
+        "alias": {
+          "@": "./src",
+          "#": "./src/types"
+        }
+      }
+    ]
+  ]
 }

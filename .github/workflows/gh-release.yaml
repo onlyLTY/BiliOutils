@@ -28,7 +28,6 @@ jobs:
           jq 'del( .optionalDependencies )' package.json > temp.json
           mv temp.json package.json
           yarn install
-          npm install -g rollup
       - name: set Docker version tag for prod
         if: ${{ env.IS_PROD == 'true' }}
         run: |
@@ -46,7 +45,7 @@ jobs:
           npm prune --production
           yarn autoclear
           mv index.cfc.js cfc
-          rm -rf index*.js tools package*.json yarn.lock .yarnclean
+          rm -rf bin.js index*.js tools package*.json yarn.lock .yarnclean
           mv cfc index.js
           zip -r -q ../baidu_cfc.zip .
       - name: Build Babel
@@ -56,6 +55,7 @@ jobs:
           cp config/config.single.json dist/config/config.json
           cd dist
           mv index.*.js ../
+          rm bin.js
           mv index.js index.local.js
       - name: ZIP SCF
         run: |
