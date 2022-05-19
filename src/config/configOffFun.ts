@@ -1,7 +1,8 @@
 import { TaskConfig } from './globalVar';
-import functionConfig from './funcConfig';
+import { getFunctionConfig } from './funcConfig';
 
 function funHandle() {
+  const functionConfig = getFunctionConfig();
   for (const funName in functionConfig) {
     if (Object.prototype.hasOwnProperty.call(functionConfig, funName)) {
       const el: boolean = functionConfig[funName];
@@ -33,6 +34,7 @@ function funHandle() {
   // if (!LIVE_HEART_FORCE && IS_LOCAL !== 'true') {
   //   functionConfig.liveHeart = false;
   // }
+  return functionConfig;
 }
 
 /**
@@ -40,6 +42,6 @@ function funHandle() {
  * @param funArr 函数数组
  */
 export function offFunctions(funArr: Array<() => unknown>): Array<() => unknown> {
-  funHandle();
+  const functionConfig = funHandle();
   return funArr.map(el => (functionConfig[el.name] ? el : null)).filter(el => el);
 }

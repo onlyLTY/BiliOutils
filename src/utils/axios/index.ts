@@ -1,15 +1,14 @@
-import type { AxiosTransform, CreateAxiosOptions } from '../../types/axiosTransform';
+import type { AxiosTransform, CreateAxiosOptions } from '#/axiosTransform';
 import type { AxiosError, AxiosResponse } from 'axios';
-import { RequestEnum, ResultEnum } from '../../enums/http.enum';
+import { RequestEnum } from '@/enums/http.enum';
 import { VAxios } from './Axios';
-import type { RequestOptions, Result } from '../../types/axios';
+import type { RequestOptions, Result } from '#/axios';
 import { isString } from '../is';
 import { deepMergeObject, jsonp2Object } from '../pure';
-import { apiDelay, sendMessage } from '../effect';
-import { defaultHeaders } from '../../constant/biliUri';
-import { TaskConfig } from '../../config/globalVar';
+import { apiDelay } from '../effect';
+import { defaultHeaders } from '@/constant/biliUri';
+import { TaskConfig } from '@/config/globalVar';
 import getCookie from '../cookie';
-import { logger, LogMessage } from '../log';
 import retryWhitelist from './retryWhitelist';
 /**
  * 数据处理，方便区分多种处理方式
@@ -93,23 +92,7 @@ const transform: AxiosTransform = {
     if (res.config.requestOptions.withBiliCookie) {
       TaskConfig.COOKIE = getCookie(TaskConfig.COOKIE, res.headers?.['set-cookie'] || []);
     }
-    // 结果异常检测
-    const code = res.data && res.data.code;
-    const exit = async function () {
-      logger.error(`运行结束：${ResultEnum[code]}`);
-      // 发送信息
-      await sendMessage(`异常：${ResultEnum[code]}`, LogMessage.value);
-      // 结束进程
-      process.exit(0);
-    };
-    switch (code) {
-      case ResultEnum['账号未登录']:
-      case ResultEnum['账号被封停']:
-        exit();
-        break;
-      default:
-        return res;
-    }
+    return res;
   },
 
   /**

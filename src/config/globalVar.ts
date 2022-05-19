@@ -126,7 +126,7 @@ export const TaskConfig = new Proxy({} as TaskConfigTemplate, {
 });
 
 /** 任务完成情况统计 */
-export abstract class TaskModule {
+abstract class TaskModuleTemplate {
   /**拥有硬币数量 */
   static money = 0;
   /**还需要投币数量,初值BILI_TARGET_COINS */
@@ -149,11 +149,14 @@ export abstract class TaskModule {
   static nickname: string;
 }
 
+export let TaskModule: typeof TaskModuleTemplate = null;
+
 export function initialize(config?: Config) {
   if (!config) {
     config = getConfig();
   }
   _taskConfig = new TaskConfigTemplate(checkConfig(config));
+  TaskModule = class extends TaskModuleTemplate {};
   TaskModule.coinsTask = _taskConfig.BILI_TARGET_COINS;
 }
 
