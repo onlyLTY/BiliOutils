@@ -26,21 +26,39 @@ function isArg(arg: string) {
 (async () => {
   if (isArg('--version') || isArg('-v')) {
     process.stdout.write('BiliTools v' + pkg.version + '\n');
-    return;
   } else if (isArg('--help') || isArg('-h')) {
     process.stdout.write(USAGE);
-    return;
   } else if (isArg('--config') || isArg('-c')) {
-    const { getArgsConfigFile } = require('./config/setConfig');
-    const { TaskConfig } = require('./config/globalVar');
-    let index: number;
-    if (isArg('--config')) {
-      index = args.indexOf('--config');
-    } else {
-      index = args.indexOf('-c');
+    const configs = await config();
+    const { initialize } = await import('./config/globalVar');
+    initialize(configs[0]);
+    const task = await import('./task/dailyTask');
+    process.stdout.write(`正在执行第1个配置\n`);
+    await task.dailyTasks();
+    process.stdout.write('执行完毕\n');
+    for (let index = 1; index < configs.length; index++) {
+      process.stdout.write(`正在执行第${index + 1}个配置\n`);
+      initialize(configs[index]);
+      await task.dailyTasks();
+      process.stdout.write('执行完毕\n');
     }
-    TaskConfig.config = getArgsConfigFile(resolve(process.cwd(), args[index + 1]));
   }
-  const task = await import('./task/dailyTask');
-  await task.dailyTasks();
 })();
+
+/**
+ * 获取配置
+ */
+async function config() {
+  const { getConfigPathFile } = await import('./config/setConfig');
+  let index: number;
+  if (isArg('--config')) {
+    index = args.indexOf('--config');
+  } else {
+    index = args.indexOf('-c');
+  }
+  const configs = getConfigPathFile(resolve(process.cwd(), args[index + 1]));
+  if (!configs.length) {
+    throw new Error('配置文件不存在');
+  }
+  return configs;
+}

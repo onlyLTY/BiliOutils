@@ -32,7 +32,7 @@ function log(level: LevelType, message: MessageType) {
     const msgStr = `[${time}] ${message}`;
     LogMessage.value += msgStr + '\n';
   }
-  console.log('[%s %s] %s', level, time, message);
+  process.stdout.write(`[${level} ${time}] ${message}\n`);
 }
 
 function errorLogger(message: MessageType) {

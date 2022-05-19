@@ -1,11 +1,11 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import type { CreateAxiosOptions } from '../../types/axiosTransform';
-import type { RequestOptions, Result } from '../../types/axios';
+import type { CreateAxiosOptions } from '#/axiosTransform';
+import type { RequestOptions, Result } from '#/axios';
 import axios from 'axios';
 import { AxiosCanceler } from './axiosCancel';
 import { isFunction, isString } from '../is';
 import { cloneObject, stringify } from '../pure';
-import { ContentTypeEnum, RequestEnum } from '../../enums/http.enum';
+import { RequestEnum } from '@/enums/http.enum';
 
 /**
  * @description axios 封装
@@ -58,7 +58,7 @@ export class VAxios {
     if (!this.axiosInstance) {
       return;
     }
-    Object.assign(this.axiosInstance.defaults.headers, headers);
+    Object.assign(this.axiosInstance.defaults.headers, this.options.headers, headers);
   }
 
   /**
@@ -120,10 +120,14 @@ export class VAxios {
    * 支持 form-data
    */
   private supportFormData(config: AxiosRequestConfig) {
-    const headers = config.headers || this.options.headers;
-    const contentType = headers?.['Content-Type'] || headers?.['content-type'];
+    const headers = {
+      ...this.options.headers,
+      ...config.headers,
+    };
+    const contentType = ((headers?.['Content-Type'] || headers?.['content-type']) as string) || '';
+
     if (
-      contentType !== ContentTypeEnum.FORM_URLENCODED ||
+      !contentType.includes('application/x-www-form-urlencoded') ||
       !Reflect.has(config, 'data') ||
       config.method?.toUpperCase() === RequestEnum.GET ||
       isString(config.data)
