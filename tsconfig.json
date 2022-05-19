@@ -8,6 +8,10 @@
     "target": "esnext",
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "#/*": ["./src/types/*"]
+    },
     "lib": ["esnext", "DOM"],
     "skipLibCheck": true,
     "moduleResolution": "node"
