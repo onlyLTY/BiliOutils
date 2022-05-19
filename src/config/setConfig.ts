@@ -1,4 +1,4 @@
-import type { Config } from '../types';
+import type { Config, MultiConfig } from '../types';
 import * as path from 'path';
 import { logger } from '../utils/log';
 import { gzipDecode } from '../utils/gzip';
@@ -65,10 +65,9 @@ function handleQLPanel(configArr: Config[]): Config {
 /**
  * 处理多用户配置
  */
-function handleMultiUserConfig(config: Config): Config | undefined {
+function handleMultiUserConfig(config: MultiConfig): Config | undefined {
   // 防止错误的将 account 用在配置中
-  // @ts-ignore
-  const newConfig = (config.account as Config[]).filter(conf => conf.cookie);
+  const newConfig = config.account.filter(conf => conf.cookie);
 
   if (newConfig.length === 0) {
     return undefined;
@@ -84,10 +83,13 @@ function handleMultiUserConfig(config: Config): Config | undefined {
   return conf;
 }
 
-export function getArgsConfigFile(filepath: string) {
+export function getConfigPathFile(filepath: string): Config[] {
   try {
     const config = require(filepath);
-    return checkConfig(config);
+    if (config.account) {
+      return filterMultiUserConfig(config);
+    }
+    return [config];
   } catch (error) {
     jsonErrorHandle(error.message);
     errorHandle('配置文件不存在！');
@@ -123,14 +125,13 @@ export function getConfig(): Config {
 }
 
 /** 检查 config */
-export function checkConfig(config: Config) {
+export function checkConfig(config: any) {
   if (!config) {
     errorHandle();
   }
 
-  // @ts-ignore
-  if (config.account && config.account.length) {
-    const multiUserConfig = handleMultiUserConfig(config);
+  if (isMultiUserConfig(config)) {
+    const multiUserConfig = handleMultiUserConfig(config as any);
     if (multiUserConfig) {
       return multiUserConfig;
     }
@@ -142,4 +143,21 @@ export function checkConfig(config: Config) {
   }
 
   return config;
+}
+
+/**
+ * 判断 config 是否是多用户配置
+ * @param config
+ */
+function isMultiUserConfig(config: MultiConfig) {
+  return config.account && config.account.length;
+}
+
+/**
+ * 过滤出有效的多用户配置
+ * @param config
+ */
+function filterMultiUserConfig(config: MultiConfig) {
+  const { account } = config;
+  return account.filter(item => item.cookie && item.cookie.length > 20);
 }

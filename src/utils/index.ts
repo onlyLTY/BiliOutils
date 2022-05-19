@@ -4,3 +4,4 @@ export * from './cookie';
 export * from './env';
 export * from './log';
 export * from './pure';
+export * from './is';
