@@ -3,6 +3,7 @@ import { apiDelay, logger, LogMessage, sendMessage } from '../utils';
 import bili, { loginTask } from './index';
 
 export async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: T[]) {
+  LogMessage.value = '';
   try {
     await loginTask();
   } catch (error) {

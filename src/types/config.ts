@@ -71,3 +71,8 @@ export interface Config {
     actFollowMsg?: 'read' | 'del' | 'delete' | 'none' | undefined;
   };
 }
+
+export interface MultiConfig {
+  account: Config[];
+  message: Config['message'];
+}

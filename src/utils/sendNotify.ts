@@ -19,7 +19,7 @@ import { stringify } from './pure';
 /**
  * 配置处理为 env
  */
-(function () {
+function initEnv() {
   /**
    * 大写命名转换为驼峰命名
    */
@@ -53,17 +53,18 @@ import { stringify } from './pure';
   ];
   const message = TaskConfig.config?.message || {};
 
-  if (TaskConfig.PUSHPLUS_TOKEN) {
-    process.env.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
-  }
-
   envName.forEach(name => {
     const value = message[upperCaseToHump(name)] || message[name] || process.env[name];
     if (value) {
       process.env[name] = value;
     }
   });
-})();
+
+  if (TaskConfig.PUSHPLUS_TOKEN) {
+    process.env.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
+  }
+  getEnv();
+}
 
 const timeout = 15000; //超时时间(单位毫秒)
 
@@ -128,76 +129,81 @@ let IGOT_PUSH_KEY = '';
 let PUSH_PLUS_TOKEN = '';
 let PUSH_PLUS_USER = '';
 
-//==========================云端环境变量的判断与接收=========================
+let QQ_SKEY = '';
+let QQ_MODE = '';
 
-if (process.env.PUSH_KEY) {
-  SCKEY = process.env.PUSH_KEY;
-}
+function getEnv() {
+  //==========================云端环境变量的判断与接收=========================
 
-if (process.env.QQ_SKEY) {
-  var QQ_SKEY = process.env.QQ_SKEY;
-}
+  if (process.env.PUSH_KEY) {
+    SCKEY = process.env.PUSH_KEY;
+  }
 
-if (process.env.QQ_MODE) {
-  var QQ_MODE = process.env.QQ_MODE;
-}
+  if (process.env.QQ_SKEY) {
+    QQ_SKEY = process.env.QQ_SKEY;
+  }
 
-if (process.env.BARK_PUSH) {
-  if (process.env.BARK_PUSH.indexOf('https') > -1 || process.env.BARK_PUSH.indexOf('http') > -1) {
-    //兼容BARK自建用户
-    BARK_PUSH = process.env.BARK_PUSH;
+  if (process.env.QQ_MODE) {
+    QQ_MODE = process.env.QQ_MODE;
+  }
+
+  if (process.env.BARK_PUSH) {
+    if (process.env.BARK_PUSH.indexOf('https') > -1 || process.env.BARK_PUSH.indexOf('http') > -1) {
+      //兼容BARK自建用户
+      BARK_PUSH = process.env.BARK_PUSH;
+    } else {
+      BARK_PUSH = `https://api.day.app/${process.env.BARK_PUSH}`;
+    }
+    if (process.env.BARK_SOUND) {
+      BARK_SOUND = process.env.BARK_SOUND;
+    }
+    if (process.env.BARK_GROUP) {
+      BARK_GROUP = process.env.BARK_GROUP;
+    }
   } else {
-    BARK_PUSH = `https://api.day.app/${process.env.BARK_PUSH}`;
+    if (BARK_PUSH && BARK_PUSH.indexOf('https') === -1 && BARK_PUSH.indexOf('http') === -1) {
+      //兼容BARK本地用户只填写设备码的情况
+      BARK_PUSH = `https://api.day.app/${BARK_PUSH}`;
+    }
   }
-  if (process.env.BARK_SOUND) {
-    BARK_SOUND = process.env.BARK_SOUND;
+  if (process.env.TG_BOT_TOKEN) {
+    TG_BOT_TOKEN = process.env.TG_BOT_TOKEN;
   }
-  if (process.env.BARK_GROUP) {
-    BARK_GROUP = process.env.BARK_GROUP;
+  if (process.env.TG_USER_ID) {
+    TG_USER_ID = process.env.TG_USER_ID;
   }
-} else {
-  if (BARK_PUSH && BARK_PUSH.indexOf('https') === -1 && BARK_PUSH.indexOf('http') === -1) {
-    //兼容BARK本地用户只填写设备码的情况
-    BARK_PUSH = `https://api.day.app/${BARK_PUSH}`;
+  if (process.env.TG_PROXY_AUTH) TG_PROXY_AUTH = process.env.TG_PROXY_AUTH;
+  if (process.env.TG_PROXY_HOST) TG_PROXY_HOST = process.env.TG_PROXY_HOST;
+  if (process.env.TG_PROXY_PORT) TG_PROXY_PORT = process.env.TG_PROXY_PORT;
+  if (process.env.TG_API_HOST) TG_API_HOST = process.env.TG_API_HOST;
+
+  if (process.env.DD_BOT_TOKEN) {
+    DD_BOT_TOKEN = process.env.DD_BOT_TOKEN;
+    if (process.env.DD_BOT_SECRET) {
+      DD_BOT_SECRET = process.env.DD_BOT_SECRET;
+    }
   }
-}
-if (process.env.TG_BOT_TOKEN) {
-  TG_BOT_TOKEN = process.env.TG_BOT_TOKEN;
-}
-if (process.env.TG_USER_ID) {
-  TG_USER_ID = process.env.TG_USER_ID;
-}
-if (process.env.TG_PROXY_AUTH) TG_PROXY_AUTH = process.env.TG_PROXY_AUTH;
-if (process.env.TG_PROXY_HOST) TG_PROXY_HOST = process.env.TG_PROXY_HOST;
-if (process.env.TG_PROXY_PORT) TG_PROXY_PORT = process.env.TG_PROXY_PORT;
-if (process.env.TG_API_HOST) TG_API_HOST = process.env.TG_API_HOST;
 
-if (process.env.DD_BOT_TOKEN) {
-  DD_BOT_TOKEN = process.env.DD_BOT_TOKEN;
-  if (process.env.DD_BOT_SECRET) {
-    DD_BOT_SECRET = process.env.DD_BOT_SECRET;
+  if (process.env.QYWX_KEY) {
+    QYWX_KEY = process.env.QYWX_KEY;
   }
-}
 
-if (process.env.QYWX_KEY) {
-  QYWX_KEY = process.env.QYWX_KEY;
-}
+  if (process.env.QYWX_AM) {
+    QYWX_AM = process.env.QYWX_AM;
+  }
 
-if (process.env.QYWX_AM) {
-  QYWX_AM = process.env.QYWX_AM;
-}
+  if (process.env.IGOT_PUSH_KEY) {
+    IGOT_PUSH_KEY = process.env.IGOT_PUSH_KEY;
+  }
 
-if (process.env.IGOT_PUSH_KEY) {
-  IGOT_PUSH_KEY = process.env.IGOT_PUSH_KEY;
+  if (process.env.PUSH_PLUS_TOKEN) {
+    PUSH_PLUS_TOKEN = process.env.PUSH_PLUS_TOKEN;
+  }
+  if (process.env.PUSH_PLUS_USER) {
+    PUSH_PLUS_USER = process.env.PUSH_PLUS_USER;
+  }
+  //==========================云端环境变量的判断与接收=========================
 }
-
-if (process.env.PUSH_PLUS_TOKEN) {
-  PUSH_PLUS_TOKEN = process.env.PUSH_PLUS_TOKEN;
-}
-if (process.env.PUSH_PLUS_USER) {
-  PUSH_PLUS_USER = process.env.PUSH_PLUS_USER;
-}
-//==========================云端环境变量的判断与接收=========================
 
 /**
  * sendNotify 推送通知功能
@@ -213,6 +219,7 @@ async function sendNotify(
   params = {},
   author = '\n\n本通知 By：https://github.com/catlair/BiliTools',
 ) {
+  initEnv();
   //提供6种通知
   desp += author; //增加作者信息，防止被贩卖等
   await Promise.all([
@@ -422,6 +429,7 @@ function BarkNotify(text, desp, params = {}) {
           resolve('');
         });
     }
+    resolve('');
   });
 }
 

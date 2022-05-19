@@ -1,4 +1,4 @@
-export const functionConfig = {
+const functionConfig = {
   silver2Coin: true,
   liveSignTask: true,
   addCoins: true,
@@ -14,6 +14,10 @@ export const functionConfig = {
   liveLottery: false,
 };
 
-export default functionConfig;
+export function getFunctionConfig() {
+  return { ...functionConfig };
+}
+
+export default getFunctionConfig;
 
 export type FunctionConfig = typeof functionConfig;
