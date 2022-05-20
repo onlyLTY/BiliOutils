@@ -103,10 +103,7 @@ export default async function loginTask() {
   logger.info('----【登录】----');
   try {
     const { data, message, code } = await loginByCookie();
-    if (code === 65006 || code === -404) {
-      logger.error(`登录错误 ${code} ${message}`);
-      return;
-    } else if (code !== 0) {
+    if (code !== 0) {
       logger.error(`登录错误 ${code} ${message}`);
       return;
     }

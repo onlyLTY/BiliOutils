@@ -6,9 +6,7 @@ process.env.IS_LOCAL = 'true';
 
 (async function dailyMain() {
   // 手动初始化配置
-  for (let index = 0; index < 3; index++) {
-    await printVersion();
-    initialize();
-    return await dailyTasks();
-  }
+  await printVersion();
+  initialize();
+  return await dailyTasks();
 })();

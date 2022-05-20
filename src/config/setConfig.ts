@@ -131,7 +131,7 @@ export function checkConfig(config: any) {
   }
 
   if (isMultiUserConfig(config)) {
-    const multiUserConfig = handleMultiUserConfig(config as any);
+    const multiUserConfig = handleMultiUserConfig(config);
     if (multiUserConfig) {
       return multiUserConfig;
     }

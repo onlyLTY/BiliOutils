@@ -2,7 +2,10 @@ import { offFunctions } from '../config/configOffFun';
 import { apiDelay, logger, LogMessage, sendMessage } from '../utils';
 import bili, { loginTask } from './index';
 
-export async function dailyTasks<T = unknown>(cb?: (...arg: T[]) => unknown, ...cbArg: T[]) {
+export async function dailyTasks<T = unknown>(
+  cb?: (...arg: T[]) => Promise<unknown>,
+  ...cbArg: T[]
+) {
   LogMessage.value = '';
   try {
     await loginTask();

@@ -168,7 +168,6 @@ export function formatCron({ hours, minutes, seconds }: CronDateType, type?: SLS
       break;
     default:
       value = `${seconds} ${minutes} ${hours} * * * *`;
-      return;
   }
   return {
     value,
