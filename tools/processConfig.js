@@ -1,5 +1,6 @@
 const { writeFileSync, readFileSync, existsSync } = require('fs');
-const { gzipDecode } = require('../dist/utils/gzip');
+// @ts-ignore
+const { gzipDecode } = require('./gzip');
 const { resolve } = require('path');
 
 /**
@@ -32,7 +33,7 @@ function setConfig(gzipString) {
 const gzipString = getConfig();
 if (gzipString) {
   setConfig(gzipString);
-  console.log('配置转化完成');
+  console.log('配置转化完成\n');
 } else {
-  console.log('没有可以转化的内容');
+  console.log('没有可以转化的内容\n');
 }

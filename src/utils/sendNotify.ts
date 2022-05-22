@@ -306,16 +306,16 @@ function serverNotify(text, desp, time = 2100) {
           .then(data => {
             //server酱和Server酱·Turbo版的返回json格式不太一样
             if (data.errno === 0 || data.data.errno === 0) {
-              logger.info('server酱发送通知消息成功🎉\n');
+              logger.info('server酱发送通知消息成功🎉');
             } else if (data.errno === 1024) {
               // 一分钟内发送相同的内容会触发
-              logger.info(`server酱发送通知消息异常: ${data.errmsg}\n`);
+              logger.info(`server酱发送通知消息异常: ${data.errmsg}`);
             } else {
               logger.info(`server酱发送通知消息异常\n${JSON.stringify(data)}`);
             }
           })
           .catch(err => {
-            logger.info('发送通知调用API失败！！\n');
+            logger.info('发送通知调用API失败！！');
             logger.info(err);
           })
           .finally(() => {
@@ -378,17 +378,17 @@ function CoolPush(text, desp) {
         .post(options)
         .then(data => {
           if (data.code === 200) {
-            logger.info(`酷推发送${pushMode(QQ_MODE)}通知消息成功🎉\n`);
+            logger.info(`酷推发送${pushMode(QQ_MODE)}通知消息成功🎉`);
           } else if (data.code === 400) {
-            logger.info(`QQ酷推(Cool Push)发送${pushMode(QQ_MODE)}推送失败：${data.msg}\n`);
+            logger.info(`QQ酷推(Cool Push)发送${pushMode(QQ_MODE)}推送失败：${data.msg}`);
           } else if (data.code === 503) {
-            logger.info(`QQ酷推出错，${data.message}：${data.data}\n`);
+            logger.info(`QQ酷推出错，${data.message}：${data.data}`);
           } else {
             logger.info(`酷推推送异常: ${JSON.stringify(data)}`);
           }
         })
         .catch(err => {
-          logger.info(`发送${pushMode(QQ_MODE)}通知调用API失败！！\n`);
+          logger.info(`发送${pushMode(QQ_MODE)}通知调用API失败！！`);
           logger.info(err);
         })
         .finally(() => {
@@ -416,13 +416,13 @@ function BarkNotify(text, desp, params = {}) {
         .get(options)
         .then(data => {
           if (data.code === 200) {
-            logger.info('Bark APP发送通知消息成功🎉\n');
+            logger.info('Bark APP发送通知消息成功🎉');
           } else {
-            logger.info(`Bark APP发送通失败：${data.message}\n`);
+            logger.info(`Bark APP发送通失败：${data.message}`);
           }
         })
         .catch(err => {
-          logger.info('Bark APP发送通知调用API失败！！\n');
+          logger.info('Bark APP发送通知调用API失败！！');
           logger.error(err);
         })
         .finally(() => {
@@ -458,15 +458,15 @@ function tgBotNotify(text, desp) {
         .post(options)
         .then(data => {
           if (data.ok) {
-            logger.info('Telegram发送通知消息成功🎉。\n');
+            logger.info('Telegram发送通知消息成功🎉。');
           } else if (data.error_code === 400) {
-            logger.info('请主动给bot发送一条消息并检查接收用户ID是否正确。\n');
+            logger.info('请主动给bot发送一条消息并检查接收用户ID是否正确。');
           } else if (data.error_code === 401) {
-            logger.info('Telegram bot token 填写错误。\n');
+            logger.info('Telegram bot token 填写错误。');
           }
         })
         .catch(err => {
-          logger.info('telegram发送通知消息失败！！\n');
+          logger.info('telegram发送通知消息失败！！');
           logger.info(err);
         })
         .finally(() => {
@@ -508,13 +508,13 @@ function ddBotNotify(text, desp) {
       .post(options)
       .then(data => {
         if (data.errcode === 0) {
-          logger.info('钉钉发送通知消息成功🎉。\n');
+          logger.info('钉钉发送通知消息成功🎉。');
         } else {
-          logger.info(`钉钉发送通知失败：${data.errmsg}\n`);
+          logger.info(`钉钉发送通知失败：${data.errmsg}`);
         }
       })
       .catch(err => {
-        logger.info('钉钉发送通知消息失败！！\n');
+        logger.info('钉钉发送通知消息失败！！');
         logger.info(err);
       });
     resolve('');
@@ -541,13 +541,13 @@ function qywxBotNotify(text, desp) {
         .post(options)
         .then(data => {
           if (data.errcode === 0) {
-            logger.info('企业微信发送通知消息成功🎉。\n');
+            logger.info('企业微信发送通知消息成功🎉。');
           } else {
-            logger.info(`企业微信发送通知失败：${data.errmsg}\n`);
+            logger.info(`企业微信发送通知失败：${data.errmsg}`);
           }
         })
         .catch(err => {
-          logger.info('企业微信发送通知消息失败！！\n');
+          logger.info('企业微信发送通知消息失败！！');
           logger.info(err);
         })
         .finally(() => {
@@ -665,15 +665,15 @@ function qywxamNotify(text, desp) {
             .then(data => {
               if (data.errcode === 0) {
                 logger.info(
-                  '成员ID:' + ChangeUserId(desp) + '企业微信应用消息发送通知消息成功🎉。\n',
+                  '成员ID:' + ChangeUserId(desp) + '企业微信应用消息发送通知消息成功🎉。',
                 );
               } else {
-                logger.info(`企业微信应用：${data.errmsg}\n`);
+                logger.info(`企业微信应用：${data.errmsg}`);
               }
             })
             .catch(err => {
               logger.info(
-                '成员ID:' + ChangeUserId(desp) + '企业微信应用消息发送通知消息失败！！\n',
+                '成员ID:' + ChangeUserId(desp) + '企业微信应用消息发送通知消息失败！！',
               );
               logger.info(err);
             })
@@ -682,7 +682,7 @@ function qywxamNotify(text, desp) {
             });
         })
         .catch(err => {
-          logger.error('企业微信应用消息发送通知消息失败！！\n');
+          logger.error('企业微信应用消息发送通知消息失败！！');
         });
     } else {
       resolve('');
@@ -696,7 +696,7 @@ function iGotNotify(text, desp, params = {}) {
       // 校验传入的IGOT_PUSH_KEY是否有效
       const IGOT_PUSH_KEY_REGX = new RegExp('^[a-zA-Z0-9]{24}$');
       if (!IGOT_PUSH_KEY_REGX.test(IGOT_PUSH_KEY)) {
-        logger.info('您所提供的IGOT_PUSH_KEY无效\n');
+        logger.info('您所提供的IGOT_PUSH_KEY无效');
         resolve('');
         return;
       }
@@ -713,13 +713,13 @@ function iGotNotify(text, desp, params = {}) {
         .then(data => {
           if (typeof data === 'string') data = JSON.parse(data);
           if (data.ret === 0) {
-            logger.info('iGot发送通知消息成功🎉\n');
+            logger.info('iGot发送通知消息成功🎉');
           } else {
-            logger.info(`iGot发送通知消息失败：${data.errMsg}\n`);
+            logger.info(`iGot发送通知消息失败：${data.errMsg}`);
           }
         })
         .catch(err => {
-          logger.info('发送通知调用API失败！！\n');
+          logger.info('发送通知调用API失败！！');
           logger.info(err);
         })
         .finally(() => {
@@ -753,15 +753,15 @@ function pushPlusNotify(text, desp) {
         .post(options)
         .then(data => {
           if (data.code === 200) {
-            logger.info(`push+发送${PUSH_PLUS_USER ? '一对多' : '一对一'}通知消息完成。\n`);
+            logger.info(`push+发送${PUSH_PLUS_USER ? '一对多' : '一对一'}通知消息完成。`);
           } else {
             logger.info(
-              `push+发送${PUSH_PLUS_USER ? '一对多' : '一对一'}通知消息失败：${data.msg}\n`,
+              `push+发送${PUSH_PLUS_USER ? '一对多' : '一对一'}通知消息失败：${data.msg}`,
             );
           }
         })
         .catch(err => {
-          logger.info(`push+发送${PUSH_PLUS_USER ? '一对多' : '一对一'}通知消息失败！！\n`);
+          logger.info(`push+发送${PUSH_PLUS_USER ? '一对多' : '一对一'}通知消息失败！！`);
           logger.info(err);
         })
         .finally(() => {

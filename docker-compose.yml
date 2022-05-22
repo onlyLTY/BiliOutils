@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   bili_task:
-    image: catlair/bilitools:latest # 按需选择版本
+    image: demo # 按需选择版本
     container_name: catlair_bilitools
     volumes: # 请注意路径是否正确
       - ./config/:/usr/src/app/config/

@@ -17,7 +17,7 @@
     "start": "node ./dist/index.js",
     "autoclear": "yarn autoclean -F && node tools/pkgclean.js",
     "prebuild": "rm -rf dist/",
-    "predeploy:multi": "cp -rf ./tools/ ./package*.json ./docker/.yarnclean ./dist && cd ./dist && yarn install --production && npm run autoclear && rm -rf tools package*.json yarn.lock .yarnclean &&  cd ../",
+    "predeploy:multi": "cp -rf ./tools/ ./package*.json ./build/.yarnclean ./dist && cd ./dist && yarn install --production && npm run autoclear && rm -rf tools package*.json yarn.lock .yarnclean &&  cd ../",
     "postbuild": "cd ./dist && rm -rf ./dto/ ./types/ *.d.js",
     "postbuild:baidu": "npm run postbuild && awk 'NR==10{s=$0;getline;s=$0\"\\n\"s;getline;print;print s;next;}1' dist/index.cfc.js > dist/index.cfc && mv dist/index.cfc dist/index.cfc.js",
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",

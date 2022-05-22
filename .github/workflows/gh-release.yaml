@@ -40,7 +40,7 @@ jobs:
         run: |
           yarn build:baidu
           echo ${{ env.DOCKER_TAG }} >> dist/version.txt
-          cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
+          cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
           cd dist
           npm prune --production
           yarn autoclear
@@ -59,7 +59,7 @@ jobs:
           mv index.js index.local.js
       - name: ZIP SCF
         run: |
-          cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
+          cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
           mv ./index.scf.js ./dist/index.js
           cd dist
           yarn add tencentcloud-sdk-nodejs
@@ -70,7 +70,7 @@ jobs:
           rm -rf node_modules
       - name: ZIP FC
         run: |
-          cp -rf ./tools/ ./package*.json yarn.lock ./docker/.yarnclean ./node_modules/ ./dist/
+          cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
           mv ./index.fc.js ./dist/index.js
           cd dist
           # yarn add @alicloud/fc2 # 自带 fc2
