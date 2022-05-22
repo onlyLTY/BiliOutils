@@ -3,13 +3,19 @@ import * as path from 'path';
 import { logger } from '../utils/log';
 import { gzipDecode } from '../utils/gzip';
 import { SystemConfig } from './systemConfig';
-import { jsonErrorHandle, readJsonFile } from '@/utils/file';
+import { readJsonFile } from '@/utils/file';
 
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
 
 function errorHandle(msg?: string): never {
   throw new Error(msg || '获取配置失败！未找到配置文件！');
+}
+
+function jsonErrorHandle(message: string) {
+  if (message.includes && message.includes('in JSON at position')) {
+    errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
+  }
 }
 
 const configPathArr = Array.from(
@@ -62,9 +68,16 @@ function handleQLPanel(configArr: Config[]): Config {
 /**
  * 处理多用户配置
  */
-function handleMultiUserConfig(config: MultiConfig): Config | undefined {
-  // 防止错误的将 account 用在配置中
-  const newConfig = config.account.filter(conf => conf.cookie);
+function handleMultiUserConfig(config: MultiConfig | Config[]): Config {
+  let newConfig: Config[];
+  const isArray = Array.isArray(config);
+  if (isArray) {
+    newConfig = config;
+  } else {
+    // [兼容]
+    // 防止错误的将 account 用在配置中
+    newConfig = config.account.filter(conf => conf.cookie);
+  }
 
   if (newConfig.length === 0) {
     return undefined;
@@ -74,16 +87,19 @@ function handleMultiUserConfig(config: MultiConfig): Config | undefined {
     return handleQLPanel(newConfig);
   }
   logger.warn('在单用户场景下配置了多用户，我们将放弃多余的配置');
+  // [兼容]
   // 合并 message 配置
   const conf = newConfig[0];
-  conf.message = Object.assign(config.message || {}, conf.message);
+  if (!isArray) {
+    conf.message = Object.assign(config.message || {}, conf.message);
+  }
   return conf;
 }
 
 export function getConfigPathFile(filepath: string): Config[] {
   try {
-    const config = require(filepath);
-    if (config.account) {
+    const config = readJsonFile(filepath);
+    if (isMultiUserConfig(config)) {
       return filterMultiUserConfig(config);
     }
     return [config];
@@ -101,7 +117,6 @@ function setConfig() {
   for (let index = 0; index < configPathArr.length; index++) {
     const config = readJsonFile<Config>(configPathArr[index]);
     if (config) {
-      logger.verbose(`读取配置文件 ${configPathArr[index]}`);
       return config;
     }
   }
@@ -137,15 +152,23 @@ export function checkConfig(config: any) {
  * 判断 config 是否是多用户配置
  * @param config
  */
-function isMultiUserConfig(config: MultiConfig) {
-  return config.account && config.account.length;
+function isMultiUserConfig(config: MultiConfig | Config[]) {
+  if (Array.isArray(config)) {
+    return true;
+  }
+  // [兼容]
+  return Boolean(config.account && config.account.length);
 }
 
 /**
  * 过滤出有效的多用户配置
  * @param config
  */
-function filterMultiUserConfig(config: MultiConfig) {
-  const { account } = config;
-  return account.filter(item => item.cookie && item.cookie.length > 20);
+function filterMultiUserConfig(config: MultiConfig | Config[]) {
+  const filter = (conf: Config) => conf.cookie && conf.cookie.length > 40;
+  if (Array.isArray(config)) {
+    return config.filter(filter);
+  }
+  // [兼容]
+  return config.account.filter(filter);
 }

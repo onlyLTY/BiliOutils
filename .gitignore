@@ -3,8 +3,8 @@ node_modules/**
 dist/
 /temp/**
 /config/*
-!config/config.example.
-!config/config.single.json
+!config/config.example.json[$|5]
+!config/config.single.json[$|5]
 .idea
 /src/config/config.json
 yarn-error.log

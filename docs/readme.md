@@ -4,11 +4,10 @@
 - [获取 Cookie 的方法](#获取-cookie-的方法)
   - [Firefox](#firefox)
   - [Chrome/Chromium](#chromechromium)
-- [获取腾讯云函数（SCF）授权（ID/KEY）的方法](#获取腾讯云函数scf授权idkey的方法)
 - [配置相关](#配置相关)
   - [配置文件路径](#配置文件路径)
   - [在线填写表单获取配置](#在线填写表单获取配置)
-  - [多用户配置参考](#多用户配置参考)
+  - [用户配置参考](#用户配置参考)
 
 ## 获取 Cookie 的方法
 
@@ -50,18 +49,14 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 ![chrome-net-bnav](./images/chrome-net-bnav.png)
 
-## 获取腾讯云函数（SCF）授权（ID/KEY）的方法
-
-获取 key 参考[腾讯云权限管理](https://console.cloud.tencent.com/cam/capi)
-
-![image-20210725112752944](images/get-scf-id.png)
-
 ## 配置相关
 
 ### 配置文件路径
 
-- 全局配置（可配置多个用户）：`config/config.json`
-- 单用户配置：`与 index.js (ts) 同目录/config/config.json`。如 `dist`
+- `config/config.json`
+- `与 index.js (ts) 同目录/config/config.json`。如 `dist`
+- 同级 `config.json`
+- 以上配置后缀改为 `.json5` 同样有效
 
 所有配置都登记在 [`types/config.ts`](/src/types/config.ts) 文件中  
 **解释：**
@@ -84,60 +79,20 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 ![docs-get-config](images/docs-get-config.png)
 
-### 多用户配置参考
+### 用户配置参考
+
+多用户配置参考 [config.example.json5](../config/config.example.json5)
+单用户配置参考 [config.single.json](../config/config.single.json)
 
 **多用户配置只用于部分情况，并不是所有都支持**
 
-- 本地/docker 运行多个用户
-- 本地/docker 推送多个到 scf
+- 本地（如 npm）/docker 运行多个用户
+- 本地（如 npm）/docker 推送多个到 scf
 
-其他情况填写多个只会使用第一个
-
-> 可能容易搞混，所以文档现在只写多用户，单一用户环境只会取 account 中的第一个
-
-```json
-{
-  "message": {},
-  "account": [
-    {
-      "function": {
-        "silver2Coin": false,
-        "liveSignTask": false,
-        "addCoins": false,
-        "mangaSign": false,
-        "shareAndWatch": false,
-        "supGroupSign": false,
-        "judgement": true,
-        "liveSendMessage": false,
-        "charging": false,
-        "getVipPrivilege": false
-      },
-      "dailyRunTime": "19:19:19-23:23:23",
-      "apiDelay": [20, 50],
-      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.141 Safari/537.36",
-      "cookie": "哔站完整cookie，至少含有三要素",
-      "message": {},
-      "stayCoins": 0,
-      "targetCoins": 5,
-      "targetLevel": 6,
-      "coinRetryNum": 6,
-      "upperAccMatch": true,
-      "customizeUp": [],
-      "chargeUpId": 0,
-      "chargePresetTime": 31,
-      "sls": {
-        "name": "bilitool_scf_demo",
-        "region": "ap-chengdu",
-        "description": "干什么的，sls 是云函数必须"
-      }
-    },
-    {},
-    {}
-  ] // {} 同上
-}
-```
+其他情况填写多个只会使用第一个, 不用担心
 
 注：
 
-- `sls` 字段是批量部署需要的内容（函数名和函数地域）
-- `json` 不支持注释，所以千万不要注释，例子中的注释 `//` 是为了方便阅读
+- 配置使用的 `json5`，兼容 `json` 且更加灵活，可以支持 `注释`。
+- 务必使用 https://www.lddgo.net/string/json5 校验 json5 格式。
+- JSON5 格式介绍 https://juejin.cn/post/6904473733067440142#heading-2

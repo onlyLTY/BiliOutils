@@ -20,15 +20,18 @@
 
 ## 配置文件路径
 
-- 全局配置（可配置多个用户）：`config/config.json`
-- 单用户配置：`与 index.js (ts) 同目录/config/config.json`。
+- 同级 `config.json` 文件
+- `config/config.json`
+- `与 index.js (ts) 同目录/config/config.json`。
+- 以上配置后缀改为 `.json5` 也可以。
 - 当然你可以不用文件配置，直接使用环境变量 `BILITOOLS_CONFIG`
 
 ## 多用户配置
 
+`[account]` 数组，参考 [config.example.json5](../config/config.example.json5)
+
 | Key     | Value                     |
 | ------- | ------------------------- |
-| message | 可选 [↓](#message-配置项) |
 | account | 必须 [↓](#account-配置项) |
 
 ## Message 配置项

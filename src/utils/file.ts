@@ -9,12 +9,18 @@ import { logger } from './log';
  */
 export function readJsonFile<T = any>(filePath: string): T {
   try {
+    let content: string;
     if (existsSync(filePath)) {
-      const content = readFileSync(filePath, 'utf-8');
-      return JSON5.parse(content);
+      content = readFileSync(filePath, 'utf-8');
+    } else if (existsSync((filePath += '5'))) {
+      content = readFileSync(filePath, 'utf-8');
     }
+    if (!content) {
+      return;
+    }
+    logger.verbose(`读取配置文件 ${filePath}`);
+    return JSON5.parse(content);
   } catch (error) {
-    logger.error(`读取配置文件 ${filePath}`);
     jsonErrorHandle(error.message);
   }
 }
