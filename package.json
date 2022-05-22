@@ -1,8 +1,11 @@
 {
   "name": "@catlair/bilitools",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "description": "this is BiliTools",
-  "main": "src/index.ts",
+  "main": "dist/main.js",
+  "bin": {
+    "bilitools": "./dist/bin.js"
+  },
   "scripts": {
     "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
     "build:baidu": "babel --config-file ./build/.baidu.babelrc ./src --out-dir ./dist --extensions \".ts\"",
@@ -20,9 +23,6 @@
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
     "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\"",
     "gitee": "ts-node tools/download.ts && ts-node tools/giteeRelease.ts"
-  },
-  "bin": {
-    "bilitools": "./dist/bin.js"
   },
   "repository": "catlair/BiliTools",
   "keywords": [
@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "json5": "^2.2.1",
     "nodemailer": "^6.7.2",
     "pako": "1.0.11",
     "tunnel": "^0.0.6"

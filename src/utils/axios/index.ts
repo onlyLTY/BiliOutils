@@ -31,9 +31,6 @@ const transform: AxiosTransform = {
 
     // 错误的时候返回
     const { data } = res;
-    if (!data) {
-      throw new Error('[HTTP] 返回数据为空');
-    }
     if (options.isJsonp && isString(data)) {
       return jsonp2Object(data);
     }
@@ -130,7 +127,7 @@ export function createAxios(opt?: Partial<CreateAxiosOptions>) {
         timeout: 10 * 1000,
         headers: {
           'Content-Type': defaultHeaders['content-type'],
-          'User-Agent': TaskConfig.USER_AGENT || defaultHeaders['user-agent'],
+          'User-Agent': defaultHeaders['user-agent'],
           'accept-language': defaultHeaders['accept-language'],
         },
         // 数据处理方式

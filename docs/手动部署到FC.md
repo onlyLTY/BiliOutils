@@ -1,15 +1,4 @@
-## 1. 下载最新版的 [aliyun_fc.zip 压缩包](https://github.com/catlair/BiliTools/releases/latest)
-
-[Gitee 备份下载地址](https://gitee.com/catlair/BiliTools/releases/)
-
-加速下载：
-<https://ghproxy.com/https://github.com/catlair/BiliTools/releases/download/v0.4.5/aliyun_fc.zip>
-
-把 v0.4.5 替换成最新版本号即可
-
-![aliyun_fc](./images/aliyun_fc.png)
-
-## 2. 新增 fc
+## 新增 fc
 
 [点击进入云函数控制台](https://fcnext.console.aliyun.com/cn-chengdu/services)
 
@@ -37,19 +26,31 @@
 
 ![fc-timeout](images/fc-timeout.png)
 
-## 3. 上传代码
+## 安装或更新
 
-选择上传刚才下载的压缩包
+![fc-npm](images/fc-npm.png)
 
-![fc-upload-zip](images/fc-upload-zip.png)
+云函数使用了镜像加速，但是镜像不是实时更新的，如果想要今天刚更新的模块，请设置源为默认。
 
-修改配置文件
+```bash
+npm config set registry https://registry.npmjs.org/
+```
 
-![fc-set-config](images/fc-set-config.png)
+安装/更新依赖，都是同样的
 
-点击测试运行一下
+```bash
+yarn add @catlair/bilitools
+```
 
-## 4. 随机时间运行（可选）
+修改 index.js 的代码
+
+```javascript
+exports.handler = require('@catlair/bilitools').fc_handler();
+```
+
+最后参考图中位置，添加配置文件，再点击部署
+
+## 随机时间运行（可选）
 
 liveHeart 必选
 

@@ -1,5 +1,6 @@
 import type { CronDateType, SLSType } from '../types';
 import { DAILY_RUN_TIME, MS2HOUR } from '../constant';
+import { isObject } from './is';
 
 const MAX_MINUTES = 59,
   MAX_HOURS = 23,
@@ -250,7 +251,11 @@ export function cloneObject<T = unknown>(object: T, deep = false): T {
  * @param source
  */
 export function deepMergeObject<T = unknown>(target: T, source: T): T {
-  if (typeof target !== 'object' || typeof source !== 'object') {
+  // 忽略 undefined
+  if (target === undefined || source === undefined) {
+    return target || source;
+  }
+  if (!isObject(target) || !isObject(source)) {
     return source;
   }
   if (Array.isArray(target) && Array.isArray(source)) {

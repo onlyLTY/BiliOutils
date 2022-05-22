@@ -1,15 +1,4 @@
-## 1. 下载最新版的 [tencent_scf.zip 压缩包](https://github.com/catlair/BiliTools/releases/latest)
-
-[Gitee 备份下载地址](https://gitee.com/catlair/BiliTools/releases/)
-
-加速下载：
-<https://ghproxy.com/https://github.com/catlair/BiliTools/releases/download/v0.4.3/tencent_scf.zip>
-
-把 v0.4.3 替换成最新版本号即可
-
-![image](./images/tencent_scf.png)
-
-## 2. 新增 scf
+## 新增 scf
 
 [点击进入云函数控制台](https://console.cloud.tencent.com/scf)
 
@@ -21,10 +10,6 @@
 
 ![SCF基础配置](images/scf-base-config.png)
 
-选择上传刚才下载的压缩包
-
-![Snipaste_2021-05-23_14-42-46](images/119252577-b133df80-bbdf-11eb-993c-ffcf893800fc.png)
-
 更多高级配置
 
 ![image](images/119252605-cd378100-bbdf-11eb-85a6-ca6aa97ea445.png)
@@ -33,19 +18,44 @@
 
 ![image](images/119252627-e4766e80-bbdf-11eb-9c53-359877711c20.png)
 
-## 3. 新建配置文件并测试是否可用
+## 下载或更新模块
 
-![image-20210725111851821](images/image-20210725111851821.png)
+![下载或更新模块](images/scf-npm.png)
 
-部署后点击运行，查看是否运行成功，如若失败，请根据输出内容修改后重试
+腾讯云函数使用了镜像加速，但是镜像不是实时更新的，如果想要今天刚更新的模块，请设置源为默认。
 
-当然也可以添加环境变量 [`BILITOOLS_CONFIG`](./configuration.md#环境变量)  
-这样就不用每次更新后都新建 `config.json` 文件  
+```bash
+npm config set registry https://registry.npmjs.org/
+```
+
+安装/更新依赖，都是同样的
+
+```bash
+cd src
+yarn add @catlair/bilitools
+```
+
+如果是需要随机运行，还需要 `yarn add tencentcloud-sdk-nodejs`
+
+修改 index.js 的代码
+
+```javascript
+exports.main_handler = require('@catlair/bilitools').scf_handler();
+```
+
+最后参考图中位置，添加配置文件
+
+## 新建配置文件并测试是否可用
+
+**部署后**点击运行，查看是否运行成功，如若失败，请根据输出内容修改后重试
+
+除了 config.json 当然也可以使用环境变量 [`BILITOOLS_CONFIG`](./configuration.md#环境变量)
+
 文件配置优先级高于 `BILITOOLS_CONFIG`
 
 ![bili-scf-config](images/bili-scf-config.png)
 
-## 4. 增加触发器
+## 增加触发器
 
 ![create-trigger](images/create-trigger.png)
 

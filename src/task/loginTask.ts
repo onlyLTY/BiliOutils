@@ -101,18 +101,14 @@ async function setUserInfo(data: UserNavData) {
 
 export default async function loginTask() {
   logger.info('----【登录】----');
-  try {
-    const { data, message, code } = await loginByCookie();
-    if (code !== 0) {
-      logger.error(`登录错误 ${code} ${message}`);
-      return;
-    }
-    if (!data.isLogin) {
-      throw new Error('接口返回为未登录');
-    }
-    await apiDelay();
-    await setUserInfo(data);
-  } catch (error) {
-    throw new Error(error.message);
+  const { data, message, code } = await loginByCookie();
+  if (code !== 0) {
+    logger.error(`登录错误 ${code} ${message}`);
+    throw new Error(message);
   }
+  if (!data.isLogin) {
+    throw new Error('接口返回为未登录');
+  }
+  await apiDelay();
+  await setUserInfo(data);
 }

@@ -26,10 +26,10 @@ jobs:
           cat package.json | jq "del( .optionalDependencies ) | .version = \"${{ env.DOCKER_TAG }}\"" > temp.json
           mv temp.json package.json
           yarn install
+          rm yarn.lock
       - name: Build and Handle
         run: |
           yarn build
-          rm dist/index*.js
       - run: yarn publish ${{ env.IS_RC == 'true' && '--tag beta' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,8 +1,18 @@
-import FCClient from '@alicloud/fc2';
 import { getPRCDate, randomDailyRunTime } from './pure';
 import { TaskConfig } from '../config/globalVar';
 import { logger } from './log';
 import type { FCContext, FCEvent } from '../types/fc';
+
+/**
+ * 获取 @alicloud/fc2
+ */
+function getSDK() {
+  try {
+    return import('@alicloud/fc2');
+  } catch {
+    logger.warn('@alicloud/fc2 not found');
+  }
+}
 
 /**
  * 更新触发器
@@ -26,6 +36,12 @@ export default async function (
     logger.info('环境变量不存在ALI_SECRET_ID和ALI_SECRET_KEY');
     return false;
   }
+  const sdk = await getSDK();
+  if (!sdk) {
+    return false;
+  }
+  const FCClient = sdk.default;
+
   const FUNCTION_NAME = context.function.name;
   const TRIGGER_NAME = event.triggerName;
   const SERVICE_NAME = context.service.name;

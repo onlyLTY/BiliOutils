@@ -1,4 +1,4 @@
-import { defHttp } from './api';
+import { defHttp } from './axios';
 
 /**
  * 获取最新版本

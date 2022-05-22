@@ -45,7 +45,7 @@ jobs:
           npm prune --production
           yarn autoclear
           mv index.cfc.js cfc
-          rm -rf bin.js index*.js tools package*.json yarn.lock .yarnclean
+          rm -rf bin.js index*.js main.js tools package*.json yarn.lock .yarnclean
           mv cfc index.js
           zip -r -q ../baidu_cfc.zip .
       - name: Build Babel
@@ -55,7 +55,7 @@ jobs:
           cp config/config.single.json dist/config/config.json
           cd dist
           mv index.*.js ../
-          rm bin.js
+          rm bin.js main.js
           mv index.js index.local.js
       - name: ZIP SCF
         run: |

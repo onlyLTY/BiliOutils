@@ -3,32 +3,29 @@ import * as path from 'path';
 import { logger } from '../utils/log';
 import { gzipDecode } from '../utils/gzip';
 import { SystemConfig } from './systemConfig';
+import { jsonErrorHandle, readJsonFile } from '@/utils/file';
 
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
+const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
 
 function errorHandle(msg?: string): never {
-  throw new Error(msg || '获取配置失败！');
+  throw new Error(msg || '获取配置失败！未找到配置文件！');
 }
 
-function jsonErrorHandle(message: string) {
-  if (message.includes && message.includes('in JSON at position')) {
-    errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
-  }
-}
-
-const configArr = [
-  () => require(resolveCWD('./config/config.dev.json')),
-  () => require(`./${SystemConfig.configFileName}`),
-  () => require(resolveCWD(`./config/${SystemConfig.configFileName}`)),
-];
+const configPathArr = Array.from(
+  new Set([
+    resolveCWD('./config/config.dev.json'),
+    resolveCWD(`./config/${SystemConfig.configFileName}`),
+    resolveCWD(`./${SystemConfig.configFileName}`),
+    resolveDir(`./config/${SystemConfig.configFileName}`),
+    resolveDir(`./${SystemConfig.configFileName}`),
+  ]),
+);
 
 /**
  * 兼容，随时删除
  */
-const qlOldConfigArr = [
-  () => require('./config.json'),
-  () => require(resolveCWD('./config/config.json')),
-];
+const qlOldConfigArr = ['./config.json', resolveCWD('./config/config.json')];
 
 const getEnvConfig = (): Config => {
   const { BILITOOLS_CONFIG, BILI_SCF_CONFIG, BILI_CONFIG } = process.env;
@@ -99,23 +96,14 @@ export function getConfigPathFile(filepath: string): Config[] {
 /** 设置 config */
 function setConfig() {
   if (SystemConfig.isQingLongPanel) {
-    configArr.splice(0, 1, ...qlOldConfigArr);
+    configPathArr.splice(0, 1, ...qlOldConfigArr);
   }
-  let hasTag = false;
-  for (const fn of configArr) {
-    try {
-      const config = fn();
-      if (config) {
-        return config;
-      }
-      hasTag = true;
-    } catch (error) {
-      const { message = '' } = error;
-      jsonErrorHandle(message);
+  for (let index = 0; index < configPathArr.length; index++) {
+    const config = readJsonFile<Config>(configPathArr[index]);
+    if (config) {
+      logger.verbose(`读取配置文件 ${configPathArr[index]}`);
+      return config;
     }
-  }
-  if (hasTag) {
-    errorHandle('配置文件不存在！');
   }
   return getEnvConfig();
 }

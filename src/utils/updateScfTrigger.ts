@@ -1,10 +1,18 @@
 import type { SCFEvent, SCFContext } from '../types/scf';
-import { scf } from 'tencentcloud-sdk-nodejs';
 import { getPRCDate, randomDailyRunTime } from './pure';
 import { TaskConfig } from '../config/globalVar';
 import { logger } from './log';
 
-const ScfClient = scf.v20180416.Client;
+/**
+ * 获取 tencentcloud-sdk-nodejs
+ */
+function getSDK() {
+  try {
+    return import('tencentcloud-sdk-nodejs');
+  } catch {
+    logger.warn('tencentcloud-sdk-nodejs not found');
+  }
+}
 
 /**
  * 更新触发器
@@ -28,6 +36,11 @@ export default async function (
     logger.info('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
     return false;
   }
+  const sdk = await getSDK();
+  if (!sdk) {
+    return false;
+  }
+  const ScfClient = sdk.scf.v20180416.Client;
 
   const FUNCTION_NAME = context.function_name;
   const TRIGGER_NAME = event.TriggerName;
