@@ -150,7 +150,7 @@ export async function unFollowUsers(users: User[], num = -1) {
  */
 export async function getTeamUsers(
   users: User[],
-  lotteryFollows: number[],
+  lotteryFollows: (number | string)[],
   lastFollow: number,
   ps = 1,
 ) {
@@ -170,7 +170,7 @@ export async function getTeamUsers(
     if (mid === lastFollow) {
       return;
     }
-    if (lotteryFollows.includes(mid)) {
+    if (lotteryFollows.includes(mid) || lotteryFollows.includes(uname)) {
       users.push({ mid, uname });
     }
   }

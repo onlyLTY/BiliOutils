@@ -384,3 +384,68 @@ export interface JoinLotteryDto extends DoubleMessageProp {
     new_order_id: string;
   };
 }
+
+export interface PopularityRedPocketDto {
+  lot_id: number;
+  sender_uid: number;
+  sender_name: string;
+  sender_face: string;
+  /** 1 是关注 */
+  join_requirement: string;
+  danmu: string;
+  awards: {
+    gift_id: number;
+    num: number;
+    gift_name: string;
+    gift_pic: string;
+  }[];
+  start_time: number;
+  end_time: number;
+  /** 总共持续时间 */
+  last_time: 180;
+  /** 删除红包时间 = end_time + 15 */
+  remove_time: number;
+  /** 替换红包时间 = end_time + 10 */
+  replace_time: number;
+  current_time: number;
+  /** 1 有效，2 结束 */
+  lot_status: number;
+  h5_url: string;
+  user_status: number;
+  lot_config_id: number;
+  total_price: number;
+  /** 还有几个红包 */
+  wait_num: number;
+}
+
+/**
+ * 检查红包状态
+ */
+export interface LiveCheckRedRes extends ApiBaseProp {
+  data: {
+    pk: null;
+    guard: null;
+    gift: null;
+    storm: null;
+    silver: null;
+    activity_box: {
+      ACTIVITY_ID: number | null;
+      ACTIVITY_PIC: string | null;
+    };
+    danmu: null;
+    anchor: null;
+    red_pocket: null;
+    popularity_red_pocket: PopularityRedPocketDto[] | null;
+    activity_box_info: null;
+  };
+}
+
+/**
+ * 抢红包响应
+ */
+export interface JoinRedPacketRes extends ApiBaseProp {
+  data: {
+    /** 1 是正确 */
+    join_status: number;
+  };
+}

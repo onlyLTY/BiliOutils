@@ -6,9 +6,9 @@ import { logger } from './log';
 /**
  * 获取 tencentcloud-sdk-nodejs
  */
-function getSDK() {
+async function getSDK() {
   try {
-    return import('tencentcloud-sdk-nodejs');
+    return await import('tencentcloud-sdk-nodejs');
   } catch {
     logger.warn('tencentcloud-sdk-nodejs not found');
   }

@@ -80,7 +80,7 @@ class TaskConfigTemplate {
 
     const coin = getNewObject(config.coin);
     this.BILI_CUSTOMIZE_UP = strArr2numArr(coin.customizeUp || config.customizeUp) || [];
-    this.BILI_UPPER_ACC_MATCH = coin.upperAccMatch || config.upperAccMatch || true;
+    this.BILI_UPPER_ACC_MATCH = (coin.upperAccMatch ?? config.upperAccMatch) !== false;
     this.BILI_COIN_RETRY_NUM = coin.retryNum || config.coinRetryNum || 4;
     this.BILI_TARGET_LEVEL = (coin.targetLevel || config.targetLevel) ?? 6;
     this.BILI_STAY_COINS = (coin.stayCoins || config.stayCoins) ?? 0;

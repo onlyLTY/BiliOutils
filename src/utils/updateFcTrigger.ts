@@ -6,9 +6,9 @@ import type { FCContext, FCEvent } from '../types/fc';
 /**
  * 获取 @alicloud/fc2
  */
-function getSDK() {
+async function getSDK() {
   try {
-    return import('@alicloud/fc2');
+    return await import('@alicloud/fc2');
   } catch {
     logger.warn('@alicloud/fc2 not found');
   }

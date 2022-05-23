@@ -3,8 +3,10 @@ import type {
   BagSendResDto,
   FansMedalPanelDto,
   JoinLotteryDto,
+  JoinRedPacketRes,
   LiveAreaDto,
   LiveCheckLotteryRes,
+  LiveCheckRedRes,
   LiveFansMedalDto,
   LiveGiftBagListDto,
   LiveRoomDto,
@@ -208,4 +210,33 @@ export function joinLottery(options: {
     visit_id: getVisitId(),
     platform: 'pc',
   });
+}
+
+/**
+ * 检查直播红包状态
+ * @param roomId 直播间id
+ */
+export function checkRedPacket(roomId: IdType) {
+  return liveApi.get<LiveCheckRedRes>(
+    `/xlive/lottery-interface/v1/lottery/getLotteryInfoWeb?roomid=${roomId}`,
+  );
+}
+
+/**
+ * 抢直播红包
+ * @param params 直播间id，红包id，用户id
+ */
+export function joinRedPacket(params: { room_id: IdType; ruid: IdType; lot_id: IdType }) {
+  return liveApi.post<JoinRedPacketRes>(
+    `/xlive/lottery-interface/v1/popularityRedPocket/RedPocketDraw`,
+    {
+      ...params,
+      spm_id: '444.8.red_envelope.extract',
+      jump_from: '',
+      session_id: '',
+      csrf_token: TaskConfig.BILIJCT,
+      csrf: TaskConfig.BILIJCT,
+      visit_id: '',
+    },
+  );
 }

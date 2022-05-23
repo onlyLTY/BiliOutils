@@ -1,7 +1,7 @@
 import type { LiveCheckLotteryDto, LiveCheckLotteryRes, LiveRoomList } from '../dto/live.dto';
 import { apiDelay, logger, pushIfNotExist } from '../utils';
 import { checkLottery, getArea, getLiveRoom, joinLottery } from '../net/live.request';
-import { RequireType, TianXuanStatus } from '../enums/live-lottery.enum';
+import { PendentID, RequireType, TianXuanStatus } from '../enums/live-lottery.enum';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 
 interface LiveAreaType {
@@ -12,7 +12,7 @@ interface LiveAreaType {
 type CheckedLottery = LiveCheckLotteryDto & { uid: number; uname: string };
 
 // 可能是新关注的UP
-let newFollowUp: number[];
+let newFollowUp: (number | string)[];
 
 /**
  * 获取直播分区
@@ -34,6 +34,26 @@ async function getLiveArea(): Promise<LiveAreaType[][]> {
 }
 
 /**
+ * 分类检测
+ */
+function pendentLottery(list: LiveRoomList[]) {
+  const lotteryTime: LiveRoomList[] = [],
+    lotteryPacket: LiveRoomList[] = [];
+  list.forEach(item => {
+    const num2 = item.pendant_info['2'];
+    if (!num2) {
+      return;
+    }
+    if (num2.pendent_id === PendentID.Time) {
+      lotteryTime.push(item);
+    } else if (num2.pendent_id === PendentID.RedPacket) {
+      lotteryPacket.push(item);
+    }
+  });
+  return { lotteryTime, lotteryPacket };
+}
+
+/**
  * 获取直播间列表
  * @param areaId
  * @param parentId
@@ -50,10 +70,7 @@ async function getLotteryRoomList(
     if (code !== 0) {
       logger.info(`获取直播间列表失败: ${code}-${message}`);
     }
-    return data.list.filter(item => {
-      const num2 = item.pendant_info['2'];
-      return num2 && num2.pendent_id == 504;
-    });
+    return pendentLottery(data.list).lotteryTime;
   } catch (error) {
     logger.error(`获取直播间列表异常: ${error.message}`);
     throw error;
@@ -123,11 +140,22 @@ async function checkLotteryRoom(room: LiveRoomList) {
 }
 
 /**
+ * 获取需要关注主播名
+ * @param requireText
+ */
+function getRequireUp(requireText: string) {
+  requireText = requireText.replace('关注主播', '');
+  const requireTextList = requireText.split(/\s*\+\s*/);
+  requireTextList.shift();
+  return requireTextList;
+}
+
+/**
  * 进行一次天选时刻
  */
 async function doLottery(lottery: CheckedLottery) {
   try {
-    const { id, gift_id, gift_num, award_name, uid, uname, require_type } = lottery;
+    const { id, gift_id, gift_num, award_name, uid, uname, require_type, require_text } = lottery;
     logger.info(`天选主播：【${uname}】`);
     logger.info(`奖品：${award_name}`);
     const { code, message } = await joinLottery({
@@ -142,6 +170,8 @@ async function doLottery(lottery: CheckedLottery) {
     logger.info(`天选成功 √`);
     if (require_type === RequireType.Follow) {
       pushIfNotExist(newFollowUp, uid);
+      const requireTextList = getRequireUp(require_text);
+      requireTextList.forEach(requireText => pushIfNotExist(newFollowUp, requireText));
     }
   } catch (error) {
     logger.info(`天选异常: ${error.message}`);
