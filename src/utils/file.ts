@@ -1,6 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs';
-import * as JSON5 from 'json5';
+import { existsSync, readFileSync } from 'fs';
 import { isString } from './is';
+import { JSON5 } from './json5';
 import { logger } from './log';
 
 /**

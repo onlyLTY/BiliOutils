@@ -1,5 +1,5 @@
-import { printVersion } from './utils/effect';
 import { dailyTasks } from './task/dailyTask';
+import { printVersion } from './utils/version';
 
 process.env.IS_LOCAL = 'true';
 

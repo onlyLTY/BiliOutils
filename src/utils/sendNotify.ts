@@ -11,7 +11,7 @@
  */
 import * as nodemailer from 'nodemailer';
 import * as tunnel from 'tunnel';
-import { TaskConfig } from '../config/globalVar';
+import { TaskConfig, TaskModule } from '../config/globalVar';
 import { defHttp } from './axios';
 import { logger } from './log';
 import { stringify } from './pure';
@@ -672,9 +672,7 @@ function qywxamNotify(text, desp) {
               }
             })
             .catch(err => {
-              logger.info(
-                '成员ID:' + ChangeUserId(desp) + '企业微信应用消息发送通知消息失败！！',
-              );
+              logger.info('成员ID:' + ChangeUserId(desp) + '企业微信应用消息发送通知消息失败！！');
               logger.info(err);
             })
             .finally(() => {
@@ -773,4 +771,14 @@ function pushPlusNotify(text, desp) {
   });
 }
 
-export { sendNotify, BARK_PUSH };
+/**
+ * 发送消息到其他设备
+ * @param title 标题
+ * @param text 文本内容
+ */
+export async function sendMessage(title: string, text: string) {
+  logger.info('----【消息推送】----');
+  // 处理 title
+  title = `Bili-${TaskModule.nickname}-${title}`;
+  await sendNotify(title, text, undefined, '');
+}

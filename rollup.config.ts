@@ -1,3 +1,4 @@
+import type { RollupOptions } from 'rollup';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import { terser } from 'rollup-plugin-terser';
@@ -8,7 +9,7 @@ import typescript from '@rollup/plugin-typescript';
 const pkgJson = require('./package.json');
 
 const extensions = ['.ts', '.js'];
-const plugins = () => [
+const plugins = (node?: string) => [
   nodeResolve({
     preferBuiltins: true,
   }),
@@ -25,7 +26,7 @@ const plugins = () => [
         '@babel/env',
         {
           targets: {
-            node: '14',
+            node: node || '14',
           },
           modules: false,
         },
@@ -39,7 +40,7 @@ const plugins = () => [
   terser(),
   sizes(),
 ];
-const optionalDependencies = ['@alicloud/fc2', 'tencentcloud-sdk-nodejs'];
+const optionalDependencies = Object.keys(pkgJson.optionalDependencies);
 const external = [...Object.keys(pkgJson.dependencies), ...optionalDependencies];
 
 export default [
@@ -70,4 +71,4 @@ export default [
     },
     external: optionalDependencies,
   },
-];
+] as RollupOptions[];

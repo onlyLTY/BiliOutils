@@ -4,6 +4,7 @@ import { logger } from '../utils/log';
 import { gzipDecode } from '../utils/gzip';
 import { SystemConfig } from './systemConfig';
 import { readJsonFile } from '@/utils/file';
+import { JSON5 } from '../utils/json5';
 
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
@@ -40,7 +41,7 @@ const getEnvConfig = (): Config => {
     return undefined;
   }
   try {
-    return JSON.parse(gzipDecode(config));
+    return JSON5.parse(gzipDecode(config));
   } catch {
     errorHandle('环境中的配置不是有效的 JSON 字符串！');
   }
@@ -111,6 +112,10 @@ export function getConfigPathFile(filepath: string): Config[] {
 
 /** 设置 config */
 function setConfig() {
+  if (globalThis.BILITOOLS_CONFIG) {
+    return globalThis.BILITOOLS_CONFIG;
+  }
+
   if (SystemConfig.isQingLongPanel) {
     configPathArr.splice(0, 1, ...qlOldConfigArr);
   }

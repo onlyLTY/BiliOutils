@@ -1,9 +1,12 @@
 {
   "ts-node": {
-    "files": true
+    "files": true,
+    "compilerOptions": {
+      "module": "commonjs"
+    }
   },
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "removeComments": true,
     "target": "esnext",
     "outDir": "./dist",

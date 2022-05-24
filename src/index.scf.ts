@@ -1,14 +1,14 @@
 import { HEART_TRIGGER_NAME } from './constant';
 import type { SCFContext, SCFEvent } from './types/scf';
 import { logger } from './utils';
-import { printVersion } from './utils/effect';
 import { dailyHandle, liveHeartHandle } from './utils/sls';
+import { printVersion } from './utils/version';
 
 /**
  * 公告
  */
 const notice = async (msg?: string) => {
-  logger.warn(msg || `SCF从5.23号其将不再拥有免费额度，如有需要请停止使用，届时产生费用不予负责。`);
+  logger.warn(msg || `SCF从6.1号其将不再拥有免费额度，暂时可以购买1元额度，请自行购买，谢谢！`);
 };
 
 async function dailyMain(event: SCFEvent, context: SCFContext) {

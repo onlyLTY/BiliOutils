@@ -1,5 +1,6 @@
 import { offFunctions } from '../config/configOffFun';
-import { apiDelay, logger, LogMessage, sendMessage } from '../utils';
+import { apiDelay, logger, LogMessage } from '../utils';
+import { sendMessage } from '@/utils/sendNotify';
 import bili, { loginTask } from './index';
 
 export async function dailyTasks<T = unknown>(
