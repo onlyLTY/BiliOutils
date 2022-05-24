@@ -25,9 +25,17 @@ async function getLatestVersion(): Promise<string> {
  * 打印版本
  */
 export async function printVersion() {
+  let version = '__BILI_VERSION__';
+  // 如果 version 被替换，则直接打印
+  if (version.includes('.')) {
+    printStrVersion();
+  } else {
+    version = undefined;
+  }
   try {
-    const version = getVersionByPkg() || getVersionByFile();
-    if (version) {
+    // 如果没有获取到版本，则尝试获取
+    if (!version) {
+      version = getVersionByPkg() || getVersionByFile();
       logger.info(`当前版本【v${version}】`);
     }
     const latestTag = await getLatestVersion();

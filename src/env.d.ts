@@ -10,6 +10,7 @@ declare global {
       ALI_SECRET_ID?: string;
       ALI_SECRET_KEY?: string;
       CONFIG_ITEM_INDEX?: string;
+      USE_NETWORK_CODE?: string;
     }
   }
 }

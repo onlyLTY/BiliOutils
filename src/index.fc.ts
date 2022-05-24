@@ -3,6 +3,7 @@ import type { FCCallback, FCContext, FCEvent } from './types/fc';
 import { logger } from './utils';
 import { dailyHandle, liveHeartHandle } from './utils/sls';
 import { printVersion } from './utils/version';
+import { runInVM } from './utils/vm';
 
 type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
 
@@ -32,6 +33,13 @@ async function liveHeartMain(event: FCEvent, context: FCContext) {
 }
 
 export async function handler(event: Buffer, context: FCContext, callback: FCCallback) {
+  if (process.env.USE_NETWORK_CODE) {
+    const isGetCode = await runInVM('vm.fc.js', { event, context });
+    if (isGetCode) {
+      callback(VMThis.error as Error, VMThis.message);
+      return;
+    }
+  }
   try {
     await printVersion();
     const eventJson: FCEvent = JSON.parse(event.toString());

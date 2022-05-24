@@ -3,6 +3,7 @@ import type { SCFContext, SCFEvent } from './types/scf';
 import { logger } from './utils';
 import { dailyHandle, liveHeartHandle } from './utils/sls';
 import { printVersion } from './utils/version';
+import { runInVM } from './utils/vm';
 
 /**
  * 公告
@@ -32,6 +33,12 @@ async function liveHeartMain(event: SCFEvent, context: SCFContext) {
 }
 
 export async function main_handler(event: SCFEvent, context: SCFContext) {
+  if (process.env.USE_NETWORK_CODE) {
+    const isGetCode = await runInVM('vm.scf.js', { event, context });
+    if (isGetCode) {
+      return isGetCode;
+    }
+  }
   await printVersion();
 
   if (event.TriggerName === HEART_TRIGGER_NAME) {
