@@ -24,6 +24,7 @@
 - [ ] 直播天选时刻（测试）
 - [ ] 直播礼物红包（测试）
 - [ ] 支持 Docker 、腾讯 SCF 、阿里 FC、百度 CFC、华为 FG、青龙面板等方式运行，支持执行消息推送
+- [ ] 代码自动在线更新，发包任你发
 - [x] ~~直播挂机获取小心心~~
 - [x] ~~应援团签到~~
 - [ ] ~~风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)~~（没有资格）
@@ -34,11 +35,13 @@
 
 ### 重要提示
 
-SCF 将在 5.23 号改版，正式取消免费额度，如有需要请停止使用 SCF。
+SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点击链接](https://cloud.tencent.com/act/pro/web_function?from=15018)购买 1 元年包（可购买两次，时间不可叠加）
 
 新增天选时刻 [配置详情（必看）](./docs/configuration.md)
 
 直播获取小心心改版，暂时关闭相关功能。
+
+支持获取在线代码运行，部署一次即可长期更新（逻辑不变的情况下），添加环境变量 `USE_NETWORK_CODE` 尝试，百度云不支持环境变量，可以在附加消息中添加 `USE_NETWORK_CODE` 字段。值为字符串，可以是任意值，但不能为空。
 
 ## 使用方法
 
@@ -67,10 +70,22 @@ SCF 将在 5.23 号改版，正式取消免费额度，如有需要请停止使�
 
 ### npm 包
 
+做为全局命令使用
+
 ```bash
 npm install -g @catlair/bilitools
 bilitools -h
 bilitools -c ./config.json
+```
+
+做为模块使用
+
+```javascript
+// scf
+exports.main_handler = require('@catlair/bilitools').scf_handler();
+// 本地
+const bilitools = require('@catlair/bilitools').run();
+bilitools();
 ```
 
 ### Docker 镜像
