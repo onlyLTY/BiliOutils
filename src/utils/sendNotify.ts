@@ -346,15 +346,13 @@ function CoolPush(text, desp) {
       desp = desp.replace(/🐶/g, '');
       desp = desp.replace(/红包/g, 'H包');
 
-      switch (QQ_MODE) {
-        case 'email':
-          options.data = {
-            t: text,
-            c: desp,
-          };
-          break;
-        default:
-          options.params = `${text}\n\n${desp}`;
+      if (QQ_MODE === 'email') {
+        options.data = {
+          t: text,
+          c: desp,
+        };
+      } else {
+        options.params = `${text}\n\n${desp}`;
       }
 
       const pushMode = function (t) {

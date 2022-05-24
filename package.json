@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "babel ./src --out-dir ./dist --extensions \".ts\"",
-    "build:baidu": "babel --config-file ./build/.baidu.babelrc ./src --out-dir ./dist --extensions \".ts\"",
+    "build:baidu": "babel --config-file ./build/.baidu.babelrc.mjs ./src --out-dir ./dist --extensions \".ts\"",
     "build:rollup": "rollup -c rollup.config.ts --configPlugin typescript",
     "build:vm": "rollup -c ./build/rollup.config.ts --configPlugin typescript",
     "deploy": "sls deploy --debug",

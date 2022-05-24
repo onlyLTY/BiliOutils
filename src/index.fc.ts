@@ -14,7 +14,7 @@ const notice = async (msg?: string) => {
   logger.info(msg || `阿里云 FC 测试ing`);
 };
 
-async function dailyMain(event: FCEvent, context: FCContext) {
+export async function dailyMain(event: FCEvent, context: FCContext) {
   notice();
   return await dailyHandle({
     event,
@@ -23,7 +23,7 @@ async function dailyMain(event: FCEvent, context: FCContext) {
   });
 }
 
-async function liveHeartMain(event: FCEvent, context: FCContext) {
+export async function liveHeartMain(event: FCEvent, context: FCContext) {
   notice('功能开发中，敬请期待');
   return await liveHeartHandle({
     event,

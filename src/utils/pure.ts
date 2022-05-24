@@ -185,7 +185,7 @@ export function randomString(length: number, lower?: boolean) {
   const chars = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let result = '';
   for (let i = 0; i < length; i++) {
-    result += chars[random(chars.length - 1)];
+    result += getRandomItem(chars);
   }
   if (lower) {
     return result.toLowerCase();
@@ -277,4 +277,14 @@ export function stringify(obj: Record<string, string | number | boolean>) {
     searchParams.append(key, String(obj[key]));
   });
   return searchParams.toString();
+}
+
+/**
+ * 获取数组或者字符串中的随机一个
+ * @param indexable
+ */
+export function getRandomItem<T extends Array<any> | string>(
+  indexable: T,
+): T extends Array<infer U> ? U : string {
+  return indexable[random(indexable.length - 1)];
 }

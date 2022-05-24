@@ -12,7 +12,7 @@ const notice = async (msg?: string) => {
   logger.warn(msg || `SCF从6.1号其将不再拥有免费额度，暂时可以购买1元额度，请自行购买，谢谢！`);
 };
 
-async function dailyMain(event: SCFEvent, context: SCFContext) {
+export async function dailyMain(event: SCFEvent, context: SCFContext) {
   notice();
 
   return await dailyHandle({
@@ -22,7 +22,7 @@ async function dailyMain(event: SCFEvent, context: SCFContext) {
   });
 }
 
-async function liveHeartMain(event: SCFEvent, context: SCFContext) {
+export async function liveHeartMain(event: SCFEvent, context: SCFContext) {
   notice();
 
   return await liveHeartHandle({

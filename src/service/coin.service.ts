@@ -1,4 +1,4 @@
-import { apiDelay, getPageNum, logger, random } from '../utils';
+import { apiDelay, getPageNum, getRandomItem, logger, random } from '../utils';
 import { getFollowings, getSpecialFollowings } from '../net/user-info.request';
 import { getRegionRankingVideos } from '../net/video.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
@@ -91,7 +91,7 @@ export async function getAidByFollowing(special = true): Promise<AidInfo> {
 
     if (code === 0) {
       await apiDelay();
-      const { mid } = followList[random(followList.length - 1)] || {};
+      const { mid } = getRandomItem(followList) || {};
       return await getIdByRandom(mid);
     }
     return {
@@ -113,12 +113,12 @@ export async function getAidByFollowing(special = true): Promise<AidInfo> {
  */
 export async function getAidByRegionRank(): Promise<AidInfo> {
   const arr = [1, 3, 4, 5, 160, 22, 119];
-  const rid = arr[random(arr.length - 1)];
+  const rid = getRandomItem(arr);
 
   try {
     const { data, message, code } = await getRegionRankingVideos(rid, 3);
     if (code == 0) {
-      const { aid, title, author } = data[random(data.length - 1)];
+      const { aid, title, author } = getRandomItem(data);
       return {
         msg: '0',
         data: {
@@ -152,8 +152,7 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
       data: {},
     };
   }
-  const mid = customizeUp[random(customizeUp.length - 1)];
-  return await getIdByRandom(mid);
+  return await getIdByRandom(getRandomItem(customizeUp));
 }
 
 /**

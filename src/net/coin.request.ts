@@ -94,12 +94,17 @@ export function searchArticlesByUpId(
   });
 }
 
+interface VideoId {
+  aid: IdType;
+  bvid: string;
+}
+
 /**
- * relation 对视频的操作
+ * relation 已经对视频的操作
  * @param aid
  * @param bvid
  */
-export function getVideoRelation(aid: number, bvid?: string): Promise<VideoRelationDto> {
+export function getVideoRelation({ aid, bvid }: VideoId): Promise<VideoRelationDto> {
   return biliApi.get('/x/web-interface/archive/relation', {
     params: {
       aid,
@@ -113,13 +118,8 @@ export function getVideoRelation(aid: number, bvid?: string): Promise<VideoRelat
  * @param aid
  * @param bvid
  */
-export function getVideoStatus(aid: number, bvid?: string): Promise<VideoStatusDto> {
-  return biliApi.get('/x/web-interface/archive/stat', {
-    params: {
-      aid,
-      bvid,
-    },
-  });
+export function getVideoStatus({ aid = '', bvid = '' }: VideoId): Promise<VideoStatusDto> {
+  return biliApi.get(`/x/web-interface/archive/stat?aid=${aid}&bvid=${bvid}`);
 }
 
 /**

@@ -1,81 +1,18 @@
-import type { RollupOptions } from 'rollup';
-import commonjs from '@rollup/plugin-commonjs';
-import json from '@rollup/plugin-json';
-import { terser } from 'rollup-plugin-terser';
-import babel from '@rollup/plugin-babel';
-import nodeResolve from '@rollup/plugin-node-resolve';
-import sizes from 'rollup-plugin-sizes';
-import typescript from '@rollup/plugin-typescript';
-import replace from '@rollup/plugin-replace';
-const pkgJson = require('./package.json');
+import { createBaseConfig, createRollupOption } from './build/rollup.config.base';
 
-const extensions = ['.ts', '.js'];
-const plugins = (node?: string) => [
-  nodeResolve({
-    preferBuiltins: true,
+export default createRollupOption([
+  createBaseConfig({
+    input: 'index.ts',
+    output: 'index.js',
+    external: false,
   }),
-  typescript({
-    module: 'ESNext',
+  createBaseConfig({
+    input: 'index.ts',
+    output: 'cat_bili_ql.js',
   }),
-  replace({
-    preventAssignment: true,
-    values: {
-      __BILI_VERSION__: `v${pkgJson.version}`,
-    },
+  createBaseConfig({
+    input: 'index.cfc.ts',
+    output: 'index.agc.js',
+    external: false,
   }),
-  babel({
-    extensions,
-    babelHelpers: 'bundled',
-    exclude: 'node_modules/**',
-    babelrc: false,
-    presets: [
-      [
-        '@babel/env',
-        {
-          targets: {
-            node: node || '14',
-          },
-          modules: false,
-        },
-      ],
-    ],
-  }),
-  commonjs({
-    extensions,
-  }),
-  json(),
-  terser(),
-  sizes(),
-];
-const optionalDependencies = Object.keys(pkgJson.optionalDependencies);
-const external = [...Object.keys(pkgJson.dependencies), ...optionalDependencies];
-
-export default [
-  {
-    plugins: plugins(),
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/rollup/index.js',
-      format: 'cjs',
-    },
-    external: optionalDependencies,
-  },
-  {
-    plugins: plugins(),
-    input: 'src/index.ts',
-    output: {
-      file: 'dist/rollup/cat_bili_ql.js',
-      format: 'cjs',
-    },
-    external,
-  },
-  {
-    plugins: plugins(),
-    input: 'src/index.cfc.ts',
-    output: {
-      file: 'dist/rollup/index.agc.js',
-      format: 'cjs',
-    },
-    external: optionalDependencies,
-  },
-] as RollupOptions[];
+]);
