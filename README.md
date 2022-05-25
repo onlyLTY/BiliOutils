@@ -52,7 +52,7 @@ SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点
 
 - [Cookies/UA 获取方法](./docs/readme.md)
 - [配置详情（必看）](./docs/configuration.md)
-- [参考配置](./config/config.example.json)
+- [参考配置](./config/config.example.json5)
 
 运行方法：
 
@@ -67,6 +67,10 @@ SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
 - [青龙面板](./docs/%E9%9D%92%E9%BE%99%E9%9D%A2%E6%9D%BF.md): 自行添加 Node 依赖 `pako axios json5`, 自行创建 `cat_bili_ql.js` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
 - [已编译文件下载](./docs/%E7%BC%96%E8%AF%91%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D.md)
+
+视频参考：
+
+https://www.aliyundrive.com/s/MBZ45dkeMnp
 
 ### npm 包
 

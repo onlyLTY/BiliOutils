@@ -1,4 +1,3 @@
-import 'core-js/modules/es.promise.any';
 import axios from 'axios';
 import * as VM from 'vm';
 import { logger } from './log';

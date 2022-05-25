@@ -6,7 +6,6 @@
   - [Chrome/Chromium](#chromechromium)
 - [配置相关](#配置相关)
   - [配置文件路径](#配置文件路径)
-  - [在线填写表单获取配置](#在线填写表单获取配置)
   - [用户配置参考](#用户配置参考)
 
 ## 获取 Cookie 的方法
@@ -68,20 +67,10 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 - `[number, number]`: 长度为 2 且必须为数字的数组，例如：`[6, 15]`
 - `targetLevel?: number;` `?` 表示 `targetLevel` 是可选的配置。
 
-### 在线填写表单获取配置
-
-~~**可能新增更新不及时**~~  
-**好吧是不更新了（之前用 vue3 的一些语法，现在都废除了）**
-
-<https://catlair.gitee.io/bili-tools-docs-deploy/>
-
-![docs-add-config](images/docs-add-config.png)
-
-![docs-get-config](images/docs-get-config.png)
-
 ### 用户配置参考
 
 多用户配置参考 [config.example.json5](../config/config.example.json5)
+
 单用户配置参考 [config.single.json](../config/config.single.json)
 
 **多用户配置只用于部分情况，并不是所有都支持**
@@ -95,4 +84,3 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 - 配置使用的 `json5`，兼容 `json` 且更加灵活，可以支持 `注释`。
 - 务必使用 https://www.lddgo.net/string/json5 校验 json5 格式。
-- JSON5 格式介绍 https://juejin.cn/post/6904473733067440142#heading-2

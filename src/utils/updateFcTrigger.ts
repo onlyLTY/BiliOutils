@@ -10,7 +10,7 @@ async function getSDK() {
   try {
     return await import('@alicloud/fc2');
   } catch {
-    logger.warn('@alicloud/fc2 not found');
+    logger.warn('@alicloud/fc2 not found，运行 yarn add @alicloud/fc2');
   }
 }
 

@@ -10,7 +10,9 @@ async function getSDK() {
   try {
     return await import('tencentcloud-sdk-nodejs');
   } catch {
-    logger.warn('tencentcloud-sdk-nodejs not found');
+    logger.warn(
+      'tencentcloud-sdk-nodejs not found，运行 cd src && yarn add tencentcloud-sdk-nodejs',
+    );
   }
 }
 

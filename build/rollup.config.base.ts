@@ -37,6 +37,8 @@ export const plugins = (node?: string) => [
       [
         '@babel/env',
         {
+          useBuiltIns: 'usage',
+          corejs: 3.22,
           targets: {
             node: node || '14',
           },

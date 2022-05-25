@@ -85,13 +85,16 @@ jobs:
           yarn
           yarn build:rollup
           yarn build:vm
-          cp dist/rollup gh-release -r
       - name: ZIP huawei AGC
         run: |
           mkdir temp
           cp dist/rollup/index.agc.js temp/index.js
           cd temp
           zip -r -q ../huawei_agc.zip index.js
+      - name: Pre Commit
+        run: |
+          rm dist/rollup/index.agc.js
+          cp dist/rollup gh-release -r
       - name: Commit files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
