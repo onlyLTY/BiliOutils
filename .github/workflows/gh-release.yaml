@@ -101,7 +101,7 @@ jobs:
           file_pattern: gh-release/**
           push_options: '--force'
           skip_fetch: true
-          skip_checkout: true
+          skip_checkout: false
           create_branch: true
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -117,7 +117,7 @@ jobs:
           prerelease: ${{ env.IS_PROD == 'true' && env.IS_RC == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Configure Private Key
+      - name: Push to Gitee
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
@@ -125,8 +125,8 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H gitee.com >> ~/.ssh/known_hosts
-      - name: Push to Gitee
-        run: |
+          echo "StrictHostKeyChecking no" >> ~/.ssh/config
           git remote set-url --push origin git@gitee.com:catlair/BiliTools.git
           GIT_BRANCH="${{ env.IS_PROD == 'true' && 'gh-release' || 'gh-release-dev' }}"
-          git push origin main:"$GIT_BRANCH" --force
+          git fetch --unshallow origin
+          git push origin "$GIT_BRANCH":"$GIT_BRANCH" --force
