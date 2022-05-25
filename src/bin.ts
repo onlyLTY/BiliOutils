@@ -29,15 +29,16 @@ function isArg(arg: string) {
   } else if (isArg('--help') || isArg('-h')) {
     process.stdout.write(USAGE);
   } else if (isArg('--config') || isArg('-c')) {
-    const configs = await config();
-    const { initialize } = await import('./config/globalVar');
+    const configs = await config(),
+      { initialize } = await import('./config/globalVar'),
+      length = configs.length;
     initialize(configs[0]);
     const task = await import('./task/dailyTask');
-    process.stdout.write(`正在执行第1个配置\n`);
+    process.stdout.write(`正在执行第1/${length}个配置\n`);
     await task.dailyTasks();
     process.stdout.write('执行完毕\n\n');
     for (let index = 1; index < configs.length; index++) {
-      process.stdout.write(`正在执行第${index + 1}个配置\n`);
+      process.stdout.write(`正在执行第${index + 1}/${length}个配置\n`);
       initialize(configs[index]);
       await task.dailyTasks();
       process.stdout.write('执行完毕\n\n');

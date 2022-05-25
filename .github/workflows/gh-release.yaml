@@ -17,6 +17,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: set version for prod
+        if: ${{ env.IS_PROD == 'true' }}
+        run: |
+          echo BILI_VERSION=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
+      - name: set version for dev
+        if: ${{ env.IS_PROD == 'false' }}
+        run: |
+          echo BILI_VERSION=$(date)-dev >> $GITHUB_ENV
       - name: Use Node.js
         uses: actions/setup-node@v2
         with:
@@ -25,21 +33,13 @@ jobs:
         run: |
           rm yarn.lock
           jq '( .optionalDependencies )' package.json > optionalDependencies.json
-          jq 'del( .optionalDependencies )' package.json > temp.json
+          cat package.json | jq "del( .optionalDependencies ) | .version = \"${{ env.BILI_VERSION }}\"" > temp.json
           mv temp.json package.json
           yarn install
-      - name: set Docker version tag for prod
-        if: ${{ env.IS_PROD == 'true' }}
-        run: |
-          echo DOCKER_TAG=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
-      - name: set Docker version tag for dev
-        if: ${{ env.IS_PROD == 'false' }}
-        run: |
-          echo DOCKER_TAG=$(date)-dev >> $GITHUB_ENV
       - name: Build and ZIP CFC
         run: |
           yarn build:baidu
-          echo ${{ env.DOCKER_TAG }} >> dist/version.txt
+          echo ${{ env.BILI_VERSION }} >> dist/version.txt
           cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
           cd dist
           npm prune --production
@@ -51,7 +51,7 @@ jobs:
       - name: Build Babel
         run: |
           yarn build
-          echo ${{ env.DOCKER_TAG }} >> dist/version.txt
+          echo ${{ env.BILI_VERSION }} >> dist/version.txt
           cp config/config.single.json dist/config/config.json
           cd dist
           mv index.*.js ../
@@ -84,6 +84,7 @@ jobs:
           mv demo.json package.json
           yarn
           yarn build:rollup
+          yarn build:vm
           cp dist/rollup gh-release -r
       - name: ZIP huawei AGC
         run: |
@@ -116,3 +117,16 @@ jobs:
           prerelease: ${{ env.IS_PROD == 'true' && env.IS_RC == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Configure Private Key
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H gitee.com >> ~/.ssh/known_hosts
+      - name: Push to Gitee
+        run: |
+          git remote set-url --push origin git@gitee.com:catlair/BiliTools.git
+          GIT_BRANCH="${{ env.IS_PROD == 'true' && 'gh-release' || 'gh-release-dev' }}"
+          git push origin main:"$GIT_BRANCH" --force

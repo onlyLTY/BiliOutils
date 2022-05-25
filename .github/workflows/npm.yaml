@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: Build
     env:
       IS_RC: ${{ contains(github.ref, '-rc') }}
     steps:
@@ -17,20 +18,20 @@ jobs:
         with:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
-      - name: set Docker version tag
+      - name: set version
         run: |
-          echo DOCKER_TAG=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
+          echo BILI_VERSION=${{ github.ref  }} | sed -e "s/refs\/tags\/v//g" >> $GITHUB_ENV
       - name: Install dependencies
         run: |
           rm yarn.lock
-          cat package.json | jq "del( .optionalDependencies ) | .version = \"${{ env.DOCKER_TAG }}\"" > temp.json
+          cat package.json | jq "del( .optionalDependencies ) | .version = \"${{ env.BILI_VERSION }}\"" > temp.json
           mv temp.json package.json
           yarn install
           rm yarn.lock
       - name: Build and Handle
         run: |
           yarn build
-      - run: yarn publish ${{ env.IS_RC == 'true' && '--tag beta' || '' }}
+      - run: npm publish ${{ env.IS_RC == 'true' && '--tag beta' || '' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   build-docker:

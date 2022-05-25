@@ -1,4 +1,5 @@
 /* eslint-disable no-var */
+import type { Config } from './config';
 declare global {
   var VMThis: {
     resolve: (value: unknown) => void;
@@ -6,7 +7,7 @@ declare global {
     message?: string;
     error?: string | Error;
   };
-  var BILITOOLS_CONFIG: string;
+  var BILITOOLS_CONFIG: Config;
 }
 
 export {};

@@ -191,6 +191,7 @@
 | TENCENT_SECRET_KEY         | 使用 SCF 随机执行需要腾讯账号授权 KEY                                |
 | ALI_SECRET_ID              | 使用 FC 随机执行需要阿里账号授权 ID                                  |
 | ALI_SECRET_KEY             | 使用 FC 随机执行需要阿里账号授权 KEY                                 |
+| USE_NETWORK_CODE           | 直接通过网络请求代码，无需手动更新（云函数）                         |
 | SERVERLESS_PLATFORM_VENDOR | Serverless 供应商，本地推送时必须，Docker 默认为`tencent`            |
 | BILITOOLS_CONFIG           | Gzip 压缩后的单个用户配置，所有环境都可用                            |
 | RUN_SCF_ALL                | 运行全部云函数（ Docker 推送至 SCF 时使用，值为需要`y`）             |
