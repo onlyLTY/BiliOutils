@@ -31,9 +31,9 @@
 
 ### 高级配置
 
-环境变量名为 [`BILITOOLS_CONFIG`](./configuration.md#环境变量)
+环境变量名为 [`BILITOOLS_CONFIG`](./readme.md#环境变量)
 
-配置就是 josn 压缩后的，可以在此处压缩，附带格式检测<https://catlair.gitee.io/bili-tools-docs-deploy/#/users/>
+配置就是 gzip 压缩后的，可以在此处压缩，[压缩详见](./readme.md#配置相关)
 
 ![环境变量配置](images/agc-base-env.png)
 

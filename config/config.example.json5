@@ -1,23 +1,57 @@
+// 这是多用户配置，所以是 [] 包裹的数组
 [
+  // 第一个用户，{} 包裹
   {
-    "function": {
-      "silver2Coin": false,
-      "liveSignTask": true,
-      "addCoins": false
+    // 功能配置
+    function: {
+      // false 为关闭，true 为开启
+      silver2Coin: false, // 注意结束需要逗号
+      liveSignTask: false,
+      addCoins: false,
+      mangaSign: false,
+      shareAndWatch: false,
+      supGroupSign: false,
+      liveSendMessage: false,
+      charging: false,
+      getVipPrivilege: false,
+      giveGift: false,
+      liveLottery: false,
+      liveHeart: false,
+    }, // 注意结束需要逗号
+    message: {
+      email: {
+        // 字符串使用 '' 或者 `` 或者 "" 括起来
+        from: 'mhtwrnm@qq.com',
+        to: 'mhtwrnm@qq.com',
+        pass: 'xxxxxxxxxxx',
+        host: 'smtp.163.com',
+        port: 465, // 数值的写法，不需要括起来
+      },
     },
-    "dailyRunTime": "09:17:19-20:23:21",
-    "apiDelay": [4, 10],
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36 Edg/91.0.864.48",
-    "cookie": "(这是虚假的，请不要把cookie上传到github)_uuid=EAJKLS4-4515-5321-8A5D-9FE2087F964051402infoc; buvid3=2F6A89C5-5E75-4000-9082-D917B2691ASKLDJA1infoc; sid=5p6e1yhf; buvid_fp=2F6A89C5-5E75-4000-9082-D917B2691ASKLDJA1infoc; DedeUserID=12312312; DedeUserID__ckMd5=123h4h3g5hf5y435k; SESSDATA=sad23sdf%asdasdasdasd%2C1afeb*61; bili_jct=asdask2l3h42g34j1l2h4k; fingerprint3=3lk4j5h1g31fh; buvid_fp_plain=2F6A89C5-5E75-4000-9082-D917B2691F3613451infoc; CURRENT_FNVAL=80; blackside_state=1; rpdid=|(ku|k~k|)uk0J'uYkJYYYlJ); PVID=1; fingerprint=8a3f1f0c1c51667648fb746216071380; fingerprint_s=77bd96f129ea0e4aa7f0d53a356454f3; LIVE_BUVID=AUTO23546232463931; bp_video_offset_17248133=553263870170650890",
-    "message": {},
-    "stayCoins": 300,
-    "targetCoins": 5,
-    "targetLevel": 6,
-    "coinRetryNum": 5,
-    "upperAccMatch": true,
-    "customizeUp": []
+    dailyRunTime: '15:23:19-21:23:23',
+    // api 调用间隔，如下表示2-6秒
+    apiDelay: [2, 6],
+    // 配置礼物相关
+    gift: {
+      mids: [18908454], // 数组 []
+    },
+    lottery: {
+      // 数组可以有多个值
+      blackUid: [65566781, 1277481241, 1643654862, 603676925],
+      // 数组值可以是字符串
+      excludeAward: ['舰', '船', '航海', '代金券', '优惠券', '自拍', '照', '写真', '图', '提督'],
+    },
+    // 配置竞猜相关
+    match: {
+      coins: 10,
+    },
+    // 建议自己添加 UA，获取方式详见文档
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.101 Safari/537.36 Edg/91.0.864.48',
+    // cookie 是必填项，获取方式详见文档
+    cookie: "buvid3=ssdas-F54F-3822-BFasd6315308infoc; i-wanna-go-back=-1; _uuid=57410536E-54ED-Fsaa9FB-E1D6-5F5Dasdsd333965infoc; buvid4=5A9EF03F-1B37-C000-F9FF-510AS*2AC0A136232033-022030520-Vv1232321ASKDJJKGrb53Q%3D%3D; sid=b5rpqqbd; buvid_fp_plain=undefined; buvid_fp=sadaasdasdsjdklaskhjd1231231h23; DedeUserID=23122318; DedeUserID__ckMd5=asdasdasdsada; SESSDATA=123da%asdsadas%2C71bb75*11; bili_jct=2de1e08sdjka18278asdg1277934; b_ut=5; CURRENT_BLACKGAP=0; blackside_state=1; rpdid=|(k))JlJmu~l0J'uYRYR)Rl)|; LIVE_BUVID=AUTO9516464848864875; nostalgia_conf=-1; CURRENT_QUALITY=116; hit-dyn-v2=1; fingerprint3=1093ceb29f559ff6ab9a3b4cc9a3d255; fingerprint=dsfdsfsdfsdfsdf; bp_t_offset_123123798=6589047841sdf488891686; innersign=1; CURRENT_FNVAL=80; b_lsid=5F279A3D_180B252A623; PVID=4",
   },
+  // 第二个用户，{} 包裹
   {
-    // 第二个账号
-  }
+    cookie: 'xxxxxxxxxxxxxx',
+  },
 ]

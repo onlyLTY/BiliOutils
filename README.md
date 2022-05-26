@@ -37,7 +37,7 @@
 
 SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点击链接](https://cloud.tencent.com/act/pro/web_function?from=15018)购买 1 元年包（可购买两次，时间不可叠加）
 
-新增天选时刻 [配置详情（必看）](./docs/configuration.md)
+新增天选时刻 [天选时刻任务配置](./docs/readme.md#天选时刻任务配置)
 
 直播获取小心心改版，暂时关闭相关功能。
 
@@ -50,8 +50,7 @@ SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点
 
 使用必读：
 
-- [Cookies/UA 获取方法](./docs/readme.md)
-- [配置详情（必看）](./docs/configuration.md)
+- [Cookies/UA 获取方法/配置详情](./docs)
 - [参考配置](./config/config.example.json5)
 
 运行方法：

@@ -49,7 +49,7 @@ exports.main_handler = require('@catlair/bilitools').scf_handler();
 
 **部署后**点击运行，查看是否运行成功，如若失败，请根据输出内容修改后重试
 
-除了 config.json 当然也可以使用环境变量 [`BILITOOLS_CONFIG`](./configuration.md#环境变量)
+除了 config.json 当然也可以使用环境变量 [`BILITOOLS_CONFIG`](./readme.md#环境变量)
 
 文件配置优先级高于 `BILITOOLS_CONFIG`
 
