@@ -1,7 +1,6 @@
 import { HEART_TRIGGER_NAME } from './constant';
 import type { FCCallback, FCContext, FCEvent } from './types/fc';
 import { logger } from './utils';
-import { dailyHandle, liveHeartHandle } from './utils/sls';
 import { printVersion } from './utils/version';
 import { runInVM } from './utils/vm';
 
@@ -16,6 +15,7 @@ const notice = async (msg?: string) => {
 
 export async function dailyMain(event: FCEvent, context: FCContext) {
   notice();
+  const { dailyHandle } = await import('./utils/sls');
   return await dailyHandle({
     event,
     context,
@@ -25,6 +25,7 @@ export async function dailyMain(event: FCEvent, context: FCContext) {
 
 export async function liveHeartMain(event: FCEvent, context: FCContext) {
   notice('功能开发中，敬请期待');
+  const { liveHeartHandle } = await import('./utils/sls');
   return await liveHeartHandle({
     event,
     context,

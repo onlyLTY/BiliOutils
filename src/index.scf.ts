@@ -1,7 +1,6 @@
 import { HEART_TRIGGER_NAME } from './constant';
 import type { SCFContext, SCFEvent } from './types/scf';
 import { logger } from './utils';
-import { dailyHandle, liveHeartHandle } from './utils/sls';
 import { printVersion } from './utils/version';
 import { runInVM } from './utils/vm';
 
@@ -14,6 +13,7 @@ const notice = async (msg?: string) => {
 
 export async function dailyMain(event: SCFEvent, context: SCFContext) {
   notice();
+  const { dailyHandle } = await import('./utils/sls');
 
   return await dailyHandle({
     event,
@@ -25,6 +25,7 @@ export async function dailyMain(event: SCFEvent, context: SCFContext) {
 export async function liveHeartMain(event: SCFEvent, context: SCFContext) {
   notice();
 
+  const { liveHeartHandle } = await import('./utils/sls');
   return await liveHeartHandle({
     event,
     context,

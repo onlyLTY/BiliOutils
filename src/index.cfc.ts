@@ -1,5 +1,3 @@
-import { dailyTasks } from './task/dailyTask';
-import { printVersion } from './utils/version';
 import { runInVM } from './utils/vm';
 
 export async function handler(event, _context, callback) {
@@ -11,6 +9,8 @@ export async function handler(event, _context, callback) {
         return;
       }
     }
+    const { dailyTasks } = await import('./task/dailyTask');
+    const { printVersion } = await import('./utils/version');
     await printVersion();
     const message = await dailyTasks();
     callback(null, message);
