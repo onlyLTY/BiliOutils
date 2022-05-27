@@ -55,7 +55,7 @@ SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点
 
 运行方法：
 
-- [腾讯 SCF（即将无免费额度）](./docs/手动部署到SCF.md)：想白嫖？没门。
+- [腾讯 SCF（无免费额度）](./docs/手动部署到SCF.md)：想白嫖？没门。
 - [阿里 FC](./docs/手动部署到FC.md)：除了文档奇烂，其它都挺好，暂时有免费的额度。
 - [百度 CFC](./docs/手动部署到CFC.md)：功能欠缺，编辑器只能看到入口文件，但是每日任务足够了。
 - [华为 FG](./docs/手动部署到FG.md)：网页交互极差，错误提示不明显甚至没有，没有 loading 效果，偶尔发生无法跳转。
@@ -64,7 +64,7 @@ SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点
 - [使用 Docker 运行](./docs/使用Docker运行.md)
 - [本地运行](./docs/本地运行.md)
 - [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
-- [青龙面板](./docs/%E9%9D%92%E9%BE%99%E9%9D%A2%E6%9D%BF.md): 自行添加 Node 依赖 `pako axios json5`, 自行创建 `cat_bili_ql.js` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
+- [青龙面板](./docs/%E9%9D%92%E9%BE%99%E9%9D%A2%E6%9D%BF.md): 自行添加 Node 依赖 `axios`, 自行创建 `cat_bili_ql.json5` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
 - [已编译文件下载](./docs/%E7%BC%96%E8%AF%91%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D.md)
 
 视频参考：
