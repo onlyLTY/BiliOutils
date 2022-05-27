@@ -15,7 +15,7 @@ try {
 }
 
 export const extensions = ['.ts', '.js'];
-export const plugins = (node?: string) => [
+export const plugins = (node?: string, replaceValues = {}) => [
   nodeResolve({
     preferBuiltins: true,
   }),
@@ -26,6 +26,7 @@ export const plugins = (node?: string) => [
     preventAssignment: true,
     values: {
       __BILI_VERSION__: `v${pkgJson.version}`,
+      ...replaceValues,
     },
   }),
   babel({
@@ -62,11 +63,16 @@ interface BaseConfigOption {
   output: string;
   node?: string;
   external?: boolean;
+  replaceValues?: Record<string, string>;
 }
 
-export function createBaseConfig(config: BaseConfigOption): RollupOptions {
-  return {
-    plugins: plugins(config.node),
+export function createBaseConfig(
+  config: BaseConfigOption,
+  options: RollupOptions = {},
+  callback?: (option: RollupOptions) => RollupOptions,
+): RollupOptions {
+  const rOptions: RollupOptions = {
+    plugins: plugins(config.node, config.replaceValues),
     input: `src/${config.input}`,
     output: {
       file: `dist/rollup/${config.output}`,
@@ -74,6 +80,11 @@ export function createBaseConfig(config: BaseConfigOption): RollupOptions {
       inlineDynamicImports: true,
     },
     external: config.external === false ? optionalDependencies : external,
+  };
+  return {
+    ...rOptions,
+    ...options,
+    ...(callback?.(rOptions) || {}),
   };
 }
 

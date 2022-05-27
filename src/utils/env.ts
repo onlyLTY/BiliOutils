@@ -2,7 +2,8 @@
  * 是否是青龙面板
  */
 export const isQingLongPanel = () => {
-  return process.env.BARK_GROUP === 'QingLong' || process.env.QL_DIR === '/ql';
+  // @ts-ignore
+  return '__IS_QINGLONG__' === 'true' || process.env.QL_BRANCH;
 };
 
 export function setConfigFileName() {
