@@ -8,12 +8,16 @@ logger.info('开始执行网络代码');
 printStrVersion();
 
 (async () => {
-  if (event.TriggerName === HEART_TRIGGER_NAME) {
-    VMThis.message = await liveHeartMain(event, context);
+  try {
+    if (event.TriggerName === HEART_TRIGGER_NAME) {
+      VMThis.message = await liveHeartMain(event, context);
+      return;
+    } else {
+      VMThis.message = await dailyMain(event, context);
+    }
+    VMThis.resolve(VMThis.message);
     return;
-  } else {
-    VMThis.message = await dailyMain(event, context);
+  } catch (error) {
+    VMThis.reject(error);
   }
-  VMThis.resolve(VMThis.message);
-  return;
 })();

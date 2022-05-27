@@ -1,11 +1,23 @@
 import axios from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 import * as VM from 'vm';
 import { logger } from './log';
 
+const options: AxiosRequestConfig = {
+  headers: {
+    'Accept-Encoding': 'gzip, deflate, br',
+  },
+  decompress: true,
+  responseType: 'arraybuffer',
+};
+
 async function getCode(name: string) {
   const { data } = await Promise.any([
-    axios.get(`https://raw.githubusercontent.com/catlair/BiliTools/gh-release/gh-release${name}`),
-    axios.get(`https://gitee.com/catlair/BiliTools/raw/gh-release/gh-release/${name}`),
+    axios.get(
+      `https://raw.githubusercontent.com/catlair/BiliTools/gh-release/gh-release${name}`,
+      options,
+    ),
+    axios.get(`https://gitee.com/catlair/BiliTools/raw/gh-release/gh-release/${name}`, options),
   ]);
   return data;
 }

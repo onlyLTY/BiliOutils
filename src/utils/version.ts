@@ -38,8 +38,11 @@ export async function printVersion() {
       version = getVersionByPkg() || getVersionByFile();
       logger.info(`当前版本【v${version}】`);
     }
+    if (!version) {
+      return;
+    }
     const latestTag = await getLatestVersion();
-    if (version && latestTag && latestTag !== `v${version}`) {
+    if (latestTag && latestTag !== `v${version}`) {
       logger.info(`可更新：最新版本【${latestTag}】`);
     }
   } catch {}
