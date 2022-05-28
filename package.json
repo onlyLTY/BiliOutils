@@ -24,7 +24,8 @@
     "postbuild:baidu": "npm run postbuild && sed -i '6a global.BILITOOLS_CONFIG = null;' dist/index.cfc.js",
     "lint:eslint": "eslint --max-warnings 0  \"**/*.{js,ts}\" --fix",
     "lint:prettier": "prettier --write  \"**/*.{js,json,ts,md}\"",
-    "gitee": "ts-node tools/download.ts && ts-node tools/giteeRelease.ts"
+    "gitee": "ts-node tools/download.ts && ts-node tools/giteeRelease.ts",
+    "build:all": "yarn build && yarn build:baidu && yarn build:rollup && yarn build:vm"
   },
   "repository": "catlair/BiliTools",
   "keywords": [

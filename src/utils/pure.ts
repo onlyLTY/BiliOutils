@@ -1,4 +1,5 @@
 import type { CronDateType, SLSType } from '../types';
+import * as crypto from 'crypto';
 import { DAILY_RUN_TIME, MS2HOUR } from '../constant';
 import { isObject } from './is';
 
@@ -269,12 +270,19 @@ export function deepMergeObject<T = unknown>(target: T, source: T): T {
 
 /**
  *  stringify
- * @param obj
+ * @param entries
  */
-export function stringify(obj: Record<string, string | number | boolean>) {
+export function stringify(entries: Record<string, any> | [string, any][]): string {
   const searchParams = new URLSearchParams();
-  Object.keys(obj).forEach(key => {
-    searchParams.append(key, String(obj[key]));
+  if (!Array.isArray(entries)) {
+    entries = Object.entries(entries);
+  }
+  entries.forEach(([key, value]) => {
+    if (isObject(value)) {
+      searchParams.append(key, JSON.stringify(value));
+      return;
+    }
+    searchParams.append(key, String(value));
   });
   return searchParams.toString();
 }
@@ -287,4 +295,15 @@ export function getRandomItem<T extends Array<any> | string>(
   indexable: T,
 ): T extends Array<infer U> ? U : string {
   return indexable[random(indexable.length - 1)];
+}
+
+/**
+ * md5 hash
+ * @param str
+ * @param uppercase
+ */
+export function md5(str: string, uppercase = false) {
+  const hash = crypto.createHash('md5');
+  hash.update(str);
+  return uppercase ? hash.digest('hex').toUpperCase() : hash.digest('hex');
 }

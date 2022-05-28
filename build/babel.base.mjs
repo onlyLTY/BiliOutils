@@ -29,5 +29,6 @@ export function baseConfig(options = {}) {
         },
       ],
     ],
+    ignore: ['**/__test__', '**/*.test.ts', '**/*.spec.ts'],
   };
 }

@@ -1,3 +1,4 @@
+import * as assert from 'assert';
 import { gzipDecode, gzipEncode } from '../gzip';
 
 // 来自百度的压缩结果
@@ -7,23 +8,21 @@ const emojiZip = 'H4sIAAAAAAAAA1MtdbEwdlEtdXE1tlQFsZ2BpJupmypM3NncFME2sQQA96V+Ez
 const emojiStr = '😹🍟👵👉';
 
 // 解压以后是否一致 true
-console.log(gzipDecode(zip) === str);
-console.log(gzipDecode(emojiZip) === emojiStr);
+assert(gzipDecode(zip) === str);
+assert(gzipDecode(emojiZip) === emojiStr);
 
-console.log('\n');
+assert('\n');
 
 // 压缩后是否一致 false
-console.log(gzipEncode(str) === zip);
-console.log(gzipEncode(emojiStr) === emojiZip);
+assert((gzipEncode(str) === zip) === false);
+assert((gzipEncode(emojiStr) === emojiZip) === false);
 
-console.log('\n');
+assert('\n');
 
 // 解压后再压缩是否一致 false
-console.log(gzipEncode(gzipDecode(zip)) === zip);
-console.log(gzipEncode(gzipDecode(emojiZip)) === emojiZip);
-
-console.log('\n');
+assert((gzipEncode(gzipDecode(zip)) === zip) === false);
+assert((gzipEncode(gzipDecode(emojiZip)) === emojiZip) === false);
 
 // 压缩后解压是否一致 true
-console.log(gzipDecode(gzipEncode(str)) === str);
-console.log(gzipDecode(gzipEncode(emojiStr)) === emojiStr);
+assert(gzipDecode(gzipEncode(str)) === str);
+assert(gzipDecode(gzipEncode(emojiStr)) === emojiStr);

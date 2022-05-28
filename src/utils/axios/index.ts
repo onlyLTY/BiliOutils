@@ -126,8 +126,8 @@ export function createAxios(opt?: Partial<CreateAxiosOptions>) {
       {
         timeout: 10 * 1000,
         headers: {
-          'Content-Type': defaultHeaders['content-type'],
-          'User-Agent': defaultHeaders['user-agent'],
+          'content-type': defaultHeaders['content-type'],
+          'user-agent': defaultHeaders['user-agent'],
           'accept-language': defaultHeaders['accept-language'],
         },
         // 数据处理方式
