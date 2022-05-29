@@ -12,6 +12,7 @@ const functionConfig = {
   giveGift: false,
   matchGame: false,
   liveLottery: false,
+  liveRedPack: false,
 };
 
 export function getFunctionConfig() {

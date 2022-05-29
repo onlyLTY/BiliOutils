@@ -96,6 +96,9 @@ const transform: AxiosTransform = {
    * 响应错误处理
    */
   responseInterceptorsCatch: async (error: AxiosError) => {
+    if (!error.config) {
+      return Promise.reject(error);
+    }
     const { requestOptions: options, url } = error.config;
     // 防止部分情况重复请求
     if (retryWhitelist.find(item => item[0] === url && item[1] === error.code)) {

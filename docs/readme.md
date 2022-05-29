@@ -129,21 +129,24 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
 
 ## 功能配置
 
-| Key             | 默认值  | 说明                 |
-| --------------- | ------- | -------------------- |
-| silver2Coin     | `true`  | 银瓜子兑换硬币       |
-| addCoins        | `true`  | 投币                 |
-| liveSignTask    | `true`  | 直播间签到           |
-| shareAndWatch   | `true`  | 观看和分享视频       |
-| mangaSign       | `false` | 漫画签到（移动端）   |
-| supGroupSign    | `false` | 应援团签到（移动端） |
-| liveSendMessage | `false` | 每日直播间发送弹幕   |
-| charging        | `false` | 给 UP 充电           |
-| getVipPrivilege | `false` | 获取年度大会员权益   |
-| giveGift        | `false` | 赠送过期礼物         |
-| matchGame       | `false` | 赛事竞猜             |
-| liveLottery     | `false` | 直播天选时刻         |
-| ~~liveHeart~~   | `false` | 直播心跳（小心心）   |
+| Key              | 默认值  | 说明                 |
+| ---------------- | ------- | -------------------- |
+| silver2Coin      | `true`  | 银瓜子兑换硬币       |
+| addCoins         | `true`  | 投币                 |
+| liveSignTask     | `true`  | 直播间签到           |
+| shareAndWatch    | `true`  | 观看和分享视频       |
+| mangaSign        | `false` | 漫画签到（移动端）   |
+| ~~supGroupSign~~ | `false` | 应援团签到（移动端） |
+| liveSendMessage  | `false` | 每日直播间发送弹幕   |
+| charging         | `false` | 给 UP 充电           |
+| getVipPrivilege  | `false` | 获取年度大会员权益   |
+| giveGift         | `false` | 赠送过期礼物         |
+| matchGame        | `false` | 赛事竞猜             |
+| liveLottery      | `false` | 直播天选时刻         |
+| liveRedPack      | `false` | 直播天选红包         |
+| ~~liveIntimacy~~ | `false` | 牌子亲密度（预设）   |
+| ~~supGroupSign~~ | `false` | 应援团签到（移动端） |
+| ~~liveHeart~~    | `false` | 直播心跳（小心心）   |
 
 - ~~liveHeart 在使用 Serverless 时即使配置为 true，也不会运行。但是在 SCF、FC 等环境中配置 `heart_bili_timer` 触发器即可正常运行，具体情况请参考对应平台的配置文档。若要强制使用请配置 `LIVE_HEART_FORCE` 环境变量为任意值（由此可能导致云函数超时等异常，一概不知）~~。
 
@@ -272,11 +275,11 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
   ```
 
 ```js
-[
+{
   'GOBOT_URL',
   'GOBOT_TOKEN',
   'GOBOT_QQ',
-  'SCKEY',
+  'SCKEY': 'server酱',
   'QQ_SKEY',
   'QQ_MODE',
   'BARK_PUSH',
@@ -295,5 +298,5 @@ LIVE_BUVID=AUTO8016188357987702; bsource=search_baidu; PVID=2
   'IGOT_PUSH_KEY',
   'PUSH_PLUS_TOKEN',
   'PUSH_PLUS_USER',
-];
+};
 ```

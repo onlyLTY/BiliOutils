@@ -231,7 +231,7 @@ export function getNewObject<T = unknown>(object: T): T {
  * @param deep
  */
 export function cloneObject<T = unknown>(object: T, deep = false): T {
-  if (typeof object !== 'object') {
+  if (!isObject(object)) {
     return object;
   }
   if (Array.isArray(object)) {

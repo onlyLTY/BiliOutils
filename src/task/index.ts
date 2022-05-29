@@ -13,6 +13,7 @@ import giveGift from './giveGift';
 import matchGame from './matchGame';
 import liveHeart from './liveHeart';
 import liveLottery from './liveLottery';
+import liveRedPack from './liveRedPack';
 
 export { loginTask, liveHeart, liveLottery };
 
@@ -31,4 +32,5 @@ export default {
   matchGame,
   liveHeart,
   liveLottery,
+  liveRedPack,
 };

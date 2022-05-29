@@ -1,8 +1,16 @@
 import type { LiveCheckLotteryDto, LiveCheckLotteryRes, LiveRoomList } from '../dto/live.dto';
 import { apiDelay, logger, pushIfNotExist } from '../utils';
-import { checkLottery, getArea, getLiveRoom, joinLottery } from '../net/live.request';
+import {
+  checkLottery,
+  getArea,
+  getLiveRoom,
+  joinLottery,
+  joinRedPacket,
+  checkRedPacket,
+} from '../net/live.request';
 import { PendentID, RequireType, TianXuanStatus } from '../enums/live-lottery.enum';
 import { TaskConfig, TaskModule } from '../config/globalVar';
+import { IdType } from '@/types';
 
 interface LiveAreaType {
   areaId: string;
@@ -63,6 +71,7 @@ async function getLotteryRoomList(
   areaId: string,
   parentId: string,
   page = 1,
+  lotType: 'lottery' | 'redPack' = 'lottery',
 ): Promise<LiveRoomList[]> {
   try {
     await apiDelay(100);
@@ -70,7 +79,7 @@ async function getLotteryRoomList(
     if (code !== 0) {
       logger.info(`获取直播间列表失败: ${code}-${message}`);
     }
-    return pendentLottery(data.list).lotteryTime;
+    return pendentLottery(data.list)[lotType === 'lottery' ? 'lotteryTime' : 'lotteryPacket'];
   } catch (error) {
     logger.error(`获取直播间列表异常: ${error.message}`);
     throw error;
@@ -78,7 +87,7 @@ async function getLotteryRoomList(
 }
 
 /**
- * 做一个大区的直播间检测
+ * 做一个区的直播间检测
  * @param areaId
  * @param parentId
  * @param page
@@ -206,6 +215,116 @@ export async function liveLotteryService() {
     // 遍历小区
     for (const area of areas) {
       await doLotteryArea(area.areaId, area.parentId, TaskConfig.LOTTERY_PAGE_NUM);
+    }
+  }
+  return newFollowUp;
+}
+
+/**
+ * 检测直播间是否有红包
+ * @param roomId
+ */
+async function getRedPacketId(roomId: IdType) {
+  try {
+    const { data, code } = await checkRedPacket(roomId);
+    if (code !== 0) {
+      return;
+    }
+    const { popularity_red_pocket } = data;
+    if (!popularity_red_pocket) {
+      return;
+    }
+    const { lot_id, lot_status } = popularity_red_pocket[0];
+    if (lot_status === 2) {
+      return;
+    }
+    return lot_id;
+  } catch (error) {}
+}
+
+interface RedPacket {
+  uid: number;
+  uname: string;
+  lot_id: number;
+  room_id: number;
+}
+
+/**
+ * 获取一个区有红包的直播间
+ * @param areaId
+ * @param parentId
+ * @param page
+ */
+export async function getRedPacketRoom(areaId: string, parentId: string, page = 1) {
+  const roomList = await getLotteryRoomList(areaId, parentId, page, 'redPack');
+  const checkedRoomList: RedPacket[] = [];
+  for (const room of roomList) {
+    const lotId = await getRedPacketId(room.roomid);
+    if (lotId) {
+      checkedRoomList.push({
+        uid: room.uid,
+        uname: room.uname,
+        lot_id: lotId,
+        room_id: room.roomid,
+      });
+      await apiDelay(100);
+    }
+  }
+  return checkedRoomList;
+}
+
+/**
+ * 进行一个直播间红包
+ * @param redPacket
+ */
+async function doRedPacket(redPacket: RedPacket) {
+  try {
+    const { lot_id, uid, uname, room_id } = redPacket;
+    logger.info(`红包主播：【${uname}】`);
+    const { code, message } = await joinRedPacket({
+      room_id,
+      lot_id,
+      ruid: uid,
+    });
+    if (code !== 0) {
+      logger.info(`红包失败: ${code}-${message}`);
+      return;
+    }
+    newFollowUp.push(uid);
+    logger.info(`红包成功 √`);
+  } catch (error) {
+    logger.info(`红包异常: ${error.message}`);
+  }
+}
+
+/**
+ * 对一个分区进行天选
+ * @param areaId
+ * @param parentId
+ * @param num 天选的页数
+ */
+async function doRedPackArea(areaId: string, parentId: string, num = 2) {
+  for (let page = 1; page <= num; page++) {
+    const rooms = await getRedPacketRoom(areaId, parentId, page);
+    for (const room of rooms) {
+      await doRedPacket(room);
+      await apiDelay(200);
+    }
+  }
+}
+
+/**
+ * 进行天选
+ */
+export async function liveRedPackService() {
+  newFollowUp = [];
+  // 获取直播分区
+  const areaList = await getLiveArea();
+  // 遍历大区
+  for (const areas of areaList) {
+    // 遍历小区
+    for (const area of areas) {
+      await doRedPackArea(area.areaId, area.parentId, TaskConfig.LOTTERY_PAGE_NUM);
     }
   }
   return newFollowUp;

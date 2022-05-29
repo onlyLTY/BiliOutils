@@ -129,11 +129,12 @@ export async function unFollowUsers(users: User[], num = -1) {
     }
     try {
       const { code, message } = await unFollow(user.mid);
+      logger.info(`取关【${user.uname}】成功！`);
       if (code !== 0) {
         logger.warn(`取关【${user.uname}】失败: ${code}-${message}`);
       }
       num !== -1 && num--;
-      await apiDelay();
+      await apiDelay(1500);
     } catch (error) {
       logger.warn(`取关【${user.uname}】异常: ${error.message}`);
     }
