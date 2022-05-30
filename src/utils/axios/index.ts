@@ -1,8 +1,8 @@
 import type { AxiosTransform, CreateAxiosOptions } from '#/axiosTransform';
-import type { AxiosError, AxiosResponse } from 'axios';
+import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { RequestEnum } from '@/enums/http.enum';
 import { VAxios } from './Axios';
-import type { RequestOptions, Result } from '#/axios';
+import type { RequestOptions, Result } from '@/types/request';
 import { isString } from '../is';
 import { deepMergeObject, jsonp2Object } from '../pure';
 import { apiDelay } from '../effect';
@@ -25,7 +25,7 @@ const transform: AxiosTransform = {
     }
     // 不进行任何处理，直接返回
     // 用于页面代码可能需要直接获取code，data，message这些信息时开启
-    if (!isTransformResponse) {
+    if (isTransformResponse === false) {
       return res.data;
     }
 
@@ -74,7 +74,7 @@ const transform: AxiosTransform = {
   /**
    * 请求拦截器处理
    */
-  requsetInterceptors: (config: CreateAxiosOptions) => {
+  requsetInterceptors: (config: AxiosRequestConfig) => {
     const { requestOptions } = config;
     if (requestOptions.withBiliCookie === true) {
       config.headers['Cookie'] = TaskConfig.COOKIE;
@@ -123,11 +123,11 @@ const transform: AxiosTransform = {
   },
 };
 
-export function createAxios(opt?: Partial<CreateAxiosOptions>) {
+export function createRequest(opt?: Partial<CreateAxiosOptions>) {
   return new VAxios(
     deepMergeObject(
       {
-        timeout: 10 * 1000,
+        timeout: 10000,
         headers: {
           'content-type': defaultHeaders['content-type'],
           'user-agent': defaultHeaders['user-agent'],
@@ -155,10 +155,10 @@ export function createAxios(opt?: Partial<CreateAxiosOptions>) {
   );
 }
 
-export const defHttp = createAxios({
+export const defHttp = createRequest({
   requestOptions: {
     withBiliCookie: false,
   },
 });
 
-export const biliHttp = createAxios();
+export const biliHttp = createRequest();

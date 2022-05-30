@@ -1,7 +1,7 @@
 import type { CronDateType, SLSType } from '../types';
 import * as crypto from 'crypto';
 import { DAILY_RUN_TIME, MS2HOUR } from '../constant';
-import { isObject } from './is';
+import { isArray, isObject } from './is';
 
 const MAX_MINUTES = 59,
   MAX_HOURS = 23,
@@ -273,6 +273,9 @@ export function deepMergeObject<T = unknown>(target: T, source: T): T {
  * @param entries
  */
 export function stringify(entries: Record<string, any> | [string, any][]): string {
+  if (!isObject(entries) && !isArray(entries)) {
+    return entries;
+  }
   const searchParams = new URLSearchParams();
   if (!Array.isArray(entries)) {
     entries = Object.entries(entries);
@@ -306,4 +309,23 @@ export function md5(str: string, uppercase = false) {
   const hash = crypto.createHash('md5');
   hash.update(str);
   return uppercase ? hash.digest('hex').toUpperCase() : hash.digest('hex');
+}
+
+/**
+ * 合并 Header
+ * @description 合并 Header，如果有相同的 key，则后面的覆盖前面的，自动处理 key 大小写
+ * @param headers
+ * @param headersToMerge
+ */
+export function mergeHeaders(
+  headers: Record<string, any> = {},
+  headersToMerge: Record<string, any> = {},
+) {
+  function toLowerCase(object: Record<string, any>) {
+    return Object.keys(object).reduce((result, key) => {
+      result[key.toLowerCase()] = object[key];
+      return result;
+    }, {});
+  }
+  return Object.assign({}, toLowerCase(headers), toLowerCase(headersToMerge));
 }

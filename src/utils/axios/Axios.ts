@@ -1,10 +1,10 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import type { CreateAxiosOptions } from '#/axiosTransform';
-import type { RequestOptions, Result } from '#/axios';
+import type { RequestOptions, Result } from '@/types/request';
 import axios from 'axios';
 import { AxiosCanceler } from './axiosCancel';
 import { isFunction, isString } from '../is';
-import { cloneObject, stringify } from '../pure';
+import { cloneObject, mergeHeaders, stringify } from '../pure';
 import { RequestEnum } from '@/enums/http.enum';
 
 /**
@@ -15,6 +15,8 @@ export class VAxios {
   private axiosInstance: AxiosInstance;
   // 配置
   private readonly options: CreateAxiosOptions;
+
+  name = 'VAxios';
 
   constructor(options: CreateAxiosOptions) {
     const { requestOptions } = options;
@@ -120,10 +122,7 @@ export class VAxios {
    * 支持 form-data
    */
   private supportFormData(config: AxiosRequestConfig) {
-    const headers = {
-      ...this.options.headers,
-      ...config.headers,
-    };
+    const headers = config.headers;
     const contentType = ((headers?.['Content-Type'] || headers?.['content-type']) as string) || '';
 
     if (
@@ -176,7 +175,10 @@ export class VAxios {
   }
 
   request<T = any>(config: CreateAxiosOptions): Promise<T> {
+    // 合并 headers
+    config.headers = mergeHeaders(this.options.headers, config.headers);
     let conf: CreateAxiosOptions = cloneObject(config, true);
+    conf.httpAgent = config.httpAgent;
     const transform = this.getTransform();
     const { requestOptions } = this.options;
     const opt: RequestOptions = Object.assign({}, requestOptions, config.requestOptions);

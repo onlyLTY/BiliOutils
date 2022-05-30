@@ -1,15 +1,15 @@
 import { TaskConfig } from '@/config/globalVar';
 import { baseURLs, RefererURLs } from '../constant/biliUri';
-import { biliHttp, createAxios, defHttp } from '../utils/axios';
+import { biliHttp, createRequest, defHttp } from '../utils/http';
 
-const accountApi = createAxios({
+const accountApi = createRequest({
   baseURL: baseURLs.account,
   headers: {
     'user-agent': TaskConfig.USER_AGENT,
   },
 });
 
-const liveApi = createAxios({
+const liveApi = createRequest({
   baseURL: baseURLs.live,
   headers: {
     Referer: RefererURLs.www,
@@ -17,7 +17,7 @@ const liveApi = createAxios({
   },
 });
 
-const biliApi = createAxios({
+const biliApi = createRequest({
   baseURL: baseURLs.api,
   headers: {
     Referer: RefererURLs.www,
@@ -25,14 +25,14 @@ const biliApi = createAxios({
   },
 });
 
-const mangaApi = createAxios({
+const mangaApi = createRequest({
   baseURL: baseURLs.manga,
   headers: {
     'user-agent': TaskConfig.USER_AGENT,
   },
 });
 
-const vcApi = createAxios({
+const vcApi = createRequest({
   baseURL: baseURLs.vc,
   headers: {
     'user-agent': TaskConfig.USER_AGENT,
