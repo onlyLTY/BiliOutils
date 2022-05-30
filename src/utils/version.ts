@@ -1,6 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { defHttp } from './axios';
+import { defHttp } from './http';
 import { logger } from './log';
 
 /**

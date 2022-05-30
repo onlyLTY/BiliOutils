@@ -1,28 +1,34 @@
-import axios from 'axios';
-import type { AxiosRequestConfig } from 'axios';
+import type { CreateAxiosOptions } from '@/types/axiosTransform';
+import { defHttp } from './http';
 import * as VM from 'vm';
 import { logger } from './log';
 
-const options: AxiosRequestConfig = {
+const options = {
   headers: {
     'Accept-Encoding': 'gzip, deflate, br',
   },
   decompress: true,
-  responseType: 'arraybuffer',
+  requestOptions: {
+    retry: 0,
+  },
+  timeout: 5000,
 };
 
-async function getCode(name: string) {
-  const { data } = await Promise.any([
-    axios.get(
+if (defHttp.name === 'VAxios') {
+  (options as CreateAxiosOptions).responseType = 'arraybuffer';
+}
+
+function getCode(name: string) {
+  return Promise.any([
+    defHttp.get(
       `https://raw.githubusercontent.com/catlair/BiliTools/gh-release/gh-release${name}`,
       options,
     ),
-    axios.get(`https://gitee.com/catlair/BiliTools/raw/gh-release/gh-release/${name}`, options),
+    defHttp.get(`https://gitee.com/catlair/BiliTools/raw/gh-release/gh-release/${name}`, options),
   ]);
-  return data;
 }
 
-export async function runInVM(name: string, context = {}) {
+export async function runInVM(name: string, context = { event: {}, context: {} }) {
   let code: string;
   try {
     code = await getCode(name);

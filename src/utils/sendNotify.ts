@@ -12,7 +12,7 @@
 import * as nodemailer from 'nodemailer';
 import * as tunnel from 'tunnel';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { defHttp } from './axios';
+import { defHttp } from './http';
 import { logger } from './log';
 import { stringify } from './pure';
 
@@ -449,6 +449,7 @@ function tgBotNotify(text, desp) {
             port: +TG_PROXY_PORT,
             proxyAuth: TG_PROXY_AUTH,
           },
+          maxSockets: 1, // 单个代理最大连接数
         });
         Object.assign(options, { httpsAgent });
       }
