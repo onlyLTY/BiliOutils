@@ -85,6 +85,12 @@ jobs:
           yarn
           yarn build:rollup
           yarn build:vm
+      - name: GZip vm
+        run: |
+          cd dist/rollup
+          gzip -c vm.scf.js > vm.scf.js.gz
+          gzip -c vm.fc.js > vm.fc.js.gz
+          gzip -c vm.cfc.js > vm.cfc.js.gz
       - name: ZIP huawei AGC
         run: |
           mkdir temp

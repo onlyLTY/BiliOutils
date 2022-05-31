@@ -9,6 +9,7 @@ import getCookie from '../cookie';
 
 const transformRequestHook = (res: Response, options: RequestOptions) => {
   const { isTransformResponse, isReturnNativeResponse } = options;
+
   // 是否返回原生响应头 比如：需要获取响应头时使用该属性
   if (isReturnNativeResponse) {
     return res;
