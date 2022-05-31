@@ -1,4 +1,6 @@
 import type { CreateAxiosOptions } from '@/types/axiosTransform';
+import type { VGotOptions } from '@/types/got';
+import { unzipSync } from 'zlib';
 import { defHttp } from './http';
 import * as VM from 'vm';
 import { logger } from './log';
@@ -10,12 +12,15 @@ const options = {
   decompress: true,
   requestOptions: {
     retry: 0,
+    isReturnNativeResponse: true,
   },
   timeout: 5000,
 };
 
 if (defHttp.name === 'VAxios') {
   (options as CreateAxiosOptions).responseType = 'arraybuffer';
+} else {
+  (options as VGotOptions).responseType = 'buffer';
 }
 
 function getCode(name: string) {
@@ -24,14 +29,23 @@ function getCode(name: string) {
       `https://raw.githubusercontent.com/catlair/BiliTools/gh-release/gh-release${name}`,
       options,
     ),
-    defHttp.get(`https://gitee.com/catlair/BiliTools/raw/gh-release/gh-release/${name}`, options),
+    defHttp.get(`http://localhost:5500/dist/rollup/${name}`, options),
   ]);
+}
+
+function unzipCode(code: Buffer) {
+  return unzipSync(code).toString();
 }
 
 export async function runInVM(name: string, context = { event: {}, context: {} }) {
   let code: string;
   try {
-    code = await getCode(name);
+    const res = await getCode(name);
+    if (res.headers['content-type']?.includes('application/gzip')) {
+      code = unzipCode(res.body || res.data);
+    } else {
+      code = (res.body || res.data).toString();
+    }
   } catch (error) {
     logger.warn(`runInVM: ${error.message}`);
     return false;
