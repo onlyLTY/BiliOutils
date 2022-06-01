@@ -45,56 +45,7 @@ SCF 将在 6.1 正式取消免费额度，如有需要请停止使用 SCF。[点
 
 ## 使用方法
 
-详细文档查看 [docs 目录](./docs)  
-**若 Github 无法查看图片，请访问 [Gitee](https://gitee.com/catlair/BiliTools/tree/main/docs)**
-
-使用必读：
-
-- [Cookies/UA 获取方法/配置详情](./docs)
-- [参考配置](./config/config.example.json5)
-
-运行方法：
-
-- [腾讯 SCF（无免费额度）](./docs/手动部署到SCF.md)：想白嫖？没门。
-- [阿里 FC](./docs/手动部署到FC.md)：除了文档奇烂，其它都挺好，暂时有免费的额度。
-- [百度 CFC](./docs/手动部署到CFC.md)：功能欠缺，编辑器只能看到入口文件，但是每日任务足够了。
-- [华为 FG](./docs/手动部署到FG.md)：网页交互极差，错误提示不明显甚至没有，没有 loading 效果，偶尔发生无法跳转。
-- [华为 AGC-FC](./docs/手动部署到AGC-FC.md)：功能欠缺，上传代码无法看到入口文件。页面交互体验比自家云函数好。
-- ~~[Action 部署到 SCF](./docs/Action部署到SCF.md)~~（使用量一直为 0，再加上收费的原因，取消该方法）
-- [使用 Docker 运行](./docs/使用Docker运行.md)
-- [本地运行](./docs/本地运行.md)
-- [gzip 在线压缩](https://www.baidufe.com/fehelper/en-decode/index.html)
-- [青龙面板](./docs/%E9%9D%92%E9%BE%99%E9%9D%A2%E6%9D%BF.md): 自行添加 Node 依赖 `axios`, 自行创建 `cat_bili_ql.json5` 文件（脚本管理中）。参考 [#46](https://github.com/catlair/BiliTools/issues/49)。
-- [已编译文件下载](./docs/%E7%BC%96%E8%AF%91%E6%96%87%E4%BB%B6%E4%BB%8B%E7%BB%8D.md)
-
-视频参考：
-
-https://www.aliyundrive.com/s/MBZ45dkeMnp
-
-### npm 包
-
-做为全局命令使用
-
-```bash
-npm install -g @catlair/bilitools
-bilitools -h
-bilitools -c ./config.json
-```
-
-做为模块使用
-
-```javascript
-// scf
-exports.main_handler = require('@catlair/bilitools').scf_handler();
-// 本地
-const bilitools = require('@catlair/bilitools');
-bilitools.run();
-```
-
-### Docker 镜像
-
-- ~~`catlair/bilitools-deploy` 用于部署到 SCF~~
-- `catlair/bilitools` 用于直接运行
+[详细文档查看]()
 
 ## 参考项目
 
