@@ -11,11 +11,11 @@ import charging from './charging';
 import getVipPrivilege from './getVipPrivilege';
 import giveGift from './giveGift';
 import matchGame from './matchGame';
-import liveHeart from './liveHeart';
 import liveLottery from './liveLottery';
 import liveRedPack from './liveRedPack';
+import liveIntimacy from './liveIntimacy';
 
-export { loginTask, liveHeart, liveLottery };
+export { loginTask, liveLottery, liveIntimacy };
 
 export default {
   taskReward,
@@ -30,7 +30,7 @@ export default {
   getVipPrivilege,
   giveGift,
   matchGame,
-  liveHeart,
   liveLottery,
   liveRedPack,
+  liveIntimacy,
 };
