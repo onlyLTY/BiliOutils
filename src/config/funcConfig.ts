@@ -13,6 +13,7 @@ const functionConfig = {
   matchGame: false,
   liveLottery: false,
   liveRedPack: false,
+  liveIntimacy: false,
 };
 
 export function getFunctionConfig() {

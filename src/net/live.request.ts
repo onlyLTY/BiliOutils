@@ -89,7 +89,7 @@ export function sendMessage(roomid: number, msg: string): Promise<PureDataProp> 
  * @param pageSize 页大小
  * @param mid 用户id （其实可以随便一个）
  */
-export function getFansMedalPanel(page = 1, pageSize = 256, mid = 1): Promise<FansMedalPanelDto> {
+export function getFansMedalPanel(page = 1, pageSize = 50, mid = 1): Promise<FansMedalPanelDto> {
   return liveApi.get(
     `/xlive/app-ucenter/v1/fansMedal/panel?page=${page}&page_size=${pageSize}&target_id=${mid}`,
   );

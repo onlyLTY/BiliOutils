@@ -70,6 +70,18 @@ export interface Config {
     /** 关注回复处理方式  */
     actFollowMsg?: 'read' | 'del' | 'delete' | 'none' | undefined;
   };
+  intimacy?: {
+    // 直播弹幕
+    liveSendMessage?: boolean;
+    // 分享直播间
+    liveShare?: boolean;
+    // 点赞直播间
+    liveLike?: boolean;
+    // 白名单
+    whiteList?: number[];
+    // 黑名单
+    blackList?: number[];
+  };
 }
 
 export interface MultiConfig {

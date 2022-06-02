@@ -60,7 +60,7 @@ export interface FansMedalDto {
   medal: {
     uid: number;
     target_id: number;
-    target_name: string;
+    target_name: '';
     medal_id: number;
     level: number;
     medal_name: string;
@@ -105,6 +105,7 @@ export interface FansMedalPanelDto extends ApiBaseProp {
       has_more: true;
       next_page: number;
       next_light_status: number;
+      total_page: number;
     };
     total_number: number;
     has_medal: number;
