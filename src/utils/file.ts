@@ -29,5 +29,9 @@ export function jsonErrorHandle(message: string) {
   if (!isString(message)) {
     return;
   }
-  throw new TypeError('配置文件存在，但是无法解析！可能 JSON5 格式不正确！');
+  if (message.includes('SyntaxError: JSON5')) {
+    logger.error(message);
+    throw new SyntaxError('配置文件存在，但是无法解析！可能 JSON5 格式不正确！');
+  }
+  throw new Error(message);
 }

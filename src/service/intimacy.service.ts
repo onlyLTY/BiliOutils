@@ -2,10 +2,11 @@ import type { FansMedalDto } from '../dto/live.dto';
 import { TaskConfig } from '../config/globalVar';
 import * as liveRequest from '../net/live.request';
 import { kaomoji } from '../constant';
-import { random, logger, apiDelay } from '@/utils';
+import { random, apiDelay, logger, Logger } from '@/utils';
 import { likeLiveRoom, shareLiveRoom } from '@/net/intimacy.request';
 
 const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
+const liveLogger = new Logger({ console: 'debug', file: 'debug' }, 'live');
 
 export async function getFansMealList() {
   let totalNumber = 99,
@@ -40,11 +41,6 @@ export async function getFansMealList() {
   }
 }
 
-// 牌子黑名单
-const blackList = [];
-// 牌子白名单
-const whiteList = [];
-
 /**
  * 过滤掉不需要发送的直播间
  */
@@ -61,6 +57,7 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
   // 今日够了
   if (medal.today_feed >= medal.day_limit) return false;
   // 不存在白名单
+  const { whiteList, blackList } = TaskConfig.intimacy;
   if (!whiteList || !whiteList.length) {
     // 判断是否存在黑名单中
     if (blackList && blackList.includes(room_info.room_id)) {
@@ -106,7 +103,7 @@ async function shareLive(roomId: number) {
     }
     logger.info(`【${roomId}】直播间分享失败 ${code} ${message}`);
   } catch (error) {
-    logger.warn(`分享直播间异常 ${error.message}`);
+    logger.warn(`分享直播间 [${roomId}] 异常 ${error.message}`);
   }
 }
 
@@ -121,13 +118,6 @@ async function likeLive(roomId: number) {
     logger.warn(`点赞直播间异常 ${error.message}`);
   }
 }
-
-// 发送直播弹幕
-const isLiveSendMessage = true;
-// 分享直播
-const isLiveShare = true;
-// 点赞直播
-const isLiveLike = true;
 
 // 发送直播弹幕 1 次 间隔 10s 以上
 // 分享直播 5 次 间隔 3s 以上
@@ -146,23 +136,24 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   if (!room_info || !anchor_info) {
     return;
   }
-  const nickName = anchor_info.nick_name,
+  const { liveLike, liveSendMessage, liveShare } = TaskConfig.intimacy,
+    nickName = anchor_info.nick_name,
     roomid = room_info.room_id;
   // 发送直播弹幕
-  if (isLiveSendMessage) {
-    logger.info(`【${nickName}】开始发送直播弹幕`);
+  if (liveSendMessage) {
+    liveLogger.verbose(`【${nickName}】开始发送直播弹幕`);
     await sendOneMessage(roomid, nickName);
   }
   // 分享直播
   async function shareLiveHandle() {
     await apiDelay(100, 300);
     for (let i = 0; i < 5; i++) {
-      logger.info(`分享${roomid}, ${nickName}`);
+      liveLogger.verbose(`分享 [${nickName}] 直播间`);
       await shareLive(roomid);
       await apiDelay(4000);
     }
   }
-  if (isLiveShare) {
+  if (liveShare) {
     shareLiveHandle().catch(error => logger.error(error));
   }
 
@@ -170,12 +161,12 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   async function likeLiveHandle() {
     await apiDelay(100, 300);
     for (let i = 0; i < 3; i++) {
-      logger.info(`点赞${roomid}, ${nickName}`);
+      liveLogger.verbose(`给 [${nickName}] 直播间点赞`);
       await likeLive(roomid);
       await apiDelay(6500);
     }
   }
-  if (isLiveLike) {
+  if (liveLike) {
     likeLiveHandle().catch(error => logger.error(error));
   }
 
