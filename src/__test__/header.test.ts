@@ -1,5 +1,4 @@
-import * as assert from 'assert';
-import { mergeHeaders } from '../pure';
+import { mergeHeaders } from '../utils/pure';
 
 const headers1 = {
   'Content-Type': 'application/json',
@@ -17,4 +16,8 @@ const headers = {
   'user-agent': 'xxxxxxxxxxxxxxxxx',
 };
 
-assert.deepStrictEqual(mergeHeaders(headers1, headers2), headers);
+describe('请求 header 测试', () => {
+  test('合并 header', () => {
+    expect(mergeHeaders(headers1, headers2)).toEqual(headers);
+  });
+});

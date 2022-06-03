@@ -251,13 +251,13 @@ export function cloneObject<T = unknown>(object: T, deep = false): T {
  * @param target
  * @param source
  */
-export function deepMergeObject<T = unknown>(target: T, source: T): T {
+export function deepMergeObject<T = unknown>(target: T, source: any): T {
   // 忽略 undefined
   if (target === undefined || source === undefined) {
-    return target || source;
+    return (target || source) as T;
   }
   if (!isObject(target) || !isObject(source)) {
-    return source;
+    return source as T;
   }
   if (Array.isArray(target) && Array.isArray(source)) {
     return target.concat(source) as unknown as T;
@@ -328,4 +328,12 @@ export function mergeHeaders(
     }, {});
   }
   return Object.assign({}, toLowerCase(headers), toLowerCase(headersToMerge));
+}
+
+/**
+ * 字符串数组转数字数组
+ * @param strArr 字符串数组
+ */
+export function arr2numArr(strArr: string[] | number[]) {
+  return strArr && strArr.map((str: any) => Number(str)).filter(num => num > 0 && num % 1 === 0);
 }

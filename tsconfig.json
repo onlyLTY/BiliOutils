@@ -17,7 +17,8 @@
     },
     "lib": ["esnext", "DOM"],
     "skipLibCheck": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "test", "temp", "dist", "**/*spec.ts"]
 }
