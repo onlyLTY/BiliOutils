@@ -8,6 +8,14 @@ declare global {
     error?: string | Error;
   };
   var BILITOOLS_CONFIG: Config;
+
+  type RecursivePartial<S> = {
+    [p in keyof S]+?: S[p] extends object ? RecursivePartial<S[p]> : S[p];
+  };
+
+  type RecursiveRequired<S> = {
+    [p in keyof S]-?: S[p] extends object ? RecursiveRequired<S[p]> : S[p];
+  };
 }
 
 export {};

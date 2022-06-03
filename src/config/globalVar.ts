@@ -1,16 +1,6 @@
 import type { Config } from '../types';
-import { LOTTERY_EXCLUDE, LOTTERY_INCLUDE, LOTTERY_UP_BLACKLIST } from '../constant';
-import { getNewObject } from '../utils/pure';
-import { getUserId, getBiliJct } from '../utils/cookie';
 import { checkConfig, getConfig } from './setConfig';
-
-/**
- * 字符串数组转数字数组
- * @param strArr 字符串数组
- */
-function strArr2numArr(strArr: string[] | number[]) {
-  return strArr && strArr.map(str => Number(str)).filter(num => num > 0 && num % 1 === 0);
-}
+import { mergeConfig } from './config';
 
 /** 默认的任务配置 */
 class TaskConfigTemplate {
@@ -35,8 +25,6 @@ class TaskConfigTemplate {
   readonly BILI_TARGET_LEVEL: number;
   /** 最低剩余硬币数,默认0 */
   readonly BILI_STAY_COINS: number;
-  /** 是否精准匹配UP主的视频 */
-  readonly BILI_UPPER_ACC_MATCH: boolean;
   /** 投币操作重试次数 默认 4 */
   readonly BILI_COIN_RETRY_NUM: number;
   /** 充电的 up 默认自己 */
@@ -68,48 +56,46 @@ class TaskConfigTemplate {
     this.config = config;
     this.COOKIE = config.cookie;
 
-    this.BILIJCT = getBiliJct(config.cookie);
-    this.USERID = getUserId(config.cookie);
+    this.BILIJCT = config.BILIJCT;
+    this.USERID = config.USERID;
     this.USER_AGENT = config.userAgent;
-    const apiDelay = config.apiDelay ?? [2, 6];
-    this.BILI_API_DELAY = Array.isArray(apiDelay) ? strArr2numArr(apiDelay) : [Number(apiDelay)];
+    this.BILI_API_DELAY = config.apiDelay;
 
-    const message = getNewObject(config.message);
-    this.MESSAGE_API = message.api;
-    this.PUSHPLUS_TOKEN = message.pushplusToken || process.env.PUSHPLUS_TOKEN;
+    const message = config.message;
+    this.MESSAGE_API = message?.api;
+    this.PUSHPLUS_TOKEN = message.pushplusToken;
 
-    const coin = getNewObject(config.coin);
-    this.BILI_CUSTOMIZE_UP = strArr2numArr(coin.customizeUp || config.customizeUp) || [];
-    this.BILI_UPPER_ACC_MATCH = (coin.upperAccMatch ?? config.upperAccMatch) !== false;
-    this.BILI_COIN_RETRY_NUM = coin.retryNum || config.coinRetryNum || 4;
-    this.BILI_TARGET_LEVEL = (coin.targetLevel || config.targetLevel) ?? 6;
-    this.BILI_STAY_COINS = (coin.stayCoins || config.stayCoins) ?? 0;
-    this.BILI_TARGET_COINS = (coin.targetCoins || config.targetCoins) ?? 5;
+    const coin = config.coin;
+    this.BILI_CUSTOMIZE_UP = coin.customizeUp;
+    this.BILI_COIN_RETRY_NUM = coin.retryNum;
+    this.BILI_TARGET_LEVEL = coin.targetLevel;
+    this.BILI_STAY_COINS = coin.stayCoins;
+    this.BILI_TARGET_COINS = coin.targetCoins;
 
-    const gift = getNewObject(config.gift);
-    this.BILI_GIFT_UP = strArr2numArr(gift.mids || config.giftUp) || this.BILI_CUSTOMIZE_UP || [];
+    const gift = config.gift;
+    this.BILI_GIFT_UP = gift.mids;
 
-    const charge = getNewObject(config.charge);
-    this.CHARGE_ID = charge.mid || config.chargeUpId || this.USERID;
-    this.CHARGE_PRESET_TIME = charge.presetTime || config.chargePresetTime || 31;
+    const charge = config.charge;
+    this.CHARGE_ID = charge.mid;
+    this.CHARGE_PRESET_TIME = charge.presetTime;
 
-    const match = getNewObject(config.match);
-    this.MATCH_COINS = (match.coins || config.matchCoins) ?? 5;
-    this.MATCH_SELECTION = (match.selection || config.matchSelection) ?? 1;
-    this.MATCH_DIFF = (match.diff || config.matchDiff) ?? 0;
+    const match = config.match;
+    this.MATCH_COINS = match.coins;
+    this.MATCH_SELECTION = match.selection;
+    this.MATCH_DIFF = match.diff;
 
     // 最新的就不再有兼容了
-    const lottery = getNewObject(config.lottery);
-    this.LOTTERY_EXCLUDE = lottery.excludeAward || LOTTERY_EXCLUDE;
-    this.LOTTERY_INCLUDE = lottery.includeAward || LOTTERY_INCLUDE;
-    this.LOTTERY_UP_BLACKLIST = lottery.blackUid || LOTTERY_UP_BLACKLIST;
+    const lottery = config.lottery;
+    this.LOTTERY_EXCLUDE = lottery.excludeAward;
+    this.LOTTERY_INCLUDE = lottery.includeAward;
+    this.LOTTERY_UP_BLACKLIST = lottery.blackUid;
     this.LOTTERY_MOVE_TAG = lottery.moveTag;
-    this.LOTTERY_PAGE_NUM = lottery.pageNum || 2;
+    this.LOTTERY_PAGE_NUM = lottery.pageNum;
   }
 }
 
-let _taskConfig: TaskConfigTemplate;
-export const TaskConfig = new Proxy({} as TaskConfigTemplate, {
+let _taskConfig: TaskConfigTemplate & Config;
+export const TaskConfig = new Proxy({} as TaskConfigTemplate & Config, {
   get(_target, key) {
     if (!_taskConfig) {
       initialize();
@@ -155,7 +141,9 @@ export function initialize(config?: Config) {
   if (!config) {
     config = getConfig();
   }
-  _taskConfig = new TaskConfigTemplate(checkConfig(config));
+  // TODO: 配置方式兼容
+  const userConfig = mergeConfig(config) as Config;
+  _taskConfig = { ...new TaskConfigTemplate(checkConfig(userConfig)), ...userConfig };
   TaskModule = class extends TaskModuleTemplate {};
   TaskModule.coinsTask = _taskConfig.BILI_TARGET_COINS;
 }
