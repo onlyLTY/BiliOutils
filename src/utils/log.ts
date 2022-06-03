@@ -1,56 +1,116 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import { getPRCDate } from './pure';
 
 type MessageType = string | number | boolean | undefined | null;
 type LevelType = 'error' | 'warn' | 'info' | 'verbose' | 'debug';
-
-export const LogMessage = {
-  value: '',
-};
-
-export const logger = {
-  log,
-  error: errorLogger,
-  warn: warnLogger,
-  info: infoLogger,
-  verbose: verboseLogger,
-  debug: debugLogger,
-};
-
-function formatTime(isoStr: string) {
-  return isoStr.match(/\w{2}:\w{2}:\w{2}/)[0];
+interface LoggerOptions {
+  console?: LevelType;
+  file?: LevelType;
+  push?: LevelType;
+  name?: string;
 }
 
-function getLevelValues(level: LevelType = 'debug') {
+interface LogOptions {
+  level?: LevelType;
+}
+
+function formatTime(date: Date, hasDate = true) {
+  // 月-日 时:分:秒
+  if (hasDate) {
+    return date.toLocaleString('zh-CN', { hour12: false });
+  }
+  // 时:分:秒
+  return date.toLocaleString('zh-CN', {
+    hour12: false,
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+  });
+}
+
+function getLevelValues(level: LevelType = 'info') {
   const LEVEL_VALUE = ['error', 'warn', 'info', 'verbose', 'debug'];
   const levelIndex = LEVEL_VALUE.indexOf(level);
   return levelIndex > 0 ? LEVEL_VALUE.slice(0, levelIndex + 1) : LEVEL_VALUE;
 }
 
-function log(level: LevelType, message: MessageType) {
-  const time = formatTime(getPRCDate().toString());
-  if (getLevelValues().includes(level)) {
-    const msgStr = `[${time}] ${message}`;
-    LogMessage.value += msgStr + '\n';
+function resolvePath(str: string) {
+  return path.resolve(process.cwd(), str);
+}
+
+export class Logger {
+  static pushValue = '';
+  private consoleLeval: string[];
+  private fileLeval: string[];
+  private pushLeval: string[];
+  private month = getPRCDate().getMonth() + 1;
+  private errorFile = resolvePath(`./logs/bt_error-${this.month}.log`);
+  private logFile = resolvePath(`./logs/bt_combined-${this.month}.log`);
+
+  constructor(
+    private options: LoggerOptions = { console: 'info', file: 'info', push: 'info' },
+    public name = 'default',
+  ) {
+    this.consoleLeval = getLevelValues(this.options.console);
+    this.fileLeval = getLevelValues(this.options.file);
+    this.pushLeval = getLevelValues(this.options.push);
   }
-  process.stdout.write(`[${level} ${time}] ${message}\n`);
+
+  public log({ level }: LogOptions, message: MessageType) {
+    const { options } = this,
+      prcTime = getPRCDate(),
+      messageStr = `[${level} ${formatTime(prcTime, false)}] ${message}\n`,
+      stderr = ['error', 'wran'].includes(level);
+    if (options.console && this.consoleLeval.includes(level)) {
+      this.Conslole(messageStr, stderr);
+    }
+    if (options.file && this.fileLeval.includes(level)) {
+      this.File(`[${level} ${formatTime(prcTime, false)}] ${message}\n`, stderr);
+    }
+    if (options.push && this.pushLeval.includes(level)) {
+      this.Push(messageStr);
+    }
+  }
+
+  public error(message: MessageType) {
+    this.log({ level: 'error' }, message);
+  }
+
+  public warn(message: MessageType) {
+    this.log({ level: 'warn' }, message);
+  }
+
+  public info(message: MessageType) {
+    this.log({ level: 'info' }, message);
+  }
+
+  public verbose(message: MessageType) {
+    this.log({ level: 'verbose' }, message);
+  }
+
+  public debug(message: MessageType) {
+    this.log({ level: 'debug' }, message);
+  }
+
+  private Conslole(message: string, stderr: boolean) {
+    if (stderr) {
+      process.stderr.write(message);
+      return;
+    }
+    process.stdout.write(message);
+  }
+
+  private File(message: string, stderr: boolean) {
+    if (stderr) {
+      fs.appendFileSync(this.errorFile, message, 'utf-8');
+    }
+    fs.appendFileSync(this.logFile, message, 'utf-8');
+  }
+
+  private Push(message: string) {
+    Logger.pushValue += message;
+  }
 }
 
-function errorLogger(message: MessageType) {
-  log('error', message);
-}
-
-function warnLogger(message: MessageType) {
-  log('warn', message);
-}
-
-function infoLogger(message: MessageType) {
-  log('info', message);
-}
-
-function verboseLogger(message: MessageType) {
-  log('verbose', message);
-}
-
-function debugLogger(message: MessageType) {
-  log('debug', message);
-}
+export const logger = new Logger({ console: 'debug', file: 'debug', push: 'debug' });

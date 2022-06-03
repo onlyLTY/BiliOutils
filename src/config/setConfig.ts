@@ -9,13 +9,9 @@ import { JSON5 } from '../utils/json5';
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
 
-function errorHandle(msg?: string): never {
-  throw new Error(msg || '获取配置失败！未找到配置文件！');
-}
-
 function jsonErrorHandle(message: string) {
   if (message.includes && message.includes('in JSON at position')) {
-    errorHandle('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
+    new Error('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
   }
 }
 
@@ -43,7 +39,7 @@ const getEnvConfig = (): Config => {
   try {
     return JSON5.parse(gzipDecode(config));
   } catch {
-    errorHandle('环境中的配置不是有效的 JSON 字符串！');
+    throw new Error('环境中的配置不是有效的 JSON 字符串！');
   }
 };
 
@@ -106,7 +102,7 @@ export function getConfigPathFile(filepath: string): Config[] {
     return [config];
   } catch (error) {
     jsonErrorHandle(error.message);
-    errorHandle('配置文件不存在！');
+    throw new Error(error.message || '配置文件不存在！');
   }
 }
 
@@ -135,7 +131,7 @@ export function getConfig(): Config {
 /** 检查 config */
 export function checkConfig(config: any) {
   if (!config) {
-    errorHandle();
+    throw new Error('获取配置失败！未找到配置文件！');
   }
 
   if (isMultiUserConfig(config)) {
@@ -147,7 +143,7 @@ export function checkConfig(config: any) {
   }
 
   if (!config.cookie) {
-    errorHandle('配置文件中没有 cookie！');
+    throw new Error('配置文件中没有 cookie！');
   }
 
   return config;

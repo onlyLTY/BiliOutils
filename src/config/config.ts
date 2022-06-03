@@ -1,6 +1,6 @@
 import { DAILY_RUN_TIME, LOTTERY_EXCLUDE, LOTTERY_INCLUDE, LOTTERY_UP_BLACKLIST } from '@/constant';
 import { cloneObject, getNewObject, deepMergeObject, arr2numArr } from '@/utils/pure';
-import { getBiliJct, getUserId } from '../utils';
+import { getBiliJct, getUserId } from '../utils/cookie';
 import { isArray } from '../utils/is';
 
 type DefaultConfig = typeof defaultConfig;
