@@ -1,4 +1,6 @@
-import { deleteSession, getSession } from '@/net/session.request';
+import type { Sessionlist } from '@/dto/session.dto';
+import { TaskConfig } from '@/config/globalVar';
+import { deleteSession, getSession, readSession } from '@/net/session.request';
 import { apiDelay, logger } from '@/utils';
 import { User } from './tags.service';
 
@@ -48,8 +50,7 @@ export async function updateSession(followUps: User[]) {
   try {
     for (let index = 0; index < sessionList.length; index++) {
       const session = sessionList[index];
-      await deleteSession(session);
-      await apiDelay(50);
+      await handleSession(session);
     }
   } catch (error) {
     logger.error(`更新会话异常：${error.message}`);
@@ -57,4 +58,19 @@ export async function updateSession(followUps: User[]) {
   if (sessionList.length >= 19) {
     await updateSession(followUps);
   }
+}
+
+async function handleSession(session: Sessionlist) {
+  switch (TaskConfig.lottery.actFollowMsg) {
+    case 'del':
+    case 'delete':
+      await deleteSession(session);
+      break;
+    case 'read':
+      await readSession(session);
+      break;
+    default:
+      break;
+  }
+  await apiDelay(50);
 }
