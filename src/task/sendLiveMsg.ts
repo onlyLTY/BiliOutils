@@ -4,6 +4,7 @@ import { getFansMealList, sendOneMessage } from '@/service/intimacy.service';
 
 export default async function liveSendMessage() {
   logger.info('----【发送直播弹幕】----');
+  logger.info(`该函数即将废弃，请使用 liveIntimacy 替代`);
 
   try {
     const fansMedalList = await getFansMealList();

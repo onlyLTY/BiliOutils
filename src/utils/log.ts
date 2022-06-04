@@ -48,6 +48,7 @@ export class Logger {
   private month = getPRCDate().getMonth() + 1;
   private errorFile = resolvePath(`./logs/bt_error-${this.month}.log`);
   private logFile = resolvePath(`./logs/bt_combined-${this.month}.log`);
+  private noFile = false;
 
   constructor(
     private options: LoggerOptions = { console: 'info', file: 'info', push: 'info' },
@@ -56,17 +57,20 @@ export class Logger {
     this.consoleLeval = getLevelValues(this.options.console);
     this.fileLeval = getLevelValues(this.options.file);
     this.pushLeval = getLevelValues(this.options.push);
+    this.noFile = isQingLongPanel() || isServerless();
+    if (!this.noFile) {
+      this.createLogFile();
+    }
   }
 
   public log({ level }: LogOptions, message: MessageType) {
-    const noFile = isQingLongPanel() || isServerless(),
-      prcTime = getPRCDate(),
+    const prcTime = getPRCDate(),
       messageStr = `[${level} ${formatTime(prcTime, false)}] ${message}\n`,
-      stderr = ['error', 'wran'].includes(level);
+      stderr = ['error', 'warn'].includes(level);
     if (this.consoleLeval.includes(level)) {
       this.Conslole(messageStr, stderr);
     }
-    if (!noFile && this.fileLeval.includes(level)) {
+    if (!this.noFile && this.fileLeval.includes(level)) {
       this.File(`[${level} ${formatTime(prcTime, false)}] ${message}\n`, stderr);
     }
     if (this.pushLeval.includes(level)) {
@@ -111,6 +115,14 @@ export class Logger {
 
   private Push(message: string) {
     Logger.pushValue += message;
+  }
+
+  private createLogFile() {
+    // 如果不存在logs文件夹，则创建
+    const logsPath = resolvePath('./logs');
+    if (!fs.existsSync(logsPath)) {
+      fs.mkdirSync(logsPath);
+    }
   }
 }
 
