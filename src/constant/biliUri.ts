@@ -5,6 +5,7 @@ export const OriginURLs = {
   live: 'https://live.bilibili.com',
   space: 'https://space.bilibili.com',
   message: 'https://message.bilibili.com',
+  www: 'https://www.bilibili.com',
 };
 
 export const RefererURLs = {

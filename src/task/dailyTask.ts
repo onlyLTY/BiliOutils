@@ -19,8 +19,13 @@ export async function dailyTasks<T = unknown>(
   const biliArr = offFunctions([...Object.values(bili)]);
 
   for (const asyncFun of biliArr) {
-    await asyncFun();
-    await apiDelay();
+    try {
+      await asyncFun();
+    } catch (error) {
+      logger.error(`${asyncFun.name}失败: ${error}`);
+    } finally {
+      await apiDelay();
+    }
   }
 
   cb && (await cb(...cbArg));
