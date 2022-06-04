@@ -1,25 +1,27 @@
-import { receiveVipPrivilege } from '../net/vip.request';
+import { receiveVipMy, receiveVipPrivilege } from '../net/vip.request';
 import { TaskModule } from '../config/globalVar';
-import { getPRCDate, getMonthHasDays } from '../utils';
 import { logger } from '../utils/log';
 
-function init() {
-  if (TaskModule.vipType !== 2) {
-    logger.info(`账号非年度大会员，不需要领取权益`);
-    return false;
+/**
+ * 获取当前领取状态
+ */
+async function getPrivilegeStatus() {
+  try {
+    const { data, code, message } = await receiveVipMy();
+    if (code !== 0) {
+      logger.info(`获取领取状态失败：${code} ${message}`);
+      return;
+    }
+    const { list } = data;
+    return list.slice(0, 2).filter(item => {
+      // 当前时间戳
+      const nowUnix = parseInt((new Date().getTime() / 1000).toString());
+      return item.state === 0 && nowUnix > item.period_end_unix;
+    });
+    // 查找未领取的权益
+  } catch (error) {
+    logger.error(`获取领取状态出现异常：${error.message}`);
   }
-  // 根据时间确定是否执行
-  const nowTime = getPRCDate(),
-    today = nowTime.getDate(),
-    monthHasDays = getMonthHasDays(nowTime);
-
-  // 本月的第一天和最后一天
-  if (today !== 1 && monthHasDays !== today) {
-    logger.info('今天非预订领取时间，跳过领取');
-    return false;
-  }
-
-  return true;
 }
 
 function getPrivilegeName(type: number): string {
@@ -67,12 +69,26 @@ async function getPrivilege(type: number) {
 }
 
 export default async function getVipPrivilege() {
-  logger.info('----【领取大会员权益】----');
+  try {
+    logger.info('----【领取大会员权益】----');
 
-  if (!init()) {
-    return;
+    if (TaskModule.vipType !== 2) {
+      logger.info(`账号非年度大会员，不需要领取权益`);
+      return false;
+    }
+
+    const privilegeList = await getPrivilegeStatus();
+
+    if (privilegeList.length === 0) {
+      logger.info(`已经领取过权益，不需要再领取`);
+      return;
+    }
+
+    for (let index = 0; index < privilegeList.length; index++) {
+      const privilege = privilegeList[index];
+      await getPrivilege(privilege.type);
+    }
+  } catch (error) {
+    logger.error(`领取大会员权益出现异常：${error.message}`);
   }
-
-  await getPrivilege(1);
-  await getPrivilege(2);
 }
