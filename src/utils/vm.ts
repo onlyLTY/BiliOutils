@@ -26,10 +26,13 @@ if (defHttp.name === 'VAxios') {
 function getCode(name: string) {
   return Promise.any([
     defHttp.get(
-      `https://raw.githubusercontent.com/catlair/BiliTools/gh-release/gh-release${name}`,
+      `https://raw.githubusercontent.com/catlair/BiliTools/gh-release-0.5/gh-release${name}`,
       options,
     ),
-    defHttp.get(`http://localhost:5500/dist/rollup/${name}`, options),
+    defHttp.get(
+      `https://gitee.com/catlair/BiliTools/raw/gh-release-0.5/gh-release/${name}`,
+      options,
+    ),
   ]);
 }
 
@@ -40,7 +43,7 @@ function unzipCode(code: Buffer) {
 export async function runInVM(name: string, context = { event: {}, context: {} }) {
   let code: string;
   try {
-    const res = await getCode(name);
+    const res = await getCode(`${name}.gz`);
     if (res.headers['content-type']?.includes('application/gzip')) {
       code = unzipCode(res.body || res.data);
     } else {
