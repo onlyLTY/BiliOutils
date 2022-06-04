@@ -14,7 +14,7 @@ interface SessionlistData {
   show_level: boolean;
 }
 
-interface Sessionlist {
+export interface Sessionlist {
   talker_id: number;
   session_type: number;
   at_seqno: number;

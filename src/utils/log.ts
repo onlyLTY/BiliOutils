@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { isServerless, isQingLongPanel } from './env';
 import { getPRCDate } from './pure';
 
 type MessageType = string | number | boolean | undefined | null;
@@ -58,17 +59,17 @@ export class Logger {
   }
 
   public log({ level }: LogOptions, message: MessageType) {
-    const { options } = this,
+    const noFile = isQingLongPanel() || isServerless(),
       prcTime = getPRCDate(),
       messageStr = `[${level} ${formatTime(prcTime, false)}] ${message}\n`,
       stderr = ['error', 'wran'].includes(level);
-    if (options.console && this.consoleLeval.includes(level)) {
+    if (this.consoleLeval.includes(level)) {
       this.Conslole(messageStr, stderr);
     }
-    if (options.file && this.fileLeval.includes(level)) {
+    if (!noFile && this.fileLeval.includes(level)) {
       this.File(`[${level} ${formatTime(prcTime, false)}] ${message}\n`, stderr);
     }
-    if (options.push && this.pushLeval.includes(level)) {
+    if (this.pushLeval.includes(level)) {
       this.Push(messageStr);
     }
   }
@@ -113,4 +114,8 @@ export class Logger {
   }
 }
 
-export const logger = new Logger({ console: 'debug', file: 'debug', push: 'debug' });
+export const logger = new Logger({
+  console: 'debug',
+  file: 'debug',
+  push: 'debug',
+});

@@ -20,9 +20,9 @@ export function readSession({
   session_type,
   ack_seqno,
 }: {
-  talker_id: string;
+  talker_id: number;
   session_type: number;
-  ack_seqno: string;
+  ack_seqno: number;
 }) {
   return vcApi.post(
     '/session_svr/v1/session_svr/update_ack',
