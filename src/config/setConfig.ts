@@ -11,7 +11,7 @@ const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
 
 function jsonErrorHandle(message: string) {
   if (message.includes && message.includes('in JSON at position')) {
-    new Error('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
+    throw new Error('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
   }
 }
 

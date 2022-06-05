@@ -16,6 +16,9 @@ import { defHttp } from './http';
 import { logger } from './log';
 import { stringify } from './pure';
 
+// 使用一个变量来记录当前的环境变量，避免多个账号复用同一个环境变量
+let MyProcessEnv: Record<string, string>;
+
 /**
  * 配置处理为 env
  */
@@ -52,16 +55,17 @@ function initEnv() {
     'PUSH_PLUS_USER',
   ];
   const message = TaskConfig.config?.message || {};
+  MyProcessEnv = {};
 
   envName.forEach(name => {
     const value = message[upperCaseToHump(name)] || message[name] || process.env[name];
     if (value) {
-      process.env[name] = value;
+      MyProcessEnv[name] = value;
     }
   });
 
   if (TaskConfig.PUSHPLUS_TOKEN) {
-    process.env.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
+    MyProcessEnv.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
   }
   getEnv();
 }
@@ -135,30 +139,33 @@ let QQ_MODE = '';
 function getEnv() {
   //==========================云端环境变量的判断与接收=========================
 
-  if (process.env.PUSH_KEY) {
-    SCKEY = process.env.PUSH_KEY;
+  if (MyProcessEnv.PUSH_KEY) {
+    SCKEY = MyProcessEnv.PUSH_KEY;
   }
 
-  if (process.env.QQ_SKEY) {
-    QQ_SKEY = process.env.QQ_SKEY;
+  if (MyProcessEnv.QQ_SKEY) {
+    QQ_SKEY = MyProcessEnv.QQ_SKEY;
   }
 
-  if (process.env.QQ_MODE) {
-    QQ_MODE = process.env.QQ_MODE;
+  if (MyProcessEnv.QQ_MODE) {
+    QQ_MODE = MyProcessEnv.QQ_MODE;
   }
 
-  if (process.env.BARK_PUSH) {
-    if (process.env.BARK_PUSH.indexOf('https') > -1 || process.env.BARK_PUSH.indexOf('http') > -1) {
+  if (MyProcessEnv.BARK_PUSH) {
+    if (
+      MyProcessEnv.BARK_PUSH.indexOf('https') > -1 ||
+      MyProcessEnv.BARK_PUSH.indexOf('http') > -1
+    ) {
       //兼容BARK自建用户
-      BARK_PUSH = process.env.BARK_PUSH;
+      BARK_PUSH = MyProcessEnv.BARK_PUSH;
     } else {
-      BARK_PUSH = `https://api.day.app/${process.env.BARK_PUSH}`;
+      BARK_PUSH = `https://api.day.app/${MyProcessEnv.BARK_PUSH}`;
     }
-    if (process.env.BARK_SOUND) {
-      BARK_SOUND = process.env.BARK_SOUND;
+    if (MyProcessEnv.BARK_SOUND) {
+      BARK_SOUND = MyProcessEnv.BARK_SOUND;
     }
-    if (process.env.BARK_GROUP) {
-      BARK_GROUP = process.env.BARK_GROUP;
+    if (MyProcessEnv.BARK_GROUP) {
+      BARK_GROUP = MyProcessEnv.BARK_GROUP;
     }
   } else {
     if (BARK_PUSH && BARK_PUSH.indexOf('https') === -1 && BARK_PUSH.indexOf('http') === -1) {
@@ -166,41 +173,41 @@ function getEnv() {
       BARK_PUSH = `https://api.day.app/${BARK_PUSH}`;
     }
   }
-  if (process.env.TG_BOT_TOKEN) {
-    TG_BOT_TOKEN = process.env.TG_BOT_TOKEN;
+  if (MyProcessEnv.TG_BOT_TOKEN) {
+    TG_BOT_TOKEN = MyProcessEnv.TG_BOT_TOKEN;
   }
-  if (process.env.TG_USER_ID) {
-    TG_USER_ID = process.env.TG_USER_ID;
+  if (MyProcessEnv.TG_USER_ID) {
+    TG_USER_ID = MyProcessEnv.TG_USER_ID;
   }
-  if (process.env.TG_PROXY_AUTH) TG_PROXY_AUTH = process.env.TG_PROXY_AUTH;
-  if (process.env.TG_PROXY_HOST) TG_PROXY_HOST = process.env.TG_PROXY_HOST;
-  if (process.env.TG_PROXY_PORT) TG_PROXY_PORT = process.env.TG_PROXY_PORT;
-  if (process.env.TG_API_HOST) TG_API_HOST = process.env.TG_API_HOST;
+  if (MyProcessEnv.TG_PROXY_AUTH) TG_PROXY_AUTH = MyProcessEnv.TG_PROXY_AUTH;
+  if (MyProcessEnv.TG_PROXY_HOST) TG_PROXY_HOST = MyProcessEnv.TG_PROXY_HOST;
+  if (MyProcessEnv.TG_PROXY_PORT) TG_PROXY_PORT = MyProcessEnv.TG_PROXY_PORT;
+  if (MyProcessEnv.TG_API_HOST) TG_API_HOST = MyProcessEnv.TG_API_HOST;
 
-  if (process.env.DD_BOT_TOKEN) {
-    DD_BOT_TOKEN = process.env.DD_BOT_TOKEN;
-    if (process.env.DD_BOT_SECRET) {
-      DD_BOT_SECRET = process.env.DD_BOT_SECRET;
+  if (MyProcessEnv.DD_BOT_TOKEN) {
+    DD_BOT_TOKEN = MyProcessEnv.DD_BOT_TOKEN;
+    if (MyProcessEnv.DD_BOT_SECRET) {
+      DD_BOT_SECRET = MyProcessEnv.DD_BOT_SECRET;
     }
   }
 
-  if (process.env.QYWX_KEY) {
-    QYWX_KEY = process.env.QYWX_KEY;
+  if (MyProcessEnv.QYWX_KEY) {
+    QYWX_KEY = MyProcessEnv.QYWX_KEY;
   }
 
-  if (process.env.QYWX_AM) {
-    QYWX_AM = process.env.QYWX_AM;
+  if (MyProcessEnv.QYWX_AM) {
+    QYWX_AM = MyProcessEnv.QYWX_AM;
   }
 
-  if (process.env.IGOT_PUSH_KEY) {
-    IGOT_PUSH_KEY = process.env.IGOT_PUSH_KEY;
+  if (MyProcessEnv.IGOT_PUSH_KEY) {
+    IGOT_PUSH_KEY = MyProcessEnv.IGOT_PUSH_KEY;
   }
 
-  if (process.env.PUSH_PLUS_TOKEN) {
-    PUSH_PLUS_TOKEN = process.env.PUSH_PLUS_TOKEN;
+  if (MyProcessEnv.PUSH_PLUS_TOKEN) {
+    PUSH_PLUS_TOKEN = MyProcessEnv.PUSH_PLUS_TOKEN;
   }
-  if (process.env.PUSH_PLUS_USER) {
-    PUSH_PLUS_USER = process.env.PUSH_PLUS_USER;
+  if (MyProcessEnv.PUSH_PLUS_USER) {
+    PUSH_PLUS_USER = MyProcessEnv.PUSH_PLUS_USER;
   }
   //==========================云端环境变量的判断与接收=========================
 }

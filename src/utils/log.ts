@@ -71,7 +71,7 @@ export class Logger {
       this.Conslole(messageStr, stderr);
     }
     if (!this.noFile && this.fileLeval.includes(level)) {
-      this.File(`[${level} ${formatTime(prcTime, false)}] ${message}\n`, stderr);
+      this.File(`[${level} ${formatTime(prcTime, true)}] ${message}\n`, stderr);
     }
     if (this.pushLeval.includes(level)) {
       this.Push(messageStr);

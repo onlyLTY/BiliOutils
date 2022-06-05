@@ -17,20 +17,35 @@ export const defaultConfig = {
     api: undefined,
   },
   function: {
+    // 瓜子兑换硬币
     silver2Coin: true,
+    // 直播签到
     liveSignTask: true,
+    // 投币
     addCoins: true,
+    // 漫画签到
     mangaSign: false,
+    // 分享和观看
     shareAndWatch: true,
+    // 应援团签到
     supGroupSign: false,
+    // 直播发送弹幕
     liveSendMessage: false,
+    // 非配置项
     taskReward: true,
+    // 充电
     charging: false,
+    // 获取 vip 权益
     getVipPrivilege: false,
+    // 直播赠送礼物
     giveGift: false,
+    // 赛事竞猜
     matchGame: false,
+    // 直播天选时刻
     liveLottery: false,
+    // 直播天选红包
     liveRedPack: false,
+    // 粉丝牌等级
     liveIntimacy: false,
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
@@ -96,13 +111,13 @@ export const defaultConfig = {
     /** 黑名单 */
     blackUid: LOTTERY_UP_BLACKLIST,
     /** 是否将天选时刻关注 UP 移动到分组 */
-    isMoveTag: false,
+    isMoveTag: true,
     /** 天选时刻关注 UP 移动到分组 */
     moveTag: '天选时刻',
     /** 天选获取的直播页数 */
-    pageNum: 0,
+    pageNum: 2,
     /** 关注回复处理方式  */
-    actFollowMsg: 'delete',
+    actFollowMsg: 'read',
   },
   intimacy: {
     // 直播弹幕
