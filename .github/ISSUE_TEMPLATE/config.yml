@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 文档
+    url: https://btdocs.vercel.app/
+    about: 仔细阅读文档
+  - name: 其他联系方式
+    url: https://btdocs.vercel.app/about.html
+    about: 希望能够在Github之外联系
+  - name: 说点什么
+    url: https://github.com/catlair/BiliTools/discussions
+    about: 如果您不是反馈问题，只是单纯聊聊，请使用 discussions 频道

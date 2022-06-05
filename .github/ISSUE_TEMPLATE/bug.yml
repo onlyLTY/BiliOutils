@@ -1,0 +1,57 @@
+name: 错误报告
+description: 如果您发现了一个错误，请在此提交您的错误报告。
+title: '[Bug]: '
+labels: ['bug']
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写这个bug报告!
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 是否已经阅读文档
+      description: 已经阅读过[文档](https://btdocs.vercel.app/)，确定没有找到想要的答案。
+      options:
+        - label: 我确定阅读过文档
+          required: true
+  - type: input
+    id: env
+    attributes:
+      label: 运行环境
+      description: 您的程序是运行在什么环境下的？
+      placeholder: 腾讯云函数、本地 Windows11、MacOS等
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 还有，告诉我们，你希望发生什么?
+      placeholder: 告诉我们你看到了什么!
+      value: '这里有一个bug! 我希望它能这样。'
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 你用的是什么版本的软件?
+      placeholder: 0.5.1
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关的日志输出
+      description: 请复制并粘贴任何相关的日志输出。 这将自动格式化为代码，因此无需背板。
+      render: shell
+  - type: textarea
+    id: help-me
+    attributes:
+      label: 有效的帮助
+      description: 对此您能提供什么有效的帮助？
+      placeholder: 告诉我们您能提供的帮助!
+      value: '这个接口是这样的。。。'

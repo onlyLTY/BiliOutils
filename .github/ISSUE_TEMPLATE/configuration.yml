@@ -1,0 +1,53 @@
+name: 配置问题
+description: 如果您配置出错或者想要了解到底发生了什么，请在此提交您的配置问题。
+title: '[配置]: '
+labels: ['疑问']
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写这个配置报告!我们希望您已经做到应该做的事情。例如：
+        - 已经校验了 json5 文件。
+        - 当您使用环境变量时，是已经压缩了配置的。
+        - 已经再三确认了配置文件，确认路径是正确的。
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 是否已经阅读文档
+      description: 已经阅读过[文档](https://btdocs.vercel.app/)，确定没有找到想要的答案。
+      options:
+        - label: 我确定阅读过文档
+          required: true
+  - type: input
+    id: env
+    attributes:
+      label: 运行环境
+      description: 您的程序是运行在什么环境下的？
+      placeholder: 腾讯云函数、本地 Windows11、MacOS等
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 发生了什么
+      description: 告诉我们你做了什么，发生了什么。还有，告诉我们，你希望发生什么?
+      placeholder: 告诉我们你看到了什么!
+      value: '我对此存在疑问。'
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 你用的是什么版本的软件?
+      placeholder: 0.5.1
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: 相关的日志输出
+      description: 请复制并粘贴任何相关的日志输出。 这将自动格式化为代码，因此无需背板。
+      render: shell

@@ -1,0 +1,41 @@
+name: 需求请求
+description: 如果您有什么好的想法或者需求，请在此提交您的需求。
+title: '[新增]: '
+labels: ['新增']
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写这个需求报告!
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: 是否已经阅读文档
+      description: 已经阅读过[文档](https://btdocs.vercel.app/)，确定没有找到想要的答案。
+      options:
+        - label: 我确定阅读过文档
+          required: true
+  - type: input
+    id: exclusive
+    attributes:
+      label: 需求是否是平台独享受的
+      description: 例如这个需求是否只能在阿里云函数实现？
+      placeholder: 腾讯云函数、本地 Windows11、MacOS等
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 需求描述
+      description: 详细的描述您的需求。
+      placeholder: 告诉我们您想说的话!
+      value: '我想。。。'
+    validations:
+      required: true
+  - type: textarea
+    id: help-me
+    attributes:
+      label: 有效的帮助
+      description: 对此您能提供什么有效的帮助？
+      placeholder: 告诉我们您能提供的帮助!
+      value: '这个接口是这样的。。。'
