@@ -4,7 +4,7 @@ import type { Got, Options, Response } from 'got';
 import { TaskConfig } from '@/config/globalVar';
 import got from 'got';
 import { isFunction, isObject, isString } from '../is';
-import { jsonp2Object, stringify } from '../pure';
+import { jsonp2Object, mergeHeaders, stringify } from '../pure';
 import getCookie from '../cookie';
 
 const transformRequestHook = (res: Response, options: RequestOptions) => {
@@ -47,14 +47,17 @@ function axiosHandle(options: VGotOptions) {
       ...options.params,
     };
   }
+  const contentType = options.headers['content-type'] as string,
+    isFormUrlencoded = contentType?.startsWith('application/x-www-form-urlencoded');
   if (isObject(options.data)) {
-    if (
-      (options.headers['content-type'] as string)?.startsWith('application/x-www-form-urlencoded')
-    ) {
+    if (isFormUrlencoded) {
       options.body = stringify(options.data);
     } else {
       options.json = options.data;
     }
+  }
+  if (isString(options.data) && isFormUrlencoded) {
+    options.body = options.data;
   }
 
   function setAgent(pro: string) {
@@ -111,7 +114,7 @@ export class VGot {
   request<T = any>(options: VGotOptions) {
     const { requestOptions = {}, headers = {} } = this.options;
     options.requestOptions = Object.assign({}, requestOptions, options.requestOptions);
-    options.headers = Object.assign({}, headers, options.headers);
+    options.headers = mergeHeaders(headers, options.headers);
     if (requestOptions.withBiliCookie) {
       options.headers['Cookie'] = TaskConfig.COOKIE;
     }

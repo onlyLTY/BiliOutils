@@ -10,7 +10,6 @@
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
  */
 import * as nodemailer from 'nodemailer';
-import * as tunnel from 'tunnel';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { defHttp } from './http';
 import { logger } from './log';
@@ -439,17 +438,18 @@ function BarkNotify(text, desp, params = {}) {
 }
 
 function tgBotNotify(text, desp) {
-  return new Promise(resolve => {
+  return new Promise(async resolve => {
     if (TG_BOT_TOKEN && TG_USER_ID) {
       const options = {
         url: `https://${TG_API_HOST}/bot${TG_BOT_TOKEN}/sendMessage`,
-        params: `chat_id=${TG_USER_ID}&text=${text}\n\n${desp}&disable_web_page_preview=true`,
+        data: `chat_id=${TG_USER_ID}&text=${text}\n\n${desp}&disable_web_page_preview=true`,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         timeout,
       };
       if (TG_PROXY_HOST && TG_PROXY_PORT) {
+        const tunnel = await import('tunnel');
         const httpsAgent = tunnel.httpsOverHttp({
           proxy: {
             host: TG_PROXY_HOST,
