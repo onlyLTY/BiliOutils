@@ -9,7 +9,6 @@
  * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
  */
-import * as nodemailer from 'nodemailer';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { defHttp } from './http';
 import { logger } from './log';
@@ -54,7 +53,7 @@ function initEnv() {
     'PUSH_PLUS_USER',
   ];
   const message = TaskConfig.message || {};
-  MyProcessEnv = {};
+  MyProcessEnv = initProcessEnv(MyProcessEnv);
 
   envName.forEach(name => {
     const value = message[upperCaseToHump(name)] || message[name] || process.env[name];
@@ -66,51 +65,55 @@ function initEnv() {
   if (TaskConfig.PUSHPLUS_TOKEN) {
     MyProcessEnv.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
   }
-  getEnv();
 }
 
 const timeout = 15000; //超时时间(单位毫秒)
 
-// =======================================微信server酱通知设置区域===========================================
-//此处填你申请的SCKEY.
-//(环境变量名 PUSH_KEY)
-let SCKEY = '';
+/**
+ * 初始化变量（防止多用户变量污染）
+ * @param processEnv
+ */
+function initProcessEnv(processEnv: Record<string, string>) {
+  // =======================================微信server酱通知设置区域===========================================
+  //此处填你申请的SCKEY.
+  //(环境变量名 PUSH_KEY)
+  MyProcessEnv.SCKEY = '';
 
-// =======================================Bark App通知设置区域===========================================
-//此处填你BarkAPP的信息(IP/设备码，例如：https://api.day.app/XXXXXXXX)
-let BARK_PUSH = '';
-//BARK app推送铃声,铃声列表去APP查看复制填写
-let BARK_SOUND = '';
-//BARK app推送消息的分组, 默认为"QingLong"
-let BARK_GROUP = 'QingLong';
+  // =======================================Bark App通知设置区域===========================================
+  //此处填你BarkAPP的信息(IP/设备码，例如：https://api.day.app/XXXXXXXX)
+  MyProcessEnv.BARK_PUSH = '';
+  //BARK app推送铃声,铃声列表去APP查看复制填写
+  MyProcessEnv.BARK_SOUND = '';
+  //BARK app推送消息的分组, 默认为"QingLong"
+  MyProcessEnv.BARK_GROUP = 'QingLong';
 
-// =======================================telegram机器人通知设置区域===========================================
-//此处填你telegram bot 的Token，telegram机器人通知推送必填项.例如：1077xxx4424:AAFjv0FcqxxxxxxgEMGfi22B4yh15R5uw
-//(环境变量名 TG_BOT_TOKEN)
-let TG_BOT_TOKEN = '';
-//此处填你接收通知消息的telegram用户的id，telegram机器人通知推送必填项.例如：129xxx206
-//(环境变量名 TG_USER_ID)
-let TG_USER_ID = '';
-//tg推送HTTP代理设置(不懂可忽略,telegram机器人通知推送功能中非必填)
-let TG_PROXY_HOST = ''; //例如:127.0.0.1(环境变量名:TG_PROXY_HOST)
-let TG_PROXY_PORT = ''; //例如:1080(环境变量名:TG_PROXY_PORT)
-let TG_PROXY_AUTH = ''; //tg代理配置认证参数
-//Telegram api自建的反向代理地址(不懂可忽略,telegram机器人通知推送功能中非必填),默认tg官方api(环境变量名:TG_API_HOST)
-let TG_API_HOST = 'api.telegram.org';
-// =======================================钉钉机器人通知设置区域===========================================
-//此处填你钉钉 bot 的webhook，例如：5a544165465465645d0f31dca676e7bd07415asdasd
-//(环境变量名 DD_BOT_TOKEN)
-let DD_BOT_TOKEN = '';
-//密钥，机器人安全设置页面，加签一栏下面显示的SEC开头的字符串
-let DD_BOT_SECRET = '';
+  // =======================================telegram机器人通知设置区域===========================================
+  //此处填你telegram bot 的Token，telegram机器人通知推送必填项.例如：1077xxx4424:AAFjv0FcqxxxxxxgEMGfi22B4yh15R5uw
+  //(环境变量名 TG_BOT_TOKEN)
+  MyProcessEnv.TG_BOT_TOKEN = '';
+  //此处填你接收通知消息的telegram用户的id，telegram机器人通知推送必填项.例如：129xxx206
+  //(环境变量名 TG_USER_ID)
+  MyProcessEnv.TG_USER_ID = '';
+  //tg推送HTTP代理设置(不懂可忽略,telegram机器人通知推送功能中非必填)
+  MyProcessEnv.TG_PROXY_HOST = ''; //例如:127.0.0.1(环境变量名:TG_PROXY_HOST)
+  MyProcessEnv.TG_PROXY_PORT = ''; //例如:1080(环境变量名:TG_PROXY_PORT)
+  MyProcessEnv.TG_PROXY_AUTH = ''; //tg代理配置认证参数
+  //Telegram api自建的反向代理地址(不懂可忽略,telegram机器人通知推送功能中非必填),默认tg官方api(环境变量名:TG_API_HOST)
+  MyProcessEnv.TG_API_HOST = 'api.telegram.org';
+  // =======================================钉钉机器人通知设置区域===========================================
+  //此处填你钉钉 bot 的webhook，例如：5a544165465465645d0f31dca676e7bd07415asdasd
+  //(环境变量名 DD_BOT_TOKEN)
+  MyProcessEnv.DD_BOT_TOKEN = '';
+  //密钥，机器人安全设置页面，加签一栏下面显示的SEC开头的字符串
+  MyProcessEnv.DD_BOT_SECRET = '';
 
-// =======================================企业微信机器人通知设置区域===========================================
-//此处填你企业微信机器人的 webhook(详见文档 https://work.weixin.qq.com/api/doc/90000/90136/91770)，例如：693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa
-//(环境变量名 QYWX_KEY)
-let QYWX_KEY = '';
+  // =======================================企业微信机器人通知设置区域===========================================
+  //此处填你企业微信机器人的 webhook(详见文档 https://work.weixin.qq.com/api/doc/90000/90136/91770)，例如：693a91f6-7xxx-4bc4-97a0-0ec2sifa5aaa
+  //(环境变量名 QYWX_KEY)
+  MyProcessEnv.QYWX_KEY = '';
 
-// =======================================企业微信应用消息通知设置区域===========================================
-/*
+  // =======================================企业微信应用消息通知设置区域===========================================
+  /*
  此处填你企业微信应用消息的值(详见文档 https://work.weixin.qq.com/api/doc/90000/90135/90236)
  环境变量名 QYWX_AM依次填入 corpid,corpsecret,touser(注:多个成员ID使用|隔开),agentid,消息类型(选填,不填默认文本消息类型)
  注意用,号隔开(英文输入法的逗号)，例如：wwcff56746d9adwers,B-791548lnzXBE6_BWfxdf3kSTMJr9vFEPKAbh6WERQ,mingcheng,1000001,2COXgjH2UIfERF2zxrtUOKgQ9XklUqMdGSWLBoW_lSDAdafat
@@ -119,96 +122,22 @@ let QYWX_KEY = '';
  - 文本消息: 1 (数字一)
  - 图文消息（mpnews）: 素材库图片id, 可查看此教程(http://note.youdao.com/s/HMiudGkb)或者(https://note.youdao.com/ynoteshare1/index.html?id=1a0c8aff284ad28cbd011b29b3ad0191&type=note)
  */
-let QYWX_AM = '';
+  MyProcessEnv.QYWX_AM = '';
 
-// =======================================iGot聚合推送通知设置区域===========================================
-//此处填您iGot的信息(推送key，例如：https://push.hellyw.com/XXXXXXXX)
-let IGOT_PUSH_KEY = '';
+  // =======================================iGot聚合推送通知设置区域===========================================
+  //此处填您iGot的信息(推送key，例如：https://push.hellyw.com/XXXXXXXX)
+  MyProcessEnv.IGOT_PUSH_KEY = '';
 
-// =======================================push+设置区域=======================================
-//官方文档：http://www.pushplus.plus/
-//PUSH_PLUS_TOKEN：微信扫码登录后一对一推送或一对多推送下面的token(您的Token)，不提供PUSH_PLUS_USER则默认为一对一推送
-//PUSH_PLUS_USER： 一对多推送的“群组编码”（一对多推送下面->您的群组(如无则新建)->群组编码，如果您是创建群组人。也需点击“查看二维码”扫描绑定，否则不能接受群组消息推送）
-let PUSH_PLUS_TOKEN = '';
-let PUSH_PLUS_USER = '';
+  // =======================================push+设置区域=======================================
+  //官方文档：http://www.pushplus.plus/
+  //PUSH_PLUS_TOKEN：微信扫码登录后一对一推送或一对多推送下面的token(您的Token)，不提供PUSH_PLUS_USER则默认为一对一推送
+  //PUSH_PLUS_USER： 一对多推送的“群组编码”（一对多推送下面->您的群组(如无则新建)->群组编码，如果您是创建群组人。也需点击“查看二维码”扫描绑定，否则不能接受群组消息推送）
+  MyProcessEnv.PUSH_PLUS_TOKEN = '';
+  MyProcessEnv.PUSH_PLUS_USER = '';
 
-let QQ_SKEY = '';
-let QQ_MODE = '';
-
-function getEnv() {
-  //==========================云端环境变量的判断与接收=========================
-
-  if (MyProcessEnv.PUSH_KEY) {
-    SCKEY = MyProcessEnv.PUSH_KEY;
-  }
-
-  if (MyProcessEnv.QQ_SKEY) {
-    QQ_SKEY = MyProcessEnv.QQ_SKEY;
-  }
-
-  if (MyProcessEnv.QQ_MODE) {
-    QQ_MODE = MyProcessEnv.QQ_MODE;
-  }
-
-  if (MyProcessEnv.BARK_PUSH) {
-    if (
-      MyProcessEnv.BARK_PUSH.indexOf('https') > -1 ||
-      MyProcessEnv.BARK_PUSH.indexOf('http') > -1
-    ) {
-      //兼容BARK自建用户
-      BARK_PUSH = MyProcessEnv.BARK_PUSH;
-    } else {
-      BARK_PUSH = `https://api.day.app/${MyProcessEnv.BARK_PUSH}`;
-    }
-    if (MyProcessEnv.BARK_SOUND) {
-      BARK_SOUND = MyProcessEnv.BARK_SOUND;
-    }
-    if (MyProcessEnv.BARK_GROUP) {
-      BARK_GROUP = MyProcessEnv.BARK_GROUP;
-    }
-  } else {
-    if (BARK_PUSH && BARK_PUSH.indexOf('https') === -1 && BARK_PUSH.indexOf('http') === -1) {
-      //兼容BARK本地用户只填写设备码的情况
-      BARK_PUSH = `https://api.day.app/${BARK_PUSH}`;
-    }
-  }
-  if (MyProcessEnv.TG_BOT_TOKEN) {
-    TG_BOT_TOKEN = MyProcessEnv.TG_BOT_TOKEN;
-  }
-  if (MyProcessEnv.TG_USER_ID) {
-    TG_USER_ID = MyProcessEnv.TG_USER_ID;
-  }
-  if (MyProcessEnv.TG_PROXY_AUTH) TG_PROXY_AUTH = MyProcessEnv.TG_PROXY_AUTH;
-  if (MyProcessEnv.TG_PROXY_HOST) TG_PROXY_HOST = MyProcessEnv.TG_PROXY_HOST;
-  if (MyProcessEnv.TG_PROXY_PORT) TG_PROXY_PORT = MyProcessEnv.TG_PROXY_PORT;
-  if (MyProcessEnv.TG_API_HOST) TG_API_HOST = MyProcessEnv.TG_API_HOST;
-
-  if (MyProcessEnv.DD_BOT_TOKEN) {
-    DD_BOT_TOKEN = MyProcessEnv.DD_BOT_TOKEN;
-    if (MyProcessEnv.DD_BOT_SECRET) {
-      DD_BOT_SECRET = MyProcessEnv.DD_BOT_SECRET;
-    }
-  }
-
-  if (MyProcessEnv.QYWX_KEY) {
-    QYWX_KEY = MyProcessEnv.QYWX_KEY;
-  }
-
-  if (MyProcessEnv.QYWX_AM) {
-    QYWX_AM = MyProcessEnv.QYWX_AM;
-  }
-
-  if (MyProcessEnv.IGOT_PUSH_KEY) {
-    IGOT_PUSH_KEY = MyProcessEnv.IGOT_PUSH_KEY;
-  }
-
-  if (MyProcessEnv.PUSH_PLUS_TOKEN) {
-    PUSH_PLUS_TOKEN = MyProcessEnv.PUSH_PLUS_TOKEN;
-  }
-  if (MyProcessEnv.PUSH_PLUS_USER) {
-    PUSH_PLUS_USER = MyProcessEnv.PUSH_PLUS_USER;
-  }
-  //==========================云端环境变量的判断与接收=========================
+  MyProcessEnv.QQ_SKEY = '';
+  MyProcessEnv.QQ_MODE = '';
+  return processEnv;
 }
 
 /**
@@ -217,11 +146,10 @@ function getEnv() {
  * @param desp 通知体
  * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
- * @returns {Promise<unknown>}
  */
 async function sendNotify(
-  text,
-  desp,
+  text: string,
+  desp: string,
   params = {},
   author = '\n\n本通知 By：https://github.com/catlair/BiliTools',
 ) {
@@ -253,9 +181,9 @@ async function sendMail(title: string, text: string) {
   const user = TaskConfig.message?.email;
   if (!user || !user.pass || !user.from || !user.host) return;
 
+  const { createTransport } = await import('nodemailer');
   const port: number = Number(user.port) || 465;
-
-  const transporter = nodemailer.createTransport({
+  const transporter = createTransport({
     host: user.host,
     port: port,
     secure: port === 465, // true for 465, false for other ports
@@ -293,6 +221,7 @@ async function customApi(title: string, text: string) {
 
 function serverNotify(text, desp, time = 2100) {
   return new Promise(resolve => {
+    const SCKEY = MyProcessEnv.SCKEY;
     if (SCKEY) {
       //微信server酱推送通知一个\n不会换行，需要两个\n才能换行，故做此替换
       desp = desp.replace(/[\n\r]/g, '\n\n');
@@ -336,6 +265,7 @@ function serverNotify(text, desp, time = 2100) {
 
 function CoolPush(text, desp) {
   return new Promise(resolve => {
+    const { QQ_SKEY, QQ_MODE } = MyProcessEnv;
     if (QQ_SKEY) {
       const options = {
         url: `https://push.xuthus.cc/${QQ_MODE}/${QQ_SKEY}`,
@@ -406,6 +336,7 @@ function CoolPush(text, desp) {
 
 function BarkNotify(text, desp, params = {}) {
   return new Promise(resolve => {
+    const { BARK_PUSH, BARK_SOUND, BARK_GROUP } = MyProcessEnv;
     if (BARK_PUSH) {
       const options = {
         url: `${BARK_PUSH}/${encodeURIComponent(text)}/${encodeURIComponent(
@@ -439,6 +370,8 @@ function BarkNotify(text, desp, params = {}) {
 
 function tgBotNotify(text, desp) {
   return new Promise(async resolve => {
+    const { TG_BOT_TOKEN, TG_USER_ID, TG_API_HOST, TG_PROXY_HOST, TG_PROXY_PORT, TG_PROXY_AUTH } =
+      MyProcessEnv;
     if (TG_BOT_TOKEN && TG_USER_ID) {
       const options = {
         url: `https://${TG_API_HOST}/bot${TG_BOT_TOKEN}/sendMessage`,
@@ -485,6 +418,7 @@ function tgBotNotify(text, desp) {
 }
 function ddBotNotify(text, desp) {
   return new Promise(resolve => {
+    const { DD_BOT_TOKEN, DD_BOT_SECRET } = MyProcessEnv;
     const options = {
       url: `https://oapi.dingtalk.com/robot/send?access_token=${DD_BOT_TOKEN}`,
       data: {
@@ -529,6 +463,7 @@ function ddBotNotify(text, desp) {
 
 function qywxBotNotify(text, desp) {
   return new Promise(resolve => {
+    const { QYWX_KEY } = MyProcessEnv;
     const options = {
       url: `https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${QYWX_KEY}`,
       data: {
@@ -565,7 +500,8 @@ function qywxBotNotify(text, desp) {
 }
 
 function ChangeUserId(desp) {
-  const QYWX_AM_AY = QYWX_AM.split(',');
+  const { QYWX_AM } = MyProcessEnv;
+  const QYWX_AM_AY = QYWX_AM?.split(',');
   if (QYWX_AM_AY[2]) {
     const userIdTmp = QYWX_AM_AY[2].split('|');
     let userId = '';
@@ -585,6 +521,7 @@ function ChangeUserId(desp) {
 
 function qywxamNotify(text, desp) {
   return new Promise(resolve => {
+    const QYWX_AM = MyProcessEnv.QYWX_AM;
     if (QYWX_AM) {
       const QYWX_AM_AY = QYWX_AM.split(',');
       const options_accesstoken = {
@@ -696,6 +633,7 @@ function qywxamNotify(text, desp) {
 
 function iGotNotify(text, desp, params = {}) {
   return new Promise(resolve => {
+    const { IGOT_PUSH_KEY } = MyProcessEnv;
     if (IGOT_PUSH_KEY) {
       // 校验传入的IGOT_PUSH_KEY是否有效
       const IGOT_PUSH_KEY_REGX = new RegExp('^[a-zA-Z0-9]{24}$');
@@ -737,6 +675,7 @@ function iGotNotify(text, desp, params = {}) {
 
 function pushPlusNotify(text, desp) {
   return new Promise(resolve => {
+    const { PUSH_PLUS_TOKEN, PUSH_PLUS_USER } = MyProcessEnv;
     if (PUSH_PLUS_TOKEN) {
       desp = desp.replace(/[\n\r]/g, '<br>'); // 默认为html, 不支持plaintext
       const params = {

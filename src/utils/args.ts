@@ -33,3 +33,17 @@ export function getArg(arg: string, short?: string) {
     return thisShort.split('=')[1];
   }
 }
+
+/**
+ * 是否存在参数（有的参数并不需要值）
+ */
+export function isArg(arg: string, short?: string) {
+  const args = process.argv.slice(2);
+  short = short || arg.at(0);
+  return Boolean(
+    args.indexOf(`--${arg}`) !== -1 ||
+      args.find(str => str.startsWith(`--${arg}=`)) ||
+      args.indexOf(`-${short}`) !== -1 ||
+      args.find(str => str.startsWith(`-${short}=`)),
+  );
+}

@@ -103,7 +103,10 @@ const theConfig = {
     moveTag: '天选时刻',
     pageNum: 2,
     actFollowMsg: 'read',
+    scanFollow: undefined,
+    skipNeedFollow: false,
   },
+  redPack: {},
   intimacy: {
     liveSendMessage: true,
     liveShare: false,

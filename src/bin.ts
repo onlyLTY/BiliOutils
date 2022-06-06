@@ -1,9 +1,10 @@
 #! /usr/bin/env node
 
-import { getArg } from './utils/args';
+import { getArg, isArg } from './utils/args';
+import { resolve, dirname } from 'path';
+import { readFileSync, writeFileSync } from 'fs';
 
 const pkg = require('../package.json');
-const { resolve } = require('path');
 
 process.env.IS_LOCAL = 'true';
 
@@ -20,16 +21,23 @@ Options:
 `;
 
 (async () => {
-  if (getArg('version')) {
+  if (isArg('version')) {
     process.stdout.write('BiliTools v' + pkg.version + '\n');
+    process.stdout.write(`node ${process.version}\n`);
+    process.stdout.write(`platform ${process.platform} ${process.arch}\n`);
     return;
   }
-  if (getArg('help')) {
+  if (isArg('help')) {
     process.stdout.write(USAGE);
     return;
   }
-  if (getArg('config')) {
+  if (isArg('config')) {
+    const configDir = dirname(resolve(process.cwd(), getArg('config')));
+    const jobsPath = resolve(configDir, 'bt_jobs.json');
+    if (isTodayRun(jobsPath)) return;
     await runTask();
+    remember(jobsPath);
+    return;
   }
   process.stdout.write(USAGE);
 })();
@@ -55,7 +63,7 @@ async function config() {
 /**
  * 运行任务
  */
-async function runTask() {
+export async function runTask() {
   const configs = await config(),
     { initialize } = await import('./config/globalVar'),
     length = configs.length;
@@ -71,4 +79,39 @@ async function runTask() {
     process.stdout.write('执行完毕\n\n');
   }
   return;
+}
+
+/**
+ * 记住本次运行情况
+ */
+function remember(jobsPath: string) {
+  // 写进 config 同级 bt_jobs.json
+  const jobsObj = {
+    lastRun: new Date().getTime(),
+  };
+  writeFileSync(jobsPath, JSON.stringify(jobsObj));
+}
+
+/**
+ * 判断今日是否已经运行过
+ */
+function isTodayRun(jobsPath: string) {
+  if (!isArg('once')) {
+    return;
+  }
+  // 读取配置文件同路径 bt_jobs.json
+  const jobsObj = JSON.parse(readFileSync(jobsPath, 'utf-8'));
+  if (jobsObj.lastRun) {
+    // lastRun 是否是今天
+    const lastRun = new Date(jobsObj.lastRun);
+    const today = new Date();
+    if (
+      lastRun.getFullYear() === today.getFullYear() &&
+      lastRun.getMonth() === today.getMonth() &&
+      lastRun.getDate() === today.getDate()
+    ) {
+      process.stdout.write('今日已经运行过\n');
+      return true;
+    }
+  }
 }

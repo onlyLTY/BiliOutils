@@ -1,4 +1,4 @@
-import { getArg } from '../utils/args';
+import { getArg, isArg } from '../utils/args';
 
 const nowArgv = [...process.argv];
 const initArgv = () => (process.argv = [...nowArgv]);
@@ -17,5 +17,20 @@ describe('node 参数处理', () => {
     initArgv();
     process.argv.push('-c', './config.json');
     expect(getArg('config')).toBe(`./config.json`);
+  });
+
+  test('是否存在参数', () => {
+    initArgv();
+    process.argv.push('--config=./config.json');
+    expect(isArg('config')).toBeTruthy();
+    initArgv();
+    process.argv.push('--config', './config.json');
+    expect(isArg('config')).toBeTruthy();
+    initArgv();
+    process.argv.push('-c=./config.json');
+    expect(isArg('config')).toBeTruthy();
+    initArgv();
+    process.argv.push('-c', './config.json');
+    expect(isArg('config')).toBeTruthy();
   });
 });
