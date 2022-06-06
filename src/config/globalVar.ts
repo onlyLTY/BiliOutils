@@ -41,19 +41,8 @@ class TaskConfigTemplate {
   readonly MATCH_DIFF: number;
   /** 自定义推送 Api */
   readonly MESSAGE_API: string;
-  /** 天选屏蔽奖品 */
-  readonly LOTTERY_EXCLUDE: string[];
-  /** 天选包含奖品 */
-  readonly LOTTERY_INCLUDE: string[];
-  /** 黑名单 */
-  readonly LOTTERY_UP_BLACKLIST: number[];
-  /** 是否将天选时刻关注 UP 移动到分组 */
-  readonly LOTTERY_MOVE_TAG: string;
-  /** 天选获取的直播页数 */
-  readonly LOTTERY_PAGE_NUM: number;
 
   constructor(config: Config) {
-    this.config = config;
     this.COOKIE = config.cookie;
 
     this.BILIJCT = config.BILIJCT;
@@ -62,7 +51,7 @@ class TaskConfigTemplate {
     this.BILI_API_DELAY = config.apiDelay;
 
     const message = config.message;
-    this.MESSAGE_API = message?.api;
+    this.MESSAGE_API = message.api;
     this.PUSHPLUS_TOKEN = message.pushplusToken;
 
     const coin = config.coin;
@@ -83,14 +72,6 @@ class TaskConfigTemplate {
     this.MATCH_COINS = match.coins;
     this.MATCH_SELECTION = match.selection;
     this.MATCH_DIFF = match.diff;
-
-    // 最新的就不再有兼容了
-    const lottery = config.lottery;
-    this.LOTTERY_EXCLUDE = lottery.excludeAward;
-    this.LOTTERY_INCLUDE = lottery.includeAward;
-    this.LOTTERY_UP_BLACKLIST = lottery.blackUid;
-    this.LOTTERY_MOVE_TAG = lottery.moveTag;
-    this.LOTTERY_PAGE_NUM = lottery.pageNum;
   }
 }
 

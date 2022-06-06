@@ -72,7 +72,7 @@ export default async function (
   }
 
   async function aSingleUpdate() {
-    const runTime = triggerDesc || randomDailyRunTime(TaskConfig.config.dailyRunTime, 'fc');
+    const runTime = triggerDesc || randomDailyRunTime(TaskConfig.dailyRunTime, 'fc');
     logger.info(`修改时间为：${runTime.string}`);
     return !!(await updateTrigger(runTime.value));
   }

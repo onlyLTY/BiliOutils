@@ -8,6 +8,7 @@ import type {
   LiveCheckLotteryRes,
   LiveCheckRedRes,
   LiveFansMedalDto,
+  LiveFollowListDto,
   LiveGiftBagListDto,
   LiveRoomDto,
   LiveRoomInfoDto,
@@ -238,5 +239,14 @@ export function joinRedPacket(params: { room_id: IdType; ruid: IdType; lot_id: I
       csrf: TaskConfig.BILIJCT,
       visit_id: '',
     },
+  );
+}
+
+/**
+ * 已关注用户的直播间列表
+ */
+export function getFollowLiveRoomList(page = 1, page_size = 9) {
+  return liveApi.get<LiveFollowListDto>(
+    `/xlive/web-ucenter/user/following?page=${page}}&page_size=${page_size}`,
   );
 }

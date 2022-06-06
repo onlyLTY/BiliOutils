@@ -1,10 +1,12 @@
 import { moveUsersToTag, User } from '../service/tags.service';
 import { logger } from '../utils';
-import { liveLotteryService } from '../service/live-lottery.service';
+import { liveFollowLotteryService, liveLotteryService } from '../service/live-lottery.service';
 import { getLastFollow, getTeamUsers } from '../service/tags.service';
 
 export default async function liveLottery() {
   logger.info('----【天选时刻】----');
+  const isGo = await liveFollowLotteryService();
+  if (!isGo) return isGo;
   try {
     // 获取最后一个关注的UP
     const lastFollow = await getLastFollow();

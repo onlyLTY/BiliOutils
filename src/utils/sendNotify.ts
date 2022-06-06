@@ -53,7 +53,7 @@ function initEnv() {
     'PUSH_PLUS_TOKEN',
     'PUSH_PLUS_USER',
   ];
-  const message = TaskConfig.config?.message || {};
+  const message = TaskConfig.message || {};
   MyProcessEnv = {};
 
   envName.forEach(name => {
@@ -250,7 +250,7 @@ async function sendNotify(
 // async..await is not allowed in global scope, must use a wrapper
 async function sendMail(title: string, text: string) {
   //发件邮箱,密码,收件邮箱,stmp地址[,端口]
-  const user = TaskConfig.config.message?.email;
+  const user = TaskConfig.message?.email;
   if (!user || !user.pass || !user.from || !user.host) return;
 
   const port: number = Number(user.port) || 465;

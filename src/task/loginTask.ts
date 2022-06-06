@@ -26,7 +26,7 @@ function setLevelInfo(data: UserNavData) {
   }
   logger.info(`当前等级: ${levelInfo.current_level}`);
   if (currentLevel >= 6) {
-    const funcs = TaskConfig.config.function;
+    const funcs = TaskConfig.function;
     funcs.shareAndWatch = false;
     funcs.addCoins = false;
     funcs.taskReward = false;

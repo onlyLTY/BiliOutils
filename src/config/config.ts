@@ -118,7 +118,12 @@ export const defaultConfig = {
     pageNum: 2,
     /** 关注回复处理方式  */
     actFollowMsg: 'read',
+    /** 扫描关注的用户 */
+    scanFollow: undefined,
+    /** 跳过需要关注的天选 */
+    skipNeedFollow: false,
   },
+  redPack: {},
   intimacy: {
     // 直播弹幕
     liveSendMessage: true,

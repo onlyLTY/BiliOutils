@@ -176,7 +176,7 @@ export interface OtherUserDto extends ApiBaseProp {
       condition: string;
     };
     user_honour_info: { mid: number; colour: null; tags: [] };
-    is_followed: true;
+    is_followed: boolean;
     top_photo: string;
     theme: Record<string, unknown>;
     sys_notice: Record<string, unknown>;

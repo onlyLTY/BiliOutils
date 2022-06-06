@@ -95,7 +95,7 @@ export default async function (
   }
 
   async function aSingleUpdate() {
-    const runTime = triggerDesc || randomDailyRunTime(TaskConfig.config.dailyRunTime, 'scf');
+    const runTime = triggerDesc || randomDailyRunTime(TaskConfig.dailyRunTime, 'scf');
     const params = {
       FunctionName: FUNCTION_NAME,
       TriggerName: TRIGGER_NAME,

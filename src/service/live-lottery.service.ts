@@ -1,4 +1,10 @@
-import type { LiveCheckLotteryDto, LiveCheckLotteryRes, LiveRoomList } from '../dto/live.dto';
+import type {
+  LiveCheckLotteryDto,
+  LiveCheckLotteryRes,
+  LiveFollowDto,
+  LiveRoomList,
+} from '../dto/live.dto';
+import type { IdType } from '@/types';
 import { apiDelay, logger, pushIfNotExist } from '../utils';
 import {
   checkLottery,
@@ -7,10 +13,10 @@ import {
   joinLottery,
   joinRedPacket,
   checkRedPacket,
+  getFollowLiveRoomList,
 } from '../net/live.request';
 import { PendentID, RequireType, TianXuanStatus } from '../enums/live-lottery.enum';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { IdType } from '@/types';
 
 interface LiveAreaType {
   areaId: string;
@@ -110,7 +116,8 @@ async function checkLotteryRoomList(areaId: string, parentId: string, page = 1) 
 }
 
 async function checkLotteryRoom(room: LiveRoomList) {
-  if (TaskConfig.LOTTERY_UP_BLACKLIST.includes(room.uid)) {
+  const { blackUid } = TaskConfig.lottery;
+  if (blackUid.includes(room.uid)) {
     logger.info(`跳过黑名单用户: ${room.uname}`);
     return;
   }
@@ -128,24 +135,42 @@ async function checkLotteryRoom(room: LiveRoomList) {
     // 可能直播间没有天选
     return;
   }
-  const isExclude = TaskConfig.LOTTERY_EXCLUDE.some(text => data.award_name.match(text)),
-    isInclude = TaskConfig.LOTTERY_INCLUDE.some(text => data.award_name.match(text));
+  const { excludeAward, includeAward } = TaskConfig.lottery,
+    isExclude = excludeAward.some(text => data.award_name.match(text)),
+    isInclude = includeAward.some(text => data.award_name.match(text));
 
   if (!isInclude && isExclude) {
     logger.info(`跳过屏蔽奖品: ${data.award_name}`);
-  } else if (data.status !== TianXuanStatus.Enabled) {
+    return;
+  }
+  // 天选没有开启
+  if (data.status !== TianXuanStatus.Enabled) {
     // log
-  } else if (data.gift_price > 0) {
+    return;
+  }
+  // 需要赠送礼物
+  if (data.gift_price > 0) {
     // log
-  } else if (data.require_type !== RequireType.None && data.require_type !== RequireType.Follow) {
-    // 主站等级足够
-    if (data.require_type === RequireType.Level && TaskModule.userLevel >= data.require_value) {
-      return data;
-    }
-    // log
-  } else {
+    return;
+  }
+  if (data.require_type === 4) {
+    logger.info(`您能反馈给作者输出了什么吗？`);
+    logger.info(`${data.require_type}--${data.require_text}--${data.require_value}`);
+    logger.info(`也许这正是我们想要的。`);
+  }
+  // 主站等级足够
+  if (data.require_type === RequireType.Level && TaskModule.userLevel >= data.require_value) {
     return data;
   }
+  // 无条件
+  if (data.require_type === RequireType.None) {
+    return data;
+  }
+  // 关注
+  if (data.require_type === RequireType.Follow && !TaskConfig.lottery.skipNeedFollow) {
+    return data;
+  }
+  // TODO: 粉丝牌（自己恰好有），舰长（自己恰好有）
 }
 
 /**
@@ -162,7 +187,7 @@ function getRequireUp(requireText: string) {
 /**
  * 进行一次天选时刻
  */
-async function doLottery(lottery: CheckedLottery) {
+async function doLottery(lottery: CheckedLottery, rememberUp = true) {
   try {
     const { id, gift_id, gift_num, award_name, uid, uname, require_type, require_text } = lottery;
     logger.info(`天选主播：【${uname}】`);
@@ -177,7 +202,7 @@ async function doLottery(lottery: CheckedLottery) {
       return;
     }
     logger.info(`天选成功 √`);
-    if (require_type === RequireType.Follow) {
+    if (require_type === RequireType.Follow && rememberUp) {
       pushIfNotExist(newFollowUp, uid);
       const requireTextList = getRequireUp(require_text);
       requireTextList.forEach(requireText => pushIfNotExist(newFollowUp, requireText));
@@ -208,13 +233,14 @@ async function doLotteryArea(areaId: string, parentId: string, num = 2) {
  */
 export async function liveLotteryService() {
   newFollowUp = [];
+  const { pageNum } = TaskConfig.lottery;
   // 获取直播分区
   const areaList = await getLiveArea();
   // 遍历大区
   for (const areas of areaList) {
     // 遍历小区
     for (const area of areas) {
-      await doLotteryArea(area.areaId, area.parentId, TaskConfig.LOTTERY_PAGE_NUM);
+      await doLotteryArea(area.areaId, area.parentId, pageNum);
     }
   }
   return newFollowUp;
@@ -318,14 +344,112 @@ async function doRedPackArea(areaId: string, parentId: string, num = 2) {
  */
 export async function liveRedPackService() {
   newFollowUp = [];
+  const { pageNum } = TaskConfig.lottery;
   // 获取直播分区
   const areaList = await getLiveArea();
   // 遍历大区
   for (const areas of areaList) {
     // 遍历小区
     for (const area of areas) {
-      await doRedPackArea(area.areaId, area.parentId, TaskConfig.LOTTERY_PAGE_NUM);
+      await doRedPackArea(area.areaId, area.parentId, pageNum);
     }
   }
   return newFollowUp;
+}
+
+/**
+ * 获取正在直播的已关注的主播
+ */
+async function getLivingFollow() {
+  const livingRoomList: LiveFollowDto[] = [];
+  await getLiveRoomList();
+  return livingRoomList;
+
+  async function getLiveRoomList(page = 1) {
+    try {
+      const { data, code, message } = await getFollowLiveRoomList(page, 9);
+      if (code !== 0) {
+        logger.info(`获取关注直播间失败: ${code}-${message}`);
+        return;
+      }
+      const roomList = data.list?.filter(room => room.live_status === 1);
+      // 如果本页都在直播，则继续获取下一页
+      if (roomList.length === 9 && page < data.totalPage) {
+        livingRoomList.push(...roomList);
+        return getLiveRoomList(page + 1);
+      }
+      livingRoomList.push(...roomList);
+    } catch (error) {
+      logger.error(`获取关注直播间异常: ${error.message}`);
+    }
+  }
+}
+
+/**
+ * 检测关注主播的天选时刻
+ */
+async function checkLotteryFollwRoom(room: LiveFollowDto) {
+  try {
+    const { code, message, data } = await checkLottery(room.roomid);
+    if (code !== 0) {
+      logger.debug(`直播间${room.roomid}检测失败: ${code}-${message}`);
+      return;
+    }
+    // 没有天选时刻
+    if (data === null) return;
+    // 天选没有开启
+    if (data.status !== TianXuanStatus.Enabled) return;
+    // 需要赠送礼物
+    if (data.gift_price > 0) return;
+    return data;
+  } catch (error) {
+    logger.info(`直播间${room.roomid}检测异常: ${error.message}`);
+    return;
+  }
+}
+
+/**
+ * 获取正在直播的主播的天选时刻
+ */
+async function checkLotteryFollowRoomList() {
+  const livingRoomList = await getLivingFollow();
+  const lotteryRoomList: CheckedLottery[] = [];
+  for (const room of livingRoomList) {
+    const lottery = await checkLotteryFollwRoom(room);
+    if (lottery) {
+      lotteryRoomList.push({
+        ...lottery,
+        uid: room.uid,
+        uname: room.uname,
+      });
+    }
+    await apiDelay(100);
+  }
+  return lotteryRoomList;
+}
+
+/**
+ * 对已关注的主播进行天选
+ * @returns 是否继续扫描分区
+ */
+export async function liveFollowLotteryService() {
+  const { scanFollow } = TaskConfig.lottery;
+  if (!scanFollow) {
+    return true;
+  }
+  try {
+    logger.info(`开始扫描关注的主播`);
+    const lotteryRoomList = await checkLotteryFollowRoomList();
+    for (const room of lotteryRoomList) {
+      await doLottery(room, false);
+      await apiDelay(300);
+    }
+    logger.info(`关注的主播天选完成`);
+  } catch (error) {
+    logger.error(`关注的主播天选异常: ${error.message}`);
+  }
+  if (scanFollow === 'only') {
+    return false;
+  }
+  return true;
 }

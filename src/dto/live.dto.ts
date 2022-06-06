@@ -337,6 +337,39 @@ export interface LiveRoomDto extends ApiBaseProp {
 }
 
 /**
+ * 已经关注的主播列表
+ */
+export interface LiveFollowListDto extends ApiBaseProp {
+  data: {
+    title: string;
+    pageSize: number;
+    totalPage: number;
+    list: LiveFollowDto[];
+    count: number;
+  };
+}
+
+export interface LiveFollowDto {
+  roomid: number;
+  uid: number;
+  uname: string;
+  title: string;
+  face: string;
+  /** 0 为未播 1 为在播 */
+  live_status: 0 | 1;
+  record_num: 0;
+  recent_record_id: '';
+  is_attention: 1;
+  clipnum: 0;
+  fans_num: 0;
+  area_name: '';
+  area_value: '';
+  tags: '';
+  recent_record_id_v2: '';
+  record_num_v2: 0;
+}
+
+/**
  * 检查天选时刻状态（lottery）
  */
 export interface LiveCheckLotteryDto {
