@@ -99,10 +99,10 @@ const theConfig = {
     ],
     includeAward: ['谢'],
     blackUid: [65566781, 1277481241, 1643654862, 603676925],
-    isMoveTag: false,
+    isMoveTag: true,
     moveTag: '天选时刻',
-    pageNum: 0,
-    actFollowMsg: 'delete',
+    pageNum: 2,
+    actFollowMsg: 'read',
   },
   intimacy: {
     liveSendMessage: true,

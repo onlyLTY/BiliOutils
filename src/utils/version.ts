@@ -35,14 +35,14 @@ export async function printVersion() {
   try {
     // 如果没有获取到版本，则尝试获取
     if (!version) {
-      version = getVersionByPkg() || getVersionByFile();
-      logger.info(`当前版本【v${version}】`);
+      version = 'v' + (getVersionByPkg() || getVersionByFile());
+      logger.info(`当前版本【${version}】`);
     }
     if (!version) {
       return;
     }
     const latestTag = await getLatestVersion();
-    if (latestTag && latestTag !== `v${version}`) {
+    if (latestTag && latestTag !== version) {
       logger.info(`可更新：最新版本【${latestTag}】`);
     }
   } catch {}
