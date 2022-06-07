@@ -32,7 +32,7 @@ export function getMonthHasDays(now?: Date) {
  */
 export function createUUID() {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, t => {
-    const e = (16 * Math.random()) | 0;
+    const e = crypto.randomBytes(1)[0] % 16;
     return (t === 'x' ? e : (3 & e) | 8).toString(16);
   });
 }

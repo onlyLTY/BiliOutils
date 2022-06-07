@@ -247,6 +247,6 @@ export function joinRedPacket(params: { room_id: IdType; ruid: IdType; lot_id: I
  */
 export function getFollowLiveRoomList(page = 1, page_size = 9) {
   return liveApi.get<LiveFollowListDto>(
-    `/xlive/web-ucenter/user/following?page=${page}}&page_size=${page_size}`,
+    `/xlive/web-ucenter/user/following?page=${page}&page_size=${page_size}`,
   );
 }
