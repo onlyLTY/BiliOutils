@@ -15,7 +15,7 @@ import { logger } from './log';
 import { stringify } from './pure';
 
 // 使用一个变量来记录当前的环境变量，避免多个账号复用同一个环境变量
-let MyProcessEnv: Record<string, string>;
+let MyProcessEnv: Record<string, string> = {};
 
 /**
  * 配置处理为 env
@@ -73,7 +73,7 @@ const timeout = 15000; //超时时间(单位毫秒)
  * 初始化变量（防止多用户变量污染）
  * @param processEnv
  */
-function initProcessEnv(processEnv: Record<string, string>) {
+function initProcessEnv(processEnv: Record<string, string> = {}) {
   // =======================================微信server酱通知设置区域===========================================
   //此处填你申请的SCKEY.
   //(环境变量名 PUSH_KEY)

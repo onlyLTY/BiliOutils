@@ -140,6 +140,9 @@ export class VGot {
           resolve(res as unknown as Promise<T>);
         })
         .catch(error => {
+          if (error.response) {
+            error.response.status = error.response.statusCode;
+          }
           reject(error);
         });
     });

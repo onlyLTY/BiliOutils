@@ -3,6 +3,7 @@
 import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
+import { logger } from './utils/log';
 
 const pkg = require('../package.json');
 
@@ -51,12 +52,13 @@ async function config() {
   try {
     const configs = getConfigPathFile(resolve(process.cwd(), configPath));
     if (!configs.length) {
+      logger.error('配置文件不存在');
       throw new Error('配置文件不存在');
     }
     return configs;
   } catch (error) {
-    process.stderr.write('配置路径可能存在问题' + '\n');
-    process.stderr.write(error.message + '\n');
+    logger.error('配置路径可能存在问题');
+    logger.error(error.message);
   }
 }
 
@@ -69,14 +71,14 @@ export async function runTask() {
     length = configs.length;
   initialize(configs[0]);
   const task = await import('./task/dailyTask');
-  process.stdout.write(`正在执行第1/${length}个配置\n`);
+  logger.info(`正在执行第1/${length}个配置`);
   await task.dailyTasks();
-  process.stdout.write('执行完毕\n\n');
+  logger.info('执行完毕\n');
   for (let index = 1; index < configs.length; index++) {
-    process.stdout.write(`正在执行第${index + 1}/${length}个配置\n`);
+    logger.info(`正在执行第${index + 1}/${length}个配置`);
     initialize(configs[index]);
     await task.dailyTasks();
-    process.stdout.write('执行完毕\n\n');
+    logger.info('执行完毕\n');
   }
   return;
 }
@@ -110,7 +112,7 @@ function isTodayRun(jobsPath: string) {
       lastRun.getMonth() === today.getMonth() &&
       lastRun.getDate() === today.getDate()
     ) {
-      process.stdout.write('今日已经运行过\n');
+      logger.info('今日已经运行过');
       return true;
     }
   }

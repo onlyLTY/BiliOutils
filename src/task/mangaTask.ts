@@ -15,7 +15,8 @@ export default async function mangaSign() {
      * 这是axios报的错误,重复签到后返回的状态码是400
      * 所以将签到成功的情况忽略掉
      */
-    if (error.response?.status === 400) {
+    const { status, statusCode } = error.response || {};
+    if (status === 400 || statusCode === 400) {
       logger.info('已经签到过了，跳过任务');
     } else {
       logger.error(`漫画签到异常 ${error.message}`);
