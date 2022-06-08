@@ -1,7 +1,25 @@
+const { unzipSync } = require('zlib');
 const { writeFileSync, readFileSync, existsSync } = require('fs');
-// @ts-ignore
-const { gzipDecode } = require('./gzip');
 const { resolve } = require('path');
+
+function gzipDecode(str) {
+  try {
+    const result = unzipSync(Buffer.from(str, 'base64')).toString();
+    try {
+      return decodeURIComponent(unicode2str(result));
+    } catch (error) {
+      // 兼容百度的在线压缩
+      return unescape(result);
+    }
+  } catch (e) {
+    process.stderr.write(e);
+    throw new Error('Error: 当前字符串不能被Gzip解压');
+  }
+}
+
+function unicode2str(str) {
+  return str.replace(/\\u([\d\w]{4})/gi, (_match, grp) => String.fromCodePoint(parseInt(grp, 16)));
+}
 
 /**
  *
@@ -15,12 +33,12 @@ function resolveRootPath(targetPath) {
 function getConfig() {
   const { BILI_CONFIG, BILITOOLS_CONFIG } = process.env;
   if (BILITOOLS_CONFIG || BILI_CONFIG) {
-    console.log('使用环境变量 BILITOOLS_CONFIG');
+    process.stdout.write('使用环境变量 BILITOOLS_CONFIG\n');
     return BILITOOLS_CONFIG || BILI_CONFIG;
   }
   const tempTxtPath = resolveRootPath('config/config.txt');
   if (existsSync(tempTxtPath)) {
-    console.log('使用本地文件 config.txt');
+    process.stdout.write('使用本地文件 config.txt\n');
     return readFileSync(tempTxtPath, 'utf-8');
   }
   return '';
@@ -33,7 +51,7 @@ function setConfig(gzipString) {
 const gzipString = getConfig();
 if (gzipString) {
   setConfig(gzipString);
-  console.log('配置转化完成\n');
+  process.stdout.write('配置转化完成\n\n');
 } else {
-  console.log('没有可以转化的内容\n');
+  process.stdout.write('没有可以转化的内容\n\n');
 }

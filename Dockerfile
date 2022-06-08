@@ -6,7 +6,5 @@ ENV SERVERLESS_PLATFORM_VENDOR=tencent
 COPY ./docker-entrypoint.sh ./tools/processConfig.js ./
 RUN chmod +x docker-entrypoint.sh \
     && npm install -g @catlair/bilitools \
-    && mkdir -p ../dist/utils \
-    && cp /usr/local/lib/node_modules/@catlair/bilitools/dist/utils/gzip.js ./ \
     && npm cache clean --force
 ENTRYPOINT ["./docker-entrypoint.sh"]
