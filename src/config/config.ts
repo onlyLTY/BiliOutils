@@ -131,6 +131,8 @@ export const defaultConfig = {
     liveShare: true,
     // 点赞直播间
     liveLike: true,
+    // 30 分钟直播心跳
+    liveHeart: false,
     // 白名单
     whiteList: [],
     // 黑名单

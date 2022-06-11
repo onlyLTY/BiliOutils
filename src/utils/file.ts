@@ -21,6 +21,7 @@ export function readJsonFile<T = any>(filePath: string): T {
     logger.verbose(`读取配置文件 ${filePath}`);
     return JSON5.parse(content);
   } catch (error) {
+    logger.error(error);
     jsonErrorHandle(error.message);
   }
 }
@@ -30,7 +31,6 @@ export function jsonErrorHandle(message: string) {
     return;
   }
   if (message.includes('SyntaxError: JSON5')) {
-    logger.error(message);
     throw new SyntaxError('配置文件存在，但是无法解析！可能 JSON5 格式不正确！');
   }
   throw new Error(message);

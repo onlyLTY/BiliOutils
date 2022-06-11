@@ -18,6 +18,7 @@ export const baseURLs = {
   api: 'https://api.bilibili.com',
   manga: 'https://manga.bilibili.com',
   vc: 'https://api.vc.bilibili.com',
+  liveTrace: 'https://live-trace.bilibili.com',
 };
 
 export const defaultHeaders = {
@@ -29,11 +30,11 @@ export const defaultHeaders = {
 };
 
 interface UAOption {
-  version: string;
-  phone: string;
-  build: string | number;
-  channel: string;
-  os: string;
+  version?: string;
+  phone?: string;
+  build?: string | number;
+  channel?: string;
+  os?: string;
 }
 
 export function getAndroidUA({

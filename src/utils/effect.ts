@@ -15,6 +15,14 @@ export function apiDelay(delayTime?: number, delayTime2?: number) {
   });
 }
 
+export function apiDelaySync(delayTime?: number, delayTime2?: number) {
+  const now = Date.now();
+  const delay = getDelay(delayTime, delayTime2);
+  while (Date.now() - now < delay) {
+    // empty
+  }
+}
+
 function getDelay(delayTime?: number, delayTime2?: number) {
   if (delayTime && delayTime2) {
     return random(delayTime, delayTime2);

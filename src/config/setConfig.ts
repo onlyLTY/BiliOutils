@@ -38,7 +38,8 @@ const getEnvConfig = (): Config => {
   }
   try {
     return JSON5.parse(gzipDecode(config));
-  } catch {
+  } catch (error) {
+    logger.error(error);
     throw new Error('环境中的配置不是有效的 JSON 字符串！');
   }
 };
@@ -101,6 +102,7 @@ export function getConfigPathFile(filepath: string): Config[] {
     }
     return [config];
   } catch (error) {
+    logger.error(error);
     jsonErrorHandle(error.message);
     throw new Error(error.message || '配置文件不存在！');
   }

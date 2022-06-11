@@ -16,6 +16,10 @@ declare global {
   type RecursiveRequired<S> = {
     [p in keyof S]-?: S[p] extends object ? RecursiveRequired<S[p]> : S[p];
   };
+
+  type Ref<T> = {
+    value: T;
+  };
 }
 
 export {};

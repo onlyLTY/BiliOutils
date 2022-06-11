@@ -39,4 +39,11 @@ const vcApi = createRequest({
   },
 });
 
-export { biliApi, vcApi, accountApi, mangaApi, liveApi, biliHttp, defHttp };
+const liveTraceApi = createRequest({
+  baseURL: baseURLs.liveTrace,
+  headers: {
+    'user-agent': TaskConfig.USER_AGENT,
+  },
+});
+
+export { biliApi, vcApi, accountApi, mangaApi, liveApi, biliHttp, defHttp, liveTraceApi };

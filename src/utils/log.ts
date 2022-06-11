@@ -63,15 +63,16 @@ export class Logger {
     }
   }
 
-  public log({ level }: LogOptions, message: MessageType) {
+  public log({ level }: LogOptions, message: MessageType, emoji?: string) {
+    emoji = emoji || emojis[level];
     const prcTime = getPRCDate(),
-      messageStr = `[${level} ${formatTime(prcTime, false)}] ${message}\n`,
+      messageStr = `[${emoji} ${formatTime(prcTime, false)}] ${message}\n`,
       stderr = ['error', 'warn'].includes(level);
     if (this.consoleLeval.includes(level)) {
       this.Conslole(messageStr, stderr);
     }
     if (!this.noFile && this.fileLeval.includes(level)) {
-      this.File(`[${level} ${formatTime(prcTime, true)}] ${message}\n`, stderr);
+      this.File(`[${emoji} ${formatTime(prcTime, true)}] ${message}\n`, stderr);
     }
     if (this.pushLeval.includes(level)) {
       this.Push(messageStr);
@@ -86,8 +87,8 @@ export class Logger {
     this.log({ level: 'warn' }, message);
   }
 
-  public info(message: MessageType) {
-    this.log({ level: 'info' }, message);
+  public info(message: MessageType, emoji?: string) {
+    this.log({ level: 'info' }, message, emoji);
   }
 
   public verbose(message: MessageType) {
@@ -131,3 +132,11 @@ export const logger = new Logger({
   file: 'debug',
   push: 'debug',
 });
+
+const emojis = {
+  error: '❓',
+  warn: '❔',
+  info: '👻',
+  verbose: '💬',
+  debug: '🐛',
+};
