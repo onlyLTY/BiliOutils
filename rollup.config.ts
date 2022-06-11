@@ -14,10 +14,11 @@ export default createRollupOption([
         __IS_QINGLONG__: 'true',
       },
       node: '16',
+      noTerser: true,
     },
     null,
     option => ({
-      external: (option.external as string[]).filter(dep => dep !== 'json5'),
+      external: (option.external as string[]).filter(dep => !['json5', 'core-js'].includes(dep)),
     }),
   ),
   createBaseConfig({

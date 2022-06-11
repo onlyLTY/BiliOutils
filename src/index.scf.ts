@@ -1,4 +1,3 @@
-import { HEART_TRIGGER_NAME } from './constant';
 import type { SCFContext, SCFEvent } from './types/scf';
 import { logger } from './utils';
 import { printVersion } from './utils/version';
@@ -22,17 +21,6 @@ export async function dailyMain(event: SCFEvent, context: SCFContext) {
   });
 }
 
-export async function liveHeartMain(event: SCFEvent, context: SCFContext) {
-  notice();
-
-  const { liveHeartHandle } = await import('./utils/sls');
-  return await liveHeartHandle({
-    event,
-    context,
-    slsType: 'scf',
-  });
-}
-
 export async function main_handler(event: SCFEvent, context: SCFContext) {
   if (process.env.USE_NETWORK_CODE) {
     const isGetCode = await runInVM('vm.scf.js', { event, context });
@@ -42,8 +30,5 @@ export async function main_handler(event: SCFEvent, context: SCFContext) {
   }
   await printVersion();
 
-  if (event.TriggerName === HEART_TRIGGER_NAME) {
-    return liveHeartMain(event, context);
-  }
   return dailyMain(event, context);
 }

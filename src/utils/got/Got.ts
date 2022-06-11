@@ -1,6 +1,6 @@
 import type { RequestOptions } from '#/request';
 import type { VGotOptions } from '#/got';
-import type { Got, Options, Response } from 'got';
+import type { Got, Response } from 'got';
 import { TaskConfig } from '@/config/globalVar';
 import got from 'got';
 import { isFunction, isObject, isString } from '../is';
@@ -158,7 +158,7 @@ export class VGot {
   }
 
   post<T = any>(config: VGotOptions): Promise<T>;
-  post<T = any, D = any>(url: string, data?: D, config?: Options): Promise<T>;
+  post<T = any, D = any>(url: string, data?: D, config?: VGotOptions): Promise<T>;
   post<T = any, D = any>(
     options: string | VGotOptions,
     data?: D,

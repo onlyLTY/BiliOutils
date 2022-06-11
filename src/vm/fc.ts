@@ -1,9 +1,8 @@
 // @ts-nocheck
 import type { FCContext, FCEvent } from '#/fc';
-import { HEART_TRIGGER_NAME } from '@/constant';
 import { logger } from '@/utils';
 import { printStrVersion } from '@/utils/version';
-import { dailyMain, liveHeartMain } from '../index.fc';
+import { dailyMain } from '../index.fc';
 
 type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
 
@@ -12,10 +11,7 @@ printStrVersion();
 
 (async () => {
   const eventJson: FCEvent = JSON.parse(event.toString());
-  let caller: MainFuncType = dailyMain;
-  if (eventJson.triggerName === HEART_TRIGGER_NAME) {
-    caller = liveHeartMain;
-  }
+  const caller: MainFuncType = dailyMain;
   caller(eventJson, context)
     .then(message => {
       VMThis.message = message;
