@@ -1,6 +1,6 @@
 import { chargingForUp, chargingCommentsForUp } from '../net/vip.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { getPRCDate, getMonthHasDays, apiDelay, logger, random } from '../utils';
+import { getPRCDate, getMonthHasDays, apiDelay, logger, random, isArray } from '../utils';
 import { updateNav } from './updateNav';
 import { defaultComments } from '../constant';
 
@@ -16,7 +16,10 @@ function init() {
     today = nowTime.getDate(),
     monthHasDays = getMonthHasDays(nowTime);
 
-  const presetTime = TaskConfig.CHARGE_PRESET_TIME;
+  let presetTime: number[] = TaskConfig.charge.presetTime;
+  if (!isArray(presetTime)) {
+    presetTime = [presetTime];
+  }
 
   // 查看余额
   if (TaskModule.bCoinCouponBalance < 2) {
@@ -31,12 +34,12 @@ function init() {
   }
 
   // 判断是否在指定时间内
-  if (presetTime > today) {
-    logger.info(`预设时间为${presetTime}，不符合条件`);
-    return false;
+  if (presetTime.some(time => time === today)) {
+    return true;
   }
 
-  return true;
+  logger.info(`不在预设时间，不符合条件`);
+  return false;
 }
 
 export default async function charging() {
@@ -52,7 +55,7 @@ export default async function charging() {
 
   try {
     const bp_num = TaskModule.bCoinCouponBalance || 0;
-    const up_mid = TaskConfig.CHARGE_ID;
+    const up_mid = TaskConfig.charge.mid;
     let errorCount = 0;
     logger.info(`b 币券余额${bp_num}`);
     // 固定为 up 模式
@@ -62,7 +65,7 @@ export default async function charging() {
         logger.warn(`充电失败：${code} ${message}`);
         return;
       }
-      logger.info(`【充值结果】${ChargeStatus[data.status]}`);
+      logger.info(`目标【${up_mid}】${ChargeStatus[data.status]}`);
 
       if (data.status === ChargeStatus['成功']) {
         TaskModule.chargeOrderNo = data.order_no;

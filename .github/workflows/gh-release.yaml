@@ -117,6 +117,10 @@ jobs:
           skip_fetch: true
           skip_checkout: false
           create_branch: true
+      - name: Commit files for prod（pre）
+        if: ${{ env.IS_PROD == 'true' && env.COMMIT_GH == 'true' }}
+        run: |
+          echo // auto commit >> gh-release/cat_bili_ql.js
       - name: Commit files for prod
         if: ${{ env.IS_PROD == 'true' && env.COMMIT_GH == 'true' }}
         uses: stefanzweifel/git-auto-commit-action@v4

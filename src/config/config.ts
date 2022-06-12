@@ -79,7 +79,7 @@ export const defaultConfig = {
     /** 充电的 up 默认自己 */
     mid: 0,
     /** 充电预设时间，哪一天？ */
-    presetTime: 31,
+    presetTime: [15],
   },
   gift: {
     /** 自定义投喂礼物用户列表 */

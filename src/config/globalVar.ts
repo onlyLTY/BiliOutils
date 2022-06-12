@@ -4,7 +4,6 @@ import { mergeConfig } from './config';
 
 /** 默认的任务配置 */
 class TaskConfigTemplate {
-  config: Config;
   /** 直接复制全部吧 */
   COOKIE: string;
   /** bilibili账号的jct */
@@ -27,10 +26,6 @@ class TaskConfigTemplate {
   readonly BILI_STAY_COINS: number;
   /** 投币操作重试次数 默认 4 */
   readonly BILI_COIN_RETRY_NUM: number;
-  /** 充电的 up 默认自己 */
-  readonly CHARGE_ID: number;
-  /** 充电预设时间，哪一天？ */
-  readonly CHARGE_PRESET_TIME: number;
   /** pushplus token */
   readonly PUSHPLUS_TOKEN: string;
   /** 压硬币数量 */
@@ -63,10 +58,6 @@ class TaskConfigTemplate {
 
     const gift = config.gift;
     this.BILI_GIFT_UP = gift.mids;
-
-    const charge = config.charge;
-    this.CHARGE_ID = charge.mid;
-    this.CHARGE_PRESET_TIME = charge.presetTime;
 
     const match = config.match;
     this.MATCH_COINS = match.coins;

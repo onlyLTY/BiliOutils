@@ -113,6 +113,7 @@ const theConfig = {
     liveLike: false,
     whiteList: [1],
     blackList: [],
+    liveHeart: false,
   },
 };
 const newConfig = mergeConfig(userConfig);
