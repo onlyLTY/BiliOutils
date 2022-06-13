@@ -8,15 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        感谢您花时间填写这个需求报告!
-  - type: checkboxes
-    id: terms
-    attributes:
-      label: 是否已经阅读文档
-      description: 已经阅读过[文档](https://btdocs.vercel.app/)，确定没有找到想要的答案。
-      options:
-        - label: 我确定阅读过文档
-          required: true
+        感谢您花时间填写这个需求报告！我们希望您已经查看文档和 Issue，确认该需求是新的。
   - type: input
     id: exclusive
     attributes:

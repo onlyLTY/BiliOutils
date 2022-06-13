@@ -34,8 +34,6 @@ class TaskConfigTemplate {
   readonly MATCH_SELECTION: number;
   /** 比赛赔率差距需要大于多少才压 */
   readonly MATCH_DIFF: number;
-  /** 自定义推送 Api */
-  readonly MESSAGE_API: string;
 
   constructor(config: Config) {
     this.COOKIE = config.cookie;
@@ -46,7 +44,6 @@ class TaskConfigTemplate {
     this.BILI_API_DELAY = config.apiDelay;
 
     const message = config.message;
-    this.MESSAGE_API = message.api;
     this.PUSHPLUS_TOKEN = message.pushplusToken;
 
     const coin = config.coin;

@@ -9,6 +9,7 @@
  * @param params 某些推送通知方式点击弹窗可跳转, 例：{ url: 'https://abc.com' }
  * @param author 作者仓库等信息  例：`本通知 By：https://github.com/whyour/qinglong`
  */
+import type { Method } from 'got/dist/source/as-promise/types';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { defHttp } from './http';
 import { logger } from './log';
@@ -209,10 +210,46 @@ async function sendMail(title: string, text: string) {
 
 async function customApi(title: string, text: string) {
   try {
-    const apiTemplate = TaskConfig.MESSAGE_API;
-    if (!apiTemplate) return;
-    const api = apiTemplate.replace('{title}', title).replace('{text}', text);
-    await defHttp.get(api);
+    const apiTemplate = TaskConfig.message.api;
+    if (!apiTemplate || !apiTemplate.url) return;
+    const { data, proxy, timeout, headers } = apiTemplate;
+    const method: Method = (apiTemplate.method.toUpperCase() || 'POST') as Method;
+    const options = {
+      method: method,
+      timeout,
+      headers,
+      url: '',
+    };
+    options.url = apiTemplate.url
+      .replace('{title}', encodeURIComponent(title))
+      .replace('{text}', encodeURIComponent(text));
+    if (proxy.host) {
+      const tunnel = await import('tunnel');
+      const httpsAgent = tunnel.httpsOverHttp({
+        proxy: {
+          host: proxy.host,
+          port: +proxy.port,
+          proxyAuth: proxy.auth,
+        },
+        maxSockets: 1, // 单个代理最大连接数
+      });
+      Object.assign(options, { httpsAgent });
+    }
+    // 处理data
+    const keys = Object.keys(data);
+    if (keys.length) {
+      keys.forEach(key => {
+        if (data[key] === '{text}') {
+          data[key] = text;
+        }
+        if (data[key] === '{title}') {
+          data[key] = title;
+        }
+      });
+      Object.assign(options, { data });
+    }
+    await defHttp.request(options);
+    logger.info(`自定义接口消息已发送！`);
   } catch (error) {
     logger.info(`自定义接口消息发送失败: ${error}`);
     logger.error(error);
@@ -229,7 +266,7 @@ function serverNotify(text, desp, time = 2100) {
         url: SCKEY.includes('SCT')
           ? `https://sctapi.ftqq.com/${SCKEY}.send`
           : `https://sc.ftqq.com/${SCKEY}.send`,
-        params: `text=${text}&desp=${desp}`,
+        data: `text=${text}&desp=${desp}`,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -250,7 +287,7 @@ function serverNotify(text, desp, time = 2100) {
             }
           })
           .catch(err => {
-            logger.info('发送通知调用API失败！！');
+            logger.info('server酱发送通知调用API失败！！');
             logger.info(err);
           })
           .finally(() => {
@@ -288,7 +325,7 @@ function CoolPush(text, desp) {
           c: desp,
         };
       } else {
-        options.params = `${text}\n\n${desp}`;
+        options.data = `${text}\n\n${desp}`;
       }
 
       const pushMode = function (t) {
@@ -644,7 +681,7 @@ function iGotNotify(text, desp, params = {}) {
       }
       const options = {
         url: `https://push.hellyw.com/${IGOT_PUSH_KEY.toLowerCase()}`,
-        params: `title=${text}&content=${desp}&${stringify(params)}`,
+        data: `title=${text}&content=${desp}&${stringify(params)}`,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -661,7 +698,7 @@ function iGotNotify(text, desp, params = {}) {
           }
         })
         .catch(err => {
-          logger.info('发送通知调用API失败！！');
+          logger.info('iGot发送通知调用API失败！！');
           logger.info(err);
         })
         .finally(() => {
@@ -678,7 +715,7 @@ function pushPlusNotify(text, desp) {
     const { PUSH_PLUS_TOKEN, PUSH_PLUS_USER } = MyProcessEnv;
     if (PUSH_PLUS_TOKEN) {
       desp = desp.replace(/[\n\r]/g, '<br>'); // 默认为html, 不支持plaintext
-      const params = {
+      const data = {
         token: `${PUSH_PLUS_TOKEN}`,
         title: `${text}`,
         content: `${desp}`,
@@ -686,7 +723,7 @@ function pushPlusNotify(text, desp) {
       };
       const options = {
         url: `https://www.pushplus.plus/send`,
-        params,
+        data,
         headers: {
           'Content-Type': ' application/json',
         },

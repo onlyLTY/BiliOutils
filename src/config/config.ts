@@ -1,7 +1,7 @@
 import { DAILY_RUN_TIME, LOTTERY_EXCLUDE, LOTTERY_INCLUDE, LOTTERY_UP_BLACKLIST } from '@/constant';
 import { cloneObject, getNewObject, deepMergeObject, arr2numArr } from '@/utils/pure';
 import { getBiliJct, getUserId } from '../utils/cookie';
-import { isArray } from '../utils/is';
+import { isArray, isString } from '../utils/is';
 
 type DefaultConfig = typeof defaultConfig;
 export type TheConfig = Omit<DefaultConfig, keyof typeof compatibleMap>;
@@ -14,7 +14,20 @@ export const defaultConfig = {
       port: 465,
     },
     pushplusToken: process.env.PUSHPLUS_TOKEN,
-    api: undefined,
+    api: {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 5000,
+      url: '',
+      proxy: {
+        host: '',
+        port: 443,
+        auth: '',
+      },
+      data: {},
+    },
   },
   function: {
     // 瓜子兑换硬币
@@ -138,6 +151,16 @@ export const defaultConfig = {
     // 黑名单
     blackList: [],
   },
+  manga: {
+    // 购买漫画 id（优先级高）
+    mc: [],
+    // 购买漫画名称（优先级中）
+    name: [],
+    // 购买追漫（优先级低）
+    love: true,
+    // 执行购买漫画的时间
+    presetTime: [14, 28],
+  },
   BILIJCT: '',
   USERID: 0,
 };
@@ -147,7 +170,9 @@ export function getDefaultConfig() {
 }
 
 export function mergeConfig(config: RecursivePartial<DefaultConfig>) {
-  return configValueHandle(configHandle(deepMergeObject(getDefaultConfig(), config)));
+  return configValueHandle(
+    oldConfigHandle(deepMergeObject(getDefaultConfig(), beforeMergeConfig(config))),
+  );
 }
 
 /**
@@ -171,7 +196,7 @@ const compatibleMap = {
  * 旧配置兼容处理
  * @param config
  */
-function configHandle(config: DefaultConfig): TheConfig {
+function oldConfigHandle(config: DefaultConfig): TheConfig {
   Object.keys(compatibleMap).forEach(oldKey => {
     if (config[oldKey] !== undefined) {
       const [newKey, newKey2] = compatibleMap[oldKey];
@@ -216,5 +241,20 @@ function configValueHandle(config: TheConfig) {
 function setConstValue(config: TheConfig) {
   config.BILIJCT = getBiliJct(config.cookie);
   config.USERID = getUserId(config.cookie);
+  return config;
+}
+
+/**
+ * 合并前处理用户配置
+ * @param config
+ */
+function beforeMergeConfig(config: RecursivePartial<DefaultConfig>) {
+  const { message } = config;
+  if (isString(message.api)) {
+    const url = message.api;
+    message.api = cloneObject(defaultConfig.message.api, true);
+    message.api.url = url;
+    message.api.method = 'GET';
+  }
   return config;
 }
