@@ -96,6 +96,8 @@ abstract class TaskModuleTemplate {
   static bCoinCouponBalance = 0;
   /** 0为无，1为月度，2为年度 */
   static vipType = 0;
+  /** 大会员状态 0 无 1 有 */
+  static vipStatus = 0;
   /** 充电留言 token */
   static chargeOrderNo: string;
   /** 用户等级 */

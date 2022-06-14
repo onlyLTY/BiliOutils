@@ -1,6 +1,6 @@
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
-import { logger } from '@/utils';
+import { apiDelay, logger } from '@/utils';
 
 let expireCouponNum: number;
 
@@ -146,6 +146,7 @@ async function buyManga(comic_id: number) {
     return false;
   }
   for (let index = 0; index < epList.length; index++) {
+    await apiDelay(100);
     if (await buyOneEpManga(epList[index].id)) return true;
   }
 }

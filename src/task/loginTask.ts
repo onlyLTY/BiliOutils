@@ -45,6 +45,7 @@ function setVipStatus(data: UserNavData) {
   let vipTypeMsg = '';
 
   TaskModule.vipType = data.vipType;
+  TaskModule.vipStatus = data.vipStatus;
 
   switch (data.vipType) {
     case 0:
