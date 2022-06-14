@@ -60,6 +60,8 @@ export const defaultConfig = {
     liveRedPack: false,
     // 粉丝牌等级
     liveIntimacy: false,
+    // 漫画任务
+    mangaTask: false,
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
   apiDelay: [2, 6],
@@ -152,6 +154,10 @@ export const defaultConfig = {
     blackList: [],
   },
   manga: {
+    // 签到
+    sign: true,
+    // 购买漫画
+    buy: false,
     // 购买漫画 id（优先级高）
     mc: [],
     // 购买漫画名称（优先级中）
@@ -159,7 +165,7 @@ export const defaultConfig = {
     // 购买追漫（优先级低）
     love: true,
     // 执行购买漫画的时间
-    presetTime: [14, 28],
+    buyPresetTime: [14, 28],
   },
   BILIJCT: '',
   USERID: 0,
@@ -249,8 +255,9 @@ function setConstValue(config: TheConfig) {
  * @param config
  */
 function beforeMergeConfig(config: RecursivePartial<DefaultConfig>) {
+  // 需要注意用户配置可能没有定义各种配置项
   const { message } = config;
-  if (isString(message.api)) {
+  if (message && isString(message.api)) {
     const url = message.api;
     message.api = cloneObject(defaultConfig.message.api, true);
     message.api.url = url;

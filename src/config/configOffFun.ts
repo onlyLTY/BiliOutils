@@ -6,8 +6,12 @@ function funHandle() {
     functionConfig.taskReward = false;
   }
   // TODO: 兼容处理 liveSendMessage
-  if (functionConfig.liveIntimacy) {
+  if (functionConfig.liveIntimacy && TaskConfig.intimacy.liveSendMessage) {
     functionConfig.liveSendMessage = false;
+  }
+  // TODO: 兼容处理 mangaSign
+  if (functionConfig.mangaTask && TaskConfig.manga.sign) {
+    functionConfig.mangaSign = false;
   }
   return functionConfig;
 }

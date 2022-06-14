@@ -3,7 +3,8 @@ import loginTask from './loginTask';
 import taskReward from './taskReward';
 import shareAndWatch from './shareAndWatch';
 import addCoins from './addCoins';
-import mangaSign from './mangaTask';
+import mangaSign from './mangaSign';
+import mangaTask from './mangaTask';
 import silver2Coin from './silver2Coin';
 import supGroupSign from './supGroupSign';
 import liveSendMessage from './sendLiveMsg';
@@ -33,4 +34,5 @@ export default {
   liveLottery,
   liveRedPack,
   liveIntimacy,
+  mangaTask,
 };

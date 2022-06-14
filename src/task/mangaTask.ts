@@ -1,25 +1,22 @@
+import { TaskConfig } from '@/config/globalVar';
+import { mangaSign, buyMangaService } from '@/service/manga.service';
+import { isTodayInTimeArr } from '@/utils';
 import { logger } from '../utils/log';
-import { clockIn } from '../net/manga.request';
 
-export default async function mangaSign() {
-  logger.info('----【漫画签到】----');
+export default async function mangaTask() {
+  logger.info('----【漫画任务】----');
+  const { manga } = TaskConfig;
   try {
-    const { code } = await clockIn();
-    if (code == 0) {
-      logger.info('漫画签到成功');
-    } else {
-      logger.warn('漫画签到失败');
+    if (manga.sign) {
+      logger.info('开始签到');
+      await mangaSign();
+    }
+    const isBuy = manga.buy && isTodayInTimeArr(manga.buyPresetTime);
+    if (isBuy) {
+      logger.info('开始购买漫画');
+      await buyMangaService();
     }
   } catch (error) {
-    /**
-     * 这是axios报的错误,重复签到后返回的状态码是400
-     * 所以将签到成功的情况忽略掉
-     */
-    const { status, statusCode } = error.response || {};
-    if (status === 400 || statusCode === 400) {
-      logger.info('已经签到过了，跳过任务');
-    } else {
-      logger.error(`漫画签到异常 ${error.message}`);
-    }
+    logger.error(`漫画任务异常: ${error}`);
   }
 }

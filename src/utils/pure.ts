@@ -337,3 +337,23 @@ export function mergeHeaders(
 export function arr2numArr(strArr: string[] | number[]) {
   return strArr && strArr.map((str: any) => Number(str)).filter(num => num > 0 && num % 1 === 0);
 }
+
+/**
+ * base64 编码
+ * @param str
+ */
+export function base64Encode(str: string) {
+  return Buffer.from(str).toString('base64');
+}
+
+/**
+ * 今天是否在预设的时间数组中
+ * @param timeArr 时间数组（为空则判断为在）
+ */
+export function isTodayInTimeArr(timeArr: number[]) {
+  if (!timeArr || !timeArr.length) {
+    return true;
+  }
+  const today = new Date().getDate();
+  return timeArr.includes(today);
+}

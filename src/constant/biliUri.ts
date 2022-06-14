@@ -6,6 +6,7 @@ export const OriginURLs = {
   space: 'https://space.bilibili.com',
   message: 'https://message.bilibili.com',
   www: 'https://www.bilibili.com',
+  manga: 'https://manga.bilibili.com',
 };
 
 export const RefererURLs = {
