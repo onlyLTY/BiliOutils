@@ -10,8 +10,6 @@ export async function handler(event, _context, callback) {
       }
     }
     const { dailyTasks } = await import('./task/dailyTask');
-    const { printVersion } = await import('./utils/version');
-    await printVersion();
     const message = await dailyTasks();
     callback(null, message);
   } catch (error) {

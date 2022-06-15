@@ -1,6 +1,5 @@
 import type { SCFContext, SCFEvent } from './types/scf';
 import { logger } from './utils';
-import { printVersion } from './utils/version';
 import { runInVM } from './utils/vm';
 
 /**
@@ -28,7 +27,6 @@ export async function main_handler(event: SCFEvent, context: SCFContext) {
       return isGetCode;
     }
   }
-  await printVersion();
 
   return dailyMain(event, context);
 }

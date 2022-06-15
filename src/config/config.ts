@@ -9,6 +9,7 @@ export type TheConfig = Omit<DefaultConfig, keyof typeof compatibleMap>;
 export const defaultConfig = {
   cookie: '',
   message: {
+    br: '\n',
     email: {
       host: 'smtp.163.com',
       port: 465,
@@ -94,7 +95,7 @@ export const defaultConfig = {
     /** 充电的 up 默认自己 */
     mid: 0,
     /** 充电预设时间，哪一天？ */
-    presetTime: [15, 25],
+    presetTime: [10, 20],
   },
   gift: {
     /** 自定义投喂礼物用户列表 */

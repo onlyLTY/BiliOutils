@@ -1,15 +1,12 @@
 // @ts-nocheck
 import type { FCContext, FCEvent } from '#/fc';
 import { logger } from '@/utils';
-import { printStrVersion } from '@/utils/version';
 import { dailyMain } from '../index.fc';
 
 type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
 
-logger.info('开始执行网络代码');
-printStrVersion();
-
 (async () => {
+  logger.info('开始执行网络代码');
   const eventJson: FCEvent = JSON.parse(event.toString());
   const caller: MainFuncType = dailyMain;
   caller(eventJson, context)

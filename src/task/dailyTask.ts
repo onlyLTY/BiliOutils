@@ -1,13 +1,14 @@
-import { offFunctions } from '../config/configOffFun';
-import { apiDelay, logger, Logger } from '../utils';
-import { sendMessage } from '@/utils/sendNotify';
-import bili, { loginTask } from './index';
-
 export async function dailyTasks<T = unknown>(
   cb?: (...arg: T[]) => Promise<unknown>,
   ...cbArg: T[]
 ) {
-  Logger.pushValue = '';
+  const { apiDelay, logger, Logger } = await import('../utils');
+  const { offFunctions } = await import('../config/configOffFun');
+  const { sendMessage } = await import('@/utils/sendNotify');
+  const { loginTask, default: bili } = await import('./index');
+  const { printVersion } = await import('@/utils/version');
+  await Logger.init();
+  await printVersion();
   try {
     await loginTask();
   } catch (error) {

@@ -1,6 +1,5 @@
 import type { FCCallback, FCContext, FCEvent } from './types/fc';
 import { logger } from './utils';
-import { printVersion } from './utils/version';
 import { runInVM } from './utils/vm';
 
 /**
@@ -29,7 +28,6 @@ export async function handler(event: Buffer, context: FCContext, callback: FCCal
     }
   }
   try {
-    await printVersion();
     const eventJson: FCEvent = JSON.parse(event.toString());
     const message = await dailyMain(eventJson, context);
     callback(null, message);

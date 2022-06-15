@@ -33,7 +33,7 @@ function formatTime(date: Date, hasDate = true) {
 function getLevelValues(level: LevelType = 'info') {
   const LEVEL_VALUE = ['error', 'warn', 'info', 'verbose', 'debug'];
   const levelIndex = LEVEL_VALUE.indexOf(level);
-  return levelIndex > 0 ? LEVEL_VALUE.slice(0, levelIndex + 1) : LEVEL_VALUE;
+  return levelIndex !== -1 ? LEVEL_VALUE.slice(0, levelIndex + 1) : LEVEL_VALUE;
 }
 
 function resolvePath(str: string) {
@@ -42,6 +42,7 @@ function resolvePath(str: string) {
 
 export class Logger {
   static pushValue = '';
+  static brChar = '\n';
   private consoleLeval: string[];
   private fileLeval: string[];
   private pushLeval: string[];
@@ -66,16 +67,16 @@ export class Logger {
   public log({ level }: LogOptions, message: MessageType, emoji?: string) {
     emoji = emoji || emojis[level];
     const prcTime = getPRCDate(),
-      messageStr = `[${emoji} ${formatTime(prcTime, false)}] ${message}\n`,
+      messageStr = `\u005b${emoji} ${formatTime(prcTime, false)}\u005d ${message}\n`,
       stderr = ['error', 'warn'].includes(level);
     if (this.consoleLeval.includes(level)) {
       this.Conslole(messageStr, stderr);
     }
     if (!this.noFile && this.fileLeval.includes(level)) {
-      this.File(`[${emoji} ${formatTime(prcTime, true)}] ${message}\n`, stderr);
+      this.File(`\u005b${emoji} ${formatTime(prcTime, true)}\u005d ${message}\n`, stderr);
     }
     if (this.pushLeval.includes(level)) {
-      this.Push(messageStr);
+      this.Push(`\u005b${emoji} ${formatTime(prcTime, false)}\u005d ${message}${Logger.brChar}`);
     }
   }
 
@@ -124,6 +125,14 @@ export class Logger {
     if (!fs.existsSync(logsPath)) {
       fs.mkdirSync(logsPath);
     }
+  }
+
+  static async init() {
+    Logger.pushValue = '';
+    try {
+      const { TaskConfig } = await import('@/config/globalVar');
+      Logger.brChar = TaskConfig.message.br || '\n';
+    } catch {}
   }
 }
 
