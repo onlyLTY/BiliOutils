@@ -8,7 +8,7 @@ export default createRollupOption([
   }),
   createBaseConfig(
     {
-      input: 'index.ts',
+      input: 'index.ql.ts',
       output: 'cat_bili_ql.js',
       replaceValues: {
         __IS_QINGLONG__: 'true',

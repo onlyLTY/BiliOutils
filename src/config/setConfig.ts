@@ -126,14 +126,18 @@ function setConfig() {
   return getEnvConfig();
 }
 
-export function getConfig(): Config {
-  return checkConfig(setConfig());
+export function getConfig<T extends boolean>(more?: T): T extends false ? Config : Config[] {
+  return checkConfig(setConfig(), more);
 }
 
 /** 检查 config */
-export function checkConfig(config: any) {
+export function checkConfig(config: any, more = false) {
   if (!config) {
     throw new Error('获取配置失败！未找到配置文件！');
+  }
+
+  if (more) {
+    return isMultiUserConfig(config) ? filterMultiUserConfig(config) : [config];
   }
 
   if (isMultiUserConfig(config)) {

@@ -4,6 +4,7 @@ import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import { logger } from './utils/log';
+import { runTask } from './util';
 
 const pkg = require('../package.json');
 
@@ -36,7 +37,7 @@ Options:
     const configDir = dirname(resolve(process.cwd(), getArg('config')));
     const jobsPath = resolve(configDir, 'bt_jobs.json');
     if (isTodayRun(jobsPath)) return;
-    await runTask();
+    await runTask(await config());
     remember(jobsPath);
     return;
   }
@@ -60,27 +61,6 @@ async function config() {
     logger.error('配置路径可能存在问题');
     logger.error(error.message);
   }
-}
-
-/**
- * 运行任务
- */
-export async function runTask() {
-  const configs = await config(),
-    { initialize } = await import('./config/globalVar'),
-    length = configs.length;
-  initialize(configs[0]);
-  const task = await import('./task/dailyTask');
-  logger.info(`正在执行第1/${length}个配置`);
-  await task.dailyTasks();
-  logger.info('执行完毕\n');
-  for (let index = 1; index < configs.length; index++) {
-    logger.info(`正在执行第${index + 1}/${length}个配置`);
-    initialize(configs[index]);
-    await task.dailyTasks();
-    logger.info('执行完毕\n');
-  }
-  return;
 }
 
 /**

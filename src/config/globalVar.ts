@@ -110,7 +110,7 @@ export let TaskModule: typeof TaskModuleTemplate = null;
 
 export function initialize(config?: Config) {
   if (!config) {
-    config = getConfig();
+    config = getConfig(false);
   }
   // TODO: 配置方式兼容
   const userConfig = mergeConfig(config) as Config;

@@ -10,6 +10,10 @@ export function cfc_handler() {
   return require('./index.cfc').handler;
 }
 
+export function qinglong() {
+  require('./index.ql');
+}
+
 export function run() {
   require('./index');
 }
