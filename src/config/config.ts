@@ -94,7 +94,7 @@ export const defaultConfig = {
     /** 充电的 up 默认自己 */
     mid: 0,
     /** 充电预设时间，哪一天？ */
-    presetTime: [15],
+    presetTime: [15, 25],
   },
   gift: {
     /** 自定义投喂礼物用户列表 */
@@ -164,8 +164,10 @@ export const defaultConfig = {
     name: [],
     // 购买追漫（优先级低）
     love: true,
-    // 执行购买漫画的时间
-    buyPresetTime: [14, 28],
+    // 执行购买漫画间隔时间（单位天）
+    buyInterval: 6,
+    // 星期几执行购买漫画
+    buyWeek: [3],
   },
   BILIJCT: '',
   USERID: 0,

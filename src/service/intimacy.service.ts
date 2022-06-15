@@ -128,6 +128,9 @@ async function liveMobileHeart(
   heartbeatParams: MobileHeartBeatParams & { uname: string },
   countRef: Ref<number>,
 ) {
+  if (countRef.value >= 31) {
+    return;
+  }
   try {
     const { code, message } = await liveMobileHeartBeat(heartbeatParams);
     if (code !== 0) {
@@ -170,25 +173,22 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
     const countRef: Ref<number> = { value: 0 };
     const fansMeal = roomList[index];
     const timerRef: Ref<NodeJS.Timer> = { value: undefined };
-    run(fansMeal, countRef, index, timerRef);
-    timerRef.value = setInterval(run, 60000, fansMeal, countRef, index, timerRef);
+    run(fansMeal, countRef, timerRef);
+    timerRef.value = setInterval(run, 60000, fansMeal, countRef, timerRef);
     apiDelaySync(50, 150);
   }
+  resolve('直播间心跳');
   async function run(
     { medal, anchor_info, room_info }: FansMedalDto,
     countRef: Ref<number>,
-    index: number,
     timerRef?: Ref<NodeJS.Timer>,
   ) {
     await liveMobileHeart(
       { up_id: medal.target_id, room_id: room_info.room_id, uname: anchor_info.nick_name },
       countRef,
     );
-    if (countRef.value >= 31 && index === roomList.length - 1) {
+    if (countRef.value >= 31) {
       timerRef && timerRef.value && clearInterval(timerRef.value);
-      setTimeout(() => {
-        resolve('直播间心跳成功');
-      });
     }
   }
 }
