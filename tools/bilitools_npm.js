@@ -1,0 +1,1 @@
+require('@catlair/bilitools').run();
