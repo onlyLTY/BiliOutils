@@ -31,8 +31,6 @@
 
 ## 使用说明
 
-消息推送直接使用了 `青龙面板` 中的消息推送
-
 ### 重要提示
 
 新增天选时刻、红包，支持自动读取/删除关注消息。
@@ -45,7 +43,9 @@
 
 ## 使用方法
 
-[详细文档查看](https://btdocs.vercel.app/)
+以上内容以文档为准
+
+**[详细文档查看](https://btdocs.vercel.app/)**
 
 ## 参考项目
 
@@ -54,10 +54,3 @@
 - [lzghzr/TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 - [whyour/qinglong](https://github.com/whyour/qinglong)
 - [RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro) （推荐转用）
-
-## 责任声明
-
-1. bug 是不可避免的，我们尽量减少 bug 所带来得损失，**但这并不意味着我们要为此负责**，选择权在您，望周知。
-2. 不会以任何方式收集用户 mid、Cookies、关注列表、收藏记录等信息。项目只向 B 站提供 Cookies，请不要将 Cookies 上传到 Github 等**开放平台**以及其他任何**不可信**平台。
-3. 仓库中内置的任何 B 站相关用户信息，都不会影响你的投币、充电、打赏，权利掌握在使用者手中。
-4. 如果您有任何疑问，请提交 issue，我们会尽快给予回复。

@@ -137,7 +137,7 @@ export function checkConfig(config: any, more = false) {
   }
 
   if (more) {
-    return isMultiUserConfig(config) ? filterMultiUserConfig(config) : [config];
+    return filterMultiUserConfig(isMultiUserConfig(config) ? config : [config]);
   }
 
   if (isMultiUserConfig(config)) {
@@ -172,7 +172,10 @@ function isMultiUserConfig(config: MultiConfig | Config[]) {
  * @param config
  */
 function filterMultiUserConfig(config: MultiConfig | Config[]) {
-  const filter = (conf: Config) => conf.cookie && conf.cookie.length > 40;
+  const filter = (conf: Config) =>
+    conf.cookie &&
+    conf.cookie.length > 90 &&
+    ['bili_jct', 'SESSDATA', 'DedeUserID'].every(str => conf.cookie.includes(str));
   if (Array.isArray(config)) {
     return config.filter(filter);
   }

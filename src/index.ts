@@ -1,7 +1,8 @@
+import { runTask } from './util';
 process.env.IS_LOCAL = 'true';
 
 (async function dailyMain() {
-  const { dailyTasks } = await import('./task/dailyTask');
-  // 手动初始化配置
-  return await dailyTasks();
+  const { getConfig } = await import('./config/setConfig');
+  const configs = getConfig(true);
+  return await runTask(configs);
 })();
