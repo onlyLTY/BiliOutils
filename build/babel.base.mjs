@@ -9,7 +9,7 @@ export function baseConfig(options = {}) {
         '@babel/env',
         {
           useBuiltIns: 'usage',
-          corejs: 3.22,
+          corejs: 3.23,
           targets: {
             node,
           },

@@ -110,7 +110,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'release: Commit from GitHub Actions (gh-release)'
-          branch: ${{ env.IS_PROD && format('{0}-{1}', 'gh-release', env.VM_VERSION) || 'gh-release-dev' }}
+          branch: ${{ env.IS_PROD == 'true' && format('{0}-{1}', 'gh-release', env.VM_VERSION) || 'gh-release-dev' }}
           commit_options: '--no-verify --signoff'
           file_pattern: gh-release/**
           push_options: '--force'

@@ -14,7 +14,17 @@ async function getPrivilegeStatus() {
       return;
     }
     const { list } = data;
-    return list.filter(item => item.state === 0 && item.vip_type <= TaskModule.vipType);
+    const stateList = list.filter(item => item.state === 0);
+    if (stateList.length === 0) {
+      logger.info('暂无可领取权益（已领取）');
+      return;
+    }
+    const vipList = stateList.filter(item => item.vip_type <= TaskModule.vipType);
+    if (vipList.length === 0) {
+      logger.info('暂无可领取权益（大会员等级不足）');
+      return;
+    }
+    return vipList;
     // 查找未领取的权益
   } catch (error) {
     logger.error(`获取领取状态出现异常：${error.message}`);
@@ -81,7 +91,6 @@ export default async function getVipPrivilege() {
     const privilegeList = await getPrivilegeStatus();
 
     if (privilegeList.length === 0) {
-      logger.info(`已经领取过权益或者无法领取(年度)大会员权益`);
       return;
     }
 

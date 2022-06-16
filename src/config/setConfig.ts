@@ -97,6 +97,10 @@ function handleMultiUserConfig(config: MultiConfig | Config[]): Config {
 export function getConfigPathFile(filepath: string): Config[] {
   try {
     const config = readJsonFile(filepath);
+    if (!config) {
+      logger.error('配置文件为空，或配置内容缺失！');
+      throw new Error('配置文件为空，或配置内容缺失！');
+    }
     if (isMultiUserConfig(config)) {
       return filterMultiUserConfig(config);
     }

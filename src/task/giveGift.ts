@@ -42,7 +42,8 @@ async function getExpiredGift() {
         return false;
       }
       const time = (gift.expire_at * 1000 - new Date().getTime()) / MS2DATE < EXPIRE_DATE;
-      const notSimple = ![1, 30607].includes(gift.gift_id);
+      // 辣条 小心心 能量石头 PK票
+      const notSimple = ![1, 30607, 30426, 31531].includes(gift.gift_id);
       if (notSimple && time) {
         logger.info(`${gift.gift_name} 即将过期请尽快投喂`);
       }
