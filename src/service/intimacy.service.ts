@@ -2,7 +2,7 @@ import type { FansMedalDto } from '../dto/live.dto';
 import { TaskConfig } from '../config/globalVar';
 import * as liveRequest from '../net/live.request';
 import { kaomoji } from '../constant';
-import { random, apiDelay, logger, Logger, apiDelaySync } from '@/utils';
+import { random, apiDelay, logger, Logger, apiDelaySync, randomString, createUUID } from '@/utils';
 import { likeLiveRoom, liveMobileHeartBeat, shareLiveRoom } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
 
@@ -57,6 +57,8 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
   if (medal.level >= 20) return false;
   // 今日够了
   if (medal.today_feed >= medal.day_limit) return false;
+  // 今天达到了 1300（默认获取最大）
+  if (medal.today_feed >= 1300) return false;
   // 不存在白名单
   // TODO：白名单兼容 uid 和 room_id
   const { whiteList, blackList } = TaskConfig.intimacy;
@@ -173,18 +175,31 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
     const countRef: Ref<number> = { value: 0 };
     const fansMeal = roomList[index];
     const timerRef: Ref<NodeJS.Timer> = { value: undefined };
-    run(fansMeal, countRef, timerRef);
-    timerRef.value = setInterval(run, 60000, fansMeal, countRef, timerRef);
+    const options = {
+      buvid: randomString(37).toUpperCase(),
+      gu_id: randomString(43).toLocaleUpperCase(),
+      visit_id: randomString(32).toLocaleLowerCase(),
+      uuid: createUUID(),
+      click_id: createUUID(),
+    };
+    run(fansMeal, options, countRef, timerRef);
+    timerRef.value = setInterval(run, 60000, fansMeal, options, countRef, timerRef);
     apiDelaySync(50, 150);
   }
   resolve('直播间心跳');
   async function run(
     { medal, anchor_info, room_info }: FansMedalDto,
+    options: any,
     countRef: Ref<number>,
     timerRef?: Ref<NodeJS.Timer>,
   ) {
     await liveMobileHeart(
-      { up_id: medal.target_id, room_id: room_info.room_id, uname: anchor_info.nick_name },
+      {
+        up_id: medal.target_id,
+        room_id: room_info.room_id,
+        uname: anchor_info.nick_name,
+        ...options,
+      },
       countRef,
     );
     if (countRef.value >= 31) {

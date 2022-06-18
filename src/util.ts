@@ -1,10 +1,10 @@
 import type { Config } from './types';
-import { logger } from './utils/log';
 
 /**
  * 运行任务
  */
 export async function runTask(configs: Config[]) {
+  const { logger } = await import('./utils/log');
   const length = configs.length;
   if (length === 0) {
     return Promise.reject(new Error('配置为空或者 cookie 不合法！'));

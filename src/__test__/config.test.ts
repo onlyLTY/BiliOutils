@@ -29,11 +29,25 @@ const theConfig = {
   USERID: 11111111,
   cookie,
   message: {
+    br: '\n',
     email: {
       host: 'smtp.163.com',
       port: 465,
     },
-    api: undefined,
+    api: {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 5000,
+      url: '',
+      proxy: {
+        host: '',
+        port: 443,
+        auth: '',
+      },
+      data: {},
+    },
     pushplusToken: process.env.PUSHPLUS_TOKEN,
   },
   function: {
@@ -41,6 +55,7 @@ const theConfig = {
     liveSignTask: true,
     addCoins: true,
     mangaSign: false,
+    mangaTask: false,
     shareAndWatch: true,
     supGroupSign: false,
     liveSendMessage: false,
@@ -74,6 +89,15 @@ const theConfig = {
     targetLevel: 1,
     stayCoins: 1,
     targetCoins: 1,
+  },
+  manga: {
+    sign: true,
+    buy: false,
+    mc: [],
+    name: [],
+    love: true,
+    buyInterval: 6,
+    buyWeek: [3],
   },
   sls: {
     name: '',

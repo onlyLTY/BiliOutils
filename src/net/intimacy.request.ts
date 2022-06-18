@@ -1,4 +1,5 @@
 import { TaskConfig } from '@/config/globalVar';
+import { getAndroidUA } from '@/constant/biliUri';
 import type { ApiBaseProp } from '@/dto/bili-base-prop';
 import type { LiveHeartBeatRes, ShareLiveRoomRes } from '@/dto/intimacy.dto';
 import { clientSign } from '@/utils/bili';
@@ -99,5 +100,10 @@ export function liveMobileHeartBeat({
   return liveTraceApi.post<LiveHeartBeatRes>(
     'xlive/data-interface/v1/heartbeat/mobileHeartBeat',
     data,
+    {
+      headers: {
+        'User-Agent': getAndroidUA(),
+      },
+    },
   );
 }

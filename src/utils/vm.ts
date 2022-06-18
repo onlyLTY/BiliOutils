@@ -30,7 +30,7 @@ function getCode(name: string) {
       options,
     ),
     defHttp.get(
-      `https://gitee.com/KudouRan/BiliTools/raw/gh-release-0.5/gh-release/${name}`,
+      `https://gitee.com/catlair/BiliTools/raw/gh-release-0.5/gh-release/${name}`,
       options,
     ),
   ]);
