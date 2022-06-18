@@ -13,7 +13,7 @@ export const files = [
 export const dir = 'temp';
 
 export const proxyUrl = 'https://ghproxy.com/';
-export const githubUrl = 'https://github.com/catlair/BiliTools/releases/download/';
+export const githubUrl = 'https://github.com/KudouRan/BiliTools/releases/download/';
 
 export const tag = process.env.TAG;
 

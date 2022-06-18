@@ -28,18 +28,18 @@
     "build:all": "yarn build && yarn build:baidu && yarn build:rollup && yarn build:vm",
     "test": "jest"
   },
-  "repository": "catlair/BiliTools",
+  "repository": "KudouRan/BiliTools",
   "keywords": [
     "BiliTools",
     "bilibili"
   ],
   "bugs": {
-    "url": "https://github.com/catlair/BiliTools/issues"
+    "url": "https://github.com/KudouRan/BiliTools/issues"
   },
   "engines": {
     "node": ">= 12.2.0"
   },
-  "homepage": "https://gitee.com/catlair/BiliTools#readme",
+  "homepage": "https://btdocs.vercel.app/",
   "author": "catlair",
   "license": "MIT",
   "devDependencies": {

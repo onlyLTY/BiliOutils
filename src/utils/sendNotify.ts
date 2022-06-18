@@ -152,7 +152,7 @@ async function sendNotify(
   text: string,
   desp: string,
   params = {},
-  author = '\n\n本通知 By：https://github.com/catlair/BiliTools',
+  author = '\n\n本通知 By：https://github.com/KudouRan/BiliTools',
 ) {
   initEnv();
   //提供6种通知

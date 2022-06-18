@@ -1,11 +1,11 @@
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/catlair/BiliTools/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/KudouRan/BiliTools/blob/main/LICENSE)
 [![node-current (scoped)](https://img.shields.io/node/v/@catlair/bilitools)](https://www.npmjs.com/package/@catlair/bilitools)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/catlair/BiliTools)](https://github.com/catlair/BiliTools/releases)
-[![欢迎 PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/catlair/BiliTools/pulls)
-[![GitHub issues](https://img.shields.io/github/issues/catlair/BiliTools)](https://github.com/catlair/BiliTools/issues)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/KudouRan/BiliTools)](https://github.com/KudouRan/BiliTools/releases)
+[![欢迎 PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/KudouRan/BiliTools/pulls)
+[![GitHub issues](https://img.shields.io/github/issues/KudouRan/BiliTools)](https://github.com/KudouRan/BiliTools/issues)
 [![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/catlair/bilitools)](https://hub.docker.com/repository/docker/catlair/bilitools)
 [![Docker Pulls](https://img.shields.io/docker/pulls/catlair/bilitools)](https://hub.docker.com/repository/docker/catlair/bilitools)
-[![GitHub release (latest by date)](https://img.shields.io/github/downloads/catlair/BiliTools/total)](https://github.com/catlair/BiliTools/releases/latest)
+[![GitHub release (latest by date)](https://img.shields.io/github/downloads/KudouRan/BiliTools/total)](https://github.com/KudouRan/BiliTools/releases/latest)
 
 ## 支持功能
 
@@ -29,23 +29,15 @@
 - [x] 代码自动在线更新，发包任你发
 - [ ] ~~风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)~~（没有资格）
 
-## 使用说明
-
-### 重要提示
-
-新增天选时刻、红包，支持自动读取/删除关注消息。
-
-直播获取小心心改版，且取消直播间弹幕功能，使用 `粉丝勋章/亲密度（测试）`替代。
-
-领取年度大会员权益/B 币券，更新为每日检测，适应新规则。
-
-支持获取在线代码运行，部署一次即可长期更新（逻辑不变的情况下），添加环境变量 `USE_NETWORK_CODE` 尝试，百度云不支持环境变量，可以在附加消息中添加 `USE_NETWORK_CODE` 字段。值为字符串，可以是任意值，但不能为空。
-
 ## 使用方法
 
 以上内容以文档为准
 
 **[详细文档查看](https://btdocs.vercel.app/)**
+
+## 说明
+
+是时候停更了，在使用上数据统计后我才明白压根没有用户。付出和用户量、收到的反馈不成正比，既然没人用也就没有必要再更新了，暂时不会删库，让它留个纪念吧。
 
 ## 参考项目
 
@@ -53,4 +45,4 @@
 - [catlair/bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)
 - [lzghzr/TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 - [whyour/qinglong](https://github.com/whyour/qinglong)
-- [RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro) （推荐转用）
+- [RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro)
