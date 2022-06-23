@@ -1,1 +1,1 @@
-require('@catlair/bilitools').run();
+require('@catlair/bilitools').ql();

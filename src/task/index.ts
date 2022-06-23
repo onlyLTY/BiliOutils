@@ -16,23 +16,23 @@ import liveLottery from './liveLottery';
 import liveRedPack from './liveRedPack';
 import liveIntimacy from './liveIntimacy';
 
-export { loginTask, liveLottery, liveIntimacy };
+export { loginTask };
 
 export default {
   taskReward,
   liveSignTask,
+  addCoins,
   shareAndWatch,
   silver2Coin,
-  addCoins,
   mangaSign,
+  mangaTask,
   supGroupSign,
   liveSendMessage,
   charging,
   getVipPrivilege,
-  giveGift,
   matchGame,
   liveLottery,
   liveRedPack,
   liveIntimacy,
-  mangaTask,
+  giveGift,
 };

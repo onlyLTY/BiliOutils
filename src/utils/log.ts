@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { isServerless, isQingLongPanel } from './env';
+import { isServerless, isQingLongPanel, isFC } from './env';
 import { getPRCDate } from './pure';
 
 type MessageType = string | number | boolean | undefined | null;
@@ -67,16 +67,19 @@ export class Logger {
   public log({ level }: LogOptions, message: MessageType, emoji?: string) {
     emoji = emoji || emojis[level];
     const prcTime = getPRCDate(),
-      messageStr = `\u005b${emoji} ${formatTime(prcTime, false)}\u005d ${message}\n`,
       stderr = ['error', 'warn'].includes(level);
     if (this.consoleLeval.includes(level)) {
-      this.Conslole(messageStr, stderr);
+      this.Conslole(`\u005b${emoji} ${formatTime(prcTime, false)}\u005d ${message}\n`, stderr);
     }
     if (!this.noFile && this.fileLeval.includes(level)) {
       this.File(`\u005b${emoji} ${formatTime(prcTime, true)}\u005d ${message}\n`, stderr);
     }
     if (this.pushLeval.includes(level)) {
-      this.Push(`\u005b${emoji} ${formatTime(prcTime, false)}\u005d ${message}${Logger.brChar}`);
+      this.Push(
+        `\u005b${this.emojiPushHandler(level)} ${formatTime(prcTime, false)}\u005d ${message}${
+          Logger.brChar
+        }`,
+      );
     }
   }
 
@@ -125,6 +128,13 @@ export class Logger {
     if (!fs.existsSync(logsPath)) {
       fs.mkdirSync(logsPath);
     }
+  }
+
+  private emojiPushHandler(level: LevelType) {
+    if (isFC()) {
+      return level;
+    }
+    return emojis[level];
   }
 
   static async init() {

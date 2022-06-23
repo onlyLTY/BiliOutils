@@ -99,3 +99,10 @@ export function searchManga(keyword: string, page_num = 1, page_size = 9) {
     page_size,
   });
 }
+
+/**
+ * 领取大会员权益
+ */
+export function receiveMangaVipPrivilege() {
+  return mangaApi.post<OnlyMsg>('twirp/user.v1.User/GetVipReward', { reason_id: 1 });
+}

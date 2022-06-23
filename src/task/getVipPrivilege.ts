@@ -19,12 +19,7 @@ async function getPrivilegeStatus() {
       logger.info('暂无可领取权益（已领取）');
       return;
     }
-    const vipList = stateList.filter(item => item.vip_type <= TaskModule.vipType);
-    if (vipList.length === 0) {
-      logger.info('暂无可领取权益（大会员等级不足）');
-      return;
-    }
-    return vipList;
+    return stateList;
     // 查找未领取的权益
   } catch (error) {
     logger.error(`获取领取状态出现异常：${error.message}`);
@@ -82,7 +77,6 @@ async function getPrivilege(type: number) {
 export default async function getVipPrivilege() {
   try {
     logger.info('----【领取大会员权益】----');
-
     if (TaskModule.vipStatus === 0 || TaskModule.vipType === 0) {
       logger.info('您还不是大会员，无法领取权益');
       return;
@@ -90,7 +84,7 @@ export default async function getVipPrivilege() {
 
     const privilegeList = await getPrivilegeStatus();
 
-    if (privilegeList.length === 0) {
+    if (!privilegeList || privilegeList.length === 0) {
       return;
     }
 

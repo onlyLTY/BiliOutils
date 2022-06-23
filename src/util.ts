@@ -1,21 +1,39 @@
 import type { Config } from './types';
-import { logger } from './utils/log';
+import { fork } from 'child_process';
+import * as path from 'path';
 
-/**
- * 运行任务
- */
-export async function runTask(configs: Config[]) {
-  const length = configs.length;
-  if (length === 0) {
-    return Promise.reject(new Error('配置为空或者 cookie 不合法！'));
+export function runForkSync(config: Config) {
+  return new Promise((resolve, reject) => {
+    const child = fork(path.resolve(__dirname, './fork'), [], {
+      env: {
+        ...process.env,
+        __BT_CONFIG__: JSON.stringify(config),
+      },
+    });
+    child.on('exit', code => {
+      if (code === 0) {
+        resolve(code);
+        return;
+      }
+      reject(code);
+    });
+  });
+}
+
+export async function runTask(configs?: Config[]) {
+  if (!configs) {
+    const { getConfig } = await import('./config/setConfig');
+    configs = getConfig(true);
   }
-  const { initialize } = await import('./config/globalVar');
-  initialize(configs[0]);
-  const task = await import('./task/dailyTask');
-  for (let index = 0; index < configs.length; index++) {
-    logger.info(`正在执行第${index + 1}/${length}个配置`);
-    initialize(configs[index]);
-    await task.dailyTasks();
-    logger.info('执行完毕\n');
+  const length = configs.length;
+  for (let index = 0; index < length; index++) {
+    const config = configs[index];
+    process.stdout.write(`正在执行第${index + 1}/${length}个配置\n`);
+    try {
+      await runForkSync(config);
+    } catch (error) {
+      process.stdout.write(`${error.message}`);
+    }
+    process.stdout.write('执行完毕\n\n');
   }
 }

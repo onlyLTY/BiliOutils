@@ -17,6 +17,7 @@ import {
 } from '../net/live.request';
 import { PendentID, RequireType, TianXuanStatus } from '../enums/live-lottery.enum';
 import { TaskConfig, TaskModule } from '../config/globalVar';
+import { liveMobileHeartBeat } from '@/net/intimacy.request';
 
 interface LiveAreaType {
   areaId: string;
@@ -333,8 +334,11 @@ async function doRedPackArea(areaId: string, parentId: string, num = 2) {
   for (let page = 1; page <= num; page++) {
     const rooms = await getRedPacketRoom(areaId, parentId, page);
     for (const room of rooms) {
+      await liveMobileHeartBeat({ room_id: room.room_id, up_id: room.uid });
+      await apiDelay(100);
       await doRedPacket(room);
-      await apiDelay(200);
+      // 发送一次心跳
+      await apiDelay(400);
     }
   }
 }

@@ -101,6 +101,7 @@ export function getConfigPathFile(filepath: string): Config[] {
       logger.error('配置文件为空，或配置内容缺失！');
       throw new Error('配置文件为空，或配置内容缺失！');
     }
+    logger.verbose(`读取配置文件 ${filepath}`);
     if (isMultiUserConfig(config)) {
       return filterMultiUserConfig(config);
     }
@@ -124,6 +125,7 @@ function setConfig() {
   for (let index = 0; index < configPathArr.length; index++) {
     const config = readJsonFile<Config>(configPathArr[index]);
     if (config) {
+      logger.verbose(`读取配置文件 ${configPathArr[index]}`);
       return config;
     }
   }
