@@ -18,7 +18,6 @@ export function readJsonFile<T = any>(filePath: string): T {
     if (!content) {
       return;
     }
-    logger.verbose(`读取配置文件 ${filePath}`);
     return JSON5.parse(content);
   } catch (error) {
     logger.error(error);

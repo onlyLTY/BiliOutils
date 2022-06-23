@@ -10,11 +10,11 @@ type Params = Record<string, string | boolean | number>;
  * @param appkey
  * @param appsec
  */
-export function getSignString(params: Params, appkey: string, appsec: string) {
+export function appSignString(params: Params = {}, appkey?: string, appsec?: string) {
   return getAppSign(params, appkey, appsec).query;
 }
 
-export function appSign(params: Params, appkey: string, appsec: string) {
+export function appSign(params: Params, appkey?: string, appsec?: string) {
   return getAppSign(params, appkey, appsec).sign;
 }
 
@@ -23,17 +23,34 @@ function sortParams(params: Params) {
   return keys.map(key => [key, params[key]]);
 }
 
-function getAppSign(params: Params, appkey: string, appsec: string) {
-  params = {
-    ...params,
-    appkey,
-  };
+export function getSign(params: Params, appsec: string, noSign = false) {
   const query = stringify(sortParams(params));
+  if (noSign) {
+    return { query, sign: '' };
+  }
   const sign = md5(query + appsec);
   return {
     query: query + '&sign=' + sign,
     sign,
   };
+}
+
+function getAppSign(
+  params: Params,
+  appkey = '1d8b6e7d45233436',
+  appsec = '560c52ccd288fed045859ed18bffd973',
+) {
+  // if (!TaskConfig.accessKey) {
+  //   return getSign(params, appsec, true);
+  // }
+  params = {
+    ...params,
+    // access_key: TaskConfig.accessKey,
+    actionKey: 'appkey',
+    appkey,
+    ts: parseInt(String(new Date().getTime() / 1000)),
+  };
+  return getSign(params, appsec);
 }
 
 /**

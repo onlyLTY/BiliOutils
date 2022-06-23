@@ -80,7 +80,7 @@ export async function moveUsersToTag(users: User[], tagName = '天选时刻') {
     if (code !== 0) {
       logger.warn(`移动【${user.uname}】失败: ${code}-${message}`);
     }
-    await apiDelay();
+    await apiDelay(500, 1300);
   }
 }
 

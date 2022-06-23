@@ -13,7 +13,7 @@ async function getLatestVersion(): Promise<string> {
   try {
     const data = await Promise.any([
       defHttp.get('https://api.github.com/repos/KudouRan/BiliTools/releases/latest', options),
-      defHttp.get('https://gitee.com/api/v5/repos/catlair/BiliTools/releases/latest', options),
+      defHttp.get('https://gitee.com/api/v5/repos/KudouRan/BiliTools/releases/latest', options),
     ]);
     return data.tag_name;
   } catch (error) {
@@ -42,7 +42,7 @@ export async function printVersion() {
       return;
     }
     const latestTag = await getLatestVersion();
-    if (latestTag && latestTag !== version) {
+    if (latestTag && checkVersion(version, latestTag)) {
       logger.info(`可更新：最新版本【${latestTag}】`);
     }
   } catch {}
@@ -62,4 +62,34 @@ function getVersionByFile() {
 
 export function printStrVersion() {
   logger.info(`当前版本【__BILI_VERSION__】`);
+}
+
+/**
+ * 检查版本是否可更新
+ * @param version 当前版本
+ * @param latestTag 最新版本
+ */
+export function checkVersion(version: string, latestTag: string) {
+  if (version.startsWith('v')) {
+    version = version.substring(1);
+  }
+  if (latestTag.startsWith('v')) {
+    latestTag = latestTag.substring(1);
+  }
+  if (version === latestTag) {
+    return false;
+  }
+  const versionArr = version.split('.'),
+    latestTagArr = latestTag.split('.');
+  for (let i = 0; i < versionArr.length; i++) {
+    const versionNum = parseInt(versionArr[i]),
+      latestTagNum = parseInt(latestTagArr[i]);
+    if (isNaN(versionNum) || isNaN(latestTagNum)) {
+      return true;
+    }
+    if (versionNum < latestTagNum) {
+      return true;
+    }
+  }
+  return false;
 }

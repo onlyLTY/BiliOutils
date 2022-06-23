@@ -41,13 +41,16 @@ function unzipCode(code: Buffer) {
 }
 
 export async function runInVM(name: string, context = { event: {}, context: {} }) {
-  let code: string;
+  let code = '';
   try {
     const res = await getCode(`${name}.gz`);
     if (res.headers['content-type']?.includes('application/gzip')) {
       code = unzipCode(res.body || res.data);
     } else {
       code = (res.body || res.data).toString();
+    }
+    if (!code || code.startsWith('<!DOCTYPE') || code.startsWith('<!doctype')) {
+      return false;
     }
   } catch (error) {
     logger.warn(`runInVM: ${error.message}`);
@@ -61,25 +64,20 @@ export async function runInVM(name: string, context = { event: {}, context: {} }
       resolve,
       reject,
     };
-    script.runInNewContext(
-      {
-        console,
-        require,
-        process,
-        __dirname,
-        __filename,
-        setTimeout,
-        clearTimeout,
-        Buffer,
-        URLSearchParams,
-        global,
-        VMThis,
-        BILITOOLS_CONFIG: global.BILITOOLS_CONFIG,
-        ...context,
-      },
-      {
-        timeout: 600000,
-      },
-    );
+    script.runInNewContext({
+      console,
+      require,
+      process,
+      __dirname,
+      __filename,
+      setTimeout,
+      clearTimeout,
+      Buffer,
+      URLSearchParams,
+      global,
+      VMThis,
+      BILITOOLS_CONFIG: global.BILITOOLS_CONFIG,
+      ...context,
+    });
   });
 }

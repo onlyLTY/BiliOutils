@@ -156,6 +156,6 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H gitee.com >> ~/.ssh/known_hosts
           echo "StrictHostKeyChecking no" >> ~/.ssh/config
-          git remote set-url --push origin git@gitee.com:catlair/BiliTools.git
+          git remote set-url --push origin git@gitee.com:Kudouran/BiliTools.git
           GIT_BRANCH="${{ env.IS_PROD && format('{0}-{1}', 'gh-release', env.VM_VERSION) || 'gh-release-dev' }}"
           git push origin "$GIT_BRANCH":"$GIT_BRANCH" --force
