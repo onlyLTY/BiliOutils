@@ -27,7 +27,6 @@ const userConfig = {
 const theConfig = {
   BILIJCT: 'asjdklha17238213b213gc213',
   USERID: 11111111,
-  accessKey: '',
   cookie,
   message: {
     br: '\n',

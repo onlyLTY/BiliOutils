@@ -10,12 +10,20 @@ export function runForkSync(config: Config) {
         __BT_CONFIG__: JSON.stringify(config),
       },
     });
-    child.on('exit', code => {
+    child.once('exit', code => {
       if (code === 0) {
         resolve(code);
         return;
       }
       reject(code);
+    });
+    child.on('message', msg => {
+      if (msg === true) {
+        resolve(true);
+      }
+    });
+    child.once('error', err => {
+      reject(err);
     });
   });
 }

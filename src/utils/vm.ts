@@ -44,12 +44,21 @@ export async function runInVM(name: string, context = { event: {}, context: {} }
   let code = '';
   try {
     const res = await getCode(`${name}.gz`);
-    if (res.headers['content-type']?.includes('application/gzip')) {
+    const contentType = res.headers['content-type'];
+    if (
+      contentType?.includes('application/gzip') ||
+      contentType?.includes('application/octet-stream')
+    ) {
       code = unzipCode(res.body || res.data);
     } else {
       code = (res.body || res.data).toString();
     }
-    if (!code || code.startsWith('<!DOCTYPE') || code.startsWith('<!doctype')) {
+    if (
+      !code ||
+      !code.startsWith('"use strict"') ||
+      code.startsWith('<!DOCTYPE') ||
+      code.startsWith('<!doctype')
+    ) {
       return false;
     }
   } catch (error) {
