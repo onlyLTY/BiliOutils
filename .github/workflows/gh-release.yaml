@@ -61,7 +61,6 @@ jobs:
           cd dist
           mv index.*.js ../
           rm bin.js main.js
-          mv index.js index.local.js
       - name: ZIP SCF
         run: |
           cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
@@ -117,22 +116,6 @@ jobs:
           skip_fetch: true
           skip_checkout: false
           create_branch: true
-      - name: Commit files for prod（pre）
-        if: ${{ env.IS_PROD == 'true' && env.COMMIT_GH == 'true' }}
-        run: |
-          echo // auto commit >> gh-release/cat_bili_ql.js
-      - name: Commit files for prod
-        if: ${{ env.IS_PROD == 'true' && env.COMMIT_GH == 'true' }}
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'release: Commit from GitHub Actions (gh-release)'
-          branch: gh-release
-          commit_options: '--no-verify --signoff'
-          file_pattern: gh-release/cat_bili_ql.js
-          push_options: '--force'
-          skip_fetch: true
-          skip_checkout: false
-          create_branch: true
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
@@ -141,13 +124,12 @@ jobs:
             aliyun_fc.zip
             baidu_cfc.zip
             huawei_agc.zip
-            gh-release/index.js
-            gh-release/cat_bili_ql.js
           draft: ${{ env.IS_TAG == 'false' }}
           prerelease: ${{ env.IS_TAG == 'true' && env.IS_RC == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Push to Gitee
+        if: ${{ env.IS_PROD == 'true' && env.COMMIT_GH == 'true' }}
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |

@@ -67,7 +67,7 @@ let _taskConfig: TaskConfigTemplate & Config;
 export const TaskConfig = new Proxy({} as TaskConfigTemplate & Config, {
   get(_target, key) {
     if (!_taskConfig) {
-      throw new Error('config 是必须的');
+      initialize();
     }
     return Reflect.get(_taskConfig, key);
   },
@@ -108,7 +108,10 @@ abstract class TaskModuleTemplate {
 
 export let TaskModule: typeof TaskModuleTemplate = null;
 
-export function initialize(config: Config) {
+export function initialize(config?: Config) {
+  if (!config) {
+    config = getConfig(false);
+  }
   // TODO: 配置方式兼容
   const userConfig = mergeConfig(config) as Config;
   _taskConfig = { ...new TaskConfigTemplate(checkConfig(userConfig)), ...userConfig };
