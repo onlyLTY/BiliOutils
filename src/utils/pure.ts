@@ -81,6 +81,7 @@ export function setCron(time = 60_000, slsType?: SLSType) {
 
 /**
  * 生成随机数
+ * @description 生成一个随机数，范围在 min 和 max 之间（包括 min 和 max）
  * @param lower
  * @param upper
  * @param floating
@@ -356,4 +357,11 @@ export function isTodayInTimeArr(timeArr: number[]) {
   }
   const today = new Date().getDate();
   return timeArr.includes(today);
+}
+
+/**
+ * 获取 unix 时间戳
+ */
+export function getUnixTime() {
+  return Math.floor(new Date().getTime() / 1000);
 }

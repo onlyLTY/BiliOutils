@@ -1,5 +1,5 @@
 import type { FansMedalDto } from '../dto/live.dto';
-import { TaskConfig } from '../config/globalVar';
+import { TaskConfig, TaskModule } from '../config/globalVar';
 import * as liveRequest from '../net/live.request';
 import { kaomoji } from '../constant';
 import { random, apiDelay, logger, Logger, apiDelaySync, randomString, createUUID } from '@/utils';
@@ -7,7 +7,10 @@ import { likeLiveRoom, liveMobileHeartBeat, shareLiveRoom } from '@/net/intimacy
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
 
 const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
-const liveLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'live');
+const liveLogger = new Logger(
+  { console: 'debug', file: 'debug', push: 'warn', payload: TaskModule.nickname },
+  'live',
+);
 
 export async function getFansMealList() {
   let totalNumber = 99,

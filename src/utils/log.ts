@@ -10,6 +10,7 @@ interface LoggerOptions {
   file?: LevelType;
   push?: LevelType;
   name?: string;
+  payload?: string;
 }
 
 interface LogOptions {
@@ -67,12 +68,16 @@ export class Logger {
   public log({ level }: LogOptions, message: MessageType, emoji?: string) {
     emoji = emoji || emojis[level];
     const prcTime = getPRCDate(),
-      stderr = ['error', 'warn'].includes(level);
+      stderr = ['error', 'warn'].includes(level),
+      payload = this.options.payload ? ` \u005b${this.options.payload}\u005d ` : ' ';
     if (this.consoleLeval.includes(level)) {
-      this.Conslole(`\u005b${emoji} ${formatTime(prcTime, false)}\u005d ${message}\n`, stderr);
+      this.Conslole(
+        `\u005b${emoji}${payload}${formatTime(prcTime, false)}\u005d ${message}\n`,
+        stderr,
+      );
     }
     if (!this.noFile && this.fileLeval.includes(level)) {
-      this.File(`\u005b${emoji} ${formatTime(prcTime, true)}\u005d ${message}\n`, stderr);
+      this.File(`\u005b${emoji}${payload}${formatTime(prcTime, true)}\u005d ${message}\n`, stderr);
     }
     if (this.pushLeval.includes(level)) {
       this.Push(

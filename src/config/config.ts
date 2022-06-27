@@ -63,6 +63,8 @@ export const defaultConfig = {
     liveIntimacy: false,
     // 漫画任务
     mangaTask: false,
+    // 大会员积分
+    bigPoint: false,
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
   apiDelay: [2, 6],

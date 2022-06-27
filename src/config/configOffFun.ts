@@ -1,3 +1,4 @@
+import { taskExportOrder, biliTasks } from '@/task';
 import { TaskConfig } from './globalVar';
 
 function funHandle() {
@@ -18,9 +19,16 @@ function funHandle() {
 
 /**
  * 按照配置清空函数
- * @param funArr 函数数组
  */
-export function offFunctions(funArr: Array<() => Promise<unknown>>): Array<() => Promise<unknown>> {
+export function getWaitRuningFunc() {
+  // 这是使用了黑魔法，也是迫不得已
+  // rollup 压缩代码后可能导致变量名变化，就找不到相应函数的，所以才改用下标的方式记录
   const functionConfig = funHandle();
-  return funArr.map(el => (functionConfig[el.name] ? el : null)).filter(el => el);
+  const result: typeof biliTasks = [];
+  taskExportOrder.forEach((key, index) => {
+    if (functionConfig[key]) {
+      result.push(biliTasks[index]);
+    }
+  });
+  return result.map(async func => (await func()).default);
 }

@@ -11,6 +11,7 @@
  */
 import type { Method } from 'got/dist/source/as-promise/types';
 import { TaskConfig, TaskModule } from '../config/globalVar';
+import { conciseNickname } from './bili';
 import { defHttp } from './http';
 import { logger } from './log';
 import { stringify } from './pure';
@@ -761,6 +762,6 @@ function pushPlusNotify(text, desp) {
 export async function sendMessage(title: string, text: string) {
   logger.info('----【消息推送】----');
   // 处理 title
-  title = `Bili-${TaskModule.nickname || TaskConfig.USERID}-${title}`;
+  title = `Bili-${conciseNickname(TaskModule.nickname) || TaskConfig.USERID}-${title}`;
   await sendNotify(title, text, undefined, '');
 }

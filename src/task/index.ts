@@ -1,38 +1,57 @@
-import liveSignTask from './liveSignTask';
-import loginTask from './loginTask';
-import taskReward from './taskReward';
-import shareAndWatch from './shareAndWatch';
-import addCoins from './addCoins';
-import mangaSign from './mangaSign';
-import mangaTask from './mangaTask';
-import silver2Coin from './silver2Coin';
-import supGroupSign from './supGroupSign';
-import liveSendMessage from './sendLiveMsg';
-import charging from './charging';
-import getVipPrivilege from './getVipPrivilege';
-import giveGift from './giveGift';
-import matchGame from './matchGame';
-import liveLottery from './liveLottery';
-import liveRedPack from './liveRedPack';
-import liveIntimacy from './liveIntimacy';
+/**
+ * 任务读取顺序
+ */
+export const taskExportOrder = [
+  'taskReward',
+  'liveSignTask',
+  'addCoins',
+  'bigPoint',
+  'shareAndWatch',
+  'silver2Coin',
+  'mangaSign',
+  'mangaTask',
+  'supGroupSign',
+  'liveSendMessage',
+  'charging',
+  'getVipPrivilege',
+  'matchGame',
+  'liveLottery',
+  'liveRedPack',
+  'liveIntimacy',
+  'giveGift',
+  'loginTask',
+] as const;
 
-export { loginTask };
+/**
+ * 按照上面的顺序导入的任务
+ */
+export const biliTasks = [
+  () => import('./taskReward'),
+  () => import('./liveSignTask'),
+  () => import('./addCoins'),
+  () => import('./bigPoint'),
+  () => import('./shareAndWatch'),
+  () => import('./silver2Coin'),
+  () => import('./mangaSign'),
+  () => import('./mangaTask'),
+  () => import('./supGroupSign'),
+  () => import('./liveSendMessage'),
+  () => import('./charging'),
+  () => import('./getVipPrivilege'),
+  () => import('./matchGame'),
+  () => import('./liveLottery'),
+  () => import('./liveRedPack'),
+  () => import('./liveIntimacy'),
+  () => import('./giveGift'),
+  () => import('./loginTask'),
+];
 
-export default {
-  taskReward,
-  liveSignTask,
-  addCoins,
-  shareAndWatch,
-  silver2Coin,
-  mangaSign,
-  mangaTask,
-  supGroupSign,
-  liveSendMessage,
-  charging,
-  getVipPrivilege,
-  matchGame,
-  liveLottery,
-  liveRedPack,
-  liveIntimacy,
-  giveGift,
-};
+export async function getBiliTask(funcName: typeof taskExportOrder[number]) {
+  const index = taskExportOrder.findIndex(name => name === funcName);
+  if (index === -1) {
+    return () => Promise.resolve();
+  }
+  return (await biliTasks[index]()).default;
+}
+
+export default biliTasks;

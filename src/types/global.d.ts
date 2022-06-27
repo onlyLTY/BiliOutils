@@ -20,6 +20,8 @@ declare global {
   type Ref<T> = {
     value: T;
   };
+
+  type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 }
 
 export {};
