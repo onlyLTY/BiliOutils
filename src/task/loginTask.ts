@@ -40,7 +40,7 @@ function setLevelInfo(data: UserNavData) {
   }
 }
 
-function setVipStatus(data: UserNavData) {
+export function setVipStatus(data: { vipType: number; vipStatus: number }) {
   /**大会员信息 */
   let vipTypeMsg = '';
 
@@ -69,25 +69,12 @@ function setVipStatus(data: UserNavData) {
   logger.info(`大会员状态: ${vipTypeMsg}`);
 }
 
-/**
- * 给昵称添加 ** （目的是变简短）
- */
-function conciseNickname(nickname: string) {
-  const length = nickname.length;
-  if (length <= 3) {
-    return nickname;
-  }
-  const firstWord = nickname[0];
-  const lastWord = nickname[length - 1];
-  return `${firstWord}**${lastWord}`;
-}
-
 async function setUserInfo(data: UserNavData) {
   try {
     const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
     logger.info(`登录成功: ${data.uname}`);
     logger.info(`硬币余额: ${coinBalance.money || 0}`);
-    TaskModule.nickname = conciseNickname(data.uname);
+    TaskModule.nickname = data.uname;
     TaskModule.money = coinBalance.money || 0;
     TaskModule.userLevel = data.level_info.current_level;
     TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;

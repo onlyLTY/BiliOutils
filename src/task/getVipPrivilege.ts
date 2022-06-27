@@ -60,6 +60,9 @@ async function getOnePrivilege(type: number): Promise<boolean> {
 }
 
 async function getPrivilege(type: number) {
+  if (![1, 3].includes(type)) {
+    return;
+  }
   let errCount = 0,
     suc = false;
 

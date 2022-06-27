@@ -20,5 +20,5 @@
     "moduleResolution": "node",
     "esModuleInterop": true
   },
-  "exclude": ["node_modules", "test", "temp", "dist", "**/*spec.ts"]
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
 }
