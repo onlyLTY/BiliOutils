@@ -1,9 +1,10 @@
 import type { TaskCombineDto } from '@/dto/big-point.dto';
 import type { PureDataProp } from '@/dto/bili-base-prop';
-import { biliApi } from './api';
+import { biliApi, biliHttp } from './api';
 import { TaskConfig } from '@/config/globalVar';
 import { getUnixTime } from '@/utils/pure';
 import type { TaskCodeType } from '@/enums/big-point.emum';
+import { appSignString } from '@/utils/bili';
 
 /**
  * 大积分签到
@@ -46,7 +47,6 @@ const baseParams = {
 export function susWin() {
   return biliApi.post<PureDataProp<Record<string, never>>>('pgc/activity/deliver/susWin/receive', {
     ...baseParams,
-    ts: getUnixTime(),
   });
 }
 
@@ -57,8 +57,32 @@ export function complete(position: string) {
   return biliApi.post<PureDataProp>('pgc/activity/deliver/task/complete', {
     ...baseParams,
     position,
-    ts: getUnixTime(),
   });
+}
+
+/**
+ * 提交事件
+ */
+export function showDispatch(eventId: string) {
+  return biliHttp.post<{
+    code: number;
+    message: string;
+    data: never;
+    errtag: number;
+    ttl: number;
+  }>(
+    `https://show.bilibili.com/api/activity/fire/common/event/dispatch?${appSignString(
+      baseParams,
+    )}`,
+    {
+      eventId,
+    },
+    {
+      headers: {
+        'content-type': 'application/json; charset=utf-8',
+      },
+    },
+  );
 }
 
 /**

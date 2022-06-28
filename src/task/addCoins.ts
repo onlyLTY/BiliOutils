@@ -21,7 +21,7 @@ export default async function addCoins() {
   const state: State = { eCount: 0, num: 0, prevCode: 0, fillCount: 0, priority: 0 };
   let isReturn = false;
   // 判断需要投币的数量
-  while (TaskModule.coinsTask && !isReturn && state.eCount < 5) {
+  while (TaskModule.coinsTask > 0 && !isReturn && state.eCount < 5 && state.num < 5) {
     isReturn = await coinHandle(state);
   }
 
@@ -56,7 +56,7 @@ async function setCoinsTask() {
   try {
     const { data: coinExp, code } = await getDonateCoinExp();
     if (code == 0) {
-      const coins = TaskConfig.BILI_TARGET_COINS - coinExp / 10;
+      const coins = TaskConfig.coin.targetCoins - coinExp / 10;
       TaskModule.coinsTask = coins > 0 ? coins : 0;
     }
   } catch (error) {}
@@ -66,9 +66,9 @@ async function setCoinsTask() {
  * 进行一次投币
  */
 async function coinToIdOnce(data: AidInfo['data'], state: State) {
-  const { id, title, author, type, mid } = data;
+  const { id, title, author, coinType, mid } = data;
   try {
-    const coinData = await coinToId({ id, type, mid } as CoinToIdParams);
+    const coinData = await coinToId({ id, coinType, mid } as CoinToIdParams);
     if (coinData.code === 0) {
       TaskModule.money--;
       TaskModule.coinsTask--;

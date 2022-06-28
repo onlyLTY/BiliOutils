@@ -64,8 +64,8 @@ function initEnv() {
     }
   });
 
-  if (TaskConfig.PUSHPLUS_TOKEN) {
-    MyProcessEnv.PUSH_PLUS_TOKEN = TaskConfig.PUSHPLUS_TOKEN;
+  if (TaskConfig.message?.pushplusToken) {
+    MyProcessEnv.PUSH_PLUS_TOKEN = TaskConfig.message.pushplusToken;
   }
 }
 
@@ -762,6 +762,6 @@ function pushPlusNotify(text, desp) {
 export async function sendMessage(title: string, text: string) {
   logger.info('----【消息推送】----');
   // 处理 title
-  title = `Bili-${conciseNickname(TaskModule.nickname) || TaskConfig.USERID}-${title}`;
+  title = `Bili-${conciseNickname(TaskModule?.nickname) || TaskConfig.USERID}-${title}`;
   await sendNotify(title, text, undefined, '');
 }

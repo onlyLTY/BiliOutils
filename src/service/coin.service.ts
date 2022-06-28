@@ -23,7 +23,7 @@ const TypeEnum = {
 export interface AidInfo {
   msg: string;
   data: {
-    type?: string;
+    coinType?: string;
     id?: number;
     title?: string;
     author?: string;
@@ -43,7 +43,7 @@ function getRandmonNum([video, audio, article]: number[]) {
   let tempNum = num;
   if (num < video) {
     return {
-      type: TypeEnum.video,
+      coinType: TypeEnum.video,
       /** 第几页 */
       page: getPageNum(30, tempNum + 1),
       /** 第几个 */
@@ -54,14 +54,14 @@ function getRandmonNum([video, audio, article]: number[]) {
   tempNum = num - video;
   if (num < mid) {
     return {
-      type: TypeEnum.audio,
+      coinType: TypeEnum.audio,
       page: getPageNum(30, tempNum + 1),
       index: tempNum % 30,
     };
   }
   tempNum = num - mid;
   return {
-    type: TypeEnum.article,
+    coinType: TypeEnum.article,
     page: getPageNum(12, tempNum + 1),
     index: tempNum % 12,
   };
@@ -144,8 +144,7 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
  * 从自定义up主列表中随机选择
  */
 export async function getAidByCustomizeUp(): Promise<AidInfo> {
-  const customizeUp = TaskConfig.BILI_CUSTOMIZE_UP;
-
+  const customizeUp = TaskConfig.coin.customizeUp;
   if (customizeUp.length === 0) {
     return {
       msg: '-1',
@@ -169,15 +168,20 @@ export async function getIdByRandom(mid: number) {
     }
     await apiDelay();
     const { video, audio, article } = data;
-    const { type, page, index } = getRandmonNum([video, audio, article]);
-
-    const handle = {
-      [TypeEnum.video]: getVideoByRandom,
-      [TypeEnum.audio]: getAudioByRandom,
-      [TypeEnum.article]: getArticleByRandom,
-    };
-
-    const handleData = await handle[type](mid, page, index);
+    const randmonNumData = getRandmonNum([video, audio, article]);
+    if (!randmonNumData) {
+      return {
+        msg: '用户没有投稿',
+        data: {},
+      };
+    }
+    const { coinType, page, index } = randmonNumData,
+      handle = {
+        [TypeEnum.video]: getVideoByRandom,
+        [TypeEnum.audio]: getAudioByRandom,
+        [TypeEnum.article]: getArticleByRandom,
+      },
+      handleData = await handle[coinType](mid, page, index);
     if (handleData.message) {
       return {
         msg: handleData.message,
@@ -203,7 +207,7 @@ async function getVideoByRandom(mid: number, page: number, index: number) {
     return { message };
   }
   const { aid, title, author } = data.list.vlist[index];
-  return { type: TypeEnum.video, id: aid, title, author };
+  return { coinType: TypeEnum.video, id: aid, title, author };
 }
 
 async function getAudioByRandom(mid: number, page: number, index: number) {
@@ -213,7 +217,7 @@ async function getAudioByRandom(mid: number, page: number, index: number) {
   }
   const { data: list } = data;
   const { id, uname, title } = list[index];
-  return { type: TypeEnum.audio, id, title, author: uname };
+  return { coinType: TypeEnum.audio, id, title, author: uname };
 }
 
 async function getArticleByRandom(mid: number, page: number, index: number) {
@@ -227,7 +231,7 @@ async function getArticleByRandom(mid: number, page: number, index: number) {
     title,
     author: { name },
   } = articles[index];
-  return { type: TypeEnum.article, id, title, author: name, mid };
+  return { coinType: TypeEnum.article, id, title, author: name, mid };
 }
 
 /**
@@ -241,7 +245,7 @@ function getIdFuncArray(): Array<() => Promise<AidInfo>> {
     getAidByRegionRank,
   ];
   //如果没有自定义up则直接删除
-  if (!TaskConfig.BILI_CUSTOMIZE_UP) {
+  if (!TaskConfig.coin.customizeUp) {
     arr.shift();
   }
   return arr;
@@ -258,7 +262,7 @@ export async function getAidByByPriority(start = 0) {
 
   for (let index = 0; index < idFuncArray.length; index++) {
     const fun = idFuncArray[index];
-    let i = Number(TaskConfig.BILI_COIN_RETRY_NUM ?? 4);
+    let i = Number(TaskConfig.coin.retryNum ?? 4);
     i = i < 1 ? 1 : i > 8 ? 8 : i;
     while (i--) {
       await apiDelay();
@@ -283,7 +287,7 @@ export async function getAidByByPriority(start = 0) {
 // 参数
 export interface CoinToIdParams {
   id: number;
-  type?: keyof typeof TypeEnum;
+  coinType?: keyof typeof TypeEnum;
   coin?: 1 | 2;
   mid?: number;
 }
@@ -291,14 +295,14 @@ export interface CoinToIdParams {
 /**
  * 投币给稿件
  */
-export async function coinToId({ id, coin = 1, type = 'video', mid }: CoinToIdParams) {
+export async function coinToId({ id, coin = 1, coinType = 'video', mid }: CoinToIdParams) {
   const handle = {
     [TypeEnum.video]: addCoinForVideo,
     [TypeEnum.audio]: addCoinForAudio,
     [TypeEnum.article]: (id: number, coin = 1) => addCoinForArticle(mid, id, coin),
   };
 
-  const handleData = await handle[type](Number(id), coin);
+  const handleData = await handle[coinType](Number(id), coin);
   return {
     code: handleData.code,
     //@ts-ignore

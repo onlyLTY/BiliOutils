@@ -1,6 +1,13 @@
 import type { TaskCodeType } from '@/enums/big-point.emum';
 import type { CommonTaskItem, SingTaskHistory, Taskinfo } from '@/dto/big-point.dto';
-import { complete, getTaskCombine, receiveTask, signIn, susWin } from '@/net/big-point.request';
+import {
+  complete,
+  getTaskCombine,
+  receiveTask,
+  showDispatch,
+  signIn,
+  susWin,
+} from '@/net/big-point.request';
 import { videoHeartbeat } from '@/net/video.request';
 import { TaskCode } from '@/enums/big-point.emum';
 import { apiDelay, getUnixTime, logger, random } from '@/utils';
@@ -36,7 +43,11 @@ export async function bigPointService() {
     logger.info('本月积分已领取完');
     return;
   }
-  await sign(task_info.sing_task_item?.histories);
+  const signCode = await sign(task_info.sing_task_item?.histories);
+  if (signCode === -401) {
+    logger.error('出现非法访问异常，可能账号存在异常，放弃大积分任务');
+    return;
+  }
   await apiDelay(100, 200);
   // 判断是否领取了任务
   if (await getTask(task_info)) {
@@ -76,13 +87,13 @@ async function handleDailyTask(taskItems: CommonTaskItem[]) {
         await watchTask(taskItem.complete_times);
         break;
       case 'filmtab':
-        await completeTask('tv_channel', '影视频道');
+        await completeTask('tv_channel', '浏览影视频道');
         break;
       case 'animatetab':
         await completeTask('jp_channel', '浏览追番频道');
         break;
       case 'vipmallbuy':
-        logger.warn('抱歉，暂时不知道怎么完成会员购，如果知道的话，请告诉我');
+        await vipMallBuy();
         break;
       default:
         break;
@@ -103,18 +114,23 @@ async function watchTask(completeTimes: number) {
     }
     return Number(prefix + epid);
   }
-  const epid = createEpid('327', 107, 134, [122, 123]);
-  const watchTime = completeTimes === 1 ? random(905, 1800) : random(1805, 2000);
-  // 播放西游记
-  await videoHeartbeat({
-    start_ts: getUnixTime() - watchTime,
-    realtime: watchTime,
-    played_time: random(1000) + watchTime,
-    real_played_time: watchTime,
-    refer_url: 'https://www.bilibili.com/bangumi/media/md28229051/',
-    epid,
-  });
-  logger.info(`观看视频任务完成`);
+  try {
+    const epid = createEpid('327', 107, 134, [122, 123]);
+    const watchTime = completeTimes === 1 ? random(905, 1800) : random(1805, 2000);
+    // 播放西游记
+    await videoHeartbeat({
+      start_ts: getUnixTime() - watchTime,
+      realtime: watchTime,
+      played_time: random(1000) + watchTime,
+      real_played_time: watchTime,
+      refer_url: 'https://www.bilibili.com/bangumi/media/md28229051/',
+      epid,
+    });
+    logger.info(`观看视频任务完成`);
+  } catch (error) {
+    logger.error(error);
+    logger.error(`观看视频任务出现异常：${error.message}`);
+  }
 }
 
 /**
@@ -132,6 +148,24 @@ async function completeTask(taskCode: string, msg: string) {
     logger.info(`${msg}每日任务完成`);
   } catch (error) {
     logger.error(error);
+    logger.error(`每日任务${msg}出现异常：${error.message}`);
+  }
+}
+
+/**
+ * 浏览会员购
+ */
+async function vipMallBuy() {
+  try {
+    const { code, message } = await showDispatch('hevent_oy4b7h3epeb');
+    if (code === 0) {
+      logger.info(`浏览会员购每日任务完成`);
+      return;
+    }
+    logger.error(`浏览会员购失败: ${code} ${message}`);
+  } catch (error) {
+    logger.error(error);
+    logger.error(`每日任务会员购出现异常：${error.message}`);
   }
 }
 
@@ -154,12 +188,14 @@ async function sign(histories: SingTaskHistory[]) {
     const { code, message } = await signIn();
     if (code === 0) {
       logger.info(`签到成功`);
-      return true;
+      return code;
     }
     logger.error(`签到失败: ${code} ${message}`);
+    return code;
   } catch (error) {
     logger.error(error);
   }
+  return -1;
 }
 
 /**
