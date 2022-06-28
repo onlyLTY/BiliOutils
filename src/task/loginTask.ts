@@ -7,10 +7,11 @@ import { logger } from '../utils/log';
 type UserNavData = UserInfoNavDto['data'];
 
 function estimatedDays(upLevelExp: number): number {
-  if (TaskConfig.BILI_TARGET_COINS <= 0) return upLevelExp / 15;
-  const dailyExp = TaskConfig.BILI_TARGET_COINS * 10 + 15;
+  const { targetCoins } = TaskConfig.coin;
+  if (targetCoins <= 0) return upLevelExp / 15;
+  const dailyExp = targetCoins * 10 + 15;
   const idealDays = upLevelExp / dailyExp;
-  const coinSupportDays = TaskModule.money / (TaskConfig.BILI_TARGET_COINS - 1);
+  const coinSupportDays = TaskModule.money / (targetCoins - 1);
   if (idealDays < coinSupportDays) return Math.floor(idealDays);
   const needExp = upLevelExp - coinSupportDays * dailyExp;
   return needExp / 25 + coinSupportDays;
@@ -21,7 +22,7 @@ function setLevelInfo(data: UserNavData) {
   const levelInfo = data.level_info;
   const currentLevel = levelInfo.current_level;
   //判断当前等级是否还需要投币
-  if (currentLevel >= TaskConfig.BILI_TARGET_LEVEL) {
+  if (currentLevel >= TaskConfig.coin.targetLevel) {
     TaskModule.coinsTask = 0;
   }
   logger.info(`当前等级: ${levelInfo.current_level}`);

@@ -62,8 +62,9 @@ async function getExpiredGift() {
 }
 
 async function findOneRoom() {
-  const upList = Object.assign([] as number[], TaskConfig.BILI_GIFT_UP);
-  const getOneUp = () => upList.splice(random(TaskConfig.BILI_GIFT_UP.length - 1), 1)[0];
+  const { gift } = TaskConfig;
+  const upList = gift.mids || [];
+  const getOneUp = () => upList.splice(random(upList.length - 1), 1)[0];
   while (upList.length) {
     const mid = getOneUp();
     const room = await getUserRoom(mid);

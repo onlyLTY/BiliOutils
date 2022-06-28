@@ -1,5 +1,5 @@
 import { isArray, isNumber, isObject } from './is';
-import { md5, stringify } from './pure';
+import { getUnixTime, md5, stringify } from './pure';
 import * as crypto from 'crypto';
 
 type Params = Record<string, string | boolean | number>;
@@ -48,7 +48,7 @@ function getAppSign(
     // access_key: TaskConfig.accessKey,
     actionKey: 'appkey',
     appkey,
-    ts: parseInt(String(new Date().getTime() / 1000)),
+    ts: getUnixTime(),
   };
   return getSign(params, appsec);
 }
@@ -87,7 +87,7 @@ export function clientSign(params: Params) {
 /**
  * 给昵称添加 ** （目的是变简短）
  */
-export function conciseNickname(nickname: string) {
+export function conciseNickname(nickname = '') {
   const length = nickname.length;
   if (length <= 3) {
     return nickname;

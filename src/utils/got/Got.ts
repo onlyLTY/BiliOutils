@@ -99,8 +99,8 @@ export class VGot {
           response => {
             const { requestOptions } = response.request.options;
             if (requestOptions?.withBiliCookie) {
-              TaskConfig.COOKIE = getCookie(
-                TaskConfig.COOKIE,
+              TaskConfig.cookie = getCookie(
+                TaskConfig.cookie,
                 response.headers?.['set-cookie'] || [],
               );
             }
@@ -116,7 +116,7 @@ export class VGot {
     options.requestOptions = Object.assign({}, requestOptions, options.requestOptions);
     options.headers = mergeHeaders(headers, options.headers);
     if (requestOptions.withBiliCookie) {
-      options.headers['Cookie'] = TaskConfig.COOKIE;
+      options.headers['Cookie'] = TaskConfig.cookie;
     }
 
     if (requestOptions.retry) {

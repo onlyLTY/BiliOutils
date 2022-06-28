@@ -101,11 +101,11 @@ export const defaultConfig = {
   },
   gift: {
     /** 自定义投喂礼物用户列表 */
-    mids: [],
+    mids: [] as number[],
   },
   coin: {
     /** 自定义高优先级用户列表 */
-    customizeUp: [],
+    customizeUp: [] as number[],
     /** 投币操作重试次数 默认 4 */
     retryNum: 4,
     /** 目标等级 默认6级 */
@@ -162,9 +162,9 @@ export const defaultConfig = {
     // 购买漫画
     buy: false,
     // 购买漫画 id（优先级高）
-    mc: [],
+    mc: [] as number[],
     // 购买漫画名称（优先级中）
-    name: [],
+    name: [] as string[],
     // 购买追漫（优先级低）
     love: true,
     // 执行购买漫画间隔时间（单位天）
@@ -225,7 +225,7 @@ function oldConfigHandle(config: DefaultConfig): TheConfig {
  */
 function configValueHandle(config: TheConfig) {
   setConstValue(config);
-  const { coin, gift, charge } = config;
+  const { coin, gift, charge, match } = config;
   // TODO: 兼容旧配置
   if (!isArray(config.apiDelay)) {
     config.apiDelay = [Number(config.apiDelay)];
@@ -244,6 +244,12 @@ function configValueHandle(config: TheConfig) {
   }
   if (!charge.mid) {
     charge.mid = config.USERID;
+  }
+  if (coin.targetCoins > 5) {
+    coin.targetCoins = 5;
+  }
+  if (match.coins > 10) {
+    match.coins = 10;
   }
 
   return config;

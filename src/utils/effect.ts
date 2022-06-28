@@ -30,7 +30,7 @@ function getDelay(delayTime?: number, delayTime2?: number) {
   if (delayTime) {
     return delayTime;
   }
-  const API_DELAY = TaskConfig.BILI_API_DELAY;
+  const API_DELAY = TaskConfig.apiDelay;
   if (API_DELAY.length === 1) {
     return API_DELAY[0] * 1000;
   }

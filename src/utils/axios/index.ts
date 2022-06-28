@@ -77,7 +77,7 @@ const transform: AxiosTransform = {
   requsetInterceptors: (config: AxiosRequestConfig) => {
     const { requestOptions } = config;
     if (requestOptions.withBiliCookie === true) {
-      config.headers['Cookie'] = TaskConfig.COOKIE;
+      config.headers['Cookie'] = TaskConfig.cookie;
     }
     return config;
   },
@@ -87,7 +87,7 @@ const transform: AxiosTransform = {
    */
   responseInterceptors: (res: AxiosResponse<any>) => {
     if (res.config.requestOptions.withBiliCookie) {
-      TaskConfig.COOKIE = getCookie(TaskConfig.COOKIE, res.headers?.['set-cookie'] || []);
+      TaskConfig.cookie = getCookie(TaskConfig.cookie, res.headers?.['set-cookie'] || []);
     }
     return res;
   },
