@@ -2,7 +2,16 @@ import type { FansMedalDto } from '../dto/live.dto';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import * as liveRequest from '../net/live.request';
 import { kaomoji } from '../constant';
-import { random, apiDelay, logger, Logger, apiDelaySync, randomString, createUUID } from '@/utils';
+import {
+  random,
+  apiDelay,
+  logger,
+  Logger,
+  apiDelaySync,
+  randomString,
+  createUUID,
+  isServerless,
+} from '@/utils';
 import { likeLiveRoom, liveMobileHeartBeat, shareLiveRoom } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
 
@@ -170,23 +179,27 @@ async function liveHeart(fansMealList: FansMedalDto[]) {
   if (fansMealList.length === 0) return;
   const { liveHeart } = TaskConfig.intimacy;
   if (!liveHeart) return;
+  if (isServerless()) return await liveHeartPromiseSync(fansMealList);
   return new Promise(resolve => liveHeartPromise(resolve, fansMealList));
 }
 
+function getRandomOptions() {
+  return {
+    buvid: randomString(37).toUpperCase(),
+    gu_id: randomString(43).toLocaleUpperCase(),
+    visit_id: randomString(32).toLocaleLowerCase(),
+    uuid: createUUID(),
+    click_id: createUUID(),
+  };
+}
+
 function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
-  for (let index = 0; index < roomList.length; index++) {
+  for (const fansMedal of roomList) {
     const countRef: Ref<number> = { value: 0 };
-    const fansMeal = roomList[index];
     const timerRef: Ref<NodeJS.Timer> = { value: undefined };
-    const options = {
-      buvid: randomString(37).toUpperCase(),
-      gu_id: randomString(43).toLocaleUpperCase(),
-      visit_id: randomString(32).toLocaleLowerCase(),
-      uuid: createUUID(),
-      click_id: createUUID(),
-    };
-    run(fansMeal, options, countRef, timerRef);
-    timerRef.value = setInterval(run, 60000, fansMeal, options, countRef, timerRef);
+    const options = getRandomOptions();
+    run(fansMedal, options, countRef, timerRef);
+    timerRef.value = setInterval(run, 60000, fansMedal, options, countRef, timerRef);
     apiDelaySync(50, 150);
   }
   resolve('直播间心跳');
@@ -208,6 +221,37 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
     if (countRef.value >= 31) {
       timerRef && timerRef.value && clearInterval(timerRef.value);
     }
+  }
+}
+
+function liveHeartPromiseSync(roomList: FansMedalDto[]) {
+  return Promise.all(
+    roomList.map(fansMedal => allLiveHeart(fansMedal, getRandomOptions(), { value: 0 })),
+  );
+}
+
+/**
+ * 完成一个直播间所有轮次的心跳
+ * @param fansMeal
+ * @param options
+ */
+async function allLiveHeart(
+  fansMedal: FansMedalDto,
+  options: Record<string, string>,
+  countRef: Ref<number>,
+) {
+  for (let i = 0; i < 31; i++) {
+    const { medal, anchor_info, room_info } = fansMedal;
+    await liveMobileHeart(
+      {
+        up_id: medal.target_id,
+        room_id: room_info.room_id,
+        uname: anchor_info.nick_name,
+        ...options,
+      },
+      countRef,
+    );
+    await apiDelay(60000);
   }
 }
 

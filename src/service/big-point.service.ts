@@ -126,7 +126,7 @@ async function watchTask(completeTimes: number) {
       refer_url: 'https://www.bilibili.com/bangumi/media/md28229051/',
       epid,
     });
-    logger.info(`观看视频任务完成`);
+    logger.info(`观看视频（西游记）任务 ✓`);
   } catch (error) {
     logger.error(error);
     logger.error(`观看视频任务出现异常：${error.message}`);
@@ -145,7 +145,7 @@ async function completeTask(taskCode: string, msg: string) {
       logger.error(`${msg}失败: ${comCode} ${comMsg}`);
       return;
     }
-    logger.info(`${msg}每日任务完成`);
+    logger.info(`${msg}每日任务 ✓`);
   } catch (error) {
     logger.error(error);
     logger.error(`每日任务${msg}出现异常：${error.message}`);
@@ -159,7 +159,7 @@ async function vipMallBuy() {
   try {
     const { code, message } = await showDispatch('hevent_oy4b7h3epeb');
     if (code === 0) {
-      logger.info(`浏览会员购每日任务完成`);
+      logger.info(`浏览会员购每日任务 ✓`);
       return;
     }
     logger.error(`浏览会员购失败: ${code} ${message}`);
@@ -181,13 +181,13 @@ async function sign(histories: SingTaskHistory[]) {
     return;
   }
   if (today.signed) {
-    logger.info('今日已签到');
+    logger.info('今日已签到 ✓');
     return;
   }
   try {
     const { code, message } = await signIn();
     if (code === 0) {
-      logger.info(`签到成功`);
+      logger.info(`签到成功 ✓`);
       return code;
     }
     logger.error(`签到失败: ${code} ${message}`);

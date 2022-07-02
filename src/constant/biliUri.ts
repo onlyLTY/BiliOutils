@@ -11,6 +11,8 @@ export const OriginURLs = {
 
 export const RefererURLs = {
   www: 'https://www.bilibili.com/',
+  bigPoint: 'https://big.bilibili.com/mobile/bigPoint',
+  bigPointTask: 'https://big.bilibili.com/mobile/bigPoint/task',
 };
 
 export const baseURLs = {
@@ -44,6 +46,6 @@ export function getAndroidUA({
   build = '6780300',
   channel = 'xiaomi',
   os = '10',
-}: UAOption) {
+}: UAOption = {}) {
   return `Mozilla/5.0 BiliDroid/${version} (bbcallen@gmail.com) os/android model/${phone} mobi_app/android build/${build} channel/${channel} innerVer/${channel} osVer/${os} network/2`;
 }
