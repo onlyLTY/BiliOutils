@@ -1,9 +1,14 @@
 import type { Config } from '../types';
 import { getConfig } from './setConfig';
 import { mergeConfig } from './config';
+import { getAndroidUA } from '@/constant/biliUri';
 
-let _taskConfig: Config;
-export const TaskConfig = new Proxy({} as Config, {
+type TaskConfigType = Config & {
+  mobileUA: string;
+};
+
+let _taskConfig: TaskConfigType;
+export const TaskConfig = new Proxy({} as TaskConfigType, {
   get(_target, key) {
     if (!_taskConfig) {
       initialize();
@@ -53,7 +58,7 @@ export function initialize(config?: Config) {
   }
   // TODO: 配置方式兼容
   const userConfig = mergeConfig(config) as Config;
-  _taskConfig = userConfig;
+  _taskConfig = { ...userConfig, mobileUA: getAndroidUA() };
   TaskModule = class extends TaskModuleTemplate {};
   TaskModule.coinsTask = _taskConfig.coin.targetCoins;
 }

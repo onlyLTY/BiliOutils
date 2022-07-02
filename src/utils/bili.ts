@@ -48,6 +48,12 @@ function getAppSign(
     // access_key: TaskConfig.accessKey,
     actionKey: 'appkey',
     appkey,
+    platform: 'android',
+    mobi_app: 'android',
+    disable_rcmd: 0,
+    build: 6780300,
+    c_locale: 'zh_CN',
+    s_locale: 'zh_CN',
     ts: getUnixTime(),
   };
   return getSign(params, appsec);

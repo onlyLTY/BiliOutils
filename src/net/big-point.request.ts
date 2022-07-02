@@ -2,17 +2,30 @@ import type { TaskCombineDto } from '@/dto/big-point.dto';
 import type { PureDataProp } from '@/dto/bili-base-prop';
 import { biliApi, biliHttp } from './api';
 import { TaskConfig } from '@/config/globalVar';
-import { getUnixTime } from '@/utils/pure';
 import type { TaskCodeType } from '@/enums/big-point.emum';
 import { appSignString } from '@/utils/bili';
+import { RefererURLs } from '@/constant/biliUri';
+import { getUnixTime } from '@/utils/pure';
+
+const baseHeader = {
+  'app-key': 'android64',
+  env: 'prod',
+  'user-agent': TaskConfig.mobileUA,
+};
 
 /**
  * 大积分签到
  */
 export function signIn() {
-  return biliApi.post<Omit<PureDataProp, 'data'>>('pgc/activity/score/task/sign', {
-    csrf: TaskConfig.BILIJCT,
-  });
+  return biliApi.post<Omit<PureDataProp, 'data'>>(
+    'pgc/activity/score/task/sign',
+    appSignString({
+      csrf: TaskConfig.BILIJCT,
+    }),
+    {
+      headers: baseHeader,
+    },
+  );
 }
 
 /**
@@ -29,35 +42,42 @@ export function receiveTask(taskCode: TaskCodeType = 'ogvwatch') {
     {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
+        referer: RefererURLs.bigPointTask,
+        ...baseHeader,
       },
     },
   );
 }
 
-const baseParams = {
-  platform: 'android',
-  mobi_app: 'android',
-  disable_rcmd: 0,
-  build: 6780300,
-  c_locale: 'zh_CN',
-  s_locale: 'zh_CN',
-  csrf: TaskConfig.BILIJCT,
-};
-
 export function susWin() {
-  return biliApi.post<PureDataProp<Record<string, never>>>('pgc/activity/deliver/susWin/receive', {
-    ...baseParams,
-  });
+  return biliApi.post<PureDataProp<Record<string, never>>>(
+    'pgc/activity/deliver/susWin/receive',
+    appSignString({
+      csrf: TaskConfig.BILIJCT,
+    }),
+    {
+      headers: baseHeader,
+    },
+  );
 }
 
 /**
  * 完成大积分每日任务
  */
 export function complete(position: string) {
-  return biliApi.post<PureDataProp>('pgc/activity/deliver/task/complete', {
-    ...baseParams,
-    position,
-  });
+  return biliApi.post<PureDataProp>(
+    'pgc/activity/deliver/task/complete',
+    appSignString({
+      csrf: TaskConfig.BILIJCT,
+      position,
+    }),
+    {
+      headers: {
+        ...baseHeader,
+        referer: RefererURLs.bigPoint,
+      },
+    },
+  );
 }
 
 /**
@@ -71,15 +91,16 @@ export function showDispatch(eventId: string) {
     errtag: number;
     ttl: number;
   }>(
-    `https://show.bilibili.com/api/activity/fire/common/event/dispatch?${appSignString(
-      baseParams,
-    )}`,
+    `https://show.bilibili.com/api/activity/fire/common/event/dispatch?${appSignString({
+      csrf: TaskConfig.BILIJCT,
+    })}`,
     {
       eventId,
     },
     {
       headers: {
         'content-type': 'application/json; charset=utf-8',
+        ...baseHeader,
       },
     },
   );
@@ -89,5 +110,7 @@ export function showDispatch(eventId: string) {
  * 获取大积分任务列表
  */
 export function getTaskCombine() {
-  return biliApi.get<TaskCombineDto>('x/vip_point/task/combine');
+  return biliApi.get<TaskCombineDto>('x/vip_point/task/combine', {
+    headers: baseHeader,
+  });
 }
