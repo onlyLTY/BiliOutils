@@ -36,7 +36,7 @@ async function getExpiredGift() {
     const {
       data: { list },
     } = await getGiftBagList();
-
+    if (!list) return;
     return list.filter(gift => {
       if (gift.expire_at <= 0) {
         return false;
@@ -52,12 +52,11 @@ async function getExpiredGift() {
     });
   } catch (error) {
     // 重试一次
-    if (!countGetExpiredGift) {
+    if (!countGetExpiredGift++) {
       await getExpiredGift();
     } else {
       return null;
     }
-    countGetExpiredGift++;
   }
 }
 
@@ -131,6 +130,8 @@ async function sendGift(
       data.gift_list.forEach(gift => {
         logger.info(`成功给 [${name}] 投喂${gift.gift_name}`);
       });
-    } catch {}
+    } catch {
+      logger.debug(`向[${name}]投喂[${gift.gift_name}]，异常`);
+    }
   }
 }
