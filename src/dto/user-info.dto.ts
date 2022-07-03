@@ -123,6 +123,15 @@ export interface CoinTodayExpDto extends ApiBaseProp {
   data: number;
 }
 
+/** 获取硬币历史记录 */
+export type CoinHistoryDto = ApiBaseProp<{
+  list: {
+    time: string;
+    delta: number;
+    reason: string;
+  }[];
+}>;
+
 export interface OtherUserDto extends ApiBaseProp {
   data: {
     mid: number;

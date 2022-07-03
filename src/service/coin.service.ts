@@ -1,5 +1,10 @@
-import { apiDelay, getPageNum, getRandomItem, logger, random } from '../utils';
-import { getFollowings, getSpecialFollowings } from '../net/user-info.request';
+import { apiDelay, getDateString, getPageNum, getRandomItem, logger, random } from '../utils';
+import {
+  getCoinHistory,
+  getDonateCoinExp,
+  getFollowings,
+  getSpecialFollowings,
+} from '../net/user-info.request';
 import { getRegionRankingVideos } from '../net/video.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import type { FollowingsDto, TagsFollowingsDto } from '../dto/user-info.dto';
@@ -308,4 +313,54 @@ export async function coinToId({ id, coin = 1, coinType = 'video', mid }: CoinTo
     //@ts-ignore
     message: handleData.message || handleData.msg,
   };
+}
+
+/**
+ * 获取今日投币数量
+ */
+export async function getTodayCoinNum() {
+  const exp = await getTodayExp();
+  if (exp) return exp;
+  const coinNum = await getTodayCoin();
+  return coinNum;
+}
+
+/** 获取已经获得的经验 */
+async function getTodayExp() {
+  try {
+    const { data: coinExp, code } = await getDonateCoinExp();
+    if (code === 0) {
+      return coinExp / 10;
+    }
+  } catch (error) {
+    logger.debug(`获取投币数量异常 ${error.message}`);
+  }
+}
+
+/** 获取今日投币消耗硬币 */
+async function getTodayCoin() {
+  try {
+    const { code, message, data } = await getCoinHistory();
+    if (code !== 0) {
+      logger.warn(`获取投币消耗硬币失败：${code} ${message}`);
+      return;
+    }
+    const list = data.list;
+    if (!list || !list.length) {
+      return;
+    }
+    const today = list
+      .filter(item => {
+        if (item.delta !== -2 && item.delta !== -1) return false;
+        const { reason, time } = item;
+        if (!reason || !time) return;
+        if (!reason.startsWith('给') || !reason.endsWith('打赏')) return;
+        if (time.startsWith(getDateString())) return true;
+        return false;
+      })
+      .reduce((acc, item) => acc + item.delta, 0);
+    return Math.abs(today);
+  } catch (error) {
+    logger.debug(`获取投币消耗硬币异常 ${error.message}`);
+  }
 }

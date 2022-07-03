@@ -63,7 +63,9 @@ async function getOneGuessCollection() {
     }
 
     return list;
-  } catch (error) {}
+  } catch (error) {
+    logger.debug(error.message);
+  }
 }
 
 async function guessOne(list: GuessCollectionDto['data']['list']) {

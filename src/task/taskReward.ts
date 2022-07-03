@@ -1,14 +1,15 @@
-import { getDailyTaskRewardInfo, getDonateCoinExp } from '../net/user-info.request';
+import { getDailyTaskRewardInfo } from '../net/user-info.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { logger } from '../utils/log';
+import { getTodayCoinNum } from '@/service/coin.service';
 
 export default async function taskReward() {
   logger.info('----【每日任务完成情况】----');
   try {
     const { data, message, code } = await getDailyTaskRewardInfo();
     await apiDelay();
-    const { data: coinExp } = await getDonateCoinExp(); // 获取更精准的已投币数
+    const coinNum = await getTodayCoinNum(); // 获取更精准的已投币数
     if (code != 0) {
       logger.warn(`状态获取失败: ${code} ${message}`);
       return;
@@ -19,22 +20,20 @@ export default async function taskReward() {
     let coins = 0;
     if (TaskModule.coinsTask === 0) {
       // 根据经验设置的目标
-      logger.info(`今日投币获取经验: ${coinExp}，还需投币0颗，经验够了，不想投了`);
+      logger.info(`今日投币数量：${coinNum}，还需投币0颗，经验够了，不想投了`);
     } else if (targetCoinsDiff <= 0) {
       // 剩余硬币比需要保留的少
-      logger.info(`今日投币获取经验: ${coinExp}，还需投币0颗，硬币不够了，不投币了`);
+      logger.info(`今日投币数量：${coinNum}，还需投币0颗，硬币不够了，不投币了`);
     } else if (targetCoinsDiff < TaskModule.coinsTask) {
       // 确保最后一次投币精准降落到设置的需要保留硬币数上
       // (狗头保命)
       coins = TaskModule.coinsTask - targetCoinsDiff;
       logger.info(
-        `投币获取经验: ${coinExp}，还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗，忽略部分投币)`,
+        `投币数量: ${coinNum}，还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗，忽略部分投币)`,
       );
     } else {
-      coins = TaskModule.coinsTask - coinExp / 10;
-      logger.info(
-        `投币获取经验: ${coinExp}，还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`,
-      );
+      coins = TaskModule.coinsTask - coinNum;
+      logger.info(`投币数量: ${coinNum}，还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`);
     }
 
     TaskModule.coinsTask = coins;

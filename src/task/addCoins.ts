@@ -1,7 +1,12 @@
-import { getDonateCoinExp } from '../net/user-info.request';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay, logger } from '../utils';
-import { AidInfo, coinToId, CoinToIdParams, getAidByByPriority } from '../service/coin.service';
+import {
+  AidInfo,
+  coinToId,
+  CoinToIdParams,
+  getAidByByPriority,
+  getTodayCoinNum,
+} from '../service/coin.service';
 
 interface State {
   eCount: number;
@@ -54,12 +59,12 @@ async function coinHandle(state: State) {
  */
 async function setCoinsTask() {
   try {
-    const { data: coinExp, code } = await getDonateCoinExp();
-    if (code == 0) {
-      const coins = TaskConfig.coin.targetCoins - coinExp / 10;
-      TaskModule.coinsTask = coins > 0 ? coins : 0;
-    }
-  } catch (error) {}
+    const coinNum = await getTodayCoinNum();
+    const coins = TaskConfig.coin.targetCoins - coinNum;
+    TaskModule.coinsTask = coins > 0 ? coins : 0;
+  } catch (error) {
+    logger.debug(`获取投币数量异常 ${error.message}`);
+  }
 }
 
 /**
