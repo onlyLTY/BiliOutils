@@ -2,6 +2,7 @@ import type { Config } from '../types';
 import { getConfig } from './setConfig';
 import { mergeConfig } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
+import { encodeCookie } from '@/utils/cookie';
 
 type TaskConfigType = Config & {
   mobileUA: string;
@@ -58,7 +59,11 @@ export function initialize(config?: Config) {
   }
   // TODO: 配置方式兼容
   const userConfig = mergeConfig(config) as Config;
-  _taskConfig = { ...userConfig, mobileUA: getAndroidUA() };
+  _taskConfig = {
+    ...userConfig,
+    mobileUA: getAndroidUA(),
+    cookie: encodeCookie(userConfig.cookie),
+  };
   TaskModule = class extends TaskModuleTemplate {};
   TaskModule.coinsTask = _taskConfig.coin.targetCoins;
 }

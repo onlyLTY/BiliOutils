@@ -92,8 +92,8 @@ async function handleDailyTask(taskItems: CommonTaskItem[]) {
       case 'animatetab':
         await completeTask('jp_channel', '浏览追番频道');
         break;
-      case 'vipmallbuy':
-        await vipMallBuy();
+      case 'vipmallview':
+        await vipMallView();
         break;
       default:
         break;
@@ -155,7 +155,7 @@ async function completeTask(taskCode: string, msg: string) {
 /**
  * 浏览会员购
  */
-async function vipMallBuy() {
+async function vipMallView() {
   try {
     const { code, message } = await showDispatch('hevent_oy4b7h3epeb');
     if (code === 0) {

@@ -8,6 +8,7 @@ export type TheConfig = Omit<DefaultConfig, keyof typeof compatibleMap>;
 
 export const defaultConfig = {
   cookie: '',
+  accessKey: '',
   message: {
     br: '\n',
     email: {

@@ -26,6 +26,7 @@ const userConfig = {
 };
 const theConfig = {
   BILIJCT: 'asjdklha17238213b213gc213',
+  accessKey: '',
   USERID: 11111111,
   cookie,
   message: {
@@ -67,6 +68,7 @@ const theConfig = {
     liveLottery: false,
     liveRedPack: false,
     liveIntimacy: false,
+    bigPoint: false,
   },
   apiDelay: [2, 6],
   userAgent: '',
