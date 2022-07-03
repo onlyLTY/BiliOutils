@@ -31,6 +31,7 @@ function encodeCookieValue(val: string): string {
   return encodeURIComponent(val)
     .replaceAll('%7C', '|')
     .replaceAll('%2B', '+')
+    .replaceAll('%25', '%')
     .replaceAll('*', '%2A');
 }
 
