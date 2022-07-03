@@ -266,7 +266,9 @@ async function getRedPacketId(roomId: IdType) {
       return;
     }
     return lot_id;
-  } catch (error) {}
+  } catch (error) {
+    logger.debug(`检测红包异常: ${error.message}`);
+  }
 }
 
 interface RedPacket {

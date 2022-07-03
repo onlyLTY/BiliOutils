@@ -49,6 +49,18 @@ export function getPRCDate(): Date {
 }
 
 /**
+ * 获取当前日期（自动补齐两位）
+ */
+export function getDateString(now?: Date) {
+  const nowTime = now || getPRCDate();
+  const year = nowTime.getFullYear(),
+    month = nowTime.getMonth() + 1,
+    day = nowTime.getDate();
+
+  return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+}
+
+/**
  * 将 JSONP 返回的数据转换为对象
  */
 export function jsonp2Object(jsonp: string) {

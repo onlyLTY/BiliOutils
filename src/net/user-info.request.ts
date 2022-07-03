@@ -1,6 +1,7 @@
 import type { IdType } from '../types';
 import type {
   CoinBalanceDto,
+  CoinHistoryDto,
   CoinTodayExpDto,
   CreateTagDto,
   FollowingsDto,
@@ -39,6 +40,13 @@ export function getDailyTaskRewardInfo(): Promise<RewardDto> {
  */
 export function getDonateCoinExp(): Promise<CoinTodayExpDto> {
   return biliApi.get('/x/web-interface/coin/today/exp');
+}
+
+/**
+ * 获取最近投币记录
+ */
+export function getCoinHistory() {
+  return biliApi.get<CoinHistoryDto>('x/member/web/coin/log?jsonp=jsonp');
 }
 
 /**

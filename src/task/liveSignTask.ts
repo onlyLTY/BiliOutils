@@ -10,7 +10,9 @@ export default async function liveSignTask() {
       logger.info(`已经签到${data.hadSignDays}天，${data.specialText}`);
       return;
     }
-  } catch (error) {}
+  } catch (error) {
+    logger.debug(`直播签到，${error.message}`);
+  }
   try {
     const { code, data, message } = await doLiveSign();
     if (code === 0) {
