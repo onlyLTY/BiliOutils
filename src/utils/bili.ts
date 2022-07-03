@@ -1,6 +1,7 @@
 import { isArray, isNumber, isObject } from './is';
 import { getUnixTime, md5, stringify } from './pure';
 import * as crypto from 'crypto';
+import { TaskConfig } from '@/config/globalVar';
 
 type Params = Record<string, string | boolean | number>;
 
@@ -40,14 +41,8 @@ function getAppSign(
   appkey = '1d8b6e7d45233436',
   appsec = '560c52ccd288fed045859ed18bffd973',
 ) {
-  // if (!TaskConfig.accessKey) {
-  //   return getSign(params, appsec, true);
-  // }
   params = {
     ...params,
-    // access_key: TaskConfig.accessKey,
-    actionKey: 'appkey',
-    appkey,
     platform: 'android',
     mobi_app: 'android',
     disable_rcmd: 0,
@@ -55,6 +50,17 @@ function getAppSign(
     c_locale: 'zh_CN',
     s_locale: 'zh_CN',
     ts: getUnixTime(),
+  };
+  if (!TaskConfig.accessKey) {
+    return getSign(params, appsec, true);
+  }
+  delete params.csrf;
+  delete params.csrf_token;
+  params = {
+    ...params,
+    access_key: TaskConfig.accessKey,
+    actionKey: 'appkey',
+    appkey,
   };
   return getSign(params, appsec);
 }

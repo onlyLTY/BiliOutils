@@ -40,10 +40,12 @@ export function receiveTask(taskCode: TaskCodeType = 'ogvwatch') {
       taskCode,
     },
     {
+      http2: true,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        referer: RefererURLs.bigPointTask,
+        Referer: RefererURLs.bigPointTask,
         ...baseHeader,
+        navtive_api_from: 'h5',
       },
     },
   );

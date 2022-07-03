@@ -3,7 +3,7 @@ function getCookieArray(cookie: string | undefined) {
   return cookie.split('; ').map(el => el.split('='));
 }
 
-function cookie2Obj(cookie: string, setCookie: unknown): object {
+function cookie2Obj(cookie: string, setCookie?: unknown): object {
   const setCookieArr = getCookieArray(setCookie?.[0]).filter(el => el.length === 2);
   const arr = getCookieArray(cookie)
     .concat(setCookieArr)
@@ -21,7 +21,21 @@ function cookie2Obj(cookie: string, setCookie: unknown): object {
       });
     }
   }
+  Object.keys(obj).forEach(key => {
+    obj[key] = encodeCookieValue(obj[key]);
+  });
   return obj;
+}
+
+function encodeCookieValue(val: string): string {
+  return encodeURIComponent(val)
+    .replaceAll('%7C', '|')
+    .replaceAll('%2B', '+')
+    .replaceAll('*', '%2A');
+}
+
+export function encodeCookie(cookie: string) {
+  return getCookieString(cookie2Obj(cookie));
 }
 
 function getCookieString(obj: object): string {
