@@ -66,6 +66,7 @@ export const defaultConfig = {
     mangaTask: false,
     // 大会员积分
     bigPoint: false,
+    liveFamine: false,
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
   apiDelay: [2, 6],
@@ -172,6 +173,9 @@ export const defaultConfig = {
     buyInterval: 6,
     // 星期几执行购买漫画
     buyWeek: [3],
+  },
+  activity: {
+    liveFamineTime: 400,
   },
   BILIJCT: '',
   USERID: 0,

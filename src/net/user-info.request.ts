@@ -21,7 +21,7 @@ import { TaskConfig } from '../config/globalVar';
  * 登录账号
  */
 export function loginByCookie(): Promise<UserInfoNavDto> {
-  return biliApi.get('/x/web-interface/nav', {
+  return biliApi.get('x/web-interface/nav', {
     headers: {
       Origin: OriginURLs.account,
     },
@@ -32,14 +32,14 @@ export function loginByCookie(): Promise<UserInfoNavDto> {
  * 每日任务完成情况
  */
 export function getDailyTaskRewardInfo(): Promise<RewardDto> {
-  return biliApi.get('/x/member/web/exp/reward');
+  return biliApi.get('x/member/web/exp/reward');
 }
 
 /**
  * 获取投币获得的经验
  */
 export function getDonateCoinExp(): Promise<CoinTodayExpDto> {
-  return biliApi.get('/x/web-interface/coin/today/exp');
+  return biliApi.get('x/web-interface/coin/today/exp');
 }
 
 /**
@@ -53,7 +53,7 @@ export function getCoinHistory() {
  * 硬币数量
  */
 export function getCoinBalance(): Promise<CoinBalanceDto> {
-  return accountApi.get('/site/getCoin');
+  return accountApi.get('site/getCoin');
 }
 
 /**
@@ -71,7 +71,7 @@ export function getFollowings(
   order = 'desc',
   order_type = 'attention',
 ): Promise<FollowingsDto> {
-  return biliApi.get('/x/relation/followings', {
+  return biliApi.get('x/relation/followings', {
     params: {
       vmid,
       pn: pageNumber,
@@ -93,7 +93,7 @@ export function getFollowingsByTag(
   pageSize = 50,
   tagId = -10,
 ): Promise<TagsFollowingsDto> {
-  return biliApi.get('/x/relation/tag', {
+  return biliApi.get('x/relation/tag', {
     params: {
       tagid: tagId,
       pn: pageNumber,
@@ -117,7 +117,7 @@ export function getSpecialFollowings(pageNumber = 1, pageSize = 50): Promise<Tag
  * @param pageSize 数据数量
  */
 export function getVideosByUpId(upId: number, pageSize = 50): Promise<VideoByUpDto> {
-  return biliApi.get('/x/v2/medialist/resource/list', {
+  return biliApi.get('x/v2/medialist/resource/list', {
     params: {
       direction: false,
       mobi_app: 'web',
@@ -134,14 +134,14 @@ export function getVideosByUpId(upId: number, pageSize = 50): Promise<VideoByUpD
  * @param mid 用户 id
  */
 export function getUser(mid: IdType): Promise<OtherUserDto> {
-  return biliApi.get(`/x/space/acc/info?mid=${mid}&jsonp=jsonp`);
+  return biliApi.get(`x/space/acc/info?mid=${mid}&jsonp=jsonp`);
 }
 
 /**
  * 创建一个关注分组
  */
 export function createTag(name: string): Promise<CreateTagDto> {
-  return biliApi.post('/x/relation/tag/create', {
+  return biliApi.post('x/relation/tag/create', {
     tag: name,
     jsonp: 'jsonp',
     csrf: TaskConfig.BILIJCT,
@@ -153,7 +153,7 @@ export function createTag(name: string): Promise<CreateTagDto> {
  * @param mid 用户 id
  */
 export function unFollow(mid: IdType): Promise<ApiBaseProp> {
-  return biliApi.post('/x/relation/modify', {
+  return biliApi.post('x/relation/modify', {
     fid: mid,
     act: 2,
     re_src: 11,
@@ -170,7 +170,7 @@ export function unFollow(mid: IdType): Promise<ApiBaseProp> {
  */
 export function moveToTag(mid: IdType, tagId: number): Promise<ApiBaseProp> {
   return biliApi.post(
-    '/x/relation/tags/addUsers?cross_domain=true',
+    'x/relation/tags/addUsers?cross_domain=true',
     {
       fids: mid,
       tagids: tagId,
@@ -188,7 +188,7 @@ export function moveToTag(mid: IdType, tagId: number): Promise<ApiBaseProp> {
  * 获取分组列表
  */
 export function getTags(): Promise<TagListDto> {
-  return biliApi.get('/x/relation/tags?jsonp=jsonp&callback=__jp3', {
+  return biliApi.get('x/relation/tags?jsonp=jsonp&callback=__jp3', {
     headers: {
       Referer: 'https://space.bilibili.com/1/fans/follow?tagid=0',
     },

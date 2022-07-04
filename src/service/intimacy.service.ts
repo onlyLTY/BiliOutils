@@ -183,7 +183,7 @@ async function liveHeart(fansMealList: FansMedalDto[]) {
   return new Promise(resolve => liveHeartPromise(resolve, fansMealList));
 }
 
-function getRandomOptions() {
+export function getRandomOptions() {
   return {
     buvid: randomString(37).toUpperCase(),
     gu_id: randomString(43).toLocaleUpperCase(),

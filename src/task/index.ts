@@ -20,6 +20,7 @@ export const taskExportOrder = [
   'liveIntimacy',
   'giveGift',
   'loginTask',
+  'liveFamine',
 ] as const;
 
 /**
@@ -44,6 +45,7 @@ export const biliTasks = [
   () => import('./liveIntimacy'),
   () => import('./giveGift'),
   () => import('./loginTask'),
+  () => import('./liveFamine'),
 ];
 
 export async function getBiliTask(funcName: typeof taskExportOrder[number]) {
