@@ -120,7 +120,8 @@ function setConfig() {
   }
 
   if (SystemConfig.isQingLongPanel) {
-    configPathArr.splice(0, 1, ...qlOldConfigArr);
+    configPathArr.splice(0, 1);
+    configPathArr.push(...qlOldConfigArr);
   }
   for (let index = 0; index < configPathArr.length; index++) {
     const config = readJsonFile<Config>(configPathArr[index]);

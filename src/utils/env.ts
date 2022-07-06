@@ -3,7 +3,7 @@
  */
 export const isQingLongPanel = () => {
   // @ts-ignore
-  return '__IS_QINGLONG__' === 'true' || process.env.QL_BRANCH;
+  return Boolean(process.env.IS_QING_LONG || '__IS_QINGLONG__' === 'true' || process.env.QL_BRANCH);
 };
 
 /**
