@@ -2,6 +2,8 @@ import type { Config } from './types';
 import { isArg } from './utils/args';
 import { runTask } from './util';
 
+process.env.IS_QING_LONG = 'true';
+
 (async () => {
   const { getConfig } = await import('./config/setConfig');
   if (isArg('item') || isArg('I')) {
