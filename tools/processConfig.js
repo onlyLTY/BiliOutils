@@ -34,7 +34,7 @@ function getConfig() {
   const { BILI_CONFIG, BILITOOLS_CONFIG } = process.env;
   if (BILITOOLS_CONFIG || BILI_CONFIG) {
     process.stdout.write('使用环境变量 BILITOOLS_CONFIG\n');
-    return BILITOOLS_CONFIG || BILI_CONFIG;
+    return (BILITOOLS_CONFIG || BILI_CONFIG)?.trim();
   }
   const tempTxtPath = resolveRootPath('config/config.txt');
   if (existsSync(tempTxtPath)) {

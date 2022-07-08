@@ -48,8 +48,8 @@ export default async function (
   const TRIGGER_NAME = event.TriggerName;
   const clientConfig = {
     credential: {
-      secretId: process.env.TENCENT_SECRET_ID,
-      secretKey: process.env.TENCENT_SECRET_KEY,
+      secretId: process.env.TENCENT_SECRET_ID.trim(),
+      secretKey: process.env.TENCENT_SECRET_KEY.trim(),
     },
     region: context.tencentcloud_region,
     profile: {

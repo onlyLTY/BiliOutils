@@ -37,7 +37,7 @@ const getEnvConfig = (): Config => {
     return undefined;
   }
   try {
-    return JSON5.parse(gzipDecode(config));
+    return JSON5.parse(gzipDecode(config.trim()));
   } catch (error) {
     logger.error(error);
     throw new Error('环境中的配置不是有效的 JSON 字符串！');
