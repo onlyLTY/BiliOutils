@@ -15,7 +15,7 @@ export const defaultConfig = {
       host: 'smtp.163.com',
       port: 465,
     },
-    pushplusToken: process.env.PUSHPLUS_TOKEN,
+    pushplusToken: process.env.PUSHPLUS_TOKEN?.trim(),
     api: {
       method: 'POST',
       headers: {

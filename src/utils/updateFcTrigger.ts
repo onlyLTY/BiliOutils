@@ -47,8 +47,8 @@ export default async function (
   const SERVICE_NAME = context.service.name;
 
   const client = new FCClient(context.accountId, {
-    accessKeyID: process.env.ALI_SECRET_ID,
-    accessKeySecret: process.env.ALI_SECRET_KEY,
+    accessKeyID: process.env.ALI_SECRET_ID.trim(),
+    accessKeySecret: process.env.ALI_SECRET_KEY.trim(),
     region: context.region,
   });
 

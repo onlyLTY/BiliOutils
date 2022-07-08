@@ -58,9 +58,9 @@ function initEnv() {
   MyProcessEnv = initProcessEnv(MyProcessEnv);
 
   envName.forEach(name => {
-    const value = message[upperCaseToHump(name)] || message[name] || process.env[name];
+    const value: string = message[upperCaseToHump(name)] || message[name] || process.env[name];
     if (value) {
-      MyProcessEnv[name] = value;
+      MyProcessEnv[name] = value.trim?.();
     }
   });
 

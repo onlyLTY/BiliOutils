@@ -151,7 +151,3 @@ interface UserWatchTime {
   bind_status: number;
   duration: number;
 }
-
-(async () => {
-  await liveAFKService(30);
-})();
