@@ -1,3 +1,13 @@
+export interface AnyProp<T = any> {
+  code?: number;
+  message?: string;
+  data?: T;
+  ttl?: number;
+  ts?: number;
+  msg?: string;
+  status?: boolean;
+}
+
 export interface ApiBaseProp<T = object | number> {
   /**
    * -658 Token 过期
