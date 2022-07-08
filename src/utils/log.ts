@@ -140,6 +140,33 @@ export class Logger {
   }
 }
 
+class EmptyLogger {
+  constructor() {
+    /** empty */
+  }
+
+  public log() {
+    /** empty */
+  }
+  public error() {
+    /** empty */
+  }
+  public warn() {
+    /** empty */
+  }
+  public info() {
+    /** empty */
+  }
+  public verbose() {
+    /** empty */
+  }
+  public debug() {
+    /** empty */
+  }
+}
+
+export const emptyLogger = new EmptyLogger() as unknown as Logger;
+
 export const logger = new Logger({
   console: 'debug',
   file: 'debug',

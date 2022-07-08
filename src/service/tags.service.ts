@@ -1,4 +1,4 @@
-import { apiDelay, logger } from '../utils';
+import { apiDelay, Logger, logger } from '../utils';
 import {
   createTag,
   getFollowingsByTag,
@@ -7,6 +7,8 @@ import {
   unFollow,
 } from '../net/user-info.request';
 import type { TagListDto } from '../dto/user-info.dto';
+
+const tagLogger = new Logger({ console: 'debug', file: 'warn', push: 'warn' }, 'live');
 
 export interface User {
   mid: number;
@@ -129,7 +131,7 @@ export async function unFollowUsers(users: User[], num = -1) {
     }
     try {
       const { code, message } = await unFollow(user.mid);
-      logger.info(`取关【${user.uname}】成功！`);
+      tagLogger.info(`取关【${user.uname}】成功！`);
       if (code !== 0) {
         logger.warn(`取关【${user.uname}】失败: ${code}-${message}`);
       }

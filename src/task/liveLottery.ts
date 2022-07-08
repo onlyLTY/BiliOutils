@@ -2,6 +2,7 @@ import { moveUsersToTag, User } from '../service/tags.service';
 import { logger } from '../utils';
 import { liveFollowLotteryService, liveLotteryService } from '../service/live-lottery.service';
 import { getLastFollow, getTeamUsers } from '../service/tags.service';
+import { TaskConfig } from '@/config/globalVar';
 
 export default async function liveLottery() {
   logger.info('----【天选时刻】----');
@@ -17,8 +18,10 @@ export default async function liveLottery() {
     const followUps: User[] = [];
     await getTeamUsers(followUps, newFollowUps, lastFollow?.mid);
     // 移动关注UP到分组
-    await moveUsersToTag(followUps);
-    logger.info('移动关注UP到分组成功');
+    if (TaskConfig.lottery.isMoveTag) {
+      await moveUsersToTag(followUps, TaskConfig.lottery.moveTag);
+      logger.info('移动关注UP到分组成功');
+    }
   } catch (error) {
     logger.warn(`天选时刻异常: ${error.message}`);
     logger.debug(error);

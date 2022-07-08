@@ -60,6 +60,8 @@ export const defaultConfig = {
     liveLottery: false,
     // 直播天选红包
     liveRedPack: false,
+    // 批量取关
+    batchUnfollow: false,
     // 粉丝牌等级
     liveIntimacy: false,
     // 漫画任务

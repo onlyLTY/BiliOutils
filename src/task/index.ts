@@ -15,6 +15,7 @@ export const taskExportOrder = [
   'charging',
   'getVipPrivilege',
   'matchGame',
+  'batchUnfollow',
   'liveLottery',
   'liveRedPack',
   'liveIntimacy',
@@ -25,6 +26,7 @@ export const taskExportOrder = [
 
 /**
  * 按照上面的顺序导入的任务
+ * 全部写出来是因为想要动态导入但不写 rollup 就不会打包
  */
 export const biliTasks = [
   () => import('./taskReward'),
@@ -40,6 +42,7 @@ export const biliTasks = [
   () => import('./charging'),
   () => import('./getVipPrivilege'),
   () => import('./matchGame'),
+  () => import('./batchUnfollow'),
   () => import('./liveLottery'),
   () => import('./liveRedPack'),
   () => import('./liveIntimacy'),
