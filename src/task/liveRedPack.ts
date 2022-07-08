@@ -3,6 +3,7 @@ import { logger } from '../utils';
 import { liveRedPackService } from '../service/live-lottery.service';
 import { getLastFollow, getTeamUsers } from '../service/tags.service';
 import { updateSession } from '@/service/session.service';
+import { TaskConfig } from '@/config/globalVar';
 
 export default async function liveRedPack() {
   logger.info('----【天选红包】----');
@@ -18,10 +19,12 @@ export default async function liveRedPack() {
     // 读取消息
     logger.info('开始读取消息');
     await updateSession(followUps);
-    logger.info('移动关注UP到分组');
     // 移动关注UP到分组
-    await moveUsersToTag(followUps);
-    logger.info('移动关注UP到分组成功');
+    if (TaskConfig.lottery.isMoveTag) {
+      logger.info('移动关注UP到分组');
+      await moveUsersToTag(followUps, TaskConfig.lottery.moveTag);
+      logger.info('移动关注UP到分组成功');
+    }
   } catch (error) {
     logger.warn(`天选时刻异常: ${error.message}`);
     logger.debug(error);
