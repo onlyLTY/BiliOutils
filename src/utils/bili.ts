@@ -3,7 +3,7 @@ import { getUnixTime, md5, stringify } from './pure';
 import * as crypto from 'crypto';
 import { TaskConfig } from '@/config/globalVar';
 
-type Params = Record<string, string | boolean | number>;
+type Params = Record<string, string | boolean | number | Array<any>>;
 
 /**
  * API 接口签名
@@ -51,14 +51,14 @@ function getAppSign(
     s_locale: 'zh_CN',
     ts: getUnixTime(),
   };
-  if (!TaskConfig.accessKey) {
+  if (!TaskConfig.accessKey && !params.access_key) {
     return getSign(params, appsec, true);
   }
   delete params.csrf;
   delete params.csrf_token;
   params = {
-    ...params,
     access_key: TaskConfig.accessKey,
+    ...params,
     actionKey: 'appkey',
     appkey,
   };
@@ -107,4 +107,12 @@ export function conciseNickname(nickname = '') {
   const firstWord = nickname[0];
   const lastWord = nickname[length - 1];
   return `${firstWord}**${lastWord}`;
+}
+
+/**
+ * 获取 Buvid
+ * @description buvid 以 XY 开头，后面跟 35 位 16 进制字符串大写
+ */
+export function getBuvid() {
+  return `XY${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
 }

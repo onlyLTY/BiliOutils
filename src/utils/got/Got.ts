@@ -1,11 +1,10 @@
 import type { RequestOptions } from '#/request';
 import type { VGotOptions } from '#/got';
 import type { Got, Response } from 'got';
-import { TaskConfig } from '@/config/globalVar';
 import got from 'got';
 import { isFunction, isObject, isString } from '../is';
 import { jsonp2Object, mergeHeaders, stringify } from '../pure';
-import getCookie from '../cookie';
+import { BiliCookieJar, CookieJar } from '../cookie';
 
 const transformRequestHook = (res: Response, options: RequestOptions) => {
   const { isTransformResponse, isReturnNativeResponse } = options;
@@ -86,28 +85,24 @@ function axiosHandle(options: VGotOptions) {
 export class VGot {
   private gotInstance: Got;
   private options: VGotOptions;
+  cookieJar: CookieJar | BiliCookieJar;
   name = 'VGot';
 
   constructor(options: VGotOptions) {
+    // 兼容 axios
     if (options.baseURL) {
       options.prefixUrl = options.baseURL;
     }
     this.options = options;
+    // 处理 cookie
+    const { withBiliCookie, withCredentials } = this.options.requestOptions;
+    if (withBiliCookie) {
+      this.cookieJar = new BiliCookieJar();
+    } else if (withCredentials) {
+      this.cookieJar = new CookieJar();
+    }
     this.gotInstance = got.extend(options, {
-      hooks: {
-        afterResponse: [
-          response => {
-            const { requestOptions } = response.request.options;
-            if (requestOptions?.withBiliCookie) {
-              TaskConfig.cookie = getCookie(
-                TaskConfig.cookie,
-                response.headers?.['set-cookie'] || [],
-              );
-            }
-            return response;
-          },
-        ],
-      },
+      cookieJar: this.cookieJar,
     });
   }
 
@@ -115,9 +110,6 @@ export class VGot {
     const { requestOptions = {}, headers = {} } = this.options;
     options.requestOptions = Object.assign({}, requestOptions, options.requestOptions);
     options.headers = mergeHeaders(headers, options.headers);
-    if (requestOptions.withBiliCookie) {
-      options.headers['Cookie'] = TaskConfig.cookie;
-    }
 
     if (requestOptions.retry) {
       options.retry = requestOptions.retry;
