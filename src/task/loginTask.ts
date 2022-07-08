@@ -3,6 +3,7 @@ import { TaskConfig, TaskModule } from '../config/globalVar';
 import { apiDelay } from '../utils';
 import { UserInfoNavDto } from '../dto/user-info.dto';
 import { logger } from '../utils/log';
+import { request } from '@/utils/request';
 
 type UserNavData = UserInfoNavDto['data'];
 
@@ -72,11 +73,12 @@ export function setVipStatus(data: { vipType: number; vipStatus: number }) {
 
 async function setUserInfo(data: UserNavData) {
   try {
-    const { data: coinBalance } = await getCoinBalance(); //获取更精准的硬币数量
+    const { money } = await request(getCoinBalance); //获取更精准的硬币数量
+
     logger.info(`登录成功: ${data.uname}`);
-    logger.info(`硬币余额: ${coinBalance.money || 0}`);
+    logger.info(`硬币余额: ${money || 0}`);
     TaskModule.nickname = data.uname;
-    TaskModule.money = coinBalance.money || 0;
+    TaskModule.money = money || 0;
     TaskModule.userLevel = data.level_info.current_level;
     TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
 
