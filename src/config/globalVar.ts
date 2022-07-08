@@ -3,9 +3,11 @@ import { getConfig } from './setConfig';
 import { mergeConfig } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
 import { encodeCookie } from '@/utils/cookie';
+import { getBuvid } from '@/utils/bili';
 
 type TaskConfigType = Config & {
   mobileUA: string;
+  buvid: string;
 };
 
 let _taskConfig: TaskConfigType;
@@ -59,10 +61,14 @@ export function initialize(config?: Config) {
   }
   // TODO: 配置方式兼容
   const userConfig = mergeConfig(config) as Config;
+
+  const buvid = getBuvid();
+
   _taskConfig = {
     ...userConfig,
     mobileUA: getAndroidUA(),
-    cookie: encodeCookie(userConfig.cookie),
+    cookie: encodeCookie(`${userConfig.cookie}; Buvid=${buvid}`),
+    buvid,
   };
   TaskModule = class extends TaskModuleTemplate {};
   TaskModule.coinsTask = _taskConfig.coin.targetCoins;

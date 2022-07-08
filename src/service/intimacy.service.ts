@@ -185,7 +185,7 @@ async function liveHeart(fansMealList: FansMedalDto[]) {
 
 export function getRandomOptions() {
   return {
-    buvid: randomString(37).toUpperCase(),
+    buvid: TaskConfig.buvid,
     gu_id: randomString(43).toLocaleUpperCase(),
     visit_id: randomString(32).toLocaleLowerCase(),
     uuid: createUUID(),
