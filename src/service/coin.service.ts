@@ -282,27 +282,18 @@ function getAidBySpecialFollowing() {
  */
 export async function getAidByByPriority() {
   // 从指定下标开始调用函数
-  const idFuncArray = getIdFuncArrayByPriority();
-
-  for (let index = 0; index < idFuncArray.length; index++) {
-    const fun = idFuncArray[index];
-    await apiDelay();
-    return await fun();
-  }
-
-  return await getAidByRegionRank();
+  const idFunc = getIdFuncByPriority();
+  await apiDelay();
+  return idFunc();
 }
 
 /**
  * 获取获取id的函数数组
  */
-function getIdFuncArrayByPriority() {
-  const idFuncArray = getIdFuncArray(),
-    idFuncArrayLen = idFuncArray.length;
-  TaskModule.currentStartFun =
-    TaskModule.currentStartFun >= idFuncArrayLen ? idFuncArrayLen - 1 : TaskModule.currentStartFun;
+function getIdFuncByPriority() {
+  const idFuncArray = getIdFuncArray();
   idFuncArray.splice(0, TaskModule.currentStartFun);
-  return idFuncArray;
+  return idFuncArray[0] || getAidByRegionRank;
 }
 
 // 参数
