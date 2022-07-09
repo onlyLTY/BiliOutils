@@ -110,14 +110,14 @@ export const defaultConfig = {
   coin: {
     /** 自定义高优先级用户列表 */
     customizeUp: [] as number[],
-    /** 投币操作重试次数 默认 4 */
-    retryNum: 4,
     /** 目标等级 默认6级 */
     targetLevel: 6,
     /** 最低剩余硬币数,默认0 */
     stayCoins: 0,
     /** 预计投币数,默认5 */
     targetCoins: 5,
+    /** 如果获取今日已投币数量失败，假设已投币数量为多少 */
+    todayCoins: 0,
   },
   sls: {
     name: '',

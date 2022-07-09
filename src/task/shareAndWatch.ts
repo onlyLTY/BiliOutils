@@ -17,9 +17,9 @@ export default async function shareAndWatch() {
   //获取aid
   try {
     let biliav = await getAidByByPriority();
-    if (biliav.msg === '-1') biliav = await getAidByRegionRank();
+    if (biliav.code !== 0) biliav = await getAidByRegionRank();
 
-    if (biliav.msg === '0') {
+    if (biliav.code === 0) {
       const { id, author, title } = biliav.data;
       gAid = id;
       logger.info(`获取视频: ${title} --up【${author}】`);

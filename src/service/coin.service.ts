@@ -25,8 +25,16 @@ const TypeEnum = {
   article: 'article',
 };
 
+// const AidInfoCodeEnum = {
+//   '-2': '获取异常',
+//   '-1': '获取错误',
+//   0: '获取成功',
+//   1: '数据为空',
+// };
+
 export interface AidInfo {
-  msg: string;
+  msg?: string;
+  code: number;
   data: {
     coinType?: string;
     id?: number;
@@ -89,7 +97,8 @@ export async function getAidByFollowing(special = true): Promise<AidInfo> {
 
     if (!followList || followList.length === 0) {
       return {
-        msg: '-1',
+        msg: '没有关注列表',
+        code: 1,
         data: {},
       };
     }
@@ -103,11 +112,13 @@ export async function getAidByFollowing(special = true): Promise<AidInfo> {
       msg: special
         ? `未获取到特别关注列表: ${code}-${message}`
         : `未获取到关注列表: ${code}-${message}`,
+      code: -1,
       data: {},
     };
   } catch (error) {
     return {
       msg: error.message,
+      code: -2,
       data: {},
     };
   }
@@ -125,7 +136,7 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
     if (code == 0) {
       const { aid, title, author } = getRandomItem(data);
       return {
-        msg: '0',
+        code: 0,
         data: {
           id: Number(aid),
           title,
@@ -135,11 +146,13 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
     }
     return {
       msg: `未获取到排行信息: ${code}-${message}`,
+      code: -1,
       data: {},
     };
   } catch (error) {
     return {
       msg: error.message,
+      code: -2,
       data: {},
     };
   }
@@ -152,7 +165,7 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
   const customizeUp = TaskConfig.coin.customizeUp;
   if (customizeUp.length === 0) {
     return {
-      msg: '-1',
+      code: 1,
       data: {},
     };
   }
@@ -168,6 +181,7 @@ export async function getIdByRandom(mid: number) {
     if (code) {
       return {
         msg: `通过uid获取视频失败: ${code}-${message}`,
+        code: -1,
         data: {},
       };
     }
@@ -177,6 +191,7 @@ export async function getIdByRandom(mid: number) {
     if (!randmonNumData) {
       return {
         msg: '用户没有投稿',
+        code: 1,
         data: {},
       };
     }
@@ -190,17 +205,19 @@ export async function getIdByRandom(mid: number) {
     if (handleData.message) {
       return {
         msg: handleData.message,
+        code: -1,
         data: {},
       };
     }
     return {
-      msg: '0',
+      code: 0,
       data: handleData,
     };
   } catch (error) {
     logger.debug(error);
     return {
       msg: error.message,
+      code: -2,
       data: {},
     };
   }
@@ -246,47 +263,46 @@ function getIdFuncArray(): Array<() => Promise<AidInfo>> {
   const arr = [
     getAidByCustomizeUp,
     getAidByFollowing,
-    () => getAidByFollowing(false),
+    getAidBySpecialFollowing,
     getAidByRegionRank,
   ];
   //如果没有自定义up则直接删除
-  if (!TaskConfig.coin.customizeUp) {
+  if (TaskConfig.coin.customizeUp?.length === 0) {
     arr.shift();
   }
   return arr;
 }
 
-export const idFuncArray = getIdFuncArray();
+function getAidBySpecialFollowing() {
+  return getAidByFollowing(false);
+}
 
 /**
  * 按照优先顺序调用不同函数获取aid
  */
-export async function getAidByByPriority(start = 0) {
-  //从指定下标开始调用函数
-  idFuncArray.splice(0, TaskModule.currentStartFun + start);
+export async function getAidByByPriority() {
+  // 从指定下标开始调用函数
+  const idFuncArray = getIdFuncArrayByPriority();
 
   for (let index = 0; index < idFuncArray.length; index++) {
     const fun = idFuncArray[index];
-    let i = Number(TaskConfig.coin.retryNum ?? 4);
-    i = i < 1 ? 1 : i > 8 ? 8 : i;
-    while (i--) {
-      await apiDelay();
-      const data = await fun();
-      if (data.msg === '-1') i = 0;
-      if (data.msg === '0') return data;
-    }
-
-    //当调用出现多次错误后将使用优先级更低的函数
-    //此处保留出错的索引
-    if (i <= 0) {
-      TaskModule.currentStartFun = index;
-    }
+    await apiDelay();
+    return await fun();
   }
 
-  return {
-    msg: '-1',
-    data: { id: 0 },
-  };
+  return await getAidByRegionRank();
+}
+
+/**
+ * 获取获取id的函数数组
+ */
+function getIdFuncArrayByPriority() {
+  const idFuncArray = getIdFuncArray(),
+    idFuncArrayLen = idFuncArray.length;
+  TaskModule.currentStartFun =
+    TaskModule.currentStartFun >= idFuncArrayLen ? idFuncArrayLen - 1 : TaskModule.currentStartFun;
+  idFuncArray.splice(0, TaskModule.currentStartFun);
+  return idFuncArray;
 }
 
 // 参数
@@ -321,8 +337,7 @@ export async function coinToId({ id, coin = 1, coinType = 'video', mid }: CoinTo
 export async function getTodayCoinNum() {
   const exp = await getTodayExp();
   if (exp) return exp;
-  const coinNum = await getTodayCoin();
-  return coinNum;
+  return await getTodayCoin();
 }
 
 /** 获取已经获得的经验 */
