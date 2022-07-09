@@ -46,7 +46,11 @@ export function getDonateCoinExp(): Promise<CoinTodayExpDto> {
  * 获取最近投币记录
  */
 export function getCoinHistory() {
-  return biliApi.get<CoinHistoryDto>('x/member/web/coin/log?jsonp=jsonp');
+  return biliApi.get<CoinHistoryDto>('x/member/web/coin/log?jsonp=jsonp', {
+    headers: {
+      origin: OriginURLs.account,
+    },
+  });
 }
 
 /**

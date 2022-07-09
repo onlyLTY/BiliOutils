@@ -15,7 +15,7 @@ export default async function taskReward() {
       return;
     }
 
-    /**还需投币 */
+    /** 剩余硬币数量 */
     const targetCoinsDiff = TaskModule.money - TaskConfig.coin.stayCoins;
     let coins = 0;
     if (TaskModule.coinsTask === 0) {
@@ -25,15 +25,13 @@ export default async function taskReward() {
       // 剩余硬币比需要保留的少
       logger.info(`今日投币数量：${coinNum}，还需投币0颗，硬币不够了，不投币了`);
     } else if (targetCoinsDiff < TaskModule.coinsTask) {
-      // 确保最后一次投币精准降落到设置的需要保留硬币数上
-      // (狗头保命)
-      coins = TaskModule.coinsTask - targetCoinsDiff;
+      coins = targetCoinsDiff;
       logger.info(
-        `投币数量: ${coinNum}，还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗，忽略部分投币)`,
+        `投币数量: ${coinNum}，还能投币数量: ${targetCoinsDiff}颗;(目标${TaskModule.coinsTask}颗，忽略部分投币)`,
       );
     } else {
       coins = TaskModule.coinsTask - coinNum;
-      logger.info(`投币数量: ${coinNum}，还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`);
+      logger.info(`投币数量：${coinNum}，还需投币数量: ${coins}颗;(目标${TaskModule.coinsTask}颗)`);
     }
 
     TaskModule.coinsTask = coins;
