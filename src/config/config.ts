@@ -69,6 +69,8 @@ export const defaultConfig = {
     // 大会员积分
     bigPoint: false,
     liveFamine: false,
+    // 风纪委员
+    judgement: false,
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
   apiDelay: [2, 6],
@@ -82,7 +84,6 @@ export const defaultConfig = {
   targetCoins: undefined,
   customizeUp: undefined,
   giftUp: undefined,
-  coinRetryNum: undefined,
   chargeUpId: undefined,
   chargePresetTime: undefined,
   matchCoins: undefined,
@@ -160,6 +161,11 @@ export const defaultConfig = {
     // 黑名单
     blackList: [],
   },
+  jury: {
+    mode: 1,
+    once: true,
+    vote: [0, 1],
+  },
   manga: {
     // 签到
     sign: true,
@@ -201,7 +207,6 @@ const compatibleMap = {
   stayCoins: ['coin', 'stayCoins'],
   targetCoins: ['coin', 'targetCoins'],
   customizeUp: ['coin', 'customizeUp'],
-  coinRetryNum: ['coin', 'retryNum'],
   giftUp: ['gift', 'mids'],
   chargeUpId: ['charge', 'mid'],
   chargePresetTime: ['charge', 'presetTime'],

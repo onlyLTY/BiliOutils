@@ -10,7 +10,6 @@ const userConfig = {
   targetCoins: 1,
   customizeUp: [1],
   giftUp: [1],
-  coinRetryNum: 1,
   chargeUpId: 1,
   chargePresetTime: 1,
   matchCoins: 1,
@@ -69,6 +68,8 @@ const theConfig = {
     liveRedPack: false,
     liveIntimacy: false,
     bigPoint: false,
+    liveFamine: false,
+    batchUnfollow: false,
   },
   apiDelay: [2, 6],
   userAgent: '',
@@ -77,6 +78,11 @@ const theConfig = {
     coins: 1,
     selection: 1,
     diff: 1,
+  },
+  jury: {
+    mode: 1,
+    once: true,
+    vote: [0, 1],
   },
   charge: {
     mid: 1,
@@ -87,10 +93,13 @@ const theConfig = {
   },
   coin: {
     customizeUp: [1],
-    retryNum: 1,
+    todayCoins: 0,
     targetLevel: 1,
     stayCoins: 1,
     targetCoins: 1,
+  },
+  activity: {
+    liveFamineTime: 400,
   },
   manga: {
     sign: true,
