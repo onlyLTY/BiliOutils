@@ -1,9 +1,14 @@
 import { TaskConfig } from '@/config/globalVar';
 import { isString } from './is';
 
-function getCookieArray(cookie: string | undefined) {
-  if (!cookie) return [];
-  return cookie.split('; ').map(el => el.split('='));
+function getCookieJSON(cookie: string | undefined): Record<string, string> {
+  if (!cookie) return {};
+  // 使用正则表达式获取 cookie 键值对，并转换为对象
+  return cookie.match(/([^;=]+)(?:=([^;]*))?/g).reduce((pre, cur) => {
+    const [key, value] = cur.trim().split('=');
+    pre[key] = value;
+    return pre;
+  }, {});
 }
 
 /**
@@ -12,32 +17,11 @@ function getCookieArray(cookie: string | undefined) {
  */
 function getSetCookieValue(setCookieArray: string[]) {
   let cookieStr = '';
-  setCookieArray.forEach(setCookie => {
-    const cookie = setCookie.split('; ')[0];
-    cookieStr += cookie + '; ';
-  });
-  return cookieStr.substring(0, cookieStr.length - 2 || 0);
-}
-
-function cookie2Obj(cookie: string): Record<string, string> {
-  const arr = getCookieArray(cookie).filter(el => el.length === 2);
-
-  const obj = {};
-  for (const it of arr) {
-    if (obj[it[0]]) {
-      obj[it[0]] = it[1];
-    } else {
-      Object.defineProperty(obj, it[0], {
-        value: it[1],
-        enumerable: true,
-        writable: true,
-      });
-    }
+  setCookieArray.forEach(setCookie => (cookieStr += setCookie.split('; ')[0] + '; '));
+  if (cookieStr.endsWith('; ')) {
+    cookieStr = cookieStr.substring(0, cookieStr.length - 2 || 0);
   }
-  Object.keys(obj).forEach(key => {
-    obj[key] = encodeCookieValue(obj[key]);
-  });
-  return obj;
+  return cookieStr;
 }
 
 function encodeCookieValue(val: string) {
@@ -49,7 +33,9 @@ function encodeCookieValue(val: string) {
 }
 
 export function encodeCookie(cookie: string) {
-  return getCookieString(cookie2Obj(cookie));
+  const cookieJson = getCookieJSON(cookie);
+  cookieJson['SESSDATA'] = encodeCookieValue(cookieJson['SESSDATA']);
+  return getCookieString(cookieJson);
 }
 
 function getCookieString(obj: object) {
@@ -62,7 +48,10 @@ export default function getCookie(cookie: string, setCookie: string[] | string) 
   if (isString(setCookie)) setCookie = [setCookie];
   if (!setCookie || setCookie.length === 0) return cookie;
 
-  return getCookieString({ ...cookie2Obj(cookie), ...cookie2Obj(getSetCookieValue(setCookie)) });
+  return getCookieString({
+    ...getCookieJSON(cookie),
+    ...getCookieJSON(getSetCookieValue(setCookie)),
+  });
 }
 export { getCookie };
 
@@ -101,7 +90,7 @@ export class CookieJar {
   }
 
   toJSON() {
-    return cookie2Obj(this.cookie);
+    return getCookieJSON(this.cookie);
   }
 
   getCookieItem(key: string) {
