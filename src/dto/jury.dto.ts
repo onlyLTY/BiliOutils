@@ -16,7 +16,7 @@ export type JuryInfoDto = ApiBaseProp<{
   uname: string;
 }>;
 
-export type JuryCaseDto = ApiBaseProp<{
+export type JuryCaseOpinionDto = ApiBaseProp<{
   total: number;
   list: JuryCaseOpinion[];
 }>;
@@ -55,4 +55,67 @@ export interface JuryVotedCase {
   vote: number;
   vote_text: string;
   vote_time: number;
+}
+
+export type JuryCaseInfoDto = ApiBaseProp<{
+  case_id: string;
+  case_type: number;
+  jury_state: number;
+  participate: number;
+  vote_items: VoteItem[];
+  default_vote: number;
+  status: number;
+  origin_start: number;
+  avid: number;
+  cid: number;
+  vote_cd: number;
+  result: number;
+  result_text: string;
+  title: string;
+  case_info: CaseInfo;
+}>;
+
+interface CaseInfo {
+  comment?: any;
+  danmu_img: string;
+  comments: Comment[];
+  single_danmu?: any;
+}
+
+interface Comment {
+  mid: number;
+  uname: string;
+  face: string;
+  content: string;
+  child_comments: Childcomment[];
+  emote?: Record<string, EmoteItem>;
+}
+
+interface Childcomment {
+  mid: number;
+  uname: string;
+  face: string;
+  content: string;
+  emote?: Record<string, EmoteItem>;
+}
+
+interface EmoteItem {
+  id: number;
+  package_id: number;
+  state: number;
+  type: number;
+  attr: number;
+  text: string;
+  url: string;
+  meta: {
+    size: number;
+  };
+  mtime: number;
+  gif_url?: string;
+  jump_title: string;
+}
+
+interface VoteItem {
+  vote: number;
+  vote_text: string;
 }

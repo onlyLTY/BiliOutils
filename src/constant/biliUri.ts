@@ -13,6 +13,7 @@ export const RefererURLs = {
   www: 'https://www.bilibili.com/',
   bigPoint: 'https://big.bilibili.com/mobile/bigPoint',
   bigPointTask: 'https://big.bilibili.com/mobile/bigPoint/task',
+  judge: 'https://www.bilibili.com/judgement/',
 };
 
 export const baseURLs = {

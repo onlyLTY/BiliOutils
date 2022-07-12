@@ -1,12 +1,12 @@
 import { TaskConfig } from '@/config/globalVar';
 import { isString } from './is';
 
-function getCookieJSON(cookie: string | undefined): Record<string, string> {
+export function getCookieJSON(cookie: string | undefined): Record<string, string> {
   if (!cookie) return {};
   // 使用正则表达式获取 cookie 键值对，并转换为对象
   return cookie.match(/([^;=]+)(?:=([^;]*))?/g).reduce((pre, cur) => {
     const [key, value] = cur.trim().split('=');
-    pre[key] = value;
+    pre[key] = encodeCookieValue(value);
     return pre;
   }, {});
 }
@@ -33,9 +33,7 @@ function encodeCookieValue(val: string) {
 }
 
 export function encodeCookie(cookie: string) {
-  const cookieJson = getCookieJSON(cookie);
-  cookieJson['SESSDATA'] = encodeCookieValue(cookieJson['SESSDATA']);
-  return getCookieString(cookieJson);
+  return getCookieString(getCookieJSON(cookie));
 }
 
 function getCookieString(obj: object) {
