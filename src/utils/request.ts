@@ -39,3 +39,14 @@ function getLogger(loggerOption: RequestOptions['logger']) {
     return loggerOption;
   }
 }
+
+export function getRequestNameWrapper(options: RequestOptions = {}) {
+  return <
+    T extends (...args: any[]) => Promise<AnyProp<R['data']>>,
+    R extends UnPromisify<ReturnType<T>>,
+  >(
+    reqFunc: T,
+    name: string,
+    ...args: Parameters<T>
+  ) => request(reqFunc, { ...options, name }, ...args);
+}
