@@ -8,3 +8,15 @@ export const JuryVote = {
   13: '差',
   14: '无法判断',
 };
+
+/**
+ * 投票返回结果
+ */
+export const JuryVoteResult = {
+  UNKNOWN: -2,
+  ERROR: -1,
+  SUCCESS: 0,
+  NO_OPINION: 1,
+  /** Opinion 太少 */
+  FEW_OPINION: 2,
+} as const;

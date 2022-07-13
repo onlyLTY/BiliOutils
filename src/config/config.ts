@@ -165,6 +165,7 @@ export const defaultConfig = {
     mode: 1,
     once: true,
     vote: [0, 1],
+    opinionMin: 3,
   },
   manga: {
     // 签到

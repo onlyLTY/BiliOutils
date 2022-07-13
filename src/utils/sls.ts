@@ -17,7 +17,7 @@ async function getUpdateTrigger(
   slsType: SLSType,
   event: any,
   context: any,
-): Promise<(...args) => any> {
+): Promise<(...args: any) => any> {
   const caller =
     slsType === 'scf'
       ? (await import('./updateScfTrigger')).default
