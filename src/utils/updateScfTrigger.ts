@@ -1,4 +1,5 @@
 import type { SCFEvent, SCFContext } from '../types/scf';
+import type { SlSOptions } from '../types/sls';
 import { getPRCDate, randomDailyRunTime } from './pure';
 import { TaskConfig } from '../config/globalVar';
 import { logger } from './log';
@@ -27,9 +28,7 @@ async function getSDK() {
 export default async function (
   event: SCFEvent,
   context: SCFContext,
-  customArg?: Record<string, unknown>,
-  triggerDesc?: { value: string; string: string },
-  runningTotalNumber = 2,
+  { customArg, triggerDesc }: SlSOptions = {},
 ) {
   if (!event.TriggerName) {
     return false;
@@ -118,7 +117,8 @@ export default async function (
     return !!(await createTrigger(params));
   }
 
-  let updateResults = false;
+  let updateResults = false,
+    runningTotalNumber = 0;
   while (!updateResults && runningTotalNumber) {
     updateResults = await aSingleUpdate();
     runningTotalNumber--;

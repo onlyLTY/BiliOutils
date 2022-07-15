@@ -43,13 +43,12 @@ export function getMoreOpinion(caseId: string, opinions: JuryCaseOpinion[]) {
  */
 export async function voteJuryByOpinion(caseId: string) {
   try {
+    await caseConfirm(caseId);
     const { list } = await request(getJuryCaseViewpoint, '获取观点', caseId);
     if (!list || !list.length) return JuryVoteResult.NO_OPINION;
     const opinion = getMoreOpinion(caseId, list);
     if (!opinion) return JuryVoteResult.FEW_OPINION;
     const vote = opinion.vote;
-    await request(juryCaseVote, '确认案件', caseId, 0);
-    await apiDelay(12000, 20000);
     juryLogger.info(`为【${caseId}】选择了【${JuryVote[vote]}】（${vote}）`);
     const { code, message } = await juryCaseVote(caseId, vote);
     if (code !== 0) {
@@ -93,6 +92,23 @@ export async function replenishVote(caseId: string, defaultVote: number) {
 }
 
 /**
+ * 确认案件
+ */
+async function caseConfirm(caseId: string) {
+  try {
+    const { code, message } = await juryCaseVote(caseId, 0);
+    if (code !== 0) {
+      juryLogger.warn(`确认案件失败，错误码：【${code}】信息为：【${message}】`);
+      throw new Error(message);
+    }
+    await apiDelay(12000, 20000);
+  } catch (error) {
+    juryLogger.error(`确认案件失败，错误信息：${error.message}`);
+    throw error;
+  }
+}
+
+/**
  * 模式 1
  */
 export async function mode1(err = 3) {
@@ -113,24 +129,17 @@ export async function mode1(err = 3) {
 async function runMode1(errRef: Ref<number>) {
   try {
     const { code, data, message } = await getJuryCaseVote();
-    const isReturn = await handleNextError({ code, message });
-    if (isReturn) return true;
-    if (code !== 0) {
-      juryLogger.warn(`获取风纪委员案件信息失败，错误码：【${code}】，信息为：【${message}】`);
-      errRef.value -= 1;
-      await apiDelay(20000, 40000);
-      return;
-    }
-    const { case_id } = data;
-    const voteResult = await voteJuryByOpinion(case_id);
-    if (voteResult === 0) return;
-    if (voteResult < 0) {
-      errRef.value -= 1;
-      return;
-    }
-    const vote = await replenishVote(case_id, getRandomItem(TaskConfig.jury.vote));
-    if (!vote) {
-      errRef.value -= 1;
+    switch (code) {
+      case 0:
+        return await handleSuccess(data, errRef);
+      case 25006:
+        return await handleJudgeExpired(message);
+      case 25008:
+        return await handleNoNewCase(message);
+      case 25014:
+        return await handleCaseFull(message);
+      default:
+        return await handleOtherError(code, message, errRef);
     }
   } catch (error) {
     juryLogger.error(`风纪委员投票异常（模式 1），错误信息：${error}`);
@@ -161,29 +170,17 @@ async function runMode2(errRef: Ref<number>, caseIdList: string[]) {
   try {
     const { code, data, message } = await getJuryCaseVote();
     switch (code) {
+      case 0:
+        return await handleSuccess(data, errRef, caseIdList);
       case 25006:
-        return handleJudgeExpired(message);
+        return await handleJudgeExpired(message);
       case 25008:
-        return handleNoNewCaseForMode2(message, caseIdList, errRef);
+        return await handleNoNewCaseForMode2(message, caseIdList, errRef);
       case 25014:
-        return handleCaseFull(message);
+        return await handleCaseFull(message);
       default:
-        break;
+        return await handleOtherError(code, message, errRef);
     }
-    if (code !== 0) {
-      juryLogger.warn(`获取风纪委员案件失败，错误码：【${code}】，信息为：【${message}】`);
-      errRef.value -= 1;
-      await apiDelay(20000, 40000);
-      return;
-    }
-    const { case_id } = data;
-    const voteResult = await voteJuryByOpinion(case_id);
-    if (voteResult === 0) return;
-    if (voteResult < 0) {
-      errRef.value -= 1;
-      return;
-    }
-    caseIdList.push(case_id);
   } catch (error) {
     juryLogger.error(`风纪委员投票异常（模式 2），错误信息：${error}`);
     errRef.value -= 1;
@@ -192,24 +189,7 @@ async function runMode2(errRef: Ref<number>, caseIdList: string[]) {
 }
 
 /**
- * 对 next 返回码非 0 的情况进行处理
- * @returns 是否退出
- */
-export async function handleNextError({ code, message }: { code: number; message: string }) {
-  switch (code) {
-    case 25006:
-      return handleJudgeExpired(message);
-    case 25008:
-      return handleNoNewCase(message);
-    case 25014:
-      return handleCaseFull(message);
-    default:
-      break;
-  }
-}
-
-/**
- * 资格已经过期
+ * 获取风纪委员案件资格已经过期
  */
 async function handleJudgeExpired(message: string) {
   juryLogger.warn(`${message}`);
@@ -219,7 +199,7 @@ async function handleJudgeExpired(message: string) {
 }
 
 /**
- * 没有新的案件
+ * 获取风纪委员案件没有新的案件
  */
 async function handleNoNewCase(message: string) {
   juryLogger.info(`${message}`);
@@ -232,7 +212,7 @@ async function handleNoNewCase(message: string) {
 }
 
 /**
- * 没有新的案件
+ * 获取风纪委员案件没有新的案件
  */
 async function handleNoNewCaseForMode2(message: string, caseIdList: string[], errRef: Ref<number>) {
   juryLogger.info(`${message}`);
@@ -256,11 +236,53 @@ async function handleNoNewCaseForMode2(message: string, caseIdList: string[], er
 }
 
 /**
- * 案件已满
+ * 获取风纪委员案件案件已满
  */
 async function handleCaseFull(message: string) {
   juryLogger.info(`${message}`);
   return true;
+}
+
+/**
+ * 获取风纪委员案件未知错误
+ */
+async function handleOtherError(code: number, message: string, errRef: Ref<number>) {
+  juryLogger.warn(`获取风纪委员案件失败，错误码：【${code}】，信息为：【${message}】`);
+  if (code === 25005) {
+    juryLogger.warn(`如果需要请手动申请风纪委员，对于从来没有当过的用户，我们默认你配置错误。`);
+    return true;
+  }
+  errRef.value -= 1;
+  await apiDelay(20000, 40000);
+  return false;
+}
+
+/**
+ * 获取风纪委员案件成功处理
+ */
+async function handleSuccess(
+  { case_id = '' }: { case_id: string },
+  errRef: Ref<number>,
+  caseIdList?: string[],
+) {
+  if (!case_id) {
+    errRef.value -= 1;
+    return;
+  }
+  const voteResult = await voteJuryByOpinion(case_id);
+  if (voteResult === 0) return;
+  if (voteResult < 0) {
+    errRef.value -= 1;
+    return;
+  }
+  if (caseIdList) {
+    caseIdList.push(case_id);
+    return;
+  }
+  const vote = await replenishVote(case_id, getRandomItem(TaskConfig.jury.vote));
+  if (!vote) {
+    errRef.value -= 1;
+  }
 }
 
 /**
