@@ -1,3 +1,4 @@
+import type { SlSOptions } from '../types/sls';
 import { getPRCDate, randomDailyRunTime } from './pure';
 import { TaskConfig } from '../config/globalVar';
 import { logger } from './log';
@@ -18,16 +19,12 @@ async function getSDK() {
  * 更新触发器
  * @param event FC 事件
  * @param context FC 上下文
- * @param customArg 自定义 FC 参数
- * @param triggerDesc cron 表达式
- * @param runningTotalNumber 接口重试次数
+ * @param options 自定义配置
  */
 export default async function (
   event: FCEvent,
   context: FCContext,
-  customArg?: Record<string, unknown>,
-  triggerDesc?: { value: string; string: string },
-  runningTotalNumber = 2,
+  { customArg, triggerDesc }: SlSOptions = {},
 ) {
   if (!event.triggerName) {
     return false;
@@ -77,7 +74,8 @@ export default async function (
     return !!(await updateTrigger(runTime.value));
   }
 
-  let updateResults = false;
+  let updateResults = false,
+    runningTotalNumber = 2;
   while (!updateResults && runningTotalNumber) {
     updateResults = await aSingleUpdate();
     runningTotalNumber--;
