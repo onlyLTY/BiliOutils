@@ -24,7 +24,8 @@ export default async function mangaTask() {
     if (isBuy) {
       logger.info('开始购买漫画');
       await buyMangaService();
-    } else {
+    }
+    if (manga.buy && !isTodayRunning()) {
       logger.info('非购买漫画时间，不购买');
     }
   } catch (error) {
