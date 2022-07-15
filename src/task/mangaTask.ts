@@ -20,14 +20,13 @@ export default async function mangaTask() {
       logger.info('开始签到');
       await mangaSign();
     }
-    const isBuy = manga.buy && isTodayRunning();
-    if (isBuy) {
+    if (!manga.buy) return;
+    if (isTodayRunning()) {
       logger.info('开始购买漫画');
       await buyMangaService();
+      return;
     }
-    if (manga.buy && !isTodayRunning()) {
-      logger.info('非购买漫画时间，不购买');
-    }
+    logger.info('非购买漫画时间，不购买');
   } catch (error) {
     logger.error(`漫画任务异常: ${error}`);
   }
