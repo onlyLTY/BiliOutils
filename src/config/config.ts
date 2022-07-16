@@ -194,6 +194,14 @@ export const defaultConfig = {
   activity: {
     liveFamineTime: 400,
   },
+  bigPoint: {
+    // 是否重试
+    isRetry: true,
+    // 是否观看视频
+    isWatch: true,
+    // 自定义观看视频的章节
+    epids: [] as number[],
+  },
   BILIJCT: '',
   USERID: 0,
 };

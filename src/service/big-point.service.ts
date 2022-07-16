@@ -10,8 +10,8 @@ import {
 } from '@/net/big-point.request';
 import { videoHeartbeat } from '@/net/video.request';
 import { TaskCode } from '@/enums/big-point.emum';
-import { apiDelay, getUnixTime, logger, random } from '@/utils';
-import { TaskModule } from '@/config/globalVar';
+import { apiDelay, getRandomItem, getUnixTime, logger, random } from '@/utils';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
 
 /**
  * 查看当前状态
@@ -43,7 +43,18 @@ export async function bigPointService() {
     logger.info('本月积分已领取完');
     return;
   }
-  const signCode = await sign(task_info.sing_task_item?.histories);
+  await bigPointTask(taskStatus);
+  if (TaskConfig.bigPoint.isRetry) {
+    await apiDelay(5000);
+    await bigPointTask(taskStatus, true);
+  }
+}
+
+type TaskStatus = UnPromisify<ReturnType<typeof getTaskStatus>>;
+
+async function bigPointTask(taskStatus: TaskStatus, isRetry = false) {
+  const { task_info } = taskStatus;
+  const signCode = await sign(task_info.sing_task_item?.histories, isRetry);
   if (signCode === -401) {
     logger.error('出现非法访问异常，可能账号存在异常，放弃大积分任务');
     return;
@@ -61,7 +72,7 @@ export async function bigPointService() {
 /**
  * 完成每日任务
  */
-async function doDailyTask(taskStatus: UnPromisify<ReturnType<typeof getTaskStatus>>) {
+async function doDailyTask(taskStatus: TaskStatus) {
   if (!taskStatus || !taskStatus.task_info) return;
   const TaskItems = taskStatus.task_info.modules?.at(-1)?.common_task_item;
   if (!TaskItems) {
@@ -106,6 +117,9 @@ async function handleDailyTask(taskItems: CommonTaskItem[]) {
  * 观看视频任务
  */
 async function watchTask(completeTimes: number) {
+  if (!TaskConfig.bigPoint.isWatch) {
+    return;
+  }
   // 随机获取一集
   function createEpid(prefix: string, min: number, max: number, exclude: number[] = []) {
     let epid = random(min, max);
@@ -115,7 +129,15 @@ async function watchTask(completeTimes: number) {
     return Number(prefix + epid);
   }
   try {
-    const epid = createEpid('327', 107, 134, [122, 123]);
+    let epid: number;
+    const { epids } = TaskConfig.bigPoint;
+    if (epids && epids.length > 0) {
+      epid = getRandomItem(epids);
+      logger.debug(`使用随机视频: ${epid}`);
+    } else {
+      logger.debug('使用默认视频（西游记随机集数）');
+      epid = createEpid('327', 107, 134, [122, 123]);
+    }
     const watchTime = completeTimes === 1 ? random(905, 1800) : random(1805, 2000);
     // 播放西游记
     await videoHeartbeat({
@@ -126,7 +148,7 @@ async function watchTask(completeTimes: number) {
       refer_url: 'https://www.bilibili.com/bangumi/media/md28229051/',
       epid,
     });
-    logger.info(`观看视频（西游记）任务 ✓`);
+    logger.info(`观看视频任务 ✓`);
   } catch (error) {
     logger.error(error);
     logger.error(`观看视频任务出现异常：${error.message}`);
@@ -172,7 +194,7 @@ async function vipMallView() {
 /**
  * 签到
  */
-async function sign(histories: SingTaskHistory[]) {
+async function sign(histories: SingTaskHistory[], isRetry = false) {
   if (!histories || !histories.length) {
     return;
   }
@@ -181,7 +203,7 @@ async function sign(histories: SingTaskHistory[]) {
     return;
   }
   if (today.signed) {
-    logger.info('今日已签到 ✓');
+    !isRetry && logger.info('今日已签到 ✓');
     return;
   }
   try {
@@ -210,7 +232,6 @@ async function getTask(taskinfo: Taskinfo) {
   }
   const taskItems = taskinfo.modules.at(-1)?.common_task_item?.filter(filterTask);
   if (!taskItems || !taskItems.length) {
-    logger.info('没有需要领取的任务');
     return false;
   }
   await getManyTask(taskItems.map(taskItem => taskItem.task_code));
