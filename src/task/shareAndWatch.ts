@@ -3,12 +3,15 @@ import { addShare, uploadVideoHeartbeat } from '../net/video.request';
 import { getAidByByPriority, getAidByRegionRank } from '../service/coin.service';
 import { TaskModule } from '../config/globalVar';
 import { logger } from '../utils/log';
+import { request } from '@/utils/request';
+import { checkShareAndWatch } from '@/service/reward.service';
 
 /**
  * 每日分享/播放视频
  */
 export default async function shareAndWatch() {
   logger.info('----【分享/播放视频】----');
+  await checkShareAndWatch();
   if (TaskModule.share && TaskModule.watch) {
     logger.info('已完成，跳过分享/播放');
     return;
@@ -35,31 +38,18 @@ export default async function shareAndWatch() {
   //分享
   if (!TaskModule.share) {
     await apiDelay();
-    try {
-      const { code, message } = await addShare(gAid);
-      if (code === 0) {
-        logger.info(`分享视频成功!`);
-      } else {
-        logger.warn(`分享视频失败: ${code} ${message}`);
-      }
-    } catch (error) {
-      logger.error(`分享视频异常: ${error.message}`);
-    }
+    await request(addShare, { name: '分享视频', okMsg: '分享视频成功！' }, gAid);
   }
 
   //播放视频
   if (!TaskModule.watch) {
     await apiDelay();
-    try {
-      //随机上传4s到60s
-      const { code, message } = await uploadVideoHeartbeat(gAid, random(4, 60));
-      if (code === 0) {
-        logger.info(`播放视频成功!`);
-      } else {
-        logger.warn(`播放视频失败: ${code} ${message}`);
-      }
-    } catch (error) {
-      logger.error(`播放视频异常: ${error.message}`);
-    }
+    //随机上传4s到60s
+    await request(
+      uploadVideoHeartbeat,
+      { name: '播放视频', okMsg: '播放视频成功！' },
+      gAid,
+      random(4, 60),
+    );
   }
 }

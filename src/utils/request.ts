@@ -6,7 +6,8 @@ export type RequestOptions = {
   logger?: Logger | boolean;
   name?: string;
   successCode?: number;
-  transformResponse?: boolean;
+  transform?: boolean;
+  okMsg?: string;
 };
 
 /**
@@ -20,17 +21,20 @@ export async function request<
   reqFunc: T,
   options?: O,
   ...args: Parameters<T>
-): Promise<O['transformResponse'] extends false ? AnyProp<R['data']> : R['data']> {
+): Promise<O['transform'] extends false ? AnyProp<R['data']> : R['data']> {
   options ||= {} as O;
   const thatlogger = getLogger(options.logger);
-  const { name, successCode = 0, transformResponse } = options;
+  const { name, successCode = 0, transform, okMsg } = options;
   try {
     const resp = await reqFunc(...args);
     const { code, message, msg, data } = resp || {};
     if (code !== successCode) {
       thatlogger.warn(`${name || reqFunc.name}请求失败：${code} ${message || msg}`);
     }
-    if (transformResponse === false) {
+    if (okMsg) {
+      thatlogger.info(okMsg);
+    }
+    if (transform === false) {
       return resp;
     }
     return data;
@@ -38,6 +42,7 @@ export async function request<
     thatlogger.error(`${name || reqFunc.name}请求出现异常`);
     thatlogger.error(error);
   }
+  return {} as unknown;
 }
 
 function getLogger(loggerOption: RequestOptions['logger']) {

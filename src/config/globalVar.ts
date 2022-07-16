@@ -2,8 +2,8 @@ import type { Config } from '../types';
 import { getConfig } from './setConfig';
 import { mergeConfig } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
-import { encodeCookie } from '@/utils/cookie';
-import { getBuvid } from '@/utils/bili';
+import { encodeCookie, getCookie } from '@/utils/cookie';
+import { getBuvid } from '@/utils/pure';
 
 type TaskConfigType = Config & {
   mobileUA: string;
@@ -81,5 +81,15 @@ export function changeConfig(index: string) {
   const config = getConfig();
   if (config[index]) {
     initialize(config[index]);
+  }
+}
+
+export class BiliCookieJar {
+  async getCookieString() {
+    return TaskConfig.cookie;
+  }
+
+  async setCookie(rawCookie: string) {
+    TaskConfig.cookie = getCookie(TaskConfig.cookie, rawCookie);
   }
 }

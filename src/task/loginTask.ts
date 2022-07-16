@@ -19,10 +19,10 @@ function estimatedDays(upLevelExp: number): number {
 }
 
 function setLevelInfo(data: UserNavData) {
-  /**等级相关信息 */
+  /** 等级相关信息 */
   const levelInfo = data.level_info;
   const currentLevel = levelInfo.current_level;
-  //判断当前等级是否还需要投币
+  // 判断当前等级是否还需要投币
   if (currentLevel >= TaskConfig.coin.targetLevel) {
     TaskModule.coinsTask = 0;
   }
@@ -31,11 +31,10 @@ function setLevelInfo(data: UserNavData) {
     const funcs = TaskConfig.function;
     funcs.shareAndWatch = false;
     funcs.addCoins = false;
-    funcs.taskReward = false;
     logger.info('已经满级，不需要再投币了，做个白嫖怪吧');
   } else {
     const upLevelExp = levelInfo.next_exp - levelInfo.current_exp;
-    //实际天数肯定会少一些
+    // 实际天数肯定会少一些
     logger.info(
       `距离升级还需要 ${upLevelExp} 经验，预计 ${estimatedDays(upLevelExp).toFixed(2)} 天`,
     );
@@ -43,7 +42,7 @@ function setLevelInfo(data: UserNavData) {
 }
 
 export function setVipStatus(data: { vipType: number; vipStatus: number }) {
-  /**大会员信息 */
+  /** 大会员信息 */
   let vipTypeMsg = '';
 
   TaskModule.vipType = data.vipType;
@@ -63,7 +62,7 @@ export function setVipStatus(data: { vipType: number; vipStatus: number }) {
       break;
   }
 
-  //判断是否过期,因为即使大会员过期,下面也会显示
+  // 判断是否过期,因为即使大会员过期,下面也会显示
   if (data.vipStatus === 0) {
     vipTypeMsg = vipTypeMsg === '无大会员' ? vipTypeMsg : vipTypeMsg + '[已过期]';
   }
@@ -73,7 +72,7 @@ export function setVipStatus(data: { vipType: number; vipStatus: number }) {
 
 async function setUserInfo(data: UserNavData) {
   try {
-    const { money } = await request(getCoinBalance); //获取更精准的硬币数量
+    const { money } = await request(getCoinBalance); // 获取更精准的硬币数量
 
     logger.info(`登录成功: ${data.uname}`);
     logger.info(`硬币余额: ${money || 0}`);

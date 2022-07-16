@@ -52,8 +52,6 @@ export const defaultConfig = {
     supGroupSign: false,
     // 直播发送弹幕
     liveSendMessage: false,
-    // 非配置项
-    taskReward: true,
     // 充电
     charging: false,
     // 获取 vip 权益

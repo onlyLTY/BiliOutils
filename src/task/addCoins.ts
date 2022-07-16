@@ -7,6 +7,7 @@ import {
   getAidByByPriority,
   getTodayCoinNum,
 } from '../service/coin.service';
+import { checkCoin } from '@/service/reward.service';
 
 interface State {
   // 投币错误次数
@@ -25,6 +26,7 @@ interface State {
 
 export default async function addCoins() {
   logger.info('----【视频投币】----');
+  await checkCoin();
   if (!TaskModule.coinsTask) {
     logger.info('跳过投币，今日已完成');
     return;

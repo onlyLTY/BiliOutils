@@ -290,7 +290,7 @@ export async function exchangeCoupon() {
     }
     const { code } = await request(
       exchangeMangaShop,
-      { name: '兑换商品', transformResponse: false },
+      { name: '兑换商品', transform: false },
       195,
       100,
       num,

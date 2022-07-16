@@ -2,7 +2,6 @@
  * 任务读取顺序
  */
 export const taskExportOrder = [
-  'taskReward',
   'liveSignTask',
   'addCoins',
   'bigPoint',
@@ -30,7 +29,6 @@ export const taskExportOrder = [
  * 全部写出来是因为想要动态导入但不写 rollup 就不会打包
  */
 export const biliTasks = [
-  () => import('./taskReward'),
   () => import('./liveSignTask'),
   () => import('./addCoins'),
   () => import('./bigPoint'),
