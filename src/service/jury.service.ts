@@ -10,7 +10,7 @@ import {
   getJuryCaseVote,
   juryCaseVote,
 } from '@/net/jury.request';
-import { apiDelay, getRandomItem, Logger } from '@/utils';
+import { apiDelay, getRandomItem, Logger, logger } from '@/utils';
 import { JuryVote, JuryVoteResult } from '@/enums/jury.emum';
 import { getRequestNameWrapper } from '@/utils/request';
 
@@ -52,7 +52,7 @@ export async function voteJuryByOpinion(caseId: string) {
     juryLogger.info(`为【${caseId}】选择了【${JuryVote[vote]}】（${vote}）`);
     const { code, message } = await juryCaseVote(caseId, vote);
     if (code !== 0) {
-      juryLogger.warn(`风纪委员投票失败，错误码：【${code}】，信息为：【${message}】`);
+      juryLogger.warn(`为案件【${caseId}】投票失败，【${code}】【${message}】`);
       return JuryVoteResult.ERROR;
     }
     juryLogger.info(
@@ -60,7 +60,7 @@ export async function voteJuryByOpinion(caseId: string) {
     );
     return JuryVoteResult.SUCCESS;
   } catch (error) {
-    juryLogger.error(`风纪委员投票失败，错误信息：${error}`);
+    juryLogger.error(`为案件【${caseId}】投票异常，错误信息：${error}`);
   }
   return JuryVoteResult.UNKNOWN;
 }
@@ -83,7 +83,7 @@ export async function replenishVote(caseId: string, defaultVote: number) {
       juryLogger.info(`成功根据【配置文件】为案件【${caseId}】投下【${selectedVote.vote_text}】`);
       return true;
     }
-    juryLogger.warn(`风纪委员投票失败，错误码：【${vote.code}】，信息为：【${vote.message}】`);
+    juryLogger.warn(`为案件【${caseId}】投票失败，【${vote.code}】【${vote.message}】`);
     return false;
   } catch (error) {
     juryLogger.error(`风纪委员默认投票异常，错误信息：${error}`);
@@ -98,12 +98,12 @@ async function caseConfirm(caseId: string) {
   try {
     const { code, message } = await juryCaseVote(caseId, 0);
     if (code !== 0) {
-      juryLogger.warn(`确认案件失败，错误码：【${code}】信息为：【${message}】`);
+      juryLogger.warn(`确认案件【${caseId}】失败，【${code}】【${message}】`);
       throw new Error(message);
     }
     await apiDelay(12000, 20000);
   } catch (error) {
-    juryLogger.error(`确认案件失败，错误信息：${error.message}`);
+    juryLogger.error(`确认案件【${caseId}】异常，错误信息：${error.message}`);
     throw error;
   }
 }
@@ -192,7 +192,7 @@ async function runMode2(errRef: Ref<number>, caseIdList: string[]) {
  * 获取风纪委员案件资格已经过期
  */
 async function handleJudgeExpired(message: string) {
-  juryLogger.warn(`${message}`);
+  logger.warn(`${message}`);
   await request(applyJury, '申请风纪委员');
   // 不管是否成功，目前是无法继续投票的
   return true;
@@ -225,7 +225,7 @@ async function handleNoNewCaseForMode2(message: string, caseIdList: string[], er
     // 删除 caseIdList 中的 caseId
     caseIdList.splice(caseIdList.indexOf(caseId), 1);
     if (errRef.value === 0) {
-      juryLogger.error(`错误次数过多，结束任务！`);
+      logger.error(`错误次数过多，结束任务！`);
       return true;
     }
     if (!(await replenishVote(caseId, getRandomItem(TaskConfig.jury.vote)))) {
@@ -239,7 +239,7 @@ async function handleNoNewCaseForMode2(message: string, caseIdList: string[], er
  * 获取风纪委员案件案件已满
  */
 async function handleCaseFull(message: string) {
-  juryLogger.info(`${message}`);
+  logger.info(`${message}`);
   return true;
 }
 
@@ -249,7 +249,7 @@ async function handleCaseFull(message: string) {
 async function handleOtherError(code: number, message: string, errRef: Ref<number>) {
   juryLogger.warn(`获取风纪委员案件失败，错误码：【${code}】，信息为：【${message}】`);
   if (code === 25005) {
-    juryLogger.warn(`如果需要请手动申请风纪委员，对于从来没有当过的用户，我们默认你配置错误。`);
+    logger.warn(`如果需要请手动申请风纪委员，对于从来没有当过的用户，我们默认你配置错误。`);
     return true;
   }
   errRef.value -= 1;
@@ -300,6 +300,6 @@ export async function juryService() {
         return;
     }
   } catch (error) {
-    juryLogger.error(`发生错误，错误信息为：${error}`);
+    logger.error(`发生错误，错误信息为：${error}`);
   }
 }

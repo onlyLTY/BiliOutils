@@ -185,9 +185,9 @@ export const defaultConfig = {
     // 购买追漫（优先级低）
     love: true,
     // 执行购买漫画间隔时间（单位天）
-    buyInterval: 6,
+    buyInterval: 2,
     // 星期几执行购买漫画
-    buyWeek: [3],
+    buyWeek: [],
     // 商城兑换漫读券数量
     exchangeCouponNum: 0,
   },
