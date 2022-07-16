@@ -4,7 +4,8 @@ import type { Got, Response } from 'got';
 import got from 'got';
 import { isFunction, isObject, isString } from '../is';
 import { jsonp2Object, mergeHeaders, stringify } from '../pure';
-import { BiliCookieJar, CookieJar } from '../cookie';
+import { CookieJar } from '../cookie';
+import { BiliCookieJar } from '@/config/globalVar';
 
 const transformRequestHook = (res: Response, options: RequestOptions) => {
   const { isTransformResponse, isReturnNativeResponse } = options;

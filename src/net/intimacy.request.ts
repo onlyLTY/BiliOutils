@@ -1,8 +1,8 @@
 import { TaskConfig } from '@/config/globalVar';
 import type { ApiBaseProp } from '@/dto/bili-base-prop';
 import type { LiveHeartBeatRes, ShareLiveRoomRes } from '@/dto/intimacy.dto';
-import { clientSign, getBuvid } from '@/utils/bili';
-import { createUUID, randomString } from '@/utils/pure';
+import { clientSign } from '@/utils/bili';
+import { createUUID, getBuvid, randomString } from '@/utils/pure';
 import { liveApi, liveTraceApi } from './api';
 
 /**

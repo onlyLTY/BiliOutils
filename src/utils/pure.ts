@@ -377,3 +377,12 @@ export function isTodayInTimeArr(timeArr: number[]) {
 export function getUnixTime() {
   return Math.floor(new Date().getTime() / 1000);
 }
+
+/**
+ * 获取 Buvid
+ * @description buvid 以 XY 开头，后面跟 35 位 16 进制字符串大写
+ * @param prefix 前缀
+ */
+export function getBuvid(prefix = 'XY') {
+  return `${prefix}${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
+}

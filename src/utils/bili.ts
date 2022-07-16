@@ -108,11 +108,3 @@ export function conciseNickname(nickname = '') {
   const lastWord = nickname[length - 1];
   return `${firstWord}**${lastWord}`;
 }
-
-/**
- * 获取 Buvid
- * @description buvid 以 XY 开头，后面跟 35 位 16 进制字符串大写
- */
-export function getBuvid() {
-  return `XY${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
-}

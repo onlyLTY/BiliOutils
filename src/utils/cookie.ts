@@ -1,4 +1,3 @@
-import { TaskConfig } from '@/config/globalVar';
 import { isString } from './is';
 
 export function getCookieJSON(cookie: string | undefined): Record<string, string> {
@@ -93,15 +92,5 @@ export class CookieJar {
 
   getCookieItem(key: string) {
     return getCookieItem(this.cookie, key);
-  }
-}
-
-export class BiliCookieJar {
-  async getCookieString() {
-    return TaskConfig.cookie;
-  }
-
-  async setCookie(rawCookie: string) {
-    TaskConfig.cookie = getCookie(TaskConfig.cookie, rawCookie);
   }
 }
