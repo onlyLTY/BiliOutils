@@ -1,4 +1,10 @@
-import { DAILY_RUN_TIME, LOTTERY_EXCLUDE, LOTTERY_INCLUDE, LOTTERY_UP_BLACKLIST } from '@/constant';
+import {
+  DAILY_RUN_TIME,
+  LOTTERY_EXCLUDE,
+  LOTTERY_INCLUDE,
+  LOTTERY_UP_BLACKLIST,
+  TODAY_MAX_FEED,
+} from '@/constant';
 import { cloneObject, getNewObject, deepMergeObject, arr2numArr } from '@/utils/pure';
 import { getBiliJct, getUserId } from '../utils/cookie';
 import { isArray, isString } from '../utils/is';
@@ -150,8 +156,6 @@ export const defaultConfig = {
   intimacy: {
     // 直播弹幕
     liveSendMessage: true,
-    // 分享直播间
-    liveShare: true,
     // 点赞直播间
     liveLike: true,
     // 30 分钟直播心跳
@@ -160,6 +164,8 @@ export const defaultConfig = {
     whiteList: [],
     // 黑名单
     blackList: [],
+    // 每日亲密度上限 （系统 1500）
+    limitFeed: TODAY_MAX_FEED,
   },
   jury: {
     mode: 1,
