@@ -1,7 +1,7 @@
 import type { FansMedalDto } from '../dto/live.dto';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import * as liveRequest from '../net/live.request';
-import { kaomoji } from '../constant';
+import { kaomoji, TODAY_MAX_FEED } from '../constant';
 import {
   random,
   apiDelay,
@@ -12,7 +12,7 @@ import {
   createUUID,
   isServerless,
 } from '@/utils';
-import { likeLiveRoom, liveMobileHeartBeat, shareLiveRoom } from '@/net/intimacy.request';
+import { likeLiveRoom, liveMobileHeartBeat } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
 
 const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
@@ -69,8 +69,8 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
   if (medal.level >= 20) return false;
   // 今日够了
   if (medal.today_feed >= medal.day_limit) return false;
-  // 今天达到了 1300（默认获取最大）
-  if (medal.today_feed >= 1300) return false;
+  // 今天达到了 TODAY_MAX_FEED（默认获取最大）
+  if (medal.today_feed >= TODAY_MAX_FEED) return false;
   // 不存在白名单
   // TODO：白名单兼容 uid 和 room_id
   const { whiteList, blackList } = TaskConfig.intimacy;
@@ -114,18 +114,6 @@ export async function sendOneMessage(roomid: number, nickName: string) {
   }
 }
 
-async function shareLive(roomId: number) {
-  try {
-    const { code, message, data } = await shareLiveRoom(roomId);
-    if (code === 0) {
-      return data;
-    }
-    logger.info(`【${roomId}】直播间分享失败 ${code} ${message}`);
-  } catch (error) {
-    logger.warn(`分享直播间 [${roomId}] 异常 ${error.message}`);
-  }
-}
-
 async function likeLive(roomId: number) {
   try {
     const { code, message, data } = await likeLiveRoom(roomId);
@@ -141,8 +129,9 @@ async function likeLive(roomId: number) {
 async function liveMobileHeart(
   heartbeatParams: MobileHeartBeatParams & { uname: string },
   countRef: Ref<number>,
+  needTime = 75,
 ) {
-  if (countRef.value >= 31) {
+  if (countRef.value >= needTime) {
     return;
   }
   try {
@@ -152,7 +141,7 @@ async function liveMobileHeart(
       return;
     }
     countRef.value++;
-    liveLogger.info(`直播间心跳成功 ${heartbeatParams.uname}（${countRef.value}/31）`);
+    liveLogger.info(`直播间心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
   } catch (error) {
     liveLogger.error(error);
     logger.error(`直播间心跳异常 ${error.message}`);
@@ -160,8 +149,7 @@ async function liveMobileHeart(
 }
 
 // 发送直播弹幕 1 次 间隔 10s 以上
-// 分享直播 5 次 间隔 3s 以上
-// 点赞 3 次 间隔 3s 以上
+// 点赞 1 次 间隔 3s 以上
 
 export async function liveIntimacyService() {
   const fansMealList = filterFansMedalList(await getFansMealList());
@@ -193,22 +181,45 @@ export function getRandomOptions() {
   };
 }
 
+function getLiveHeartNeedTime(medal = { today_feed: 0 }) {
+  const { limitFeed } = TaskConfig.intimacy;
+  // 今日还需要 feed
+  const { today_feed } = medal;
+  const needFeed = limitFeed - today_feed - 200;
+  if (needFeed <= 0) {
+    return 0;
+  }
+  // 所需要挂机时间 （每 100 feed 需要挂机 5 分钟）,加 1 是因为 1 分钟需要 1 + 1 次
+  return Math.ceil(needFeed / 100) * 5 + 1;
+}
+
+type LiveHeartRunOptions = {
+  fansMedal: FansMedalDto;
+  options: Record<string, string>;
+  countRef: Ref<number>;
+  needTime: number;
+  timerRef?: Ref<NodeJS.Timer>;
+};
+
 function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
   for (const fansMedal of roomList) {
     const countRef: Ref<number> = { value: 0 };
     const timerRef: Ref<NodeJS.Timer> = { value: undefined };
     const options = getRandomOptions();
-    run(fansMedal, options, countRef, timerRef);
-    timerRef.value = setInterval(run, 60000, fansMedal, options, countRef, timerRef);
+    const needTime = getLiveHeartNeedTime(fansMedal.medal);
+    const runOptions = { fansMedal, options, countRef, needTime, timerRef };
+    run(runOptions);
+    timerRef.value = setInterval(run, 60000, runOptions);
     apiDelaySync(50, 150);
   }
   resolve('直播间心跳');
-  async function run(
-    { medal, anchor_info, room_info }: FansMedalDto,
-    options: Record<string, string>,
-    countRef: Ref<number>,
-    timerRef?: Ref<NodeJS.Timer>,
-  ) {
+  async function run({
+    fansMedal: { medal, room_info, anchor_info },
+    options,
+    countRef,
+    needTime,
+    timerRef,
+  }: LiveHeartRunOptions) {
     await liveMobileHeart(
       {
         up_id: medal.target_id,
@@ -217,8 +228,9 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
         ...options,
       },
       countRef,
+      needTime,
     );
-    if (countRef.value >= 31) {
+    if (countRef.value >= needTime) {
       timerRef && timerRef.value && clearInterval(timerRef.value);
     }
   }
@@ -232,7 +244,7 @@ function liveHeartPromiseSync(roomList: FansMedalDto[]) {
 
 /**
  * 完成一个直播间所有轮次的心跳
- * @param fansMeal
+ * @param fansMedal
  * @param options
  */
 async function allLiveHeart(
@@ -240,7 +252,8 @@ async function allLiveHeart(
   options: Record<string, string>,
   countRef: Ref<number>,
 ) {
-  for (let i = 0; i < 31; i++) {
+  const needTime = getLiveHeartNeedTime(fansMedal.medal);
+  for (let i = 0; i < needTime; i++) {
     const { medal, anchor_info, room_info } = fansMedal;
     await liveMobileHeart(
       {
@@ -260,40 +273,22 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   if (!room_info || !anchor_info) {
     return;
   }
-  const { liveLike, liveSendMessage, liveShare } = TaskConfig.intimacy,
+  const { liveLike, liveSendMessage } = TaskConfig.intimacy,
     nickName = anchor_info.nick_name,
     roomid = room_info.room_id;
-  if (!liveLike && !liveSendMessage && !liveShare) return;
+  if (!liveLike && !liveSendMessage) return;
   // 发送直播弹幕
   if (liveSendMessage) {
-    liveLogger.verbose(`【${nickName}】开始发送直播弹幕`);
+    liveLogger.verbose(`为【${nickName}】发送直播弹幕`);
     await sendOneMessage(roomid, nickName);
-  }
-  // 分享直播
-  async function shareLiveHandle() {
-    await apiDelay(100, 300);
-    for (let i = 0; i < 5; i++) {
-      liveLogger.verbose(`分享 [${nickName}] 直播间`);
-      await shareLive(roomid);
-      await apiDelay(4000);
-    }
-  }
-  if (liveShare) {
-    shareLiveHandle().catch(error => logger.error(error));
   }
 
   // 点赞直播
-  async function likeLiveHandle() {
-    await apiDelay(100, 300);
-    for (let i = 0; i < 3; i++) {
-      liveLogger.verbose(`给 [${nickName}] 直播间点赞`);
-      await likeLive(roomid);
-      await apiDelay(6500);
-    }
-  }
   if (liveLike) {
-    likeLiveHandle().catch(error => logger.error(error));
+    await apiDelay(100, 300);
+    liveLogger.verbose(`为 [${nickName}] 直播间点赞`);
+    await likeLive(roomid);
   }
 
-  await apiDelay(22000);
+  await apiDelay(11000, 16000);
 }
