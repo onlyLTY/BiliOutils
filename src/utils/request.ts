@@ -6,6 +6,7 @@ export type RequestOptions = {
   logger?: Logger | boolean;
   name?: string;
   successCode?: number;
+  transformResponse?: boolean;
 };
 
 /**
@@ -14,14 +15,23 @@ export type RequestOptions = {
 export async function request<
   T extends (...args: any[]) => Promise<AnyProp<R['data']>>,
   R extends UnPromisify<ReturnType<T>>,
->(reqFunc: T, options: RequestOptions = {}, ...args: Parameters<T>): Promise<R['data']> {
+  O extends RequestOptions,
+>(
+  reqFunc: T,
+  options?: O,
+  ...args: Parameters<T>
+): Promise<O['transformResponse'] extends false ? AnyProp<R['data']> : R['data']> {
+  options ||= {} as O;
   const thatlogger = getLogger(options.logger);
-  const { name, successCode = 0 } = options;
+  const { name, successCode = 0, transformResponse } = options;
   try {
-    const { code, message, msg, data } = await reqFunc(...args);
+    const resp = await reqFunc(...args);
+    const { code, message, msg, data } = resp || {};
     if (code !== successCode) {
       thatlogger.warn(`${name || reqFunc.name}请求失败：${code} ${message || msg}`);
-      return;
+    }
+    if (transformResponse === false) {
+      return resp;
     }
     return data;
   } catch (error) {

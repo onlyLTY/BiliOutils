@@ -5,6 +5,8 @@ import type {
   CouponDto,
   FavoriteManga,
   MangaDetailDto,
+  MangaPointShopDto,
+  PointShopBuyDto,
   SearchMangaDto,
   WalletDto,
 } from '../dto/manga.dto';
@@ -105,4 +107,29 @@ export function searchManga(keyword: string, page_num = 1, page_size = 9) {
  */
 export function receiveMangaVipPrivilege() {
   return mangaApi.post<OnlyMsg>('twirp/user.v1.User/GetVipReward', { reason_id: 1 });
+}
+
+/**
+ * 获取当前漫画积分
+ */
+export function getMangaPoint() {
+  return mangaApi.post<OnlyMsg<{ point: string }>>('twirp/pointshop.v1.Pointshop/GetUserPoint');
+}
+
+/**
+ * 漫画积分商城列表
+ */
+export function getMangaPointShopList() {
+  return mangaApi.post<MangaPointShopDto>(`twirp/pointshop.v1.Pointshop/ListProduct`);
+}
+
+/**
+ * 漫画积分商城兑换
+ */
+export function exchangeMangaShop(product_id = 195, point = 100, product_num = 1) {
+  return mangaApi.post<PointShopBuyDto>(`twirp/pointshop.v1.Pointshop/Exchange`, {
+    product_id,
+    point,
+    product_num,
+  });
 }

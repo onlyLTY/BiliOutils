@@ -182,6 +182,8 @@ export const defaultConfig = {
     buyInterval: 6,
     // 星期几执行购买漫画
     buyWeek: [3],
+    // 商城兑换漫读券数量
+    exchangeCouponNum: 0,
   },
   activity: {
     liveFamineTime: 400,

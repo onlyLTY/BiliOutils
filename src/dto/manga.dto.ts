@@ -344,3 +344,46 @@ interface SearchMangaWiki {
   publish_time: string;
   frequency: string;
 }
+
+/**
+ * 漫画商城列表
+ */
+export type MangaPointShopDto = OnlyMsg<
+  {
+    id: number;
+    type: number;
+    title: string;
+    image: string;
+    /** 总量 */
+    amount: number;
+    /** 原价 */
+    cost: number;
+    /** 现价 */
+    real_cost: number;
+    /** 剩余数量 */
+    remain_amount: number;
+    comic_id: number;
+    limits: any[];
+    discount: number;
+    product_type: number;
+    pendant_url: string;
+    pendant_expire: number;
+    exchange_limit: number;
+    address_deadline: string;
+    act_type: number;
+    has_exchanged: boolean;
+    main_coupon_deadline: string;
+    deadline: string;
+    point: string;
+  }[]
+>;
+
+/**
+ * 积分商场购买反馈
+ */
+export type PointShopBuyDto = OnlyMsg<{
+  id: string;
+  expire_day: number;
+  remain_amount: number;
+  deadline: string;
+}>;

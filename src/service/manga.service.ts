@@ -1,6 +1,8 @@
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
+import { exchangeMangaShop, getMangaPoint } from '@/net/manga.request';
 import { apiDelay, logger } from '@/utils';
+import { request } from '@/utils/request';
 
 let expireCouponNum: number;
 
@@ -209,17 +211,41 @@ async function buyMangaByLove() {
 }
 
 export async function buyMangaService() {
+  const { buy } = TaskConfig.manga;
+  if (!buy) {
+    return;
+  }
+  if (!isTodayRunning()) {
+    logger.info('非购买漫画时间，不购买');
+    return;
+  }
   expireCouponNum = await getExpireCouponNum();
   if (expireCouponNum < 1) {
     logger.info('没有即将过期的漫读券，跳过任务');
     return;
   }
+  logger.info('开始购买漫画');
   await buyMangaByMc();
   await buyMangaByName();
   await buyMangaByLove();
+
+  function isTodayRunning() {
+    const { buyWeek, buyInterval } = TaskConfig.manga;
+    if (!buyWeek || buyWeek.length === 0) return false;
+    if (buyInterval === 1) return true;
+    const now = new Date();
+    const weekDay = now.getDay();
+    const today = now.getDate();
+    return buyWeek.includes(weekDay) || (today % buyInterval) - 1 === 0;
+  }
 }
 
 export async function mangaSign() {
+  const { sign } = TaskConfig.manga;
+  if (!sign) {
+    return;
+  }
+  logger.info('开始签到');
   try {
     const { code } = await mangaApi.clockIn();
     if (code == 0) {
@@ -238,5 +264,42 @@ export async function mangaSign() {
     } else {
       logger.error(`漫画签到异常 ${error.message}`);
     }
+  }
+}
+
+/**
+ * 商城兑换
+ */
+export async function exchangeCoupon() {
+  const { exchangeCouponNum } = TaskConfig.manga;
+  if (exchangeCouponNum < 1) {
+    return;
+  }
+  logger.info(`开始兑换漫读券，预设数量：${exchangeCouponNum}`);
+  try {
+    let num = exchangeCouponNum;
+    const { point } = await request(getMangaPoint, { name: '获取积分' });
+    const pointNum = parseInt(point, 10) || 0,
+      buyCouponNum = Math.floor(pointNum / 100);
+    logger.info(`当前积分：${pointNum}`);
+    if (buyCouponNum < num) {
+      num = buyCouponNum;
+    }
+    if (buyCouponNum < 1) {
+      logger.info('可兑换的漫读券数量不足 1，跳过任务');
+      return;
+    }
+    const { code } = await request(
+      exchangeMangaShop,
+      { name: '兑换商品', transformResponse: false },
+      195,
+      100,
+      num,
+    );
+    if (code === 0) {
+      logger.info(`兑换商品成功，兑换数量：${num}`);
+    }
+  } catch (error) {
+    logger.error(`商城兑换异常: ${error}`);
   }
 }
