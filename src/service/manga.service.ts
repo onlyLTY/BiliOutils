@@ -231,7 +231,6 @@ export async function buyMangaService() {
 
   function isTodayRunning() {
     const { buyWeek, buyInterval } = TaskConfig.manga;
-    if (!buyWeek || buyWeek.length === 0) return false;
     if (buyInterval === 1) return true;
     const now = new Date();
     const weekDay = now.getDay();

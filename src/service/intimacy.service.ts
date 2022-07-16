@@ -27,9 +27,10 @@ export async function getFansMealList() {
   const list: FansMedalDto[] = [];
   try {
     while (pageNumber < totalNumber) {
+      await apiDelay(200, 600);
       const { code, message, data } = await liveRequest.getFansMedalPanel(
         pageNumber + 1,
-        50,
+        10,
         TaskConfig.USERID,
       );
 
@@ -89,6 +90,32 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
     return true;
   }
   return false;
+}
+
+async function getSuccessMsgNoLighted(list: FansMedalDto[]) {
+  const { liveSendMessage } = TaskConfig.intimacy;
+  if (!liveSendMessage) {
+    return list;
+  }
+  const noLightedList = list.filter(({ medal }) => medal.is_lighted === 0);
+  const resultList: FansMedalDto[] = [];
+  // 发送直播弹幕
+  for (let index = 0; index < noLightedList.length; index++) {
+    const {
+      anchor_info: { nick_name },
+      room_info: { room_id },
+    } = noLightedList[index];
+    liveLogger.verbose(`为【${nick_name}】发送直播弹幕`);
+    const isSuccess = await sendOneMessage(room_id, nick_name);
+    if (isSuccess) {
+      resultList.push(noLightedList[index]);
+      await apiDelay(100, 300);
+      liveLogger.verbose(`为 [${nick_name}] 直播间点赞`);
+      await likeLive(room_id);
+    }
+    await apiDelay(11000, 15000);
+  }
+  return resultList;
 }
 
 export async function sendOneMessage(roomid: number, nickName: string) {
@@ -152,8 +179,16 @@ async function liveMobileHeart(
 // 点赞 1 次 间隔 3s 以上
 
 export async function liveIntimacyService() {
+  // 获取到可能需要操作的粉丝牌
   const fansMealList = filterFansMedalList(await getFansMealList());
-  return await Promise.allSettled([likeAndShare(fansMealList), liveHeart(fansMealList)]);
+  // 获取到没有点亮的且能成功发送弹幕的粉丝牌
+  const noLightedList = await getSuccessMsgNoLighted(fansMealList);
+  // 获取到点亮的粉丝牌
+  const lightedList = fansMealList.filter(({ medal }) => medal.is_lighted === 1);
+  return await Promise.allSettled([
+    likeAndShare(lightedList),
+    liveHeart([...lightedList, ...noLightedList]),
+  ]);
 }
 
 async function likeAndShare(fansMealList: FansMedalDto[]) {
@@ -185,7 +220,10 @@ function getLiveHeartNeedTime(medal = { today_feed: 0 }) {
   const { limitFeed } = TaskConfig.intimacy;
   // 今日还需要 feed
   const { today_feed } = medal;
-  const needFeed = limitFeed - today_feed - 200;
+  let needFeed = limitFeed - today_feed;
+  if (today_feed < 200) {
+    needFeed -= 200;
+  }
   if (needFeed <= 0) {
     return 0;
   }
