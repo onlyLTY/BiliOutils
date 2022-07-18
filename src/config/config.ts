@@ -170,6 +170,8 @@ export const defaultConfig = {
     once: true,
     vote: [0, 1],
     opinionMin: 3,
+    // 没有案件后的等待时间（分）
+    waitTime: 20,
   },
   manga: {
     // 签到
@@ -199,6 +201,8 @@ export const defaultConfig = {
     isWatch: true,
     // 自定义观看视频的章节
     epids: [] as number[],
+    // 领取任务后的观看延时（秒）
+    watchDelay: 20,
   },
   BILIJCT: '',
   USERID: 0,

@@ -31,15 +31,16 @@ export async function getFansMealList() {
   try {
     while (pageNumber < totalNumber) {
       await apiDelay(200, 600);
-      const { code, message, data } = await liveRequest.getFansMedalPanel(
-        pageNumber + 1,
-        10,
-        TaskConfig.USERID,
-      );
-
+      const { code, message, data } = await liveRequest.getFansMedalPanel(pageNumber + 1, 10);
+      // TODO: 测试已经佩戴的粉丝牌
+      {
+        if (pageNumber === 0) {
+          console.log(data.special_list[0]);
+        }
+      }
       if (code !== 0) {
         logger.verbose(`获取勋章信息失败 ${code} ${message}`);
-        return null;
+        return list;
       }
 
       if (!data) {
@@ -54,7 +55,7 @@ export async function getFansMealList() {
     return list;
   } catch (error) {
     logger.error(`获取勋章异常 ${error.message}`);
-    return null;
+    return list;
   }
 }
 
@@ -93,32 +94,6 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
     return true;
   }
   return false;
-}
-
-async function getSuccessMsgNoLighted(list: FansMedalDto[]) {
-  const { liveSendMessage } = TaskConfig.intimacy;
-  if (!liveSendMessage) {
-    return list;
-  }
-  const noLightedList = list.filter(({ medal }) => medal.is_lighted === 0);
-  const resultList: FansMedalDto[] = [];
-  // 发送直播弹幕
-  for (let index = 0; index < noLightedList.length; index++) {
-    const {
-      anchor_info: { nick_name },
-      room_info: { room_id },
-    } = noLightedList[index];
-    liveLogger.verbose(`为【${nick_name}】发送直播弹幕`);
-    const msgCode = await sendOneMessage(room_id, nick_name);
-    if (msgCode === SeedMessageResult.Success) {
-      resultList.push(noLightedList[index]);
-      await apiDelay(100, 300);
-      liveLogger.verbose(`为 [${nick_name}] 直播间点赞`);
-      await likeLive(room_id);
-    }
-    await apiDelay(11000, 15000);
-  }
-  return resultList;
 }
 
 export async function sendOneMessage(roomid: number, nickName: string) {
@@ -348,13 +323,7 @@ export async function liveInteract(fansMedal: FansMedalDto) {
 export async function liveIntimacyService() {
   // 获取到可能需要操作的粉丝牌
   const fansMealList = filterFansMedalList(await getFansMealList());
-  // 获取到没有点亮的且能成功发送弹幕的粉丝牌
-  const noLightedList = await getSuccessMsgNoLighted(fansMealList);
   // 获取到点亮的粉丝牌
-  const lightedList = fansMealList.filter(({ medal }) => medal.is_lighted === 1);
-  await Promise.allSettled([
-    likeAndShare(lightedList),
-    liveHeart([...lightedList, ...noLightedList]),
-  ]);
+  await Promise.allSettled([likeAndShare(fansMealList), liveHeart(fansMealList)]);
   return;
 }

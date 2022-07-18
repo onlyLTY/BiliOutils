@@ -128,9 +128,10 @@ async function watchTask(completeTimes: number) {
     }
     return Number(prefix + epid);
   }
+  const { epids, watchDelay = 20 } = TaskConfig.bigPoint;
+  await apiDelay(watchDelay * 1000);
   try {
     let epid: number;
-    const { epids } = TaskConfig.bigPoint;
     if (epids && epids.length > 0) {
       epid = getRandomItem(epids);
       logger.debug(`使用随机视频: ${epid}`);

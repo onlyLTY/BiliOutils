@@ -1,11 +1,11 @@
-import { mangaSign, buyMangaService, exchangeCoupon } from '@/service/manga.service';
+import { mangaSign, buyMangaService, exchangeCouponService } from '@/service/manga.service';
 import { logger } from '../utils/log';
 
 export default async function mangaTask() {
   logger.info('----【漫画任务】----');
   try {
     // 兑换漫读券
-    await exchangeCoupon();
+    await exchangeCouponService();
     // 漫画签到
     await mangaSign();
     // 购买漫画

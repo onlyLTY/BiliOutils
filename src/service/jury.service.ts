@@ -203,11 +203,19 @@ async function handleJudgeExpired(message: string) {
 async function handleNoNewCase(message: string) {
   juryLogger.info(`${message}`);
   if (TaskConfig.jury.once) {
-    juryLogger.info(`休眠30分钟后继续获取案件！`);
-    await apiDelay(1800000);
-    return false;
+    return await waitFor();
   }
   return true;
+}
+
+/**
+ * 休眠等待
+ */
+async function waitFor() {
+  const waitTime = TaskConfig.jury.waitTime || 20;
+  juryLogger.info(`休眠 ${waitTime} 分钟后继续获取案件！`);
+  await apiDelay(waitTime * 60000);
+  return false;
 }
 
 /**
@@ -216,9 +224,7 @@ async function handleNoNewCase(message: string) {
 async function handleNoNewCaseForMode2(message: string, caseIdList: string[], errRef: Ref<number>) {
   juryLogger.info(`${message}`);
   if (!caseIdList.length && TaskConfig.jury.once) {
-    juryLogger.info(`休眠30分钟后继续获取案件！`);
-    await apiDelay(1800000);
-    return false;
+    return await waitFor();
   }
   juryLogger.debug('没有新的案件，清空保存的案件！');
   for (const caseId of caseIdList) {

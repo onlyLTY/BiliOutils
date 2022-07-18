@@ -295,10 +295,23 @@ export async function exchangeCoupon() {
       100,
       num,
     );
+    // 抢的人太多
+    if (code === 4) {
+      return true;
+    }
     if (code === 0) {
       logger.info(`兑换商品成功，兑换数量：${num}`);
+      return;
     }
   } catch (error) {
     logger.error(`商城兑换异常: ${error}`);
+  }
+}
+
+export async function exchangeCouponService() {
+  let isRepeat = true;
+  while (isRepeat) {
+    isRepeat = await exchangeCoupon();
+    await apiDelay(300);
   }
 }
