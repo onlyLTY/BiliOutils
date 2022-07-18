@@ -43,7 +43,6 @@ export function getMoreOpinion(caseId: string, opinions: JuryCaseOpinion[]) {
  */
 export async function voteJuryByOpinion(caseId: string) {
   try {
-    await caseConfirm(caseId);
     const { list } = await request(getJuryCaseViewpoint, '获取观点', caseId);
     if (!list || !list.length) return JuryVoteResult.NO_OPINION;
     const opinion = getMoreOpinion(caseId, list);
@@ -221,6 +220,7 @@ async function handleNoNewCaseForMode2(message: string, caseIdList: string[], er
     await apiDelay(1800000);
     return false;
   }
+  juryLogger.debug('没有新的案件，清空保存的案件！');
   for (const caseId of caseIdList) {
     // 删除 caseIdList 中的 caseId
     caseIdList.splice(caseIdList.indexOf(caseId), 1);
@@ -228,6 +228,7 @@ async function handleNoNewCaseForMode2(message: string, caseIdList: string[], er
       logger.error(`错误次数过多，结束任务！`);
       return true;
     }
+    await caseConfirm(caseId);
     if (!(await replenishVote(caseId, getRandomItem(TaskConfig.jury.vote)))) {
       errRef.value -= 1;
     }
@@ -269,15 +270,24 @@ async function handleSuccess(
     errRef.value -= 1;
     return;
   }
+  if (!caseIdList) {
+    await caseConfirm(case_id);
+  }
   const voteResult = await voteJuryByOpinion(case_id);
-  if (voteResult === 0) return;
-  if (voteResult < 0) {
+  if (voteResult === JuryVoteResult.SUCCESS) return;
+  if (voteResult < JuryVoteResult.SUCCESS) {
     errRef.value -= 1;
     return;
   }
   if (caseIdList) {
-    caseIdList.push(case_id);
-    return;
+    const isIncludes = caseIdList.includes(case_id);
+    if (!isIncludes) {
+      caseIdList.push(case_id);
+      return;
+    } else {
+      // 删除 caseIdList 中的 caseId
+      caseIdList.splice(caseIdList.indexOf(case_id), 1);
+    }
   }
   const vote = await replenishVote(case_id, getRandomItem(TaskConfig.jury.vote));
   if (!vote) {
