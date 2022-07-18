@@ -1,62 +1,70 @@
-/**
- * 任务读取顺序
- */
-export const taskExportOrder = [
-  'liveSignTask',
-  'addCoins',
-  'bigPoint',
-  'shareAndWatch',
-  'silver2Coin',
-  'mangaSign',
-  'mangaTask',
-  'supGroupSign',
-  'liveSendMessage',
-  'charging',
-  'getVipPrivilege',
-  'matchGame',
-  'batchUnfollow',
-  'liveLottery',
-  'liveRedPack',
-  'liveIntimacy',
-  'giveGift',
-  'loginTask',
-  'liveFamine',
-  'judgement',
+import { logger } from '../utils/log';
+
+export const biliTaskArray = [
+  ['loginTask', () => import('./loginTask')],
+  ['liveSignTask', () => import('./liveSignTask')],
+  ['addCoins', () => import('./addCoins')],
+  ['bigPoint', () => import('./bigPoint')],
+  ['shareAndWatch', () => import('./shareAndWatch')],
+  ['silver2Coin', () => import('./silver2Coin')],
+  ['mangaSign', () => import('./mangaSign')],
+  ['mangaTask', () => import('./mangaTask')],
+  ['supGroupSign', () => import('./supGroupSign')],
+  ['liveSendMessage', () => import('./liveSendMessage')],
+  ['charging', () => import('./charging')],
+  ['getVipPrivilege', () => import('./getVipPrivilege')],
+  ['matchGame', () => import('./matchGame')],
+  ['giveGift', () => import('./giveGift')],
+  ['batchUnfollow', () => import('./batchUnfollow')],
+  ['liveLottery', () => import('./liveLottery')],
+  ['liveRedPack', () => import('./liveRedPack')],
+  ['liveIntimacy', () => import('./liveIntimacy')],
+  ['liveFamine', () => import('./liveFamine')],
+  ['judgement', () => import('./judgement')],
 ] as const;
 
-/**
- * 按照上面的顺序导入的任务
- * 全部写出来是因为想要动态导入但不写 rollup 就不会打包
- */
-export const biliTasks = [
-  () => import('./liveSignTask'),
-  () => import('./addCoins'),
-  () => import('./bigPoint'),
-  () => import('./shareAndWatch'),
-  () => import('./silver2Coin'),
-  () => import('./mangaSign'),
-  () => import('./mangaTask'),
-  () => import('./supGroupSign'),
-  () => import('./liveSendMessage'),
-  () => import('./charging'),
-  () => import('./getVipPrivilege'),
-  () => import('./matchGame'),
-  () => import('./batchUnfollow'),
-  () => import('./liveLottery'),
-  () => import('./liveRedPack'),
-  () => import('./liveIntimacy'),
-  () => import('./giveGift'),
-  () => import('./loginTask'),
-  () => import('./liveFamine'),
-  () => import('./judgement'),
-];
+export type BiliTaskName = typeof biliTaskArray[number][0];
 
-export async function getBiliTask(funcName: typeof taskExportOrder[number]) {
-  const index = taskExportOrder.findIndex(name => name === funcName);
-  if (index === -1) {
-    return () => Promise.resolve();
-  }
-  return (await biliTasks[index]()).default;
-}
+export const biliTasks = new Map<string, () => Promise<{ default: () => Promise<any> }>>(
+  biliTaskArray,
+);
 
 export default biliTasks;
+
+export async function getBiliTask(funcName: BiliTaskName) {
+  const biliTask = biliTasks.get(funcName);
+  if (!biliTask) {
+    return () => Promise.resolve(0);
+  }
+  return (await biliTask()).default;
+}
+
+/**
+ * 获取用户输入的任务
+ */
+export function getInputBiliTask(taskNameStr: string) {
+  const taskNameArr = taskNameStr.split(',');
+  const taskArr: Array<ReturnType<typeof biliTasks.get>> = [];
+  taskNameArr.forEach(name => {
+    const task = biliTasks.get(name);
+    if (task) {
+      taskArr.push(task);
+    }
+  });
+  return taskArr.map(async func => (await func()).default);
+}
+
+/**
+ * 运行用户输入的任务
+ */
+export async function runInputBiliTask(taskNameStr: string) {
+  logger.info(`开始执行自定义任务！`);
+  const { Logger } = await import('../utils/log');
+  const { sendMessage } = await import('../utils/sendNotify');
+  Logger.init();
+  const taskArr = getInputBiliTask(taskNameStr);
+  for await (const task of taskArr) {
+    await task();
+  }
+  await sendMessage('任务完成', Logger.pushValue);
+}

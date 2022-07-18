@@ -1,5 +1,6 @@
 import type { SCFContext, SCFEvent } from './types/scf';
 import { logger } from './utils';
+import { JSON5 } from './utils/json5';
 import { runInVM } from './utils/vm';
 
 /**
@@ -27,6 +28,21 @@ export async function main_handler(event: SCFEvent, context: SCFContext) {
       return isGetCode;
     }
   }
-
+  let isReturn = false;
+  if (event.Message) {
+    isReturn = await runTasks(event.Message);
+  }
+  if (isReturn) return 'success';
   return dailyMain(event, context);
+}
+
+async function runTasks(payload: string) {
+  try {
+    const { runInputBiliTask } = await import('./task');
+    const payloadJson = JSON5.parse(payload);
+    if (payloadJson.task) {
+      await runInputBiliTask(payloadJson.task);
+      return true;
+    }
+  } catch {}
 }

@@ -1,4 +1,4 @@
-import { UserInfoNavDto } from '../dto/user-info.dto';
+import type { UserInfoNavDto } from '../dto/user-info.dto';
 import { TaskModule } from '../config/globalVar';
 import { loginByCookie } from '../net/user-info.request';
 import { logger } from '../utils/log';
@@ -21,5 +21,3 @@ export async function updateNav() {
     logger.error(`获取用户信息异常：${error.message}`);
   }
 }
-
-export default updateNav;

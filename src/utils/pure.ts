@@ -386,3 +386,12 @@ export function getUnixTime() {
 export function getBuvid(prefix = 'XY') {
   return `${prefix}${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
 }
+
+/**
+ * 如果数组中没有，则添加
+ */
+export function addIfNotExist<T>(arr: T[], item: T) {
+  if (!arr.includes(item)) {
+    arr.push(item);
+  }
+}

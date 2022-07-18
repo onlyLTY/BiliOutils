@@ -2,6 +2,7 @@ import { getPRCDate } from './pure';
 import { dailyTasks } from '../task/dailyTask';
 import type { FCContext, FCEvent } from '../types/fc';
 import type { SCFContext, SCFEvent, SLSType } from '../types';
+import { JSON5 } from './json5';
 
 interface Params {
   event: FCEvent | SCFEvent;
@@ -30,7 +31,7 @@ export async function dailyHandle({ event, context, slsType }: Params) {
     updateTrigger = await getUpdateTrigger(slsType, event, context);
   let message: { lastTime: string };
   try {
-    message = JSON.parse(payload);
+    message = JSON5.parse(payload);
   } catch (error) {}
 
   if (message && message.lastTime === getPRCDate().getDate().toString()) {

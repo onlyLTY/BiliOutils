@@ -17,9 +17,11 @@ Usage:
 Options:
   --version, -v             输出版本号
   --help, -h                输出帮助信息
-  --config, -c              配置文件路径
+  --config, -c <path>       配置文件路径
     eg: --config ./config.json
   --once, -o                每日任务只执行一次
+  --task, -t <taskString>   执行指定的 task
+    
 `;
 
 (async () => {
@@ -34,6 +36,9 @@ Options:
     return;
   }
   if (isArg('config')) {
+    if (isArg('task')) {
+      return await runCmdTask();
+    }
     const configDir = dirname(resolve(process.cwd(), getArg('config')));
     const jobsPath = resolve(configDir, 'bt_jobs.json');
     if (isTodayRun(jobsPath)) return;
@@ -96,4 +101,13 @@ function isTodayRun(jobsPath: string) {
       return true;
     }
   }
+}
+
+/**
+ * 执行命令行参数的 task
+ */
+async function runCmdTask() {
+  const task = getArg('task');
+  const { runInputBiliTask } = await import('./task');
+  await runInputBiliTask(task);
 }

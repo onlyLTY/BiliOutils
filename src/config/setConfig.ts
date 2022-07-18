@@ -5,6 +5,7 @@ import { gzipDecode } from '../utils/gzip';
 import { SystemConfig } from './systemConfig';
 import { readJsonFile } from '@/utils/file';
 import { JSON5 } from '../utils/json5';
+import { isArray } from '@/utils';
 
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
@@ -68,8 +69,8 @@ function handleQLPanel(configArr: Config[]): Config {
  */
 function handleMultiUserConfig(config: MultiConfig | Config[]): Config {
   let newConfig: Config[];
-  const isArray = Array.isArray(config);
-  if (isArray) {
+  const isArrayConf = isArray(config);
+  if (isArrayConf) {
     newConfig = config;
   } else {
     // [兼容]
@@ -88,7 +89,7 @@ function handleMultiUserConfig(config: MultiConfig | Config[]): Config {
   // [兼容]
   // 合并 message 配置
   const conf = newConfig[0];
-  if (!isArray) {
+  if (!isArrayConf && Reflect.has(conf, 'account')) {
     conf.message = Object.assign(config.message || {}, conf.message);
   }
   return conf;

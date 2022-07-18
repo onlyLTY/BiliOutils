@@ -18,6 +18,10 @@ export function run() {
   require('./index');
 }
 
+export function runInputTasks(task: string) {
+  return require('./task').runInputBiliTask(task);
+}
+
 export const agc_handler = cfc_handler;
 export const fg_handler = cfc_handler;
 export const ql = qinglong;
