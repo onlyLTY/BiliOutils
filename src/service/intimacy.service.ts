@@ -14,12 +14,15 @@ import {
 } from '@/utils';
 import { likeLiveRoom, liveMobileHeartBeat } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
+import { SeedMessageResult } from '@/enums/intimacy.emum';
 
 const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
 const liveLogger = new Logger(
   { console: 'debug', file: 'debug', push: 'warn', payload: TaskModule.nickname },
   'live',
 );
+// 发送弹幕失败的直播间
+const sendMessageFailList = new Map<number, FansMedalDto>();
 
 export async function getFansMealList() {
   let totalNumber = 99,
@@ -106,8 +109,8 @@ async function getSuccessMsgNoLighted(list: FansMedalDto[]) {
       room_info: { room_id },
     } = noLightedList[index];
     liveLogger.verbose(`为【${nick_name}】发送直播弹幕`);
-    const isSuccess = await sendOneMessage(room_id, nick_name);
-    if (isSuccess) {
+    const msgCode = await sendOneMessage(room_id, nick_name);
+    if (msgCode === SeedMessageResult.Success) {
       resultList.push(noLightedList[index]);
       await apiDelay(100, 300);
       liveLogger.verbose(`为 [${nick_name}] 直播间点赞`);
@@ -123,22 +126,21 @@ export async function sendOneMessage(roomid: number, nickName: string) {
   try {
     const { code, message } = await liveRequest.sendMessage(roomid, msg);
 
-    if (code !== 0) {
-      // 11000 某种不可抗力不允许发
-      // 10030 发送过于频繁
-      if (code === 11000) {
-        logger.warn(`【${nickName}】${roomid}-可能未开启评论`);
-        return false;
-      }
-      logger.warn(`【${nickName}】${roomid}-发送失败 ${message}`);
-      logger.verbose(`code: ${code}`);
-      return false;
+    if (code === 0) {
+      // logger.info('发送成功!');
+      return SeedMessageResult.Success;
     }
-    // logger.info('发送成功!');
-    return true;
+    if (code === SeedMessageResult.Unresistant) {
+      logger.warn(`【${nickName}】${roomid}-可能未开启评论`);
+      return SeedMessageResult.Unresistant;
+    }
+    logger.warn(`【${nickName}】${roomid}-发送失败 ${message}`);
+    logger.verbose(`code: ${code}`);
+    return code;
   } catch (error) {
     logger.verbose(`发送弹幕异常 ${error.message}`);
   }
+  return SeedMessageResult.Unknown;
 }
 
 async function likeLive(roomId: number) {
@@ -175,22 +177,6 @@ async function liveMobileHeart(
   }
 }
 
-// 发送直播弹幕 1 次 间隔 10s 以上
-// 点赞 1 次 间隔 3s 以上
-
-export async function liveIntimacyService() {
-  // 获取到可能需要操作的粉丝牌
-  const fansMealList = filterFansMedalList(await getFansMealList());
-  // 获取到没有点亮的且能成功发送弹幕的粉丝牌
-  const noLightedList = await getSuccessMsgNoLighted(fansMealList);
-  // 获取到点亮的粉丝牌
-  const lightedList = fansMealList.filter(({ medal }) => medal.is_lighted === 1);
-  return await Promise.allSettled([
-    likeAndShare(lightedList),
-    liveHeart([...lightedList, ...noLightedList]),
-  ]);
-}
-
 async function likeAndShare(fansMealList: FansMedalDto[]) {
   for (let index = 0; index < fansMealList.length; index++) {
     const fansMedal = fansMealList[index];
@@ -216,7 +202,12 @@ export function getRandomOptions() {
   };
 }
 
-function getLiveHeartNeedTime(medal = { today_feed: 0 }) {
+type NeedTimeType = {
+  value: number;
+  increase?: boolean;
+};
+
+function getLiveHeartNeedTime(medal = { today_feed: 0 }): NeedTimeType {
   const { limitFeed } = TaskConfig.intimacy;
   // 今日还需要 feed
   const { today_feed } = medal;
@@ -225,17 +216,22 @@ function getLiveHeartNeedTime(medal = { today_feed: 0 }) {
     needFeed -= 200;
   }
   if (needFeed <= 0) {
-    return 0;
+    return {
+      value: 0,
+    };
   }
   // 所需要挂机时间 （每 100 feed 需要挂机 5 分钟）,加 1 是因为 1 分钟需要 1 + 1 次
-  return Math.ceil(needFeed / 100) * 5 + 1;
+  return {
+    value: Math.ceil(needFeed / 100) * 5 + 1,
+    increase: today_feed < 200,
+  };
 }
 
 type LiveHeartRunOptions = {
   fansMedal: FansMedalDto;
   options: Record<string, string>;
   countRef: Ref<number>;
-  needTime: number;
+  needTime: NeedTimeType;
   timerRef?: Ref<NodeJS.Timer>;
 };
 
@@ -266,11 +262,17 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
         ...options,
       },
       countRef,
-      needTime,
+      needTime.value,
     );
-    if (countRef.value >= needTime) {
-      timerRef && timerRef.value && clearInterval(timerRef.value);
+    if (countRef.value < needTime.value) {
+      return;
     }
+    if (needTime.increase && sendMessageFailList.has(room_info.room_id)) {
+      needTime.value += 5;
+      sendMessageFailList.delete(room_info.room_id);
+      return;
+    }
+    timerRef && timerRef.value && clearInterval(timerRef.value);
   }
 }
 
@@ -291,8 +293,12 @@ async function allLiveHeart(
   countRef: Ref<number>,
 ) {
   const needTime = getLiveHeartNeedTime(fansMedal.medal);
-  for (let i = 0; i < needTime; i++) {
+  for (let i = 0; i < needTime.value; i++) {
     const { medal, anchor_info, room_info } = fansMedal;
+    if (needTime.increase && sendMessageFailList.has(room_info.room_id)) {
+      needTime.value += 5;
+      sendMessageFailList.delete(room_info.room_id);
+    }
     await liveMobileHeart(
       {
         up_id: medal.target_id,
@@ -301,6 +307,7 @@ async function allLiveHeart(
         ...options,
       },
       countRef,
+      needTime.value,
     );
     await apiDelay(60000);
   }
@@ -316,9 +323,13 @@ export async function liveInteract(fansMedal: FansMedalDto) {
     roomid = room_info.room_id;
   if (!liveLike && !liveSendMessage) return;
   // 发送直播弹幕
+  let sendMessageResult: number;
   if (liveSendMessage) {
     liveLogger.verbose(`为【${nickName}】发送直播弹幕`);
-    await sendOneMessage(roomid, nickName);
+    sendMessageResult = await sendOneMessage(roomid, nickName);
+  }
+  if (sendMessageResult !== SeedMessageResult.Success) {
+    sendMessageFailList.set(roomid, fansMedal);
   }
 
   // 点赞直播
@@ -329,4 +340,21 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   }
 
   await apiDelay(11000, 16000);
+}
+
+// 发送直播弹幕 1 次 间隔 10s 以上
+// 点赞 1 次 间隔 3s 以上
+
+export async function liveIntimacyService() {
+  // 获取到可能需要操作的粉丝牌
+  const fansMealList = filterFansMedalList(await getFansMealList());
+  // 获取到没有点亮的且能成功发送弹幕的粉丝牌
+  const noLightedList = await getSuccessMsgNoLighted(fansMealList);
+  // 获取到点亮的粉丝牌
+  const lightedList = fansMealList.filter(({ medal }) => medal.is_lighted === 1);
+  await Promise.allSettled([
+    likeAndShare(lightedList),
+    liveHeart([...lightedList, ...noLightedList]),
+  ]);
+  return;
 }
