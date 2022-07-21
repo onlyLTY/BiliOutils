@@ -3,8 +3,8 @@
 import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
-import { logger } from './utils/log';
-import { runTask } from './util';
+import { defLogger } from './utils/Logger';
+import { config, runTask } from './util';
 
 const pkg = require('../package.json');
 
@@ -18,9 +18,12 @@ Options:
   --version, -v             输出版本号
   --help, -h                输出帮助信息
   --config, -c <path>       配置文件路径
-    eg: --config ./config.json
+    eg: --config=./config.json
   --once, -o                每日任务只执行一次
-  --task, -t <taskString>   执行指定的 task
+  --task, -t <taskString>   执行指定的 task，使用英文逗号（,）分隔
+    eg: --task=loginTask,judgement
+  --item, -i <item>         多用户配置执行指定的配置，下标 1 开始（倒数 -1 开始），使用英文逗号（,）分隔
+    eg: --item=2
     
 `;
 
@@ -36,37 +39,19 @@ Options:
     return;
   }
   if (isArg('config')) {
-    if (isArg('task')) {
-      return await runCmdTask();
-    }
     const configDir = dirname(resolve(process.cwd(), getArg('config')));
     const jobsPath = resolve(configDir, 'bt_jobs.json');
+    const configs = await config();
+    if (isArg('task')) {
+      return await runTask(configs, './bin/inputTask', getArg('task'));
+    }
     if (isTodayRun(jobsPath)) return;
-    await runTask(await config());
+    await runTask(configs);
     remember(jobsPath);
     return;
   }
   process.stdout.write(USAGE);
 })();
-
-/**
- * 获取配置
- */
-async function config() {
-  const { getConfigPathFile } = await import('./config/setConfig');
-  const configPath = getArg('config');
-  try {
-    const configs = getConfigPathFile(resolve(process.cwd(), configPath));
-    if (!configs.length) {
-      logger.error('配置文件不存在');
-      throw new Error('配置文件不存在');
-    }
-    return configs;
-  } catch (error) {
-    logger.error('配置路径可能存在问题');
-    logger.error(error.message);
-  }
-}
 
 /**
  * 记住本次运行情况
@@ -97,17 +82,8 @@ function isTodayRun(jobsPath: string) {
       lastRun.getMonth() === today.getMonth() &&
       lastRun.getDate() === today.getDate()
     ) {
-      logger.info('今日已经运行过');
+      defLogger.info('今日已经运行过');
       return true;
     }
   }
-}
-
-/**
- * 执行命令行参数的 task
- */
-async function runCmdTask() {
-  const task = getArg('task');
-  const { runInputBiliTask } = await import('./task');
-  await runInputBiliTask(task);
 }

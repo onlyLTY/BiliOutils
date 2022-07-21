@@ -1,7 +1,6 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import { defHttp } from './http';
-import { logger } from './log';
 
 /**
  * 获取最新版本
@@ -25,10 +24,11 @@ async function getLatestVersion(): Promise<string> {
  * 打印版本
  */
 export async function printVersion() {
+  const { logger } = await import('./log');
   let version = '__BILI_VERSION__';
   // 如果 version 被替换，则直接打印
   if (version.includes('.')) {
-    printStrVersion();
+    logger.info(`当前版本【__BILI_VERSION__】`);
   } else {
     version = undefined;
   }
@@ -58,10 +58,6 @@ function getVersionByFile() {
   try {
     return fs.readFileSync(path.resolve(__dirname, '../version.txt'), 'utf8').trim();
   } catch {}
-}
-
-export function printStrVersion() {
-  logger.info(`当前版本【__BILI_VERSION__】`);
 }
 
 /**

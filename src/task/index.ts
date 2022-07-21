@@ -1,5 +1,3 @@
-import { logger } from '../utils/log';
-
 export const biliTaskArray = [
   ['loginTask', () => import('./loginTask')],
   ['liveSignTask', () => import('./liveSignTask')],
@@ -58,10 +56,12 @@ export function getInputBiliTask(taskNameStr: string) {
  * 运行用户输入的任务
  */
 export async function runInputBiliTask(taskNameStr: string) {
-  logger.info(`开始执行自定义任务！`);
-  const { Logger } = await import('../utils/log');
+  const { logger, Logger } = await import('../utils/log');
   const { sendMessage } = await import('../utils/sendNotify');
-  Logger.init();
+  const { printVersion } = await import('../utils/version');
+  await Logger.init();
+  await printVersion();
+  logger.info(`开始执行自定义任务！`);
   const taskArr = getInputBiliTask(taskNameStr);
   for await (const task of taskArr) {
     await task();

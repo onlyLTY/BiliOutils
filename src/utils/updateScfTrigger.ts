@@ -21,9 +21,7 @@ async function getSDK() {
  * 更新触发器
  * @param event SCF 事件
  * @param context SCF 上下文
- * @param customArg 自定义 SCF 参数
- * @param triggerDesc cron 表达式
- * @param runningTotalNumber 接口重试次数
+ * @param options 自定义 SCF 参数
  */
 export default async function (
   event: SCFEvent,

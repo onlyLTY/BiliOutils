@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { FCContext, FCEvent } from '#/fc';
 import { logger } from '@/utils';
-import { dailyMain } from '../index.fc';
+import { dailyMain, runTasks } from '../index.fc';
 import { JSON5 } from '@/utils/json5';
 
 type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
@@ -9,6 +9,15 @@ type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
 (async () => {
   logger.info('开始执行网络代码');
   const eventJson: FCEvent = JSON5.parse(event.toString());
+  let isReturn = false;
+  if (eventJson.payload) {
+    isReturn = await runTasks(eventJson.payload);
+  }
+  if (isReturn) {
+    VMThis.message = 'success';
+    VMThis.resolve(success);
+    return;
+  }
   const caller: MainFuncType = dailyMain;
   caller(eventJson, context)
     .then(message => {
