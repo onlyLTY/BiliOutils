@@ -17,6 +17,9 @@ describe('node 参数处理', () => {
     initArgv();
     process.argv.push('-c', './config.json');
     expect(getArg('config')).toBe(`./config.json`);
+    initArgv();
+    process.argv.push('-T', './config.json');
+    expect(getArg('demo', 'T')).toBe(`./config.json`);
   });
 
   test('是否存在参数', () => {
@@ -32,5 +35,8 @@ describe('node 参数处理', () => {
     initArgv();
     process.argv.push('-c', './config.json');
     expect(isArg('config')).toBeTruthy();
+    initArgv();
+    process.argv.push('-T', './config.json');
+    expect(isArg('demo', 'T')).toBeTruthy();
   });
 });

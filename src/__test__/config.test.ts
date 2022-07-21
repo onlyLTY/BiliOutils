@@ -59,7 +59,7 @@ const theConfig = {
     shareAndWatch: true,
     supGroupSign: false,
     liveSendMessage: false,
-    taskReward: true,
+    judgement: false,
     charging: false,
     getVipPrivilege: false,
     giveGift: false,
@@ -82,7 +82,13 @@ const theConfig = {
   jury: {
     mode: 1,
     once: true,
+    opinionMin: 3,
     vote: [0, 1],
+    waitTime: 20,
+  },
+  log: {
+    pushLevel: 'debug',
+    useEmoji: true,
   },
   charge: {
     mid: 1,
@@ -107,8 +113,9 @@ const theConfig = {
     mc: [],
     name: [],
     love: true,
-    buyInterval: 6,
-    buyWeek: [3],
+    buyInterval: 2,
+    buyWeek: [],
+    exchangeCouponNum: 0,
   },
   sls: {
     name: '',
@@ -147,8 +154,15 @@ const theConfig = {
     liveShare: false,
     liveLike: false,
     whiteList: [1],
+    limitFeed: 1500,
     blackList: [],
     liveHeart: false,
+  },
+  bigPoint: {
+    epids: [],
+    isRetry: true,
+    isWatch: true,
+    watchDelay: 20,
   },
 };
 const newConfig = mergeConfig(userConfig);
