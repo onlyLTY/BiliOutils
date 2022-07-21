@@ -1,3 +1,4 @@
+import type { LevelType } from '@/types/log';
 import {
   DAILY_RUN_TIME,
   LOTTERY_EXCLUDE,
@@ -75,6 +76,10 @@ export const defaultConfig = {
     liveFamine: false,
     // 风纪委员
     judgement: false,
+  },
+  log: {
+    pushLevel: 'debug' as LevelType,
+    useEmoji: true,
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
   apiDelay: [2, 6],

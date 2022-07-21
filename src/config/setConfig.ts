@@ -1,11 +1,11 @@
-import type { Config, MultiConfig } from '../types';
+import type { Config, MultiConfig } from '@/types';
 import * as path from 'path';
-import { logger } from '../utils/log';
-import { gzipDecode } from '../utils/gzip';
+import { defLogger as logger } from '@/utils/Logger';
+import { gzipDecode } from '@/utils/gzip';
 import { SystemConfig } from './systemConfig';
 import { readJsonFile } from '@/utils/file';
-import { JSON5 } from '../utils/json5';
-import { isArray } from '@/utils';
+import { JSON5 } from '@/utils/json5';
+import { isArray } from '@/utils/is';
 
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
@@ -46,25 +46,6 @@ const getEnvConfig = (): Config => {
 };
 
 /**
- * 处理青龙面板的配置，根据参数获取第几个配置
- */
-function handleQLPanel(configArr: Config[]): Config {
-  const arg2 = process.argv.find(
-    arg => arg.includes('--item') || arg.includes('-i') || arg.includes('-I'),
-  );
-  if (!arg2) {
-    return configArr[0];
-  }
-  // 下标从 1 开始
-  const index = Number(arg2.split('=')[1]) - 1;
-  if (!index || index >= configArr.length || index < 0) {
-    logger.warn('似乎想要指定一个不存在的用户，我们将指定第一个用户');
-    return configArr[0];
-  }
-  return configArr[index];
-}
-
-/**
  * 处理多用户配置
  */
 function handleMultiUserConfig(config: MultiConfig | Config[]): Config {
@@ -82,9 +63,6 @@ function handleMultiUserConfig(config: MultiConfig | Config[]): Config {
     return undefined;
   }
 
-  if (SystemConfig.isQingLongPanel) {
-    return handleQLPanel(newConfig);
-  }
   logger.warn('在单用户场景下配置了多用户，我们将放弃多余的配置');
   // [兼容]
   // 合并 message 配置

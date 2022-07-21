@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import { isString } from './is';
 import { JSON5 } from './json5';
-import { logger } from './log';
+import { defLogger } from './Logger';
 
 /**
  * 读取 json 文件
@@ -20,7 +20,7 @@ export function readJsonFile<T = any>(filePath: string): T {
     }
     return JSON5.parse(content);
   } catch (error) {
-    logger.error(error);
+    defLogger.error(error);
     jsonErrorHandle(error.message);
   }
 }
