@@ -1,7 +1,7 @@
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint } from '@/net/manga.request';
-import { apiDelay, logger } from '@/utils';
+import { apiDelay, getPRCDate, logger } from '@/utils';
 import { request } from '@/utils/request';
 
 let expireCouponNum: number;
@@ -269,32 +269,9 @@ export async function mangaSign() {
 /**
  * 商城兑换
  */
-export async function exchangeCoupon() {
-  const { exchangeCouponNum } = TaskConfig.manga;
-  if (exchangeCouponNum < 1) {
-    return;
-  }
-  logger.info(`开始兑换漫读券，预设数量：${exchangeCouponNum}`);
+export async function exchangeCoupon(num: number) {
   try {
-    let num = exchangeCouponNum;
-    const { point } = await request(getMangaPoint, { name: '获取积分' });
-    const pointNum = parseInt(point, 10) || 0,
-      buyCouponNum = Math.floor(pointNum / 100);
-    logger.info(`当前积分：${pointNum}`);
-    if (buyCouponNum < num) {
-      num = buyCouponNum;
-    }
-    if (buyCouponNum < 1) {
-      logger.info('可兑换的漫读券数量不足 1，跳过任务');
-      return;
-    }
-    const { code } = await request(
-      exchangeMangaShop,
-      { name: '兑换商品', transform: false },
-      195,
-      100,
-      num,
-    );
+    const { code, msg } = await exchangeMangaShop(195, 100, num);
     // 抢的人太多
     if (code === 4) {
       return true;
@@ -303,15 +280,38 @@ export async function exchangeCoupon() {
       logger.info(`兑换商品成功，兑换数量：${num}`);
       return;
     }
+    logger.warn(`兑换商品失败：${code} ${msg}`);
+    // 库存不足，且时间是 12:02 之前
+    if (code === 2 && getPRCDate().getHours() === 12 && getPRCDate().getMinutes() < 2) {
+      logger.verbose('库存不足，但时间是 12:02 之前，尝试重新兑换');
+      return true;
+    }
   } catch (error) {
     logger.error(`商城兑换异常: ${error}`);
   }
 }
 
 export async function exchangeCouponService() {
+  const { exchangeCouponNum } = TaskConfig.manga;
+  if (exchangeCouponNum < 1) {
+    return;
+  }
+  logger.info(`开始兑换漫读券，预设数量：${exchangeCouponNum}`);
+  let num = exchangeCouponNum;
+  const { point } = await request(getMangaPoint, { name: '获取积分' });
+  const pointNum = parseInt(point, 10) || 0,
+    buyCouponNum = Math.floor(pointNum / 100);
+  logger.info(`当前积分：${pointNum}`);
+  if (buyCouponNum < num) {
+    num = buyCouponNum;
+  }
+  if (buyCouponNum < 1) {
+    logger.info('可兑换的漫读券数量不足 1，跳过任务');
+    return;
+  }
   let isRepeat = true;
   while (isRepeat) {
-    isRepeat = await exchangeCoupon();
+    isRepeat = await exchangeCoupon(num);
     await apiDelay(300);
   }
 }

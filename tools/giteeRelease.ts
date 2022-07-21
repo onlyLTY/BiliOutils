@@ -73,7 +73,10 @@ async function createRelease(page: Page): Promise<void> {
     const btn = await page.$('#btn-submit-release');
     await page.waitForTimeout(4000);
     core.debug('start submitting');
-    await Promise.all([page.waitForNavigation(), page.evaluate(sub => sub.click(), btn)]);
+    await Promise.all([
+      page.waitForNavigation(),
+      page.evaluate((sub: HTMLElement) => sub.click(), btn),
+    ]);
     core.info('created release');
   } catch (error) {
     if (error instanceof Error) {

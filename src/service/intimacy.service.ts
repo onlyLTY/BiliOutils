@@ -32,12 +32,6 @@ export async function getFansMealList() {
     while (pageNumber < totalNumber) {
       await apiDelay(200, 600);
       const { code, message, data } = await liveRequest.getFansMedalPanel(pageNumber + 1, 10);
-      // TODO: 测试已经佩戴的粉丝牌
-      {
-        if (pageNumber === 0) {
-          console.log(data.special_list[0]);
-        }
-      }
       if (code !== 0) {
         logger.verbose(`获取勋章信息失败 ${code} ${message}`);
         return list;

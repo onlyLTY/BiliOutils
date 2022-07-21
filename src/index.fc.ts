@@ -45,7 +45,7 @@ export async function handler(event: Buffer, context: FCContext, callback: FCCal
   }
 }
 
-async function runTasks(payload: string) {
+export async function runTasks(payload: string) {
   try {
     const { runInputBiliTask } = await import('./task');
     const payloadJson = JSON5.parse(payload);

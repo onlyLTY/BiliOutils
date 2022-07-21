@@ -58,13 +58,15 @@ export function getInputBiliTask(taskNameStr: string) {
 export async function runInputBiliTask(taskNameStr: string) {
   const { logger, Logger } = await import('../utils/log');
   const { sendMessage } = await import('../utils/sendNotify');
-  const { printVersion } = await import('../utils/version');
   await Logger.init();
-  await printVersion();
   logger.info(`开始执行自定义任务！`);
   const taskArr = getInputBiliTask(taskNameStr);
   for await (const task of taskArr) {
     await task();
   }
+  // 在任务完成后再加载版本
+  logger.info(`----【版本信息】----`);
+  const { printVersion } = await import('../utils/version');
+  await printVersion();
   await sendMessage('任务完成', Logger.pushValue);
 }

@@ -13,6 +13,7 @@ process.env.IS_LOCAL = 'true';
 const USAGE = `
 Usage:
   bilitools [options] [value]
+  bilitools [options]=[value]
 
 Options:
   --version, -v             输出版本号

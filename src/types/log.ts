@@ -5,7 +5,7 @@ export interface LoggerOptions {
   file?: LevelType;
   push?: LevelType;
   name?: string;
-  payload?: string;
+  payload?: string | number;
 }
 export interface LogOptions {
   level?: LevelType;

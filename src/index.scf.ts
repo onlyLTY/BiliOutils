@@ -36,7 +36,7 @@ export async function main_handler(event: SCFEvent, context: SCFContext) {
   return dailyMain(event, context);
 }
 
-async function runTasks(payload: string) {
+export async function runTasks(payload: string) {
   try {
     const { runInputBiliTask } = await import('./task');
     const payloadJson = JSON5.parse(payload);

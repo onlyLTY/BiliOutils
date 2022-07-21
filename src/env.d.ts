@@ -11,8 +11,10 @@ declare global {
       ALI_SECRET_KEY?: string;
       CONFIG_ITEM_INDEX?: string;
       USE_NETWORK_CODE?: string;
+      BILITOOLS_IS_ASYNC?: string;
       /** 私有变量 */
       __BT_CONFIG__?: string;
+      __BT_TASKS_STRING__?: string;
     }
   }
 }

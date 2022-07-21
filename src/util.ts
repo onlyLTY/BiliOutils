@@ -73,6 +73,9 @@ export async function runTask(configs?: Config[], forkPath = './bin/fork', tasks
     configs = getConfig(true);
   }
   const length = configs.length;
+  if (process.env.BILITOOLS_IS_ASYNC) {
+    return await runTaskAsync(configs.map(config => runForkSync(config, forkPath, tasks)));
+  }
   for (let index = 0; index < length; index++) {
     const config = configs[index];
     process.stdout.write(`正在执行第${index + 1}/${length}个配置\n`);
@@ -93,4 +96,13 @@ function getItemIndex(item: string, len: number) {
   // 下标从 1 开始，所以 -1
   if (itemNum > 0) return itemNum - 1;
   return 0;
+}
+
+async function runTaskAsync(forkPromises: Promise<any>[]) {
+  try {
+    return Promise.all(forkPromises);
+  } catch (error) {
+    process.stdout.write(`${error.message}`);
+  }
+  process.stdout.write('执行完毕\n\n');
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { FCContext, FCEvent } from '#/fc';
 import { logger } from '@/utils';
 import { dailyMain, runTasks } from '../index.fc';
@@ -15,10 +14,11 @@ type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
   }
   if (isReturn) {
     VMThis.message = 'success';
-    VMThis.resolve(success);
+    VMThis.resolve('success');
     return;
   }
   const caller: MainFuncType = dailyMain;
+  // @ts-ignore
   caller(eventJson, context)
     .then(message => {
       VMThis.message = message;
