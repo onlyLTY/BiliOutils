@@ -1,9 +1,12 @@
 import type { Sessionlist, SessionMessage10Dto } from '@/dto/session.dto';
 import { TaskConfig } from '@/config/globalVar';
 import { deleteSession, getSession, getSessionHistory, readSession } from '@/net/session.request';
-import { apiDelay, logger } from '@/utils';
+import { apiDelay, isBoolean, logger } from '@/utils';
 import { User } from './tags.service';
 import { request } from '@/utils/request';
+
+// 直播小喇叭是否存在未读信息
+let liveLoudspeakerNow;
 
 /**
  * 判断时间戳是否是 n 小时内
@@ -29,6 +32,10 @@ async function getMessageList(followUps: User[]) {
     if (session_list.length <= 0) {
       return;
     }
+    const liveLoudspeaker = session_list.find(el => el.talker_id === 17561219);
+    if (liveLoudspeaker) {
+      liveLoudspeakerNow = true;
+    }
     return session_list.filter(
       ({ unread_count, talker_id, is_follow, last_msg }) =>
         followUps.find(follow => follow.mid === talker_id) &&
@@ -46,6 +53,10 @@ async function getMessageList(followUps: User[]) {
  * 读取或者删除会话
  */
 export async function updateSession(followUps: User[]) {
+  if (followUps.length <= 0) {
+    return;
+  }
+  liveLoudspeakerNow = false;
   const sessionList = await getMessageList(followUps);
   await apiDelay(200);
   try {
@@ -81,6 +92,9 @@ async function handleSession(session: Sessionlist) {
  */
 async function getLiveUserSession() {
   const { messages } = await request(getSessionHistory, { name: '获取直播小喇叭消息' });
+  if (!messages) {
+    return [];
+  }
   return messages
     .map(({ msg_type, content, timestamp }) => {
       // 10 就是卡片类型的
@@ -93,7 +107,7 @@ async function getLiveUserSession() {
       }
       try {
         const ctObj: SessionMessage10Dto = JSON.parse(content);
-        const isOk = ctObj?.text?.includes('中奖');
+        const isOk = ctObj?.title?.includes('中奖');
         if (isOk) {
           return ctObj.text;
         }
@@ -106,6 +120,9 @@ async function getLiveUserSession() {
  * 打印小喇叭消息
  */
 export async function printLiveUserSession() {
+  if (isBoolean(liveLoudspeakerNow) && !liveLoudspeakerNow) {
+    return;
+  }
   const messages = await getLiveUserSession();
   if (messages.length <= 0) {
     return;

@@ -81,7 +81,7 @@ export function deleteSession({
  */
 export function getSessionHistory(talker_id = 17561219, session_type = 1) {
   return vcApi.get<SessionHistoryDto>(
-    `svr_sync/v1/svr_sync/fetch_session_msgs?sender_device_id=1&talker_id=${talker_id}}&session_type=${session_type}&size=20&build=0&mobi_app=web`,
+    `svr_sync/v1/svr_sync/fetch_session_msgs?sender_device_id=1&talker_id=${talker_id}&session_type=${session_type}&size=20&build=0&mobi_app=web`,
     {
       headers: {
         Origin: OriginURLs.message,
