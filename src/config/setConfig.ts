@@ -81,6 +81,7 @@ export function getConfigPathFile(filepath: string): Config[] {
       throw new Error('配置文件为空，或配置内容缺失！');
     }
     logger.verbose(`读取配置文件 ${filepath}`);
+    process.env.__BT_CONFIG_PATH__ = filepath;
     if (isMultiUserConfig(config)) {
       return filterMultiUserConfig(config);
     }
@@ -103,9 +104,11 @@ function setConfig() {
     configPathArr.push(...qlOldConfigArr);
   }
   for (let index = 0; index < configPathArr.length; index++) {
-    const config = readJsonFile<Config>(configPathArr[index]);
+    let filepath = configPathArr[index];
+    const config = readJsonFile<Config>(filepath) || readJsonFile<Config>((filepath += '5'));
     if (config) {
-      logger.verbose(`读取配置文件 ${configPathArr[index]}`);
+      logger.verbose(`读取配置文件 ${filepath}`);
+      process.env.__BT_CONFIG_PATH__ = filepath;
       return config;
     }
   }

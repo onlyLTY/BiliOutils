@@ -15,6 +15,8 @@ declare global {
       /** 私有变量 */
       __BT_CONFIG__?: string;
       __BT_TASKS_STRING__?: string;
+      __BT_CONFIG_PATH__?: string;
+      __BT_CONFIG_ITEM__?: string;
     }
   }
 }

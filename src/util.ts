@@ -40,13 +40,14 @@ export function getConfigByItem(configs: Config[], item: string) {
     .filter(el => el);
 }
 
-export function runForkSync(config: Config, forkPath = './bin/fork', tasks = '') {
+export function runForkSync(config: Config, index: number, forkPath = './bin/fork', tasks = '') {
   return new Promise((resolve, reject) => {
     const child = fork(path.resolve(__dirname, forkPath), [], {
       env: {
         ...process.env,
         __BT_CONFIG__: JSON.stringify(config),
         __BT_TASKS_STRING__: tasks,
+        __BT_CONFIG_ITEM__: index.toString(),
       },
     });
     child.once('exit', code => {
@@ -74,13 +75,15 @@ export async function runTask(configs?: Config[], forkPath = './bin/fork', tasks
   }
   const length = configs.length;
   if (process.env.BILITOOLS_IS_ASYNC) {
-    return await runTaskAsync(configs.map(config => runForkSync(config, forkPath, tasks)));
+    return await runTaskAsync(
+      configs.map((config, index) => runForkSync(config, index, forkPath, tasks)),
+    );
   }
   for (let index = 0; index < length; index++) {
     const config = configs[index];
     process.stdout.write(`正在执行第${index + 1}/${length}个配置\n`);
     try {
-      await runForkSync(config, forkPath, tasks);
+      await runForkSync(config, index, forkPath, tasks);
     } catch (error) {
       process.stdout.write(`${error.message}`);
     }

@@ -36,6 +36,7 @@ const vcApi = createRequest({
   baseURL: baseURLs.vc,
   headers: {
     'user-agent': TaskConfig.userAgent,
+    Referer: RefererURLs.www,
   },
 });
 
