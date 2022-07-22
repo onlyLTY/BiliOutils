@@ -43,7 +43,11 @@ export async function bigPointService() {
     logger.info('本月积分已领取完');
     return;
   }
-  await bigPointTask(taskStatus);
+  const isEmpty = await bigPointTask(taskStatus);
+  if (isEmpty) {
+    logger.info('今日任务已完成 √');
+    return;
+  }
   if (TaskConfig.bigPoint.isRetry) {
     await apiDelay(5000);
     await bigPointTask(taskStatus, true);
@@ -63,10 +67,9 @@ async function bigPointTask(taskStatus: TaskStatus, isRetry = false) {
   // 判断是否领取了任务
   if (await getTask(task_info)) {
     await apiDelay(100, 200);
-    await doDailyTask(await getTaskStatus());
-  } else {
-    await doDailyTask(taskStatus);
+    return await doDailyTask(await getTaskStatus());
   }
+  return await doDailyTask(taskStatus);
 }
 
 /**
@@ -85,6 +88,9 @@ async function doDailyTask(taskStatus: TaskStatus) {
     if (taskItem.complete_times >= taskItem.max_times) return false;
     if (taskItem.state === 1) return true;
   });
+  if (waitTaskItems.length === 0) {
+    return true;
+  }
   await handleDailyTask(waitTaskItems);
 }
 

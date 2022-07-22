@@ -101,8 +101,6 @@ interface VideoId {
 
 /**
  * relation 已经对视频的操作
- * @param aid
- * @param bvid
  */
 export function getVideoRelation({ aid, bvid }: VideoId): Promise<VideoRelationDto> {
   return biliApi.get('/x/web-interface/archive/relation', {
