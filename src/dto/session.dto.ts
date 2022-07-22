@@ -1,3 +1,5 @@
+import { DoubleMessageProp } from './bili-base-prop';
+
 export interface SessionDto {
   code: number;
   msg: string;
@@ -56,4 +58,61 @@ interface Lastmsg {
   msg_status: number;
   notify_code: string;
   new_face_version: number;
+}
+
+export type SessionHistoryDto = DoubleMessageProp<{
+  messages: SessionMessageDto[];
+  has_more: number;
+  min_seqno: number;
+  max_seqno: number;
+}>;
+
+export interface SessionMessageDto {
+  sender_uid: number;
+  receiver_type: number;
+  receiver_id: number;
+  msg_type: number;
+  content: string;
+  msg_seqno: number;
+  timestamp: number;
+  at_uids: number[];
+  msg_key: number;
+  msg_status: number;
+  notify_code: string;
+  new_face_version: number;
+}
+
+/**
+ * message type 10
+ */
+export interface SessionMessage10Dto {
+  title: string;
+  text: string;
+  jump_text: string;
+  jump_uri: string;
+  modules?: any;
+  jump_text_2: string;
+  jump_uri_2: string;
+  jump_text_3: string;
+  jump_uri_3: string;
+  notifier?: any;
+  jump_uri_config: {
+    all_uri: string;
+    text: string;
+  };
+
+  jump_uri_2_config: {
+    text: string;
+  };
+  jump_uri_3_config: {
+    text: string;
+  };
+  biz_content?: any;
+}
+
+/**
+ * message type 1
+ */
+export interface SessionMessage1Dto {
+  content: string;
 }

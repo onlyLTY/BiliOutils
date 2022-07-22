@@ -154,6 +154,8 @@ export const defaultConfig = {
     scanFollow: undefined,
     /** 跳过需要关注的天选 */
     skipNeedFollow: false,
+    // 打印可能中奖的消息
+    mayBeWinMsg: true,
   },
   redPack: {},
   intimacy: {

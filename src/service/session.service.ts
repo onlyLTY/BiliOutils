@@ -1,17 +1,18 @@
-import type { Sessionlist } from '@/dto/session.dto';
+import type { Sessionlist, SessionMessage10Dto } from '@/dto/session.dto';
 import { TaskConfig } from '@/config/globalVar';
-import { deleteSession, getSession, readSession } from '@/net/session.request';
+import { deleteSession, getSession, getSessionHistory, readSession } from '@/net/session.request';
 import { apiDelay, logger } from '@/utils';
 import { User } from './tags.service';
+import { request } from '@/utils/request';
 
 /**
- * 判断时间戳是否是一个小时内
- * @param {number} timestamp 时间戳
+ * 判断时间戳是否是 n 小时内
+ * @param {number} timestamp 时间戳 （unix，秒级）
  */
-function isOneHour(timestamp: number) {
+function isInNHour(timestamp: number, n = 1) {
   const now = Date.now();
   const diff = now - timestamp * 1000;
-  return diff < 3600000;
+  return diff < n * 3600000;
 }
 
 /**
@@ -34,7 +35,7 @@ async function getMessageList(followUps: User[]) {
         unread_count > 0 &&
         talker_id === last_msg.sender_uid &&
         is_follow === 1 &&
-        isOneHour(last_msg.timestamp),
+        isInNHour(last_msg.timestamp, 1.5),
     );
   } catch (error) {
     logger.error(`获取会话异常：${error.message}`);
@@ -73,4 +74,41 @@ async function handleSession(session: Sessionlist) {
       break;
   }
   await apiDelay(50);
+}
+
+/**
+ * 读取 直播小喇叭 的消息
+ */
+async function getLiveUserSession() {
+  const { messages } = await request(getSessionHistory, { name: '获取直播小喇叭消息' });
+  return messages
+    .map(({ msg_type, content, timestamp }) => {
+      // 10 就是卡片类型的
+      if (msg_type !== 10) {
+        return;
+      }
+      // timestamp 是秒级的，判断是否是这两天发的
+      if (!isInNHour(timestamp, 48)) {
+        return;
+      }
+      try {
+        const ctObj: SessionMessage10Dto = JSON.parse(content);
+        const isOk = ctObj?.text?.includes('中奖');
+        if (isOk) {
+          return ctObj.text;
+        }
+      } catch {}
+    })
+    .filter(Boolean);
+}
+
+/**
+ * 打印小喇叭消息
+ */
+export async function printLiveUserSession() {
+  const messages = await getLiveUserSession();
+  if (messages.length <= 0) {
+    return;
+  }
+  messages.forEach(message => logger.info(`【最近 48 小时可能中奖的消息】：${message}`));
 }
