@@ -271,7 +271,7 @@ export async function mangaSign() {
  */
 export async function exchangeCoupon(num: number) {
   try {
-    const { code, msg } = await exchangeMangaShop(195, 100, num);
+    const { code, msg } = await exchangeMangaShop(195, num * 100, num);
     // 抢的人太多
     if (code === 4) {
       return true;
