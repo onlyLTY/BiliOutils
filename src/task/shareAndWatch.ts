@@ -19,9 +19,7 @@ export default async function shareAndWatch() {
   let gAid: number | string = 0;
   //获取aid
   try {
-    let biliav = await getAidByByPriority();
-    if (biliav.code !== 0) biliav = await getAidByRegionRank();
-
+    const biliav = await getVideo();
     if (biliav.code === 0) {
       const { id, author, title } = biliav.data;
       gAid = id;
@@ -52,4 +50,20 @@ export default async function shareAndWatch() {
       random(4, 60),
     );
   }
+}
+
+/**
+ * 获取视频
+ */
+export async function getVideo() {
+  for (let errCount = 5; errCount > 0; errCount--) {
+    const biliav = await getAidByByPriority();
+    if (biliav.code !== 0) {
+      return await getAidByRegionRank();
+    }
+    if (biliav && biliav.data.coinType === 'video') {
+      return biliav;
+    }
+  }
+  return await getAidByRegionRank();
 }

@@ -96,6 +96,8 @@ const theConfig = {
   },
   gift: {
     mids: [1],
+    id: [1, 30607, 30426, 31531, 31674],
+    name: [],
   },
   coin: {
     customizeUp: [1],
@@ -115,7 +117,10 @@ const theConfig = {
     love: true,
     buyInterval: 2,
     buyWeek: [],
-    exchangeCouponNum: 0,
+  },
+  exchangeCoupon: {
+    num: 1,
+    delay: 2000,
   },
   sls: {
     name: '',
@@ -147,6 +152,7 @@ const theConfig = {
     actFollowMsg: 'read',
     scanFollow: undefined,
     skipNeedFollow: false,
+    mayBeWinMsg: true,
   },
   redPack: {},
   intimacy: {

@@ -41,14 +41,14 @@ async function getExpiredGift() {
       if (gift.expire_at <= 0) {
         return false;
       }
-      const time = (gift.expire_at * 1000 - new Date().getTime()) / MS2DATE < EXPIRE_DATE;
-      // 辣条 小心心 能量石头 PK票
-      const notSimple = ![1, 30607, 30426, 31531].includes(gift.gift_id);
-      if (notSimple && time) {
+      const isExpire = (gift.expire_at * 1000 - new Date().getTime()) / MS2DATE < EXPIRE_DATE;
+      const { id, name } = TaskConfig.gift;
+      const isSimple = id.includes(gift.gift_id) || name.includes(gift.gift_name);
+      if (!isSimple && isExpire) {
         logger.info(`${gift.gift_name} 即将过期请尽快投喂`);
       }
-      // 判断 是否是辣条或者小星星
-      return notSimple ? false : time;
+      // 判断 是否需要投喂的
+      return isSimple ? isExpire : false;
     });
   } catch (error) {
     // 重试一次

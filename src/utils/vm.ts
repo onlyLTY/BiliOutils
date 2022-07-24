@@ -3,7 +3,7 @@ import type { VGotOptions } from '@/types/got';
 import { unzipSync } from 'zlib';
 import { defHttp } from './http';
 import * as VM from 'vm';
-import { logger } from './log';
+import { defLogger } from './Logger';
 
 const options = {
   headers: {
@@ -55,14 +55,14 @@ export async function runInVM(name: string, context = { event: {}, context: {} }
     }
     if (
       !code ||
-      !code.startsWith('"use strict"') ||
+      !/$["']use strict["']/.test(code) ||
       code.startsWith('<!DOCTYPE') ||
       code.startsWith('<!doctype')
     ) {
       return false;
     }
   } catch (error) {
-    logger.warn(`runInVM: ${error.message}`);
+    defLogger.warn(`runInVM: ${error.message}`);
     return false;
   }
   return new Promise((resolve, reject) => {

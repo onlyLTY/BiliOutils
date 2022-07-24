@@ -1,5 +1,5 @@
 import type { FCCallback, FCContext, FCEvent } from './types/fc';
-import { logger } from './utils';
+import { defLogger } from './utils/Logger';
 import { JSON5 } from './utils/json5';
 import { runInVM } from './utils/vm';
 
@@ -7,7 +7,7 @@ import { runInVM } from './utils/vm';
  * 公告
  */
 const notice = async (msg?: string) => {
-  logger.info(msg || `阿里云 FC 测试ing`);
+  defLogger.info(msg || `阿里云 FC 测试ing`);
 };
 
 export async function dailyMain(event: FCEvent, context: FCContext) {

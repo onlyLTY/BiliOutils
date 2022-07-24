@@ -271,7 +271,7 @@ export async function mangaSign() {
  */
 export async function exchangeCoupon(num: number) {
   try {
-    const { code, msg } = await exchangeMangaShop(195, num * 100, num);
+    const { code, msg = '' } = await exchangeMangaShop(195, num * 100, num);
     // 抢的人太多
     if (code === 4) {
       return true;
@@ -280,19 +280,28 @@ export async function exchangeCoupon(num: number) {
       logger.info(`兑换商品成功，兑换数量：${num}`);
       return;
     }
-    logger.warn(`兑换商品失败：${code} ${msg}`);
-    // 库存不足，且时间是 12:02 之前
-    if (code === 2 && getPRCDate().getHours() === 12 && getPRCDate().getMinutes() < 2) {
-      logger.verbose('库存不足，但时间是 12:02 之前，尝试重新兑换');
+    if (code === 1 && msg.includes('快')) {
+      logger.debug(msg);
       return true;
     }
+    // 库存不足，且时间是 12:02 之前
+    if (
+      code === 2 &&
+      msg.includes('库存') &&
+      getPRCDate().getHours() === 12 &&
+      getPRCDate().getMinutes() < 2
+    ) {
+      logger.debug('库存不足，但时间是 12:02 之前，尝试重新兑换');
+      return true;
+    }
+    logger.warn(`兑换商品失败：${code} ${msg}`);
   } catch (error) {
     logger.error(`商城兑换异常: ${error}`);
   }
 }
 
 export async function exchangeCouponService() {
-  const { exchangeCouponNum } = TaskConfig.manga;
+  const { num: exchangeCouponNum, delay } = TaskConfig.exchangeCoupon;
   if (exchangeCouponNum < 1) {
     return;
   }
@@ -312,6 +321,7 @@ export async function exchangeCouponService() {
   let isRepeat = true;
   while (isRepeat) {
     isRepeat = await exchangeCoupon(num);
-    await apiDelay(300);
+    // 等待 2s 再次尝试
+    await apiDelay(delay - 50, delay + 150);
   }
 }

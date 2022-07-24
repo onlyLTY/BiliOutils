@@ -1,5 +1,5 @@
 import type { SCFContext, SCFEvent } from './types/scf';
-import { logger } from './utils';
+import { defLogger } from './utils/Logger';
 import { JSON5 } from './utils/json5';
 import { runInVM } from './utils/vm';
 
@@ -7,7 +7,7 @@ import { runInVM } from './utils/vm';
  * 公告
  */
 const notice = async (msg?: string) => {
-  logger.warn(msg || `SCF从6.1号其将不再拥有免费额度，暂时可以购买1元额度，请自行购买，谢谢！`);
+  defLogger.warn(msg || `SCF从6.1号其将不再拥有免费额度，暂时可以购买1元额度，请自行购买，谢谢！`);
 };
 
 export async function dailyMain(event: SCFEvent, context: SCFContext) {

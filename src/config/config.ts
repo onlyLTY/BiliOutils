@@ -116,6 +116,11 @@ export const defaultConfig = {
   gift: {
     /** 自定义投喂礼物用户列表 */
     mids: [] as number[],
+    // 投喂礼物 id
+    // 辣条 小心心 能量石头 PK票 小海浪
+    id: [1, 30607, 30426, 31531, 31674],
+    // 投喂礼物 name
+    name: [] as string[],
   },
   coin: {
     /** 自定义高优先级用户列表 */
@@ -195,8 +200,12 @@ export const defaultConfig = {
     buyInterval: 2,
     // 星期几执行购买漫画
     buyWeek: [],
-    // 商城兑换漫读券数量
-    exchangeCouponNum: 0,
+  },
+  exchangeCoupon: {
+    // 兑换漫读券数量
+    num: 1,
+    // 间隔时间，单位 ms，随机误差 -50 ~ 150
+    delay: 2000,
   },
   activity: {
     liveFamineTime: 400,
