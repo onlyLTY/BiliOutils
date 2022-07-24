@@ -8,6 +8,7 @@ export default createRollupOption([
       __IS_CFC__: 'true',
     },
     node: '12.2',
+    noTerser: true,
   }),
   createBaseConfig({
     input: 'vm/fc.ts',
@@ -15,6 +16,7 @@ export default createRollupOption([
     replaceValues: {
       __IS_FC__: 'true',
     },
+    noTerser: true,
   }),
   createBaseConfig({
     input: 'vm/scf.ts',
@@ -22,5 +24,6 @@ export default createRollupOption([
     replaceValues: {
       __IS_SCF__: 'true',
     },
+    noTerser: true,
   }),
 ]);
