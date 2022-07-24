@@ -44,21 +44,8 @@ export async function runInVM(name: string, context = { event: {}, context: {} }
   let code = '';
   try {
     const res = await getCode(`${name}.gz`);
-    const contentType = res.headers['content-type'];
-    if (
-      contentType?.includes('application/gzip') ||
-      contentType?.includes('application/octet-stream')
-    ) {
-      code = unzipCode(res.body || res.data);
-    } else {
-      code = (res.body || res.data).toString();
-    }
-    if (
-      !code ||
-      !/$["']use strict["']/.test(code) ||
-      code.startsWith('<!DOCTYPE') ||
-      code.startsWith('<!doctype')
-    ) {
+    code = handleCode(res.body || res.data);
+    if (!isJavaScriptCode(code)) {
       return false;
     }
   } catch (error) {
@@ -66,27 +53,44 @@ export async function runInVM(name: string, context = { event: {}, context: {} }
     return false;
   }
   return new Promise((resolve, reject) => {
-    const script = new VM.Script(code, {
-      filename: 'bilitools/index.js',
-    });
-    global.VMThis = {
-      resolve,
-      reject,
-    };
-    script.runInNewContext({
-      console,
-      require,
-      process,
-      __dirname,
-      __filename,
-      setTimeout,
-      clearTimeout,
-      Buffer,
-      URLSearchParams,
-      global,
-      VMThis,
-      BILITOOLS_CONFIG: global.BILITOOLS_CONFIG,
-      ...context,
-    });
+    try {
+      const script = new VM.Script(code, {
+        filename: 'bilitools/index.js',
+      });
+      global.VMThis = {
+        resolve,
+        reject,
+      };
+      script.runInNewContext({
+        console,
+        require,
+        process,
+        __dirname,
+        __filename,
+        setTimeout,
+        clearTimeout,
+        Buffer,
+        URLSearchParams,
+        global,
+        VMThis,
+        BILITOOLS_CONFIG: global.BILITOOLS_CONFIG,
+        ...context,
+      });
+    } catch (error) {
+      defLogger.error(`runInVM Script: ${error.message}`);
+      return false;
+    }
   });
+}
+
+function handleCode(data: any) {
+  const code = data.toString();
+  if (isJavaScriptCode(code)) {
+    return code;
+  }
+  return unzipCode(data);
+}
+
+function isJavaScriptCode(code: string) {
+  return code && /^["']use strict["']/.test(code);
 }
