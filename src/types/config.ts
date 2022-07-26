@@ -1,7 +1,7 @@
 import type { TheConfig } from '@/config/config';
 
 export type Config = Required<
-  RecursivePartial<TheConfig> & {
+  TheConfig & {
     message?: {
       email?: {
         pass: string;

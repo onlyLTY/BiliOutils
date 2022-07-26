@@ -4,22 +4,46 @@ import { defHttp } from '@/net/api';
 import { ActivityLotteryIdType } from '@/types';
 import {
   base64Decode,
+  deepMergeObject,
+  getPRCDate,
   gzipDecode,
   isArray,
   isBoolean,
+  isServerless,
   logger,
+  pushIfNotExist,
   sleep,
   uniqueObjectArray,
 } from '@/utils';
+import { readJsonFile } from '@/utils/file';
+import { writeFileSync } from 'fs';
+import { dirname } from 'path';
 import * as activityRequest from '../net/activity-lottery.request';
+
+const EXPIRED_LIST: string[] = [];
+const configPath = process.env.__BT_CONFIG_PATH__;
+const FILE_PATH = configPath ? dirname(configPath) + '/bt_activityLottery.json' : undefined;
+
+type LocalStatusDto = {
+  last_update_at?: number;
+  expired_list?: string[];
+  activity_list?: ActivityLotteryIdType[];
+  last_run_at?: Record<number, string>;
+};
 
 /**
  * 进行转盘抽奖
  */
 export async function activityLotteryService() {
-  const netList = await getActivityList();
+  const localStatus = getLocalStatus();
+  if (isTodayRun(localStatus.last_run_at)) {
+    logger.info(`今天该账号已经运行过了`);
+    return;
+  }
+  const netList = await getActivityList(localStatus);
+  const { list: userList } = TaskConfig.activityLottery;
   const list = uniqueObjectArray(
-    netList.concat((TaskConfig.activityLottery?.list as ActivityLotteryIdType[]) || []),
+    netList.concat(userList.filter(item => expiredIdsFilter(item, localStatus)) || []),
     'sid',
   );
   if (!list || list.length === 0) {
@@ -46,6 +70,7 @@ export async function activityLotteryService() {
     logger.error(`转盘抽奖异常`);
     logger.error(error);
   }
+  writeStatus(localStatus, netList);
 }
 
 /**
@@ -58,10 +83,8 @@ export async function getLotteryMyTimes(sid: string) {
       return data.times;
     }
     logger.warn(`获取抽奖次数失败【${sid}】 ${code} ${message}`);
-    if (code === ActivityLotteryStatus.NotExist) {
-      return false;
-    }
-    if (code === ActivityLotteryStatus.End) {
+    if (code === ActivityLotteryStatus.NotExist || code === ActivityLotteryStatus.End) {
+      pushIfNotExist(EXPIRED_LIST, sid);
       return false;
     }
     return await commonError(code);
@@ -177,7 +200,7 @@ function getCode() {
   return Promise.any([defHttp.get(ghUrl, header), defHttp.get(geUrl, header)]);
 }
 
-async function getActivityList(): Promise<ActivityLotteryIdType[]> {
+async function getActivityList(localStatus?: LocalStatusDto): Promise<ActivityLotteryIdType[]> {
   const { isRequest } = TaskConfig.activityLottery;
   if (!isRequest) {
     return [];
@@ -185,12 +208,77 @@ async function getActivityList(): Promise<ActivityLotteryIdType[]> {
   logger.verbose(`获取活动列表`);
   try {
     const res = await getCode();
-    const reslut = JSON.parse(gzipDecode(base64Decode(res.value)));
-    if (isArray(reslut)) {
-      return reslut;
+    const reslut: ActivityLotteryIdType[] = JSON.parse(gzipDecode(base64Decode(res.value)));
+    if (!isArray(reslut)) {
+      return localStatus?.activity_list || [];
     }
+    if (localStatus && localStatus.expired_list) {
+      return reslut.filter(item => expiredIdsFilter(item, localStatus));
+    }
+    return reslut;
   } catch (error) {
     logger.error(error);
   }
-  return [];
+  return localStatus?.activity_list || [];
+}
+
+/**
+ * 读取本地运行状态
+ */
+function getLocalStatus() {
+  if (!FILE_PATH && isServerless()) {
+    return;
+  }
+  try {
+    return readJsonFile<LocalStatusDto>(FILE_PATH);
+  } catch (error) {
+    logger.debug(error);
+  }
+  return;
+}
+
+/**
+ * 将运行状态写入文件
+ */
+function writeStatus(oldData: LocalStatusDto, activityList: ActivityLotteryIdType[] = []) {
+  if (!FILE_PATH && isServerless()) {
+    return;
+  }
+  try {
+    let activity_list: ActivityLotteryIdType[] = activityList,
+      expired_list: string[];
+    if (EXPIRED_LIST.length) {
+      pushIfNotExist(EXPIRED_LIST, ...(oldData?.expired_list || []));
+      // 如果长度超过 30 则取前 30 个，避免列表无限增长
+      expired_list = EXPIRED_LIST.length > 30 ? EXPIRED_LIST.slice(0, 30) : EXPIRED_LIST;
+      activity_list = activity_list.filter(item =>
+        expiredIdsFilter(item, { expired_list: EXPIRED_LIST }),
+      );
+    }
+    const activity_json = {
+      activity_list,
+      expired_list,
+      last_run_at: {
+        [TaskConfig.USERID]: getPRCDate().toLocaleString('zh-CN'),
+      },
+      last_update_at: new Date().getTime(),
+    };
+    // 写入合并后的数据
+    writeFileSync(FILE_PATH, JSON.stringify(deepMergeObject(oldData, activity_json), null, 2));
+  } catch (error) {
+    logger.debug(error);
+  }
+}
+
+/**
+ * 检测今天是否已经运行过
+ */
+function isTodayRun(lastRunAt: Record<number, string>) {
+  return lastRunAt[TaskConfig.USERID]?.startsWith(
+    getPRCDate().toLocaleString('zh-CN').substring(0, 9),
+  );
+}
+
+function expiredIdsFilter(activity: ActivityLotteryIdType, localStatus: LocalStatusDto) {
+  return localStatus.expired_list.indexOf(activity.sid) === -1;
 }

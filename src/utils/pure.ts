@@ -224,10 +224,12 @@ export function getVisitId() {
  * @param array
  * @param item
  */
-export function pushIfNotExist<T = unknown>(array: T[], item: T) {
-  if (!array.includes(item)) {
-    array.push(item);
-  }
+export function pushIfNotExist<T = unknown>(array: T[], ...item: T[]) {
+  item.forEach(i => {
+    if (!array.includes(i)) {
+      array.push(i);
+    }
+  });
 }
 
 /**
