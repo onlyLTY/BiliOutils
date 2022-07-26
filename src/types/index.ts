@@ -10,3 +10,8 @@ export interface CronDateType {
   minutes: number;
   seconds?: number;
 }
+
+export interface ActivityLotteryIdType {
+  sid: string;
+  title?: string;
+}

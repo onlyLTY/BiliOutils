@@ -360,6 +360,13 @@ export function base64Encode(str: string) {
 }
 
 /**
+ * base64 解码
+ */
+export function base64Decode(str: string) {
+  return Buffer.from(str, 'base64').toString();
+}
+
+/**
  * 今天是否在预设的时间数组中
  * @param timeArr 时间数组（为空则判断为在）
  */
@@ -394,4 +401,15 @@ export function addIfNotExist<T>(arr: T[], item: T) {
   if (!arr.includes(item)) {
     arr.push(item);
   }
+}
+
+/**
+ * 对象数组去重
+ * @param arr 对象数组
+ * @param key 去重的 key
+ */
+export function uniqueObjectArray<T>(arr: T[], key: string) {
+  return arr.filter((item, index, self) => {
+    return self.findIndex(i => i[key] === item[key]) === index;
+  });
 }

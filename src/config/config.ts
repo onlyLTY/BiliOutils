@@ -1,4 +1,5 @@
 import type { LevelType } from '@/types/log';
+import type { ActivityLotteryIdType } from '@/types';
 import {
   DAILY_RUN_TIME,
   LOTTERY_EXCLUDE,
@@ -76,6 +77,8 @@ export const defaultConfig = {
     liveFamine: false,
     // 风纪委员
     judgement: false,
+    // 转盘抽奖
+    activityLottery: false,
   },
   log: {
     pushLevel: 'debug' as LevelType,
@@ -219,6 +222,14 @@ export const defaultConfig = {
     epids: [] as number[],
     // 领取任务后的观看延时（秒）
     watchDelay: 20,
+  },
+  activityLottery: {
+    // 活动列表
+    list: [] as ActivityLotteryIdType[],
+    // 是否请求活动列表
+    isRequest: false,
+    // 抽奖延时（秒）
+    delay: [1.8, 3.2],
   },
   BILIJCT: '',
   USERID: 0,

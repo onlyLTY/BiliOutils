@@ -29,7 +29,7 @@ async function getMessageList(followUps: User[]) {
       return;
     }
     const { session_list } = data;
-    if (session_list.length <= 0) {
+    if (!session_list || session_list.length <= 0) {
       return;
     }
     const liveLoudspeaker = session_list.find(el => el.talker_id === 17561219);
@@ -53,11 +53,14 @@ async function getMessageList(followUps: User[]) {
  * 读取或者删除会话
  */
 export async function updateSession(followUps: User[]) {
-  if (followUps.length <= 0) {
+  if (!followUps || followUps.length <= 0) {
     return;
   }
   liveLoudspeakerNow = false;
   const sessionList = await getMessageList(followUps);
+  if (!sessionList || sessionList.length <= 0) {
+    return;
+  }
   await apiDelay(200);
   try {
     for (let index = 0; index < sessionList.length; index++) {
