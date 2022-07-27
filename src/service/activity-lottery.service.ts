@@ -36,7 +36,7 @@ type LocalStatusDto = {
  */
 export async function activityLotteryService() {
   const localStatus = getLocalStatus();
-  if (isTodayRun(localStatus.last_run_at)) {
+  if (localStatus && isTodayRun(localStatus.last_run_at)) {
     logger.info(`今天该账号已经运行过了`);
     return;
   }
@@ -276,11 +276,12 @@ function writeStatus(oldData: LocalStatusDto, activityList: ActivityLotteryIdTyp
  * 检测今天是否已经运行过
  */
 function isTodayRun(lastRunAt: Record<number, string>) {
+  if (!lastRunAt) return false;
   return lastRunAt[TaskConfig.USERID]?.startsWith(
     getPRCDate().toLocaleString('zh-CN').substring(0, 9),
   );
 }
 
-function expiredIdsFilter(activity: ActivityLotteryIdType, localStatus: LocalStatusDto) {
-  return localStatus.expired_list.indexOf(activity.sid) === -1;
+function expiredIdsFilter(activity: ActivityLotteryIdType, { expired_list = [] }: LocalStatusDto) {
+  return expired_list.indexOf(activity.sid) === -1;
 }
