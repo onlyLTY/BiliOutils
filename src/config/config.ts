@@ -226,7 +226,7 @@ export const defaultConfig = {
   activityLottery: {
     // 活动列表
     list: [] as ActivityLotteryIdType[],
-    // 是否请求活动列表
+    // 是否从网络请求活动列表
     isRequest: false,
     // 抽奖延时（秒）
     delay: [1.8, 3.2],

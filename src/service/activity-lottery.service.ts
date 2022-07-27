@@ -63,7 +63,7 @@ export async function activityLotteryService() {
       if (finalNum === true) return;
       if (finalNum === false || finalNum === 0) continue;
       await doLotteryContinue(finalNum, item as ActivityLotteryIdType);
-      logger.info(`完成【${title}】转盘的抽奖`);
+      logger.verbose(`完成【${title}】转盘的抽奖`);
       await sleep(300, 500);
     }
   } catch (error) {
