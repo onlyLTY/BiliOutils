@@ -3,6 +3,8 @@
  */
 export const ActivityLotteryStatus = {
   Success: 0,
+  /** 请求过于频繁 */
+  TooManyRequests: -509,
   /** 不存在 */
   NotExist: 170001,
   /** 结束 */

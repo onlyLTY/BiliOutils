@@ -142,7 +142,7 @@ export async function addTimes(sid: string) {
 }
 
 async function commonError(code: number | string) {
-  if (code === ActivityLotteryStatus.Frequent) {
+  if (code === ActivityLotteryStatus.Frequent || code === ActivityLotteryStatus.TooManyRequests) {
     await sleep(2000, 5000);
     return false;
   }
@@ -174,9 +174,11 @@ export async function addTimesContinue(sid: string) {
 
 export async function doLotteryContinue(num: number, item: ActivityLotteryIdType) {
   const [delay1, delay2] = TaskConfig.activityLottery.delay;
+  const delay1Time = delay1 * 1000,
+    delay2Time = delay2 * 1000;
   try {
     for (let index = 0; index < num; index++) {
-      await sleep(delay1, delay2);
+      await sleep(delay1Time, delay2Time);
       const data = await doLottery(item);
       if (data) return;
     }
