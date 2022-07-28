@@ -82,7 +82,10 @@ export const defaultConfig = {
   },
   log: {
     pushLevel: 'debug' as LevelType,
+    consoleLevel: 'debug' as LevelType | boolean,
+    fileLevel: 'debug' as LevelType | boolean,
     useEmoji: true,
+    fileSplit: 'month' as 'day' | 'month',
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
   apiDelay: [2, 6],
@@ -183,7 +186,7 @@ export const defaultConfig = {
   jury: {
     mode: 1,
     once: true,
-    vote: [0, 1],
+    vote: [0, 0, 1],
     opinionMin: 3,
     // 没有案件后的等待时间（分）
     waitTime: 20,

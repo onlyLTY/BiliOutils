@@ -397,15 +397,6 @@ export function getBuvid(prefix = 'XY') {
 }
 
 /**
- * 如果数组中没有，则添加
- */
-export function addIfNotExist<T>(arr: T[], item: T) {
-  if (!arr.includes(item)) {
-    arr.push(item);
-  }
-}
-
-/**
  * 对象数组去重
  * @param arr 对象数组
  * @param key 去重的 key
