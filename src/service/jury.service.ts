@@ -48,7 +48,8 @@ export async function voteJuryByOpinion(caseId: string) {
     const opinion = getMoreOpinion(caseId, list);
     if (!opinion) return JuryVoteResult.FEW_OPINION;
     const vote = opinion.vote;
-    juryLogger.info(`为【${caseId}】选择了【${JuryVote[vote]}】（${vote}）`);
+    juryLogger.verbose(`为【${caseId}】选择了【${JuryVote[vote]}】（${vote}）`);
+    await caseConfirm(caseId);
     const { code, message } = await juryCaseVote(caseId, vote);
     if (code !== 0) {
       juryLogger.warn(`为案件【${caseId}】投票失败，【${code}】【${message}】`);
@@ -77,12 +78,13 @@ export async function replenishVote(caseId: string, defaultVote: number) {
       return false;
     }
     const selectedVote = info.data.vote_items[defaultVote];
+    await caseConfirm(caseId);
     const vote = await juryCaseVote(caseId, selectedVote.vote);
     if (vote.code === 0) {
       juryLogger.info(`成功根据【配置文件】为案件【${caseId}】投下【${selectedVote.vote_text}】`);
       return true;
     }
-    juryLogger.warn(`为案件【${caseId}】投票失败，【${vote.code}】【${vote.message}】`);
+    juryLogger.warn(`为案件【${caseId}】默认投票失败，【${vote.code}】【${vote.message}】`);
     return false;
   } catch (error) {
     juryLogger.error(`风纪委员默认投票异常，错误信息：${error}`);
@@ -117,8 +119,9 @@ export async function mode1(err = 3) {
     if (isReturn) break;
     await apiDelay(2000, 5000);
   }
-  if (errRef.value < 0) {
+  if (errRef.value <= 0) {
     juryLogger.error(`错误次数过多，结束任务！`);
+    return false;
   }
 }
 
@@ -157,8 +160,9 @@ export async function mode2(err = 3) {
     if (isReturn) break;
     await apiDelay(2000, 5000);
   }
-  if (errRef.value < 0) {
+  if (errRef.value <= 0) {
     juryLogger.error(`错误次数过多，结束任务！`);
+    return false;
   }
 }
 
@@ -234,7 +238,6 @@ async function handleNoNewCaseForMode2(message: string, caseIdList: string[], er
       logger.error(`错误次数过多，结束任务！`);
       return true;
     }
-    await caseConfirm(caseId);
     if (!(await replenishVote(caseId, getRandomItem(TaskConfig.jury.vote)))) {
       errRef.value -= 1;
     }
@@ -275,9 +278,6 @@ async function handleSuccess(
   if (!case_id) {
     errRef.value -= 1;
     return;
-  }
-  if (!caseIdList) {
-    await caseConfirm(case_id);
   }
   const voteResult = await voteJuryByOpinion(case_id);
   if (voteResult === JuryVoteResult.SUCCESS) return;
