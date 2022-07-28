@@ -577,8 +577,7 @@ function qywxamNotify(text, desp) {
         .post(options_accesstoken)
         .then(data => {
           const html = desp.replace(/\n/g, '<br/>');
-          const json = JSON.parse(data);
-          const accesstoken = json.access_token;
+          const accesstoken = data.access_token;
           let options;
 
           switch (QYWX_AM_AY[4]) {
@@ -662,6 +661,7 @@ function qywxamNotify(text, desp) {
         })
         .catch(err => {
           logger.error('企业微信应用消息发送通知消息失败！！');
+          logger.error(err);
         });
     } else {
       resolve('');
