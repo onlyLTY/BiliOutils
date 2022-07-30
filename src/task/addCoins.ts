@@ -39,9 +39,14 @@ export default async function addCoins() {
     prevFillId: undefined,
     eAidCount: 0,
   };
-  let isReturn = false;
+  let isReturn = false,
+    MAX_COUNT = 5;
+  // 突破数量限制
+  if (!TaskConfig.limit.coins5) {
+    MAX_COUNT = TaskModule.coinsTask;
+  }
   // 判断需要投币的数量
-  while (TaskModule.coinsTask > 0 && !isReturn && state.eCount < 5 && state.num < 5) {
+  while (TaskModule.coinsTask > 0 && !isReturn && state.eCount < 5 && state.num < MAX_COUNT) {
     isReturn = await coinHandle(state);
   }
   if (state.eCount >= 5) logger.info(`出现异常/错误5次，自动退出投币`);

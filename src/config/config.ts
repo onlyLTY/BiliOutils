@@ -17,6 +17,8 @@ export type TheConfig = Omit<DefaultConfig, keyof typeof compatibleMap>;
 export const defaultConfig = {
   cookie: '',
   accessKey: '',
+  cookieRefreshToken: '',
+  // accessRefreshToken: '',
   message: {
     br: '\n',
     email: {
@@ -86,6 +88,12 @@ export const defaultConfig = {
     fileLevel: 'debug' as LevelType | boolean,
     useEmoji: true,
     fileSplit: 'month' as 'day' | 'month',
+  },
+  limit: {
+    // 获取经验限制为 6 级
+    level6: true,
+    // 投币限制为 5 颗
+    coins5: true,
   },
   /** 调用api时的延迟(单位s),默认2s至6s */
   apiDelay: [2, 6],
