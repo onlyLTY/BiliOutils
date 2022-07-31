@@ -3257,6 +3257,11 @@ globby@^11.1.0:
     merge2 "^1.4.1"
     slash "^3.0.0"
 
+golden-fleece@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.npmjs.org/golden-fleece/-/golden-fleece-1.0.9.tgz#0c4cbba8b493c8ab4cd4023404317a97785306f3"
+  integrity sha512-YSwLaGMOgSBx9roJlNLL12c+FRiw7VECphinc6mGucphc/ZxTHgdEz6gmJqH6NOzYEd/yr64hwjom5pZ+tJVpg==
+
 got@^11.8.5:
   version "11.8.5"
   resolved "https://registry.npmmirror.com/got/-/got-11.8.5.tgz"
