@@ -1,10 +1,12 @@
 #! /usr/bin/env node
 
+import type { Config } from './types/config';
 import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import { defLogger } from './utils/Logger';
 import { config, runTask } from './util';
+import * as cron from 'node-cron';
 
 const pkg = require('../package.json');
 
@@ -25,6 +27,8 @@ Options:
     eg: --task=loginTask,judgement
   --item, -i <item>         多用户配置执行指定的配置，下标 1 开始（倒数 -1 开始），使用英文逗号（,）分隔
     eg: --item=2
+  --cron <cronString>       cron 表达式，see：https://github.com/node-cron/node-cron#allowed-fields
+    eg: --cron="0 0 0 * * *"
     
 `;
 
@@ -40,16 +44,7 @@ Options:
     return;
   }
   if (isArg('config')) {
-    const configDir = dirname(resolve(process.cwd(), getArg('config')));
-    const jobsPath = resolve(configDir, 'bt_jobs.json');
-    const configs = await config();
-    if (isArg('task')) {
-      return await runTask(configs, './bin/inputTask', getArg('task'));
-    }
-    if (isTodayRun(jobsPath)) return;
-    await runTask(configs);
-    remember(jobsPath);
-    return;
+    return await run();
   }
   process.stdout.write(USAGE);
 })();
@@ -87,4 +82,35 @@ function isTodayRun(jobsPath: string) {
       return true;
     }
   }
+}
+
+async function run() {
+  const configDir = dirname(resolve(process.cwd(), getArg('config')));
+  const jobsPath = resolve(configDir, 'bt_jobs.json');
+  const configs = await config();
+  const cronStr = getArg('cron', false);
+
+  if (cron.validate(cronStr)) {
+    process.stdout.write(`等待运行：cron ${cronStr}\n`);
+    const cronTask = cron.schedule(
+      cronStr,
+      async () => {
+        await argTaskHandle(jobsPath, configs);
+      },
+      { timezone: 'Asia/Shanghai' },
+    );
+    cronTask.start();
+    return;
+  }
+
+  return await argTaskHandle(jobsPath, configs);
+}
+
+async function argTaskHandle(jobsPath: string, configs: Config[]) {
+  if (isArg('task')) {
+    return await runTask(configs, './bin/inputTask', getArg('task'));
+  }
+  if (isTodayRun(jobsPath)) return;
+  await runTask(configs);
+  remember(jobsPath);
 }

@@ -1782,6 +1782,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/node-cron@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.npmjs.org/@types/node-cron/-/node-cron-3.0.2.tgz#1a95877680f828817e395789ac2bf8d72a5df6af"
+  integrity sha512-SK/4GYWiWvGLPl/yv+Tm5oLYbzMx1V3y7CsNTvOb3vF8O9oXH11U6/zckISHnBl4YH8MvXHFIUXbYoBONSdmzw==
+
 "@types/node@*":
   version "17.0.35"
   resolved "https://registry.npmmirror.com/@types/node/-/node-17.0.35.tgz"
@@ -4310,6 +4315,11 @@ netmask@^2.0.1:
   resolved "https://registry.npmmirror.com/netmask/-/netmask-2.0.2.tgz"
   integrity sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==
 
+node-cron@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.npmjs.org/node-cron/-/node-cron-3.0.1.tgz#6a9d5a71513c7ee1eb9e64a673f6730084561d87"
+  integrity sha512-RAWZTNn2M5KDIUV/389UX0EXsqvdFAwc9QwHQceh0Ga56dygqSRthqIjwpgZsoDspHGt2rkHdk9Z4RgfPMdALw==
+
 node-fetch@2.6.7, node-fetch@^2.2.0:
   version "2.6.7"
   resolved "https://registry.npmmirror.com/node-fetch/-/node-fetch-2.6.7.tgz"
@@ -5555,6 +5565,11 @@ utility@^1.16.1, utility@^1.8.0:
     mkdirp "^0.5.1"
     mz "^2.7.0"
     unescape "^1.0.1"
+
+uuid@^8.3.2:
+  version "8.3.2"
+  resolved "https://registry.npmjs.org/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
+  integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"

@@ -58,6 +58,7 @@
     "@rollup/plugin-typescript": "^8.3.3",
     "@types/jest": "^28.1.6",
     "@types/node": "^18.0.6",
+    "@types/node-cron": "^3.0.2",
     "@types/nodemailer": "^6.4.4",
     "@types/tunnel": "^0.0.3",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
@@ -81,8 +82,10 @@
     "core-js": "^3.23.5",
     "golden-fleece": "^1.0.9",
     "got": "^11.8.5",
+    "node-cron": "^3.0.1",
     "nodemailer": "^6.7.7",
-    "tunnel": "^0.0.6"
+    "tunnel": "^0.0.6",
+    "uuid": "^8.3.2"
   },
   "optionalDependencies": {
     "@alicloud/fc2": "^2.6.0",
