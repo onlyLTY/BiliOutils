@@ -139,7 +139,7 @@ async function liveMobileHeart(
       return;
     }
     countRef.value++;
-    liveLogger.info(`直播间心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
+    liveLogger.info(`直播心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
   } catch (error) {
     liveLogger.error(error);
     logger.error(`直播间心跳异常 ${error.message}`);

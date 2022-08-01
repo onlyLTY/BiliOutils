@@ -17,7 +17,7 @@ export type TheConfig = Omit<DefaultConfig, keyof typeof compatibleMap>;
 export const defaultConfig = {
   cookie: '',
   accessKey: '',
-  cookieRefreshToken: '',
+  // acTimeValue: '',
   // accessRefreshToken: '',
   message: {
     br: '\n',
@@ -198,6 +198,8 @@ export const defaultConfig = {
     opinionMin: 3,
     // 没有案件后的等待时间（分）
     waitTime: 20,
+    // insiders 参考值
+    insiders: 0.8,
   },
   manga: {
     // 签到
@@ -232,7 +234,7 @@ export const defaultConfig = {
     // 自定义观看视频的章节
     epids: [] as number[],
     // 领取任务后的观看延时（秒）
-    watchDelay: 20,
+    watchDelay: 40,
   },
   activityLottery: {
     // 活动列表
@@ -325,8 +327,13 @@ function configValueHandle(config: TheConfig) {
 }
 
 function setConstValue(config: TheConfig) {
-  config.BILIJCT = getBiliJct(config.cookie);
-  config.USERID = getUserId(config.cookie);
+  setCookieValue(config, config.cookie);
+  return config;
+}
+
+export function setCookieValue(config: TheConfig, cookie: string) {
+  config.BILIJCT = getBiliJct(cookie);
+  config.USERID = getUserId(cookie);
   return config;
 }
 

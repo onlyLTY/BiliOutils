@@ -70,7 +70,7 @@ export async function tryCreateTag(tagName: string) {
  * @param tagName 分组名称
  */
 export async function moveUsersToTag(users: User[], tagName = '天选时刻') {
-  if (users.length === 0) {
+  if (!users || users.length === 0) {
     return;
   }
   const tagId = await tryCreateTag(tagName);

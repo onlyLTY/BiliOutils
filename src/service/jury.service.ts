@@ -10,7 +10,7 @@ import {
   getJuryCaseVote,
   juryCaseVote,
 } from '@/net/jury.request';
-import { apiDelay, getRandomItem, Logger, logger } from '@/utils';
+import { apiDelay, getRandomItem, Logger, logger, pushIfNotExist } from '@/utils';
 import { JuryVote, JuryVoteResult } from '@/enums/jury.emum';
 import { getRequestNameWrapper } from '@/utils/request';
 
@@ -22,9 +22,12 @@ const request = getRequestNameWrapper({ logger: juryLogger });
  */
 export function getMoreOpinion(caseId: string, opinions: JuryCaseOpinion[]) {
   const opinionStatistics: Record<string, number> = {};
+  const { insiders = 1 } = TaskConfig.jury;
   for (const opinion of opinions) {
     if (Reflect.has(opinionStatistics, opinion.vote)) {
-      opinionStatistics[opinion.vote]++;
+      opinion.insiders
+        ? opinionStatistics[opinion.vote]++
+        : (opinionStatistics[opinion.vote] += insiders);
       continue;
     }
     opinionStatistics[opinion.vote] = 1;
@@ -97,12 +100,13 @@ export async function replenishVote(caseId: string, defaultVote: number) {
  */
 async function caseConfirm(caseId: string) {
   try {
+    juryLogger.debug(`开始案件【${caseId}】`);
     const { code, message } = await juryCaseVote(caseId, 0);
     if (code !== 0) {
       juryLogger.warn(`确认案件【${caseId}】失败，【${code}】【${message}】`);
       throw new Error(message);
     }
-    await apiDelay(12000, 20000);
+    await apiDelay(12222, 17777);
   } catch (error) {
     juryLogger.error(`确认案件【${caseId}】异常，错误信息：${error.message}`);
     throw error;
@@ -286,14 +290,8 @@ async function handleSuccess(
     return;
   }
   if (caseIdList) {
-    const isIncludes = caseIdList.includes(case_id);
-    if (!isIncludes) {
-      caseIdList.push(case_id);
-      return;
-    } else {
-      // 删除 caseIdList 中的 caseId
-      caseIdList.splice(caseIdList.indexOf(case_id), 1);
-    }
+    pushIfNotExist(caseIdList, case_id);
+    return;
   }
   const vote = await replenishVote(case_id, getRandomItem(TaskConfig.jury.vote));
   if (!vote) {

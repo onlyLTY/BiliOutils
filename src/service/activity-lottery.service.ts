@@ -10,6 +10,7 @@ import {
   isArray,
   isBoolean,
   isServerless,
+  Logger,
   logger,
   pushIfNotExist,
   sleep,
@@ -19,6 +20,8 @@ import { readJsonFile } from '@/utils/file';
 import { writeFileSync } from 'fs';
 import { dirname } from 'path';
 import * as activityRequest from '../net/activity-lottery.request';
+
+const ltyLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'activity-lottery');
 
 const EXPIRED_LIST: string[] = [];
 const configPath = process.env.__BT_CONFIG_PATH__;
@@ -31,25 +34,20 @@ type LocalStatusDto = {
   last_run_at?: Record<number, string>;
 };
 
+let okCount = 0;
+
 /**
  * 进行转盘抽奖
  */
 export async function activityLotteryService() {
+  okCount = 0;
   const localStatus = getLocalStatus();
-  if (localStatus && isTodayRun(localStatus.last_run_at)) {
-    logger.info(`今天该账号已经运行过了`);
-    return;
-  }
-  const netList = await getActivityList(localStatus);
-  const { list: userList } = TaskConfig.activityLottery;
-  const list = uniqueObjectArray(
-    netList.concat(userList.filter(item => expiredIdsFilter(item, localStatus)) || []),
-    'sid',
-  );
+  const list = await getActivityLotteryList(localStatus);
   if (!list || list.length === 0) {
     return;
   }
   try {
+    logger.info(`总计获取到 ${list.length} 个活动`);
     for (const item of list) {
       const { sid, title } = item;
       const nums = await getLotteryMyTimes(sid);
@@ -70,7 +68,28 @@ export async function activityLotteryService() {
     logger.error(`转盘抽奖异常`);
     logger.error(error);
   }
-  writeStatus(localStatus, netList);
+  logger.info(`转盘抽奖完成，共进行 ${okCount} 次转盘`);
+  writeStatus(localStatus, list);
+}
+
+/**
+ * 获取列表
+ */
+async function getActivityLotteryList(localStatus: LocalStatusDto = {}) {
+  if (localStatus && isTodayRun(localStatus.last_run_at)) {
+    logger.info(`今天该账号已经运行过了`);
+    return;
+  }
+  // 请求网络代码
+  const netList = (await getActivityList(localStatus)) || [];
+  // config 文件中的活动列表
+  const { list: userList } = TaskConfig.activityLottery;
+  return uniqueObjectArray(
+    netList
+      .concat(userList.filter(item => expiredIdsFilter(item, localStatus)) || [])
+      .concat(localStatus.activity_list || []),
+    'sid',
+  );
 }
 
 /**
@@ -82,11 +101,12 @@ export async function getLotteryMyTimes(sid: string) {
     if (code === 0) {
       return data.times;
     }
-    logger.warn(`获取抽奖次数失败【${sid}】 ${code} ${message}`);
     if (code === ActivityLotteryStatus.NotExist || code === ActivityLotteryStatus.End) {
       pushIfNotExist(EXPIRED_LIST, sid);
+      ltyLogger.info(`【${sid}】活动已结束或不存在【${message}】`);
       return false;
     }
+    logger.warn(`获取抽奖次数失败【${sid}】 ${code} ${message}`);
     return await commonError(code);
   } catch (error) {
     logger.error(`获取抽奖次数异常`);
@@ -102,9 +122,12 @@ export async function doLottery({ sid, title }: ActivityLotteryIdType) {
   try {
     const { code, message, data } = await activityRequest.doLottery(sid);
     if (code === 0) {
+      okCount++;
       if (!data.gift_name || data.gift_name.includes('未中奖')) {
+        // ltyLogger.debug(JSON.stringify(data));
         return false;
       }
+      // ltyLogger.debug(JSON.stringify(data));
       logger.info(`【${title}】中奖【${data.gift_name}】`);
       return;
     }
@@ -205,14 +228,14 @@ function getCode() {
 async function getActivityList(localStatus?: LocalStatusDto): Promise<ActivityLotteryIdType[]> {
   const { isRequest } = TaskConfig.activityLottery;
   if (!isRequest) {
-    return [];
+    return;
   }
   logger.verbose(`获取活动列表`);
   try {
     const res = await getCode();
     const reslut: ActivityLotteryIdType[] = JSON.parse(gzipDecode(base64Decode(res.value)));
     if (!isArray(reslut)) {
-      return localStatus?.activity_list || [];
+      return;
     }
     if (localStatus && localStatus.expired_list) {
       return reslut.filter(item => expiredIdsFilter(item, localStatus));
@@ -221,20 +244,20 @@ async function getActivityList(localStatus?: LocalStatusDto): Promise<ActivityLo
   } catch (error) {
     logger.error(error);
   }
-  return localStatus?.activity_list || [];
+  return;
 }
 
 /**
  * 读取本地运行状态
  */
 function getLocalStatus() {
-  if (!FILE_PATH && isServerless()) {
+  if (!FILE_PATH) {
     return;
   }
   try {
     return readJsonFile<LocalStatusDto>(FILE_PATH);
   } catch (error) {
-    logger.debug(error);
+    ltyLogger.debug(error);
   }
   return;
 }
@@ -242,7 +265,7 @@ function getLocalStatus() {
 /**
  * 将运行状态写入文件
  */
-function writeStatus(oldData: LocalStatusDto, activityList: ActivityLotteryIdType[] = []) {
+function writeStatus(oldData: LocalStatusDto = {}, activityList: ActivityLotteryIdType[] = []) {
   if (!FILE_PATH && isServerless()) {
     return;
   }
@@ -250,7 +273,7 @@ function writeStatus(oldData: LocalStatusDto, activityList: ActivityLotteryIdTyp
     let activity_list: ActivityLotteryIdType[] = activityList,
       expired_list: string[];
     if (EXPIRED_LIST.length) {
-      pushIfNotExist(EXPIRED_LIST, ...(oldData?.expired_list || []));
+      pushIfNotExist(EXPIRED_LIST, ...(oldData.expired_list || []));
       // 如果长度超过 30 则取前 30 个，避免列表无限增长
       expired_list = EXPIRED_LIST.length > 30 ? EXPIRED_LIST.slice(0, 30) : EXPIRED_LIST;
       activity_list = activity_list.filter(item =>
@@ -268,7 +291,7 @@ function writeStatus(oldData: LocalStatusDto, activityList: ActivityLotteryIdTyp
     // 写入合并后的数据
     writeFileSync(FILE_PATH, JSON.stringify(deepMergeObject(oldData, activity_json), null, 2));
   } catch (error) {
-    logger.debug(error);
+    ltyLogger.debug(error);
   }
 }
 
