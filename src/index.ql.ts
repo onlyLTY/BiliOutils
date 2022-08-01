@@ -1,4 +1,4 @@
-import { config, runTask } from './util';
+import { config, runTask, waitForArgs } from './util';
 import { getArg, isArg } from './utils/args';
 
 process.env.IS_QING_LONG = 'true';
@@ -7,6 +7,7 @@ process.env.IS_QING_LONG = 'true';
   if (isArg('config')) {
     const configs = await config();
     const taskArg = getArg('task');
+    await waitForArgs();
     if (taskArg) {
       return await runTask(configs, './bin/inputTask', taskArg);
     }

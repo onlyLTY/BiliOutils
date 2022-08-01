@@ -5,7 +5,7 @@ import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
 import { defLogger } from './utils/Logger';
-import { config, runTask } from './util';
+import { config, runTask, waitForArgs } from './util';
 import * as cron from 'node-cron';
 
 const pkg = require('../package.json');
@@ -29,7 +29,10 @@ Options:
     eg: --item=2
   --cron <cronString>       cron 表达式，see：https://github.com/node-cron/node-cron#allowed-fields
     eg: --cron="0 0 0 * * *"
-    
+  --delay <time[-time]>     不带单位是延迟 time 分钟后执行，单位可以为 ms（毫秒）、s（秒）、m（分）、h（小时）
+    eg: --delay=10 延迟 0-10 分钟后执行
+        --delay=10m-2h 延迟 10分钟-2小时 后执行
+
 `;
 
 (async () => {
@@ -95,6 +98,7 @@ async function run() {
     const cronTask = cron.schedule(
       cronStr,
       async () => {
+        await waitForArgs();
         await argTaskHandle(jobsPath, configs);
       },
       { timezone: 'Asia/Shanghai' },
@@ -103,6 +107,7 @@ async function run() {
     return;
   }
 
+  await waitForArgs();
   return await argTaskHandle(jobsPath, configs);
 }
 

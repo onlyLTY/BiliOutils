@@ -1,5 +1,5 @@
 import { TaskConfig } from '../config/globalVar';
-import { random } from './pure';
+import { Sleep, random } from './pure';
 
 /**
  * 异步延迟函数
@@ -7,18 +7,11 @@ import { random } from './pure';
  * @param delayTime2 延迟时间2(ms)
  */
 export function apiDelay(delayTime?: number, delayTime2?: number) {
-  const delay = getDelay(delayTime, delayTime2);
-  return new Promise<typeof delay>(resolve => {
-    setTimeout(() => {
-      resolve(delay);
-    }, delay);
-  });
+  return Sleep.wait(getDelay(delayTime, delayTime2));
 }
 
 export function apiDelaySync(delayTime?: number, delayTime2?: number) {
-  const now = Date.now();
-  const delay = getDelay(delayTime, delayTime2);
-  while (Date.now() - now < delay);
+  Sleep.waitSync(getDelay(delayTime, delayTime2));
 }
 
 export const sleep = apiDelay;

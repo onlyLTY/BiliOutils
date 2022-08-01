@@ -406,3 +406,18 @@ export function uniqueObjectArray<T>(arr: T[], key: string) {
     return self.findIndex(i => i[key] === item[key]) === index;
   });
 }
+
+export class Sleep {
+  static wait(delay: number) {
+    return new Promise<typeof delay>(resolve => {
+      setTimeout(() => {
+        resolve(delay);
+      }, delay);
+    });
+  }
+
+  static waitSync(delay: number) {
+    const now = Date.now();
+    while (Date.now() - now < delay);
+  }
+}
