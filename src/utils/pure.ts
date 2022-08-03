@@ -1,7 +1,7 @@
 import type { CronDateType, SLSType } from '../types';
 import * as crypto from 'crypto';
 import { DAILY_RUN_TIME, MS2HOUR } from '../constant';
-import { isArray, isObject } from './is';
+import { isArray, isNumber, isObject } from './is';
 
 const MAX_MINUTES = 59,
   MAX_HOURS = 23,
@@ -376,10 +376,18 @@ export function isTodayInTimeArr(timeArr: number[]) {
   if (!timeArr || !timeArr.length) {
     return true;
   }
-  const today = new Date().getDate();
+  const today = getPRCDate().getDate();
   return timeArr.includes(today);
 }
 
+export function isToday(date: Date): boolean;
+export function isToday(date: number, isUnix?: boolean): boolean;
+export function isToday(date: Date | number, isUnix = true): boolean {
+  if (isNumber(date)) {
+    date = isUnix ? new Date(date * 1000) : new Date(date);
+  }
+  return getPRCDate().toDateString() === date.toDateString();
+}
 /**
  * 获取 unix 时间戳
  */

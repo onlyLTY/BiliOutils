@@ -10,7 +10,6 @@ export default async function bigPoint() {
       return;
     }
     await bigPointService();
-    logger.info('大会员积分任务结束');
   } catch (error) {
     logger.error(`大会员积分任务异常: ${error.message}`);
   }

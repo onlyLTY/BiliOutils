@@ -1,4 +1,4 @@
-import type { TaskCombineDto } from '@/dto/big-point.dto';
+import type { PointListDto, TaskCombineDto } from '@/dto/big-point.dto';
 import type { PureDataProp } from '@/dto/bili-base-prop';
 import { biliApi, biliHttp } from './api';
 import { TaskConfig } from '@/config/globalVar';
@@ -115,4 +115,21 @@ export function getTaskCombine() {
   return biliApi.get<TaskCombineDto>('x/vip_point/task/combine', {
     headers: baseHeader,
   });
+}
+
+/**
+ * 积分记录
+ */
+export function getPointList() {
+  return biliApi.get<PointListDto>(
+    `x/vip_point/list?${appSignString({
+      csrf: TaskConfig.BILIJCT,
+      change_type: 1,
+      pn: 1,
+      ps: 10,
+    })}`,
+    {
+      headers: baseHeader,
+    },
+  );
 }

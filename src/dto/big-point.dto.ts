@@ -86,3 +86,16 @@ interface Vipinfo {
   tv_vip_pay_type: number;
   tv_due_date: number;
 }
+
+export type PointListDto = ApiBaseProp<{
+  total: number;
+  big_point_list: Bigpointlist[];
+}>;
+
+interface Bigpointlist {
+  point: number;
+  change_time: number;
+  remark: string;
+  order_no: string;
+  image_url: string;
+}

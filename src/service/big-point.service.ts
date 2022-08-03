@@ -2,6 +2,7 @@ import type { TaskCodeType } from '@/enums/big-point.emum';
 import type { CommonTaskItem, SingTaskHistory, Taskinfo } from '@/dto/big-point.dto';
 import {
   complete,
+  getPointList,
   getTaskCombine,
   receiveTask,
   showDispatch,
@@ -10,8 +11,10 @@ import {
 } from '@/net/big-point.request';
 import { videoHeartbeat } from '@/net/video.request';
 import { TaskCode } from '@/enums/big-point.emum';
-import { apiDelay, getRandomItem, getUnixTime, logger, random } from '@/utils';
+import { apiDelay, getRandomItem, getUnixTime, isToday, isUnDef, logger, random } from '@/utils';
 import { TaskConfig, TaskModule } from '@/config/globalVar';
+
+let isRetry = false;
 
 /**
  * 查看当前状态
@@ -29,6 +32,7 @@ async function getTaskStatus() {
 }
 
 export async function bigPointService() {
+  isRetry = false;
   const taskStatus = await getTaskStatus();
   if (!taskStatus) {
     return;
@@ -45,20 +49,21 @@ export async function bigPointService() {
   }
   const isEmpty = await bigPointTask(taskStatus);
   if (isEmpty) {
-    logger.info('今日任务已完成 √');
-    return;
+    return await printPoint();
   }
   if (TaskConfig.bigPoint.isRetry) {
+    isRetry = true;
     await apiDelay(5000);
-    await bigPointTask(taskStatus, true);
+    await bigPointTask(taskStatus);
   }
+  return await printPoint();
 }
 
 type TaskStatus = UnPromisify<ReturnType<typeof getTaskStatus>>;
 
-async function bigPointTask(taskStatus: TaskStatus, isRetry = false) {
+async function bigPointTask(taskStatus: TaskStatus) {
   const { task_info } = taskStatus;
-  const signCode = await sign(task_info.sing_task_item?.histories, isRetry);
+  const signCode = await sign(task_info.sing_task_item?.histories);
   if (signCode === -401) {
     logger.error('出现非法访问异常，可能账号存在异常，放弃大积分任务');
     return;
@@ -134,7 +139,7 @@ async function watchTask(completeTimes: number) {
     }
     return Number(prefix + epid);
   }
-  const { epids, watchDelay = 20 } = TaskConfig.bigPoint;
+  const { epids, watchDelay = 40 } = TaskConfig.bigPoint;
   await apiDelay(watchDelay * 1000);
   try {
     let epid: number;
@@ -155,7 +160,7 @@ async function watchTask(completeTimes: number) {
       refer_url: 'https://www.bilibili.com/bangumi/media/md28229051/',
       epid,
     });
-    logger.info(`观看视频任务 ✓`);
+    logger.debug(`观看视频任务 ✓`);
   } catch (error) {
     logger.error(error);
     logger.error(`观看视频任务出现异常：${error.message}`);
@@ -174,7 +179,7 @@ async function completeTask(taskCode: string, msg: string) {
       logger.error(`${msg}失败: ${comCode} ${comMsg}`);
       return;
     }
-    logger.info(`${msg}每日任务 ✓`);
+    logger.debug(`${msg}每日任务 ✓`);
   } catch (error) {
     logger.error(error);
     logger.error(`每日任务${msg}出现异常：${error.message}`);
@@ -188,7 +193,7 @@ async function vipMallView() {
   try {
     const { code, message } = await showDispatch('hevent_oy4b7h3epeb');
     if (code === 0) {
-      logger.info(`浏览会员购每日任务 ✓`);
+      logger.debug(`浏览会员购每日任务 ✓`);
       return;
     }
     logger.error(`浏览会员购失败: ${code} ${message}`);
@@ -201,7 +206,7 @@ async function vipMallView() {
 /**
  * 签到
  */
-async function sign(histories: SingTaskHistory[], isRetry = false) {
+async function sign(histories: SingTaskHistory[]) {
   if (!histories || !histories.length) {
     return;
   }
@@ -210,13 +215,13 @@ async function sign(histories: SingTaskHistory[], isRetry = false) {
     return;
   }
   if (today.signed) {
-    !isRetry && logger.info('今日已签到 ✓');
+    !isRetry && logger.debug('今日已签到 ✓');
     return;
   }
   try {
     const { code, message } = await signIn();
     if (code === 0) {
-      logger.info(`签到成功 ✓`);
+      logger.debug(`签到成功 ✓`);
       return code;
     }
     logger.error(`签到失败: ${code} ${message}`);
@@ -242,7 +247,7 @@ async function getTask(taskinfo: Taskinfo) {
     return false;
   }
   await getManyTask(taskItems.map(taskItem => taskItem.task_code));
-  logger.info('领取任务完成');
+  logger.debug('领取任务完成');
   return true;
 }
 
@@ -281,5 +286,34 @@ async function getManyTask(taskCodes: string[]) {
   for (const taskCode of taskCodes) {
     await getOneTask(taskCode as TaskCodeType);
     await apiDelay(100, 300);
+  }
+}
+
+/**
+ * 获取今日积分
+ */
+async function getPoint() {
+  const keyword = ['观看任意', '签到', '10秒'];
+  try {
+    const { code, data, message } = await getPointList();
+    if (code !== 0) {
+      logger.warn(`获取今日积分失败: ${code} ${message}`);
+      return;
+    }
+    return data.big_point_list
+      .filter(item => isToday(item.change_time) && keyword.some(key => item.remark.includes(key)))
+      .reduce((num, item) => num + item.point, 0);
+  } catch (error) {
+    logger.error(error);
+  }
+}
+
+async function printPoint() {
+  const todayPoint = await getPoint();
+  if (isUnDef(todayPoint)) return;
+  if (todayPoint < 75) {
+    logger.error(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
+  } else {
+    logger.info(`今日获取积分【${todayPoint}】√`);
   }
 }
