@@ -113,13 +113,10 @@ async function caseConfirm(caseId: string) {
   }
 }
 
-/**
- * 模式 1
- */
-export async function mode1(err = 3) {
+export async function runJury(err = 3, caseIdList?: string[]) {
   const errRef = { value: err };
   while (errRef.value > 0) {
-    const isReturn = await runMode1(errRef);
+    const isReturn = await runOneJury(errRef, caseIdList);
     if (isReturn) break;
     await apiDelay(2000, 5000);
   }
@@ -130,50 +127,9 @@ export async function mode1(err = 3) {
 }
 
 /**
- * 运行一轮模式 1
+ * 运行一轮
  */
-async function runMode1(errRef: Ref<number>) {
-  try {
-    const { code, data, message } = await getJuryCaseVote();
-    switch (code) {
-      case 0:
-        return await handleSuccess(data, errRef);
-      case 25006:
-        return await handleJudgeExpired(message);
-      case 25008:
-        return await handleNoNewCase(message);
-      case 25014:
-        return await handleCaseFull(message);
-      default:
-        return await handleOtherError(code, message, errRef);
-    }
-  } catch (error) {
-    juryLogger.error(`风纪委员投票异常（模式 1），错误信息：${error}`);
-    errRef.value -= 1;
-  }
-}
-
-/**
- * 模式2
- */
-export async function mode2(err = 3) {
-  const errRef = { value: err },
-    caseIdList = [];
-  while (errRef.value > 0) {
-    const isReturn = await runMode2(errRef, caseIdList);
-    if (isReturn) break;
-    await apiDelay(2000, 5000);
-  }
-  if (errRef.value <= 0) {
-    juryLogger.error(`错误次数过多，结束任务！`);
-    return false;
-  }
-}
-
-/**
- * 运行一轮模式 2
- */
-async function runMode2(errRef: Ref<number>, caseIdList: string[]) {
+async function runOneJury(errRef: Ref<number>, caseIdList?: string[]) {
   try {
     const { code, data, message } = await getJuryCaseVote();
     switch (code) {
@@ -182,16 +138,16 @@ async function runMode2(errRef: Ref<number>, caseIdList: string[]) {
       case 25006:
         return await handleJudgeExpired(message);
       case 25008:
-        return await handleNoNewCaseForMode2(message, caseIdList, errRef);
+        return await handleNoNewCase(message, caseIdList, errRef);
       case 25014:
         return await handleCaseFull(message);
       default:
         return await handleOtherError(code, message, errRef);
     }
   } catch (error) {
-    juryLogger.error(`风纪委员投票异常（模式 2），错误信息：${error}`);
+    juryLogger.error(`风纪委员投票异常，错误信息：${error}`);
     errRef.value -= 1;
-    await apiDelay(20000, 40000);
+    await apiDelay(5000, 10000);
   }
 }
 
@@ -202,17 +158,6 @@ async function handleJudgeExpired(message: string) {
   logger.warn(`${message}`);
   await request(applyJury, '申请风纪委员');
   // 不管是否成功，目前是无法继续投票的
-  return true;
-}
-
-/**
- * 获取风纪委员案件没有新的案件
- */
-async function handleNoNewCase(message: string) {
-  juryLogger.info(`${message}`);
-  if (TaskConfig.jury.once) {
-    return await waitFor();
-  }
   return true;
 }
 
@@ -229,24 +174,17 @@ async function waitFor() {
 /**
  * 获取风纪委员案件没有新的案件
  */
-async function handleNoNewCaseForMode2(message: string, caseIdList: string[], errRef: Ref<number>) {
+async function handleNoNewCase(message: string, caseIdList: string[] = [], errRef?: Ref<number>) {
   juryLogger.info(`${message}`);
-  if (!caseIdList.length && TaskConfig.jury.once) {
+  if (!TaskConfig.jury.once) {
+    caseIdList.length && caseIdListVote(caseIdList, errRef);
+    return true;
+  }
+  if (!caseIdList.length) {
     return await waitFor();
   }
   juryLogger.debug('没有新的案件，清空保存的案件！');
-  for (const caseId of caseIdList) {
-    // 删除 caseIdList 中的 caseId
-    caseIdList.splice(caseIdList.indexOf(caseId), 1);
-    if (errRef.value === 0) {
-      logger.error(`错误次数过多，结束任务！`);
-      return true;
-    }
-    if (!(await replenishVote(caseId, getRandomItem(TaskConfig.jury.vote)))) {
-      errRef.value -= 1;
-    }
-    await apiDelay(10000, 20000);
-  }
+  return caseIdListVote(caseIdList, errRef);
 }
 
 /**
@@ -291,11 +229,34 @@ async function handleSuccess(
   }
   if (caseIdList) {
     pushIfNotExist(caseIdList, case_id);
-    return;
+    return await handleCaseIdList(caseIdList, errRef);
   }
   const vote = await replenishVote(case_id, getRandomItem(TaskConfig.jury.vote));
   if (!vote) {
     errRef.value -= 1;
+  }
+}
+
+/**
+ * 对 caseIdList 进行操作
+ */
+async function handleCaseIdList(caseIdList: string[], errRef: Ref<number>) {
+  if (caseIdList.length % 10 !== 0) return;
+  return caseIdListVote(caseIdList, errRef);
+}
+
+async function caseIdListVote(caseIdList: string[], errRef: Ref<number>) {
+  for (const caseId of caseIdList) {
+    // 删除 caseIdList 中的 caseId
+    caseIdList.splice(caseIdList.indexOf(caseId), 1);
+    if (errRef.value === 0) {
+      logger.error(`错误次数过多，结束任务！`);
+      return true;
+    }
+    if (!(await replenishVote(caseId, getRandomItem(TaskConfig.jury.vote)))) {
+      errRef.value -= 1;
+    }
+    await apiDelay(6000, 15000);
   }
 }
 
@@ -306,10 +267,13 @@ export async function juryService() {
   const { mode } = TaskConfig.jury;
   try {
     switch (mode) {
-      case 1:
-        return await mode1();
-      case 2:
-        return await mode2();
+      case 1: {
+        return await runJury();
+      }
+      case 2: {
+        const caseIdList: string[] = [];
+        return await runJury(3, caseIdList);
+      }
       default:
         return;
     }
