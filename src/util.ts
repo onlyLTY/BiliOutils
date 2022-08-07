@@ -2,7 +2,6 @@ import type { Config } from './types';
 import { resolve } from 'path';
 import { fork } from 'child_process';
 import * as path from 'path';
-import { defLogger } from './utils/Logger';
 import { getArg } from './utils/args';
 import { random, Sleep } from './utils/pure';
 
@@ -15,7 +14,7 @@ export async function config() {
   try {
     const configs = getConfigPathFile(resolve(process.cwd(), configPath));
     if (!configs.length) {
-      defLogger.error('配置文件不存在');
+      process.stderr.write('配置文件不存在');
       throw new Error('配置文件不存在');
     }
     const itemIndex = getArg('item');
@@ -24,8 +23,8 @@ export async function config() {
     }
     return configs;
   } catch (error) {
-    defLogger.error('配置路径可能存在问题');
-    defLogger.error(error.message);
+    process.stderr.write('配置路径可能存在问题');
+    process.stderr.write(error.message);
   }
 }
 
@@ -133,8 +132,11 @@ function getDelayTime(delay = '') {
 export async function waitForArgs() {
   const delay = getArg('delay', false);
   if (delay) {
+    const { defLogger } = await import('./utils');
     const [delay1, delay2] = getDelayTime(delay);
-    await Sleep.wait(random(delay1, delay2));
+    const delayTime = random(delay1, delay2);
+    defLogger.info(`运行前休眠 ${delayTime}ms`);
+    await Sleep.wait(delayTime);
     return true;
   }
 }

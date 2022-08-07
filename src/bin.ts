@@ -4,7 +4,6 @@ import type { Config } from './types/config';
 import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
 import { readFileSync, writeFileSync } from 'fs';
-import { defLogger } from './utils/Logger';
 import { config, runTask, waitForArgs } from './util';
 import * as cron from 'node-cron';
 
@@ -66,7 +65,7 @@ function remember(jobsPath: string) {
 /**
  * 判断今日是否已经运行过
  */
-function isTodayRun(jobsPath: string) {
+async function isTodayRun(jobsPath: string) {
   if (!isArg('once')) {
     return;
   }
@@ -76,6 +75,7 @@ function isTodayRun(jobsPath: string) {
     // lastRun 是否是今天
     const lastRun = new Date(jobsObj.lastRun);
     const today = new Date();
+    const { defLogger } = await import('./utils/Logger');
     if (
       lastRun.getFullYear() === today.getFullYear() &&
       lastRun.getMonth() === today.getMonth() &&
@@ -115,7 +115,7 @@ async function argTaskHandle(jobsPath: string, configs: Config[]) {
   if (isArg('task')) {
     return await runTask(configs, './bin/inputTask', getArg('task'));
   }
-  if (isTodayRun(jobsPath)) return;
+  if (await isTodayRun(jobsPath)) return;
   await runTask(configs);
   remember(jobsPath);
 }
