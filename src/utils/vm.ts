@@ -78,6 +78,7 @@ export async function runInVM(name: string, context = { event: {}, context: {} }
       });
     } catch (error) {
       defLogger.error(`runInVM Script: ${error.message}`);
+      resolve(false);
       return false;
     }
   });
