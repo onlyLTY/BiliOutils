@@ -11,8 +11,19 @@ import {
 } from '@/net/big-point.request';
 import { videoHeartbeat } from '@/net/video.request';
 import { TaskCode } from '@/enums/big-point.emum';
-import { apiDelay, getRandomItem, getUnixTime, isToday, isUnDef, logger, random } from '@/utils';
+import {
+  apiDelay,
+  getRandomItem,
+  getUnixTime,
+  isToday,
+  isUnDef,
+  Logger,
+  logger,
+  random,
+} from '@/utils';
 import { TaskConfig, TaskModule } from '@/config/globalVar';
+
+const bigLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'big-point');
 
 let isRetry = false;
 
@@ -145,9 +156,9 @@ async function watchTask(completeTimes: number) {
     let epid: number;
     if (epids && epids.length > 0) {
       epid = getRandomItem(epids);
-      logger.debug(`使用随机视频: ${epid}`);
+      bigLogger.debug(`使用随机视频: ${epid}`);
     } else {
-      logger.debug('使用默认视频（西游记随机集数）');
+      bigLogger.debug('使用默认视频（西游记随机集数）');
       epid = createEpid('327', 107, 134, [122, 123]);
     }
     const watchTime = completeTimes === 1 ? random(905, 1800) : random(1805, 2000);
@@ -160,7 +171,7 @@ async function watchTask(completeTimes: number) {
       refer_url: 'https://www.bilibili.com/bangumi/media/md28229051/',
       epid,
     });
-    logger.debug(`观看视频任务 ✓`);
+    bigLogger.debug(`观看视频任务 ✓`);
   } catch (error) {
     logger.error(error);
     logger.error(`观看视频任务出现异常：${error.message}`);
@@ -179,7 +190,7 @@ async function completeTask(taskCode: string, msg: string) {
       logger.error(`${msg}失败: ${comCode} ${comMsg}`);
       return;
     }
-    logger.debug(`${msg}每日任务 ✓`);
+    bigLogger.debug(`${msg}每日任务 ✓`);
   } catch (error) {
     logger.error(error);
     logger.error(`每日任务${msg}出现异常：${error.message}`);
@@ -193,7 +204,7 @@ async function vipMallView() {
   try {
     const { code, message } = await showDispatch('hevent_oy4b7h3epeb');
     if (code === 0) {
-      logger.debug(`浏览会员购每日任务 ✓`);
+      bigLogger.debug(`浏览会员购每日任务 ✓`);
       return;
     }
     logger.error(`浏览会员购失败: ${code} ${message}`);
@@ -215,13 +226,13 @@ async function sign(histories: SingTaskHistory[]) {
     return;
   }
   if (today.signed) {
-    !isRetry && logger.debug('今日已签到 ✓');
+    !isRetry && bigLogger.debug('今日已签到 ✓');
     return;
   }
   try {
     const { code, message } = await signIn();
     if (code === 0) {
-      logger.debug(`签到成功 ✓`);
+      bigLogger.debug(`签到成功 ✓`);
       return code;
     }
     logger.error(`签到失败: ${code} ${message}`);
@@ -247,7 +258,7 @@ async function getTask(taskinfo: Taskinfo) {
     return false;
   }
   await getManyTask(taskItems.map(taskItem => taskItem.task_code));
-  logger.debug('领取任务完成');
+  bigLogger.debug('领取任务完成');
   return true;
 }
 

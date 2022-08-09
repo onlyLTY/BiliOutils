@@ -57,11 +57,11 @@ export async function activityLotteryService() {
       if ((await addTimesContinue(sid)) === true) return;
       const finalNum = await getLotteryMyTimes(sid);
       await sleep(150, 300);
-      logger.debug(`【${title}】剩余次数 ${finalNum}`);
+      ltyLogger.debug(`【${title}】剩余次数 ${finalNum}`);
       if (finalNum === true) return;
       if (finalNum === false || finalNum === 0) continue;
       await doLotteryContinue(finalNum, item as ActivityLotteryIdType);
-      logger.verbose(`完成【${title}】转盘的抽奖`);
+      // ltyLogger.verbose(`完成【${title}】转盘的抽奖`);
       await sleep(300, 500);
     }
   } catch (error) {
@@ -85,9 +85,9 @@ async function getActivityLotteryList(localStatus: LocalStatusDto = {}) {
   // config 文件中的活动列表
   const { list: userList } = TaskConfig.activityLottery;
   return uniqueObjectArray(
-    netList
-      .concat(userList.filter(item => expiredIdsFilter(item, localStatus)) || [])
-      .concat(localStatus.activity_list || []),
+    (localStatus.activity_list || [])
+      .concat(netList)
+      .concat(userList.filter(item => expiredIdsFilter(item, localStatus)) || []),
     'sid',
   );
 }
@@ -123,12 +123,11 @@ export async function doLottery({ sid, title }: ActivityLotteryIdType) {
     const { code, message, data } = await activityRequest.doLottery(sid);
     if (code === 0) {
       okCount++;
-      if (!data.gift_name || data.gift_name.includes('未中奖')) {
-        // ltyLogger.debug(JSON.stringify(data));
+      const { gift_name } = data?.[0] || {};
+      if (!gift_name || gift_name.includes('未中奖')) {
         return false;
       }
-      // ltyLogger.debug(JSON.stringify(data));
-      logger.info(`【${title}】中奖【${data.gift_name}】`);
+      logger.info(`【${title}】中奖【${gift_name}】`);
       return;
     }
     logger.warn(`【${title}】抽奖失败 ${code} ${message}`);
@@ -230,7 +229,7 @@ async function getActivityList(localStatus?: LocalStatusDto): Promise<ActivityLo
   if (!isRequest) {
     return;
   }
-  logger.verbose(`获取活动列表`);
+  logger.verbose(`通过网络获取活动列表`);
   try {
     const res = await getCode();
     const reslut: ActivityLotteryIdType[] = JSON.parse(gzipDecode(base64Decode(res.value)));
