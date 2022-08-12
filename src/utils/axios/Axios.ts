@@ -20,7 +20,7 @@ export class VAxios {
 
   constructor(options: CreateAxiosOptions) {
     const { requestOptions } = options;
-    if (requestOptions.withCredentials === false) {
+    if (requestOptions?.withCredentials === false) {
       options.withCredentials = false;
     }
     this.options = options;
@@ -83,9 +83,7 @@ export class VAxios {
 
     // 请求拦截器
     this.axiosInstance.interceptors.request.use((config: AxiosRequestConfig) => {
-      const {
-        headers: { ignoreCancelToken },
-      } = config;
+      const { headers: { ignoreCancelToken } = {} } = config;
 
       const ignoreCancel = ignoreCancelToken
         ? ignoreCancelToken
@@ -93,7 +91,7 @@ export class VAxios {
 
       !ignoreCancel && axiosCanceler.addPending(config);
 
-      if (isFunction(responseInterceptors)) {
+      if (isFunction(requsetInterceptors)) {
         config = requsetInterceptors(config, this.options);
       }
 

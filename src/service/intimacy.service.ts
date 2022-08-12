@@ -207,7 +207,7 @@ type LiveHeartRunOptions = {
 function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
   for (const fansMedal of roomList) {
     const countRef: Ref<number> = { value: 0 };
-    const timerRef: Ref<NodeJS.Timer> = { value: undefined };
+    const timerRef: Ref<NodeJS.Timer> = { value: undefined as unknown as NodeJS.Timer };
     const options = getRandomOptions();
     const needTime = getLiveHeartNeedTime(fansMedal.medal);
     const runOptions = { fansMedal, options, countRef, needTime, timerRef };
@@ -297,7 +297,7 @@ export async function liveInteract(fansMedal: FansMedalDto) {
     liveLogger.verbose(`为【${nickName}】发送直播弹幕`);
     sendMessageResult = await sendOneMessage(roomid, nickName);
   }
-  if (sendMessageResult !== SeedMessageResult.Success) {
+  if (sendMessageResult! !== SeedMessageResult.Success) {
     sendMessageFailList.set(roomid, fansMedal);
   }
 

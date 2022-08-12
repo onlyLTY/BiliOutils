@@ -2,7 +2,7 @@ import { ApiBaseProp, PureDataProp, ResponseCode } from './bili-base-prop';
 
 /** 领取每月会员权益 */
 export interface ReceiveVipPrivilegeDto extends ApiBaseProp {
-  data?: null;
+  data: null;
 }
 
 /** 领取每月会员权益状态 */

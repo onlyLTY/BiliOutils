@@ -17,7 +17,8 @@ import {
 } from '../net/live.request';
 import { PendentID, RequireType, TianXuanStatus } from '../enums/live-lottery.enum';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { liveMobileHeartBeat } from '@/net/intimacy.request';
+import { entryRoomPc, getAnchorInRoom } from '@/net/live-heart.request';
+import { request } from '@/utils/request';
 
 interface LiveAreaType {
   areaId: string;
@@ -209,7 +210,7 @@ async function doLottery(lottery: CheckedLottery, rememberUp = true) {
       requireTextList.forEach(requireText => pushIfNotExist(newFollowUp, requireText));
     }
   } catch (error) {
-    logger.info(`天选异常: ${error.message}`);
+    logger.error(`天选异常: ${error.message}`);
   }
 }
 
@@ -336,11 +337,11 @@ async function doRedPackArea(areaId: string, parentId: string, num = 2) {
   for (let page = 1; page <= num; page++) {
     const rooms = await getRedPacketRoom(areaId, parentId, page);
     for (const room of rooms) {
-      await liveMobileHeartBeat({ room_id: room.room_id, up_id: room.uid });
-      await apiDelay(100);
+      await request(getAnchorInRoom, undefined, room.room_id);
+      await apiDelay(40);
+      await request(entryRoomPc, undefined, room.room_id);
+      await apiDelay(1000);
       await doRedPacket(room);
-      // 发送一次心跳
-      await apiDelay(400);
     }
   }
 }
@@ -355,8 +356,10 @@ export async function liveRedPackService() {
   const areaList = await getLiveArea();
   // 遍历大区
   for (const areas of areaList) {
+    await apiDelay(10000);
     // 遍历小区
     for (const area of areas) {
+      await apiDelay(3000);
       await doRedPackArea(area.areaId, area.parentId, pageNum);
     }
   }

@@ -6,6 +6,7 @@ export async function replaceNewCookie() {
   const { getCookieItem } = await import('@/utils/cookie');
   const { replaceAllCookie } = await import('@/utils/file');
   const cookieJar = new BiliCookieJar(),
-    cookie = await cookieJar.getCookieString();
-  replaceAllCookie(process.env.__BT_CONFIG_PATH__, getCookieItem(cookie, 'DedeUserID'), cookie);
+    cookie = await cookieJar.getCookieString(),
+    mid = getCookieItem(cookie, 'DedeUserID');
+  mid && replaceAllCookie(process.env.__BT_CONFIG_PATH__, mid, cookie);
 }

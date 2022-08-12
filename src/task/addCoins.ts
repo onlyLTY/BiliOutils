@@ -34,9 +34,9 @@ export default async function addCoins() {
   const state: State = {
     eCount: 0,
     num: 0,
-    prevCode: undefined,
+    prevCode: -999,
     fillCount: 0,
-    prevFillId: undefined,
+    prevFillId: 0,
     eAidCount: 0,
   };
   let isReturn = false,
@@ -93,8 +93,7 @@ async function coinHandle(state: State) {
  * 设置还需要投币的数量
  */
 async function setCoinsTask() {
-  let coinNum = await getTodayCoinNum();
-  coinNum ||= TaskConfig.coin.todayCoins;
+  const coinNum = await getTodayCoinNum();
   const coins = TaskConfig.coin.targetCoins - coinNum;
   TaskModule.coinsTask = coins > 0 ? coins : 0;
 }
@@ -106,6 +105,10 @@ async function coinToIdOnce(data: AidInfo['data'], state: State) {
   const { id, coinType, mid } = data;
   try {
     const coinData = await coinToId({ id, coinType, mid } as CoinToIdParams);
+    if (!id) {
+      state.eCount++;
+      return false;
+    }
     switch (coinData.code) {
       case 0:
         return coinSuccessHandle(state, data);

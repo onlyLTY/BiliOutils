@@ -106,7 +106,7 @@ export interface UserInfoNavDto extends ApiBaseProp {
 
 /** 每日任务完成情况 */
 export interface RewardDto extends ApiBaseProp {
-  data?: {
+  data: {
     login: boolean;
     watch: boolean;
     coins: number;

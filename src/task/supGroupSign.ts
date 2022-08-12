@@ -8,7 +8,7 @@ type Group = SupGroupsDto['data']['list'];
 /**
  * 获取应援团信息
  */
-async function getMyGroups(): Promise<Group> {
+async function getMyGroups() {
   try {
     const { data, code, message } = await getMyGroupsApi();
     if (code === 0) {
@@ -28,6 +28,7 @@ export default async function supGroupSign() {
   logger.info('----【应援团签到】----');
 
   const myGroups = await getMyGroups();
+  if (!myGroups) return;
   await apiDelay();
   const countRef = { value: 0 };
   for (let i = 0; i < myGroups.length; i++) {

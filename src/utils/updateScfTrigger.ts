@@ -108,7 +108,7 @@ export default async function (
     if (hasTrigger) {
       const deleteResult = await deleteTrigger(params);
       if (!deleteResult) {
-        return;
+        return false;
       }
     }
 
@@ -116,7 +116,7 @@ export default async function (
   }
 
   let updateResults = false,
-    runningTotalNumber = 0;
+    runningTotalNumber = 2;
   while (!updateResults && runningTotalNumber) {
     updateResults = await aSingleUpdate();
     runningTotalNumber--;

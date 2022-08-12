@@ -39,4 +39,4 @@ export interface FCEvent {
   [key: string]: unknown;
 }
 
-export type FCCallback = (err?: Error, message?: string) => void;
+export type FCCallback = (err?: Error | null, message?: string) => void;

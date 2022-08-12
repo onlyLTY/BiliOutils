@@ -31,10 +31,12 @@ export async function dailyHandle({ event, context, slsType }: Params) {
     updateTrigger = await getUpdateTrigger(slsType, event, context);
   let message: { lastTime: string };
   try {
-    message = JSON5.parse(payload);
+    if (payload) {
+      message = JSON5.parse(payload);
+    }
   } catch (error) {}
 
-  if (message && message.lastTime === getPRCDate().getDate().toString()) {
+  if (message! && message.lastTime === getPRCDate().getDate().toString()) {
     return '今日重复执行';
   }
 

@@ -7,7 +7,7 @@ import { jsonp2Object, mergeHeaders, stringify } from '../pure';
 import { CookieJar } from '../cookie';
 import { BiliCookieJar } from '@/config/globalVar';
 
-const transformRequestHook = (res: Response, options: RequestOptions) => {
+const transformRequestHook = (res: Response, options: RequestOptions = {}) => {
   const { isTransformResponse, isReturnNativeResponse } = options;
 
   // 是否返回原生响应头 比如：需要获取响应头时使用该属性
@@ -37,7 +37,7 @@ const transformRequestHook = (res: Response, options: RequestOptions) => {
 function axiosHandle(options: VGotOptions) {
   // 如果 options.url 不是字符串，则转换为字符串
   if (!isString(options.url)) {
-    options.url = options.url.toString();
+    options.url = options.url?.toString();
   }
 
   // 如果 params 存在值，则合并到 searchParams
@@ -47,6 +47,7 @@ function axiosHandle(options: VGotOptions) {
       ...options.params,
     };
   }
+  options.headers || (options.headers = {});
   const contentType = options.headers['content-type'] as string,
     isFormUrlencoded = contentType?.startsWith('application/x-www-form-urlencoded');
   if (isObject(options.data)) {
@@ -96,7 +97,7 @@ export class VGot {
     }
     this.options = options;
     // 处理 cookie
-    const { withBiliCookie, withCredentials } = this.options.requestOptions;
+    const { withBiliCookie, withCredentials } = this.options.requestOptions || {};
     if (withBiliCookie) {
       this.cookieJar = new BiliCookieJar();
     } else if (withCredentials) {

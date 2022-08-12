@@ -31,7 +31,7 @@ const configPathArr = Array.from(
  */
 const qlOldConfigArr = ['./config.json', resolveCWD('./config/config.json')];
 
-const getEnvConfig = (): Config => {
+function getEnvConfig() {
   const { BILITOOLS_CONFIG, BILI_SCF_CONFIG, BILI_CONFIG } = process.env;
   const config = BILITOOLS_CONFIG || BILI_SCF_CONFIG || BILI_CONFIG;
   if (!config) {
@@ -43,12 +43,12 @@ const getEnvConfig = (): Config => {
     logger.error(error);
     throw new Error('环境中的配置不是有效的 JSON 字符串！');
   }
-};
+}
 
 /**
  * 处理多用户配置
  */
-function handleMultiUserConfig(config: MultiConfig | Config[]): Config {
+function handleMultiUserConfig(config: MultiConfig | Config[]) {
   let newConfig: Config[];
   const isArrayConf = isArray(config);
   if (isArrayConf) {

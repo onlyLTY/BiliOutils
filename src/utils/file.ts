@@ -7,13 +7,13 @@ import { defLogger } from './Logger';
  * 读取 json 文件
  * @param filePath 文件路径
  */
-export function readJsonFile<T = any>(filePath: string): T {
+export function readJsonFile<T = any>(filePath: string): T | undefined {
   try {
     let content: string;
     if (existsSync(filePath)) {
       content = readFileSync(filePath, 'utf-8');
     }
-    if (content) {
+    if (content!) {
       return JSON5.parse(content);
     }
   } catch (error) {

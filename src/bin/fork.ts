@@ -6,5 +6,5 @@
   // 替换 cookie 为最新的
   const { replaceNewCookie } = await import('./util');
   replaceNewCookie();
-  process.send(true);
+  process.send?.(true);
 })();

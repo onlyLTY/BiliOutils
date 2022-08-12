@@ -88,12 +88,15 @@ async function isTodayRun(jobsPath: string) {
 }
 
 async function run() {
-  const configDir = dirname(resolve(process.cwd(), getArg('config')));
+  const configDir = dirname(resolve(process.cwd(), getArg('config')!));
   const jobsPath = resolve(configDir, 'bt_jobs.json');
   const configs = await config();
+  if (!configs) {
+    return;
+  }
   const cronStr = getArg('cron', false);
 
-  if (cron.validate(cronStr)) {
+  if (cronStr && cron.validate(cronStr)) {
     process.stdout.write(`等待运行：cron ${cronStr}\n`);
     const cronTask = cron.schedule(
       cronStr,

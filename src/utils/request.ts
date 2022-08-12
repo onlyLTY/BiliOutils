@@ -19,10 +19,9 @@ export async function request<
   O extends RequestOptions,
 >(
   reqFunc: T,
-  options?: O,
+  options: O = { transform: true } as O,
   ...args: Parameters<T>
 ): Promise<O['transform'] extends false ? AnyProp<R['data']> : R['data']> {
-  options ||= {} as O;
   const thatlogger = getLogger(options.logger);
   const { name, successCode = 0, transform, okMsg } = options;
   try {
@@ -37,12 +36,12 @@ export async function request<
     if (transform === false) {
       return resp;
     }
-    return data;
+    return data as R['data'];
   } catch (error) {
     thatlogger.error(`${name || reqFunc.name}请求出现异常`);
     thatlogger.error(error);
   }
-  return {} as unknown;
+  return {} as Record<string, any>;
 }
 
 function getLogger(loggerOption: RequestOptions['logger']) {

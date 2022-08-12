@@ -72,7 +72,7 @@ export function liveMobileHeartBeat({
     timestamp: String(parseInt(String(new Date().getTime() / 1000)) - 60),
     secret_key: 'axoaadsffcazxksectbbb',
     watch_time: '60',
-    up_id: up_id || uid,
+    up_id: up_id || !uid,
     up_level,
     jump_from: '30000',
     gu_id,

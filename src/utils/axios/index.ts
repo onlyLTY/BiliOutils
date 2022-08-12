@@ -41,9 +41,9 @@ const transform: AxiosTransform = {
   beforeRequestHook: (config, options) => {
     const { apiUrl } = options;
     if (apiUrl && isString(apiUrl)) {
-      if (config.url.startsWith('/') && apiUrl.endsWith('/')) {
+      if (config.url?.startsWith('/') && apiUrl.endsWith('/')) {
         config.url = apiUrl + config.url.substring(1);
-      } else if (!config.url.startsWith('/') && !apiUrl.endsWith('/')) {
+      } else if (!config.url?.startsWith('/') && !apiUrl.endsWith('/')) {
         config.url = `${apiUrl}/${config.url}`;
       } else {
         config.url = `${apiUrl}${config.url}`;
@@ -76,7 +76,8 @@ const transform: AxiosTransform = {
    */
   requsetInterceptors: (config: AxiosRequestConfig) => {
     const { requestOptions } = config;
-    if (requestOptions.withBiliCookie === true) {
+    config.headers || (config.headers = {});
+    if (requestOptions?.withBiliCookie === true) {
       config.headers['Cookie'] = TaskConfig.cookie;
     }
     return config;
@@ -86,7 +87,7 @@ const transform: AxiosTransform = {
    * 响应拦截器处理
    */
   responseInterceptors: (res: AxiosResponse<any>) => {
-    if (res.config.requestOptions.withBiliCookie) {
+    if (res.config.requestOptions?.withBiliCookie) {
       TaskConfig.cookie = getCookie(TaskConfig.cookie, res.headers?.['set-cookie'] || []);
     }
     return res;
@@ -99,7 +100,7 @@ const transform: AxiosTransform = {
     if (!error.config) {
       return Promise.reject(error);
     }
-    const { requestOptions: options, url } = error.config;
+    const { requestOptions: options = {}, url } = error.config;
     // 防止部分情况重复请求
     if (retryWhitelist.find(item => item[0] === url && item[1] === error.code)) {
       return Promise.reject(error);

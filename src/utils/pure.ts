@@ -118,6 +118,8 @@ export function random(lower?: number, upper?: number, floating?: boolean) {
     upper = lower;
     lower = 0;
   }
+  lower = lower || 0;
+  upper = upper || 1;
   if (lower > upper) {
     const temp = lower;
     lower = upper;
@@ -405,7 +407,7 @@ export function getBuvid(prefix = 'XY') {
 }
 
 /**
- * 对象数组去重
+ * 对象数组去重 （保留第一个）
  * @param arr 对象数组
  * @param key 去重的 key
  */

@@ -3,7 +3,9 @@ import { isString } from './is';
 export function getCookieJSON(cookie: string | undefined): Record<string, string> {
   if (!cookie) return {};
   // 使用正则表达式获取 cookie 键值对，并转换为对象
-  return cookie.match(/([^;=]+)(?:=([^;]*))?/g).reduce((pre, cur) => {
+  const matchArray = cookie.match(/([^;=]+)(?:=([^;]*))?/g);
+  if (!matchArray) return {};
+  return matchArray.reduce((pre, cur) => {
     const [key, value] = cur.trim().split('=');
     pre[key] = encodeCookieValue(value);
     return pre;
@@ -52,7 +54,7 @@ export default function getCookie(cookie: string, setCookie: string[] | string) 
 }
 export { getCookie };
 
-export function getCookieItem(cookie: string, key: string) {
+export function getCookieItem(cookie: string | undefined, key: string) {
   if (!cookie) return null;
   const reg = `(?:^|)${key}=([^;]*)(?:;|$)`;
   const r = cookie.match(reg);
@@ -75,7 +77,9 @@ export class CookieJar {
   private cookie: string;
 
   constructor(cookie?: string) {
-    this.cookie = cookie;
+    if (cookie) {
+      this.cookie = cookie;
+    }
   }
 
   getCookieString() {

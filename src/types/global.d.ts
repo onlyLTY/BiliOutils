@@ -22,6 +22,9 @@ declare global {
   };
 
   type UnPromisify<T> = T extends Promise<infer U> ? U : T;
+
+  // 一定已经定义了
+  type Defined<T> = T extends undefined ? never : T;
 }
 
 export {};

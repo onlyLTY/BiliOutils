@@ -301,7 +301,7 @@ export interface CoinToIdParams {
   id: number;
   coinType?: keyof typeof TypeEnum;
   coin?: 1 | 2;
-  mid?: number;
+  mid: number;
 }
 
 /**
@@ -328,7 +328,8 @@ export async function coinToId({ id, coin = 1, coinType = 'video', mid }: CoinTo
 export async function getTodayCoinNum() {
   const exp = await getTodayExp();
   if (exp) return exp;
-  return await getTodayCoin();
+  const coin = await getTodayCoin();
+  return coin || TaskConfig.coin.todayCoins;
 }
 
 /** 获取已经获得的经验 */
@@ -370,3 +371,12 @@ async function getTodayCoin() {
     logger.debug(`获取投币消耗硬币异常 ${error.message}`);
   }
 }
+
+/**
+ * 获取视频已投币数量
+ */
+// export async function getVideoCoinNum(aid: number) {
+//   try {
+//     const { coin } = await request(getVideoRelation, undefined, { aid });
+//   } catch (error) {}
+// }

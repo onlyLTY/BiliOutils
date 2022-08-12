@@ -8,39 +8,39 @@ export interface AnyProp<T = any> {
   status?: boolean;
 }
 
-export interface ApiBaseProp<T = object | number> {
+export interface ApiBaseProp<T = object | number | null> {
   /**
    * -658 Token 过期
    */
   code: number;
   message: string;
   ttl: number;
-  data?: T;
+  data: T;
 }
 
 export interface OnlyMsg<T = any> {
   code: number;
   msg: string;
-  data?: T;
+  data: T;
 }
 
 export interface AccountBaseProp<T = object> {
   code: number;
   status: boolean;
-  data?: T;
+  data: T;
 }
 
 export interface DoubleMessageProp<T = unknown> {
   code: number;
   msg: string;
   message: string;
-  data?: T;
+  data: T;
 }
 
 export interface PureDataProp<T = object | [] | null> {
   code: number;
   message: string;
-  data?: T;
+  data: T;
 }
 
 /**

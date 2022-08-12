@@ -22,7 +22,7 @@ export default async function shareAndWatch() {
     const biliav = await getVideo();
     if (biliav.code === 0) {
       const { id, author, title } = biliav.data;
-      gAid = id;
+      gAid = id!;
       logger.info(`获取视频: ${title} --up【${author}】`);
     } else {
       logger.warn(`获取视频失败 ${biliav.msg}`);

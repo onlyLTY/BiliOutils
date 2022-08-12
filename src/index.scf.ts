@@ -45,4 +45,5 @@ export async function runTasks(payload: string) {
       return true;
     }
   } catch {}
+  return false;
 }

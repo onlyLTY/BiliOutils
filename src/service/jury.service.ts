@@ -33,7 +33,7 @@ export function getMoreOpinion(caseId: string, opinions: JuryCaseOpinion[]) {
     opinionStatistics[opinion.vote] = 1;
   }
   const maxValue = Math.max(...Object.values(opinionStatistics));
-  const maxKey = +Object.keys(opinionStatistics).find(key => opinionStatistics[key] === maxValue);
+  const maxKey = +Object.keys(opinionStatistics).find(key => opinionStatistics[key] === maxValue)!;
   if (maxValue < TaskConfig.jury.opinionMin) return;
   juryLogger.debug(
     `【${caseId}】的观点分布（观点id: 投票人数）${JSON.stringify(opinionStatistics)}`,
@@ -176,7 +176,7 @@ async function waitFor() {
  */
 async function handleNoNewCase(message: string, caseIdList: string[] = [], errRef?: Ref<number>) {
   juryLogger.info(`${message}`);
-  if (!TaskConfig.jury.once) {
+  if (!TaskConfig.jury.once && errRef) {
     caseIdList.length && caseIdListVote(caseIdList, errRef);
     return true;
   }
@@ -184,7 +184,7 @@ async function handleNoNewCase(message: string, caseIdList: string[] = [], errRe
     return await waitFor();
   }
   juryLogger.debug('没有新的案件，清空保存的案件！');
-  return caseIdListVote(caseIdList, errRef);
+  return caseIdListVote(caseIdList, errRef!);
 }
 
 /**
@@ -228,8 +228,9 @@ async function handleSuccess(
     return;
   }
   if (caseIdList) {
+    const re = await handleCaseIdList(caseIdList, errRef);
     pushIfNotExist(caseIdList, case_id);
-    return await handleCaseIdList(caseIdList, errRef);
+    return re;
   }
   const vote = await replenishVote(case_id, getRandomItem(TaskConfig.jury.vote));
   if (!vote) {
@@ -241,20 +242,35 @@ async function handleSuccess(
  * 对 caseIdList 进行操作
  */
 async function handleCaseIdList(caseIdList: string[], errRef: Ref<number>) {
-  if (caseIdList.length % 10 !== 0) return;
-  return caseIdListVote(caseIdList, errRef);
+  const len = caseIdList.length;
+  if (len % 10 !== 0) return;
+  if (len < 30) {
+    return caseIdListVote(caseIdList, errRef, true);
+  }
+  let count = 0;
+  logger.debug(`handleCaseIdList：${len}`);
+  while (caseIdList.length >= 20 && count++ < 10) {
+    caseIdListVote(caseIdList, errRef, true);
+    await apiDelay(60000, 150000);
+  }
 }
 
-async function caseIdListVote(caseIdList: string[], errRef: Ref<number>) {
+/**
+ * caseIdList 投票
+ */
+async function caseIdListVote(caseIdList: string[], errRef: Ref<number>, noReplenish?: boolean) {
   for (const caseId of caseIdList) {
-    // 删除 caseIdList 中的 caseId
-    caseIdList.splice(caseIdList.indexOf(caseId), 1);
     if (errRef.value === 0) {
       logger.error(`错误次数过多，结束任务！`);
       return true;
     }
-    if (!(await replenishVote(caseId, getRandomItem(TaskConfig.jury.vote)))) {
-      errRef.value -= 1;
+    if (!noReplenish) {
+      if (!(await replenishVote(caseId, getRandomItem(TaskConfig.jury.vote)))) {
+        errRef.value -= 1;
+      } else {
+        // 删除 caseIdList 中的 caseId
+        caseIdList.splice(caseIdList.indexOf(caseId), 1);
+      }
     }
     await apiDelay(6000, 15000);
   }

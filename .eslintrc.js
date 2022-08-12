@@ -26,5 +26,6 @@ module.exports = {
         fixToUnknown: true,
       },
     ],
+    '@typescript-eslint/no-non-null-assertion': 'off',
   },
 };

@@ -53,7 +53,7 @@ abstract class TaskModuleTemplate {
   static nickname: string;
 }
 
-export let TaskModule: typeof TaskModuleTemplate = null;
+export let TaskModule: typeof TaskModuleTemplate;
 
 export function initialize(config?: Config) {
   if (!config) {

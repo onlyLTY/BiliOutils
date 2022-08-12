@@ -10,7 +10,7 @@ import { random, Sleep } from './utils/pure';
  */
 export async function config() {
   const { getConfigPathFile } = await import('./config/setConfig');
-  const configPath = getArg('config');
+  const configPath = getArg('config') as string;
   try {
     const configs = getConfigPathFile(resolve(process.cwd(), configPath));
     if (!configs.length) {
@@ -36,7 +36,7 @@ export function getConfigByItem(configs: Config[], item: string) {
   return item
     .split(',')
     .filter(el => el)
-    .map(item => configs.at(getItemIndex(item, len)))
+    .map(item => configs.at(getItemIndex(item, len))!)
     .filter(el => el);
 }
 
@@ -103,7 +103,7 @@ function getItemIndex(item: string, len: number) {
 
 async function runTaskAsync(forkPromises: Promise<any>[]) {
   try {
-    return Promise.all(forkPromises);
+    return await Promise.all(forkPromises);
   } catch (error) {
     process.stdout.write(`${error.message}`);
   }

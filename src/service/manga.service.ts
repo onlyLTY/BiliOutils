@@ -219,7 +219,10 @@ export async function buyMangaService() {
     logger.info('非购买漫画时间，不购买');
     return;
   }
-  expireCouponNum = await getExpireCouponNum();
+  expireCouponNum = (await getExpireCouponNum()) as number;
+  if (!expireCouponNum) {
+    return;
+  }
   if (expireCouponNum < 1) {
     logger.info('没有即将过期的漫读券，跳过任务');
     return;
@@ -318,7 +321,7 @@ export async function exchangeCouponService() {
     logger.info('可兑换的漫读券数量不足 1，跳过任务');
     return;
   }
-  let isRepeat = true;
+  let isRepeat: boolean | undefined = true;
   while (isRepeat) {
     isRepeat = await exchangeCoupon(num);
     // 等待 2s 再次尝试

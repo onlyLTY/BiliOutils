@@ -7,6 +7,7 @@ type MainFuncType = (event: FCEvent, context: FCContext) => Promise<string>;
 
 (async () => {
   logger.info('开始执行网络代码');
+  // @ts-ignore
   const eventJson: FCEvent = JSON5.parse(event.toString());
   let isReturn = false;
   if (eventJson.payload) {

@@ -224,7 +224,9 @@ function getCode() {
   return Promise.any([defHttp.get(ghUrl, header), defHttp.get(geUrl, header)]);
 }
 
-async function getActivityList(localStatus?: LocalStatusDto): Promise<ActivityLotteryIdType[]> {
+async function getActivityList(
+  localStatus?: LocalStatusDto,
+): Promise<ActivityLotteryIdType[] | undefined> {
   const { isRequest } = TaskConfig.activityLottery;
   if (!isRequest) {
     return;
@@ -270,7 +272,7 @@ function writeStatus(oldData: LocalStatusDto = {}, activityList: ActivityLottery
   }
   try {
     let activity_list: ActivityLotteryIdType[] = activityList,
-      expired_list: string[];
+      expired_list: string[] = [];
     if (EXPIRED_LIST.length) {
       pushIfNotExist(EXPIRED_LIST, ...(oldData.expired_list || []));
       // 如果长度超过 30 则取前 30 个，避免列表无限增长
@@ -288,7 +290,8 @@ function writeStatus(oldData: LocalStatusDto = {}, activityList: ActivityLottery
       last_update_at: new Date().getTime(),
     };
     // 写入合并后的数据
-    writeFileSync(FILE_PATH, JSON.stringify(deepMergeObject(oldData, activity_json), null, 2));
+    FILE_PATH &&
+      writeFileSync(FILE_PATH, JSON.stringify(deepMergeObject(oldData, activity_json), null, 2));
   } catch (error) {
     ltyLogger.debug(error);
   }
@@ -297,7 +300,7 @@ function writeStatus(oldData: LocalStatusDto = {}, activityList: ActivityLottery
 /**
  * 检测今天是否已经运行过
  */
-function isTodayRun(lastRunAt: Record<number, string>) {
+function isTodayRun(lastRunAt: Record<number, string> | undefined) {
   if (!lastRunAt) return false;
   return lastRunAt[TaskConfig.USERID]?.startsWith(
     getPRCDate().toLocaleString('zh-CN').substring(0, 9),

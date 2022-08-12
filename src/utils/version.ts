@@ -5,7 +5,7 @@ import { defHttp } from './http';
 /**
  * 获取最新版本
  */
-async function getLatestVersion(): Promise<string> {
+async function getLatestVersion() {
   const options = {
     timeout: 6000,
   };
@@ -30,7 +30,7 @@ export async function printVersion() {
   if (version.includes('.')) {
     logger.info(`当前版本【__BILI_VERSION__】`);
   } else {
-    version = undefined;
+    version = '';
   }
   try {
     // 如果没有获取到版本，则尝试获取

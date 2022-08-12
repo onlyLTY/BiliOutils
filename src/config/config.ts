@@ -185,9 +185,9 @@ export const defaultConfig = {
     // 30 分钟直播心跳
     liveHeart: false,
     // 白名单
-    whiteList: [],
+    whiteList: [] as number[],
     // 黑名单
-    blackList: [],
+    blackList: [] as number[],
     // 每日亲密度上限 （系统 1500）
     limitFeed: TODAY_MAX_FEED,
   },
@@ -215,7 +215,7 @@ export const defaultConfig = {
     // 执行购买漫画间隔时间（单位天）
     buyInterval: 2,
     // 星期几执行购买漫画
-    buyWeek: [],
+    buyWeek: [] as number[],
   },
   exchangeCoupon: {
     // 兑换漫读券数量

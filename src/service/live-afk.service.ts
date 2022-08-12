@@ -21,7 +21,7 @@ const liveLogger = new Logger(
 export async function liveAFKService(time = 400) {
   for (let index = time / 6; index > 0; index--) {
     const watchTime = await userWatchTime();
-    if (watchTime.duration > 360) break;
+    if (watchTime && watchTime.duration > 360) break;
     await runOneRound();
   }
 }

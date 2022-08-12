@@ -2,17 +2,17 @@ import { ApiBaseProp } from './bili-base-prop';
 
 /** 传递视频播放时长 */
 export interface HeartbeatDto extends ApiBaseProp {
-  data?: null;
+  data: null;
 }
 
 /** 分享 */
 export interface ShareAddDto extends ApiBaseProp {
-  data?: number | null;
+  data: number | null;
 }
 
 /** 投币 */
 export interface AddCoinDto extends ApiBaseProp {
-  data?: {
+  data: {
     like: boolean;
   };
 }

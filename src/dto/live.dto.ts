@@ -3,12 +3,12 @@ import { ApiBaseProp, DoubleMessageProp, PureDataProp } from './bili-base-prop';
 
 /** 直播签到 */
 export interface LiveSignDto extends ApiBaseProp {
-  data?: { text: string; hadSignDays: number; specialText: string } | null;
+  data: { text: string; hadSignDays: number; specialText: string };
 }
 
 /** 直播签到信息 */
 export interface LiveSignInfoDto extends ApiBaseProp {
-  data?: {
+  data: {
     text: string;
     hadSignDays: number;
     specialText: string;

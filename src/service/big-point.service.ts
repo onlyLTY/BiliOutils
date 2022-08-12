@@ -15,8 +15,8 @@ import {
   apiDelay,
   getRandomItem,
   getUnixTime,
+  isDef,
   isToday,
-  isUnDef,
   Logger,
   logger,
   random,
@@ -35,6 +35,7 @@ async function getTaskStatus() {
     const { code, data, message } = await getTaskCombine();
     if (code !== 0) {
       logger.error(`查看当前状态失败: ${code} ${message}`);
+      return;
     }
     return data;
   } catch (error) {
@@ -70,7 +71,7 @@ export async function bigPointService() {
   return await printPoint();
 }
 
-type TaskStatus = UnPromisify<ReturnType<typeof getTaskStatus>>;
+type TaskStatus = Defined<UnPromisify<ReturnType<typeof getTaskStatus>>>;
 
 async function bigPointTask(taskStatus: TaskStatus) {
   const { task_info } = taskStatus;
@@ -91,7 +92,7 @@ async function bigPointTask(taskStatus: TaskStatus) {
 /**
  * 完成每日任务
  */
-async function doDailyTask(taskStatus: TaskStatus) {
+async function doDailyTask(taskStatus: TaskStatus | undefined) {
   if (!taskStatus || !taskStatus.task_info) return;
   const TaskItems = taskStatus.task_info.modules?.at(-1)?.common_task_item;
   if (!TaskItems) {
@@ -321,7 +322,7 @@ async function getPoint() {
 
 async function printPoint() {
   const todayPoint = await getPoint();
-  if (isUnDef(todayPoint)) return;
+  if (!isDef(todayPoint)) return;
   if (todayPoint < 75) {
     logger.error(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
   } else {

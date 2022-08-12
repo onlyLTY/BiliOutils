@@ -26,7 +26,7 @@ function getLevelValues(level: LevelType = 'info') {
   return levelIndex !== -1 ? LEVEL_VALUE.slice(0, levelIndex + 1) : LEVEL_VALUE;
 }
 
-function getLogLevel(level: LevelType | boolean) {
+function getLogLevel(level: LevelType | boolean | undefined) {
   if (isBoolean(level)) {
     return level ? LEVEL_VALUE : [];
   }
@@ -98,7 +98,7 @@ export class SimpleLogger {
     return Object.assign(this.options, options);
   }
 
-  public log({ level }: LogOptions, message: MessageType, emoji?: string) {
+  public log({ level = 'info' }: LogOptions, message: MessageType, emoji?: string) {
     emoji = emoji || SimpleLogger.emojis[level];
     const prcTime = getPRCDate(),
       stderr = ['error', 'warn'].includes(level),

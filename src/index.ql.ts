@@ -6,6 +6,9 @@ process.env.IS_QING_LONG = 'true';
 (async () => {
   if (isArg('config')) {
     const configs = await config();
+    if (!configs) {
+      return;
+    }
     const taskArg = getArg('task');
     await waitForArgs();
     if (taskArg) {
