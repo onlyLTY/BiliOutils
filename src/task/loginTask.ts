@@ -23,7 +23,7 @@ function setLevelInfo(data: UserNavData) {
   const levelInfo = data.level_info;
   const currentLevel = levelInfo.current_level;
   // 判断当前等级是否还需要投币
-  if (currentLevel >= TaskConfig.coin.targetLevel && TaskConfig.limit.coins5) {
+  if (currentLevel >= TaskConfig.coin.targetLevel && TaskConfig.limit.level6) {
     TaskModule.coinsTask = 0;
   }
   logger.info(`当前等级: ${levelInfo.current_level}`);

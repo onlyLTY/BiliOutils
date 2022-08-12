@@ -4,6 +4,7 @@ import type {
   RegionRankingVideosDto,
   DonatedCoinsForVideoDto,
   HeartbeatDto,
+  RecommendVideoDto,
 } from '../dto/video.dto';
 import { biliApi } from './api';
 import { TaskConfig } from '../config/globalVar';
@@ -32,6 +33,15 @@ export function getRegionRankingVideos(rid = 1, day = 3): Promise<RegionRankingV
       day,
     },
   });
+}
+
+/**
+ * 获取推荐视频列表
+ */
+export function getRecommendVideos(ps = 2) {
+  return biliApi.get<RecommendVideoDto>(
+    `x/web-interface/index/top/rcmd?fresh_type=12&version=1&ps=${ps}`,
+  );
 }
 
 /**

@@ -25,6 +25,9 @@ declare global {
 
   // 一定已经定义了
   type Defined<T> = T extends undefined ? never : T;
+
+  // 将值作为类型
+  type ValueOf<T> = T[keyof T];
 }
 
 export {};

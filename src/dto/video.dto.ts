@@ -61,3 +61,50 @@ export interface VideoByUpDto extends ApiBaseProp {
     }>;
   };
 }
+
+/**
+ * 推荐视频
+ */
+export type RecommendVideoDto = ApiBaseProp<{
+  item: RecommendVideo[];
+  business_card?: any;
+  floor_info?: any;
+  user_feature: string;
+  abtest: {
+    group: string;
+  };
+  preload_expose_pct: number;
+  preload_floor_expose_pct: number;
+}>;
+
+interface RecommendVideo {
+  id: number;
+  bvid: string;
+  cid: number;
+  goto: string;
+  uri: string;
+  pic: string;
+  title: string;
+  duration: number;
+  pubdate: number;
+  owner: {
+    mid: number;
+    name: string;
+    face: string;
+  };
+  stat: {
+    view: number;
+    like: number;
+    danmaku: number;
+  };
+  av_feature: string;
+  is_followed: number;
+  rcmd_reason: {
+    reason_type: number;
+  };
+  show_info: number;
+  track_id: string;
+  pos: number;
+  room_info?: any;
+  ogv_info?: any;
+}

@@ -5,6 +5,8 @@ import type {
   VideoRelationDto,
   VideoStatusDto,
   AudioCoinDto,
+  AudioCoinNumDto,
+  ArticleInfoDto,
 } from '../dto/coin.dto';
 import type { AddCoinDto } from '../dto/video.dto';
 import type { IdType } from '../types';
@@ -17,7 +19,7 @@ import { TaskConfig } from '../config/globalVar';
  * @param mid 用户 id
  */
 export function getUserNavNum(mid: IdType): Promise<UserNavNumDto> {
-  return biliApi.get(`/x/space/navnum?mid=${mid}`);
+  return biliApi.get(`x/space/navnum?mid=${mid}`);
 }
 
 /**
@@ -33,7 +35,7 @@ export function searchVideosByUpId(
   pageNumber = 1,
   keyword = '',
 ): Promise<VideoSearchDto> {
-  return biliApi.get('/x/space/arc/search', {
+  return biliApi.get('x/space/arc/search', {
     params: {
       jsonp: 'jsonp',
       order: 'pubdate',
@@ -57,7 +59,7 @@ export function searchAudiosByUpId(
   pageSize = 30,
   pageNumber = 1,
 ): Promise<AudioSearchDto> {
-  return biliApi.get('/audio/music-service/web/song/upper', {
+  return biliApi.get('audio/music-service/web/song/upper', {
     params: {
       jsonp: 'jsonp',
       order: 1,
@@ -79,7 +81,7 @@ export function searchArticlesByUpId(
   pageSize = 12,
   pageNumber = 1,
 ): Promise<ArticleSearchDto> {
-  return biliApi.get('/x/space/article', {
+  return biliApi.get('x/space/article', {
     params: {
       callback: '__test',
       jsonp: 'jsonp',
@@ -95,15 +97,15 @@ export function searchArticlesByUpId(
 }
 
 interface VideoId {
-  aid: IdType;
-  bvid: string;
+  aid?: IdType;
+  bvid?: string;
 }
 
 /**
  * relation 已经对视频的操作
  */
 export function getVideoRelation({ aid, bvid }: VideoId): Promise<VideoRelationDto> {
-  return biliApi.get('/x/web-interface/archive/relation', {
+  return biliApi.get('x/web-interface/archive/relation', {
     params: {
       aid,
       bvid,
@@ -113,11 +115,14 @@ export function getVideoRelation({ aid, bvid }: VideoId): Promise<VideoRelationD
 
 /**
  * 视频状态
- * @param aid
- * @param bvid
  */
-export function getVideoStatus({ aid = '', bvid = '' }: VideoId): Promise<VideoStatusDto> {
-  return biliApi.get(`/x/web-interface/archive/stat?aid=${aid}&bvid=${bvid}`);
+export function getVideoStatus({ aid, bvid }: VideoId): Promise<VideoStatusDto> {
+  return biliApi.get(`x/web-interface/archive/stat`, {
+    params: {
+      aid,
+      bvid,
+    },
+  });
 }
 
 /**
@@ -131,7 +136,7 @@ export function addCoinForVideo(
   multiply: 1 | 2,
   selectLike: 1 | 2 = 1,
 ): Promise<AddCoinDto> {
-  return biliApi.post('/x/web-interface/coin/add', {
+  return biliApi.post('x/web-interface/coin/add', {
     aid,
     multiply,
     selectLike,
@@ -160,11 +165,27 @@ export function addCoinForAudio(sid: number, coin = 1): Promise<AudioCoinDto> {
  * @param coin
  */
 export function addCoinForArticle(upid: number, aid: number, coin = 1): Promise<AddCoinDto> {
-  return biliApi.post('/x/web-interface/coin/add', {
+  return biliApi.post('x/web-interface/coin/add', {
     aid,
     upid,
     avtype: 2,
     multiply: coin,
     csrf: TaskConfig.BILIJCT,
   });
+}
+
+/**
+ * 获取对音频的投币数量
+ */
+export function getMusicCoin(sid: number) {
+  return biliHttp.get<AudioCoinNumDto>(
+    `https://www.bilibili.com/audio/music-service-c/web/coin/audio?sid=${sid}`,
+  );
+}
+
+/**
+ * 获取对专栏信息
+ */
+export function getArticleInfo(id: number) {
+  return biliApi.get<ArticleInfoDto>(`x/article/viewinfo?id=${id}&mobi_app=pc&from=web`);
 }

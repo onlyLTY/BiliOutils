@@ -118,8 +118,8 @@ export function random(lower?: number, upper?: number, floating?: boolean) {
     upper = lower;
     lower = 0;
   }
-  lower = lower || 0;
-  upper = upper || 1;
+  lower = Number(lower);
+  upper = Number(upper);
   if (lower > upper) {
     const temp = lower;
     lower = upper;
