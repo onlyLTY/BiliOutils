@@ -17,7 +17,7 @@ import {
   uniqueObjectArray,
 } from '@/utils';
 import { readJsonFile } from '@/utils/file';
-import { writeFileSync } from 'fs';
+import { existsSync, writeFileSync } from 'fs';
 import { dirname } from 'path';
 import * as activityRequest from '../net/activity-lottery.request';
 
@@ -252,7 +252,7 @@ async function getActivityList(
  * 读取本地运行状态
  */
 function getLocalStatus() {
-  if (!FILE_PATH) {
+  if (!FILE_PATH || !existsSync(FILE_PATH)) {
     return;
   }
   try {
