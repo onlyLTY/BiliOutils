@@ -1,12 +1,20 @@
-import { apiDelay, getDateString, getPageNum, getRandomItem, logger, random } from '../utils';
+import {
+  apiDelay,
+  getDateString,
+  getPageNum,
+  getRandomItem,
+  isNumber,
+  logger,
+  random,
+} from '../utils';
 import {
   getCoinHistory,
   getDonateCoinExp,
   getFollowings,
   getSpecialFollowings,
 } from '../net/user-info.request';
-import { getRegionRankingVideos } from '../net/video.request';
-import { TaskConfig, TaskModule } from '../config/globalVar';
+import { getRecommendVideos, getRegionRankingVideos } from '../net/video.request';
+import { TaskConfig } from '../config/globalVar';
 import type { FollowingsDto, TagsFollowingsDto } from '../dto/user-info.dto';
 import {
   addCoinForVideo,
@@ -16,14 +24,13 @@ import {
   searchArticlesByUpId,
   searchAudiosByUpId,
   searchVideosByUpId,
+  getVideoRelation,
+  getMusicCoin,
+  getArticleInfo,
 } from '../net/coin.request';
 import type { ApiBaseProp } from '../dto/bili-base-prop';
-
-const TypeEnum = {
-  video: 'video',
-  audio: 'audio',
-  article: 'article',
-};
+import { request } from '@/utils/request';
+import { SourceEnum, TypeEnum } from '@/enums/coin.emum';
 
 // const AidInfoCodeEnum = {
 //   '-2': '获取异常',
@@ -35,13 +42,15 @@ const TypeEnum = {
 export interface AidInfo {
   msg?: string;
   code: number;
-  data: {
-    coinType?: string;
-    id?: number;
-    title?: string;
-    author?: string;
+  data?: {
+    coinType: ValueOf<typeof TypeEnum>;
+    id: number;
+    title: string;
+    author: string;
     message?: string;
     mid?: number; // article 需要
+    /** 1：自制 2：转载 */
+    copyright?: string; // video 需要
   };
 }
 
@@ -84,7 +93,7 @@ function getRandmonNum([video, audio, article]: number[]) {
  * 从关注列表随机获取一个视频
  * @param special 是否只获取特别关注列表
  */
-export async function getAidByFollowing(special = true): Promise<AidInfo> {
+export async function getAidByFollowing(special = false): Promise<AidInfo> {
   try {
     const uid = TaskConfig.USERID;
     const { data, message, code }: ApiBaseProp = await (special
@@ -99,7 +108,6 @@ export async function getAidByFollowing(special = true): Promise<AidInfo> {
       return {
         msg: '没有关注列表',
         code: 1,
-        data: {},
       };
     }
 
@@ -113,13 +121,41 @@ export async function getAidByFollowing(special = true): Promise<AidInfo> {
         ? `未获取到特别关注列表: ${code}-${message}`
         : `未获取到关注列表: ${code}-${message}`,
       code: -1,
-      data: {},
     };
   } catch (error) {
     return {
       msg: error.message,
       code: -2,
-      data: {},
+    };
+  }
+}
+
+/**
+ * 从推荐列表随机获取一个视频
+ */
+export async function getAidByRecommend(): Promise<AidInfo> {
+  try {
+    const { code, data, message } = await getRecommendVideos(4);
+    if (code !== 0) {
+      return {
+        msg: `未获取到首页推荐列表: ${code}-${message}`,
+        code: -1,
+      };
+    }
+    const { id, title, owner } = getRandomItem(data.item);
+    return {
+      code: 0,
+      data: {
+        id,
+        title,
+        coinType: TypeEnum.video,
+        author: owner.name,
+      },
+    };
+  } catch (error) {
+    return {
+      msg: error.message,
+      code: -2,
     };
   }
 }
@@ -133,27 +169,26 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
 
   try {
     const { data, message, code } = await getRegionRankingVideos(rid, 3);
-    if (code == 0) {
-      const { aid, title, author } = getRandomItem(data);
+    if (code !== 0) {
       return {
-        code: 0,
-        data: {
-          id: Number(aid),
-          title,
-          author,
-        },
+        msg: `未获取到排行信息: ${code}-${message}`,
+        code: -1,
       };
     }
+    const { aid, title, author } = getRandomItem(data);
     return {
-      msg: `未获取到排行信息: ${code}-${message}`,
-      code: -1,
-      data: {},
+      code: 0,
+      data: {
+        id: Number(aid),
+        title,
+        coinType: TypeEnum.video,
+        author,
+      },
     };
   } catch (error) {
     return {
       msg: error.message,
       code: -2,
-      data: {},
     };
   }
 }
@@ -166,23 +201,29 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
   if (customizeUp.length === 0) {
     return {
       code: 1,
-      data: {},
+      msg: '没有自定义up主',
     };
   }
-  return await getIdByRandom(getRandomItem(customizeUp));
+  const a = getRandomItem(customizeUp);
+  return await getIdByRandom(a);
 }
 
 /**
  * 获取随机投稿（视频，音频，专栏）
  */
 export async function getIdByRandom(mid: number) {
+  if (!mid) {
+    return {
+      code: 1,
+      msg: '用户id不存在',
+    };
+  }
   try {
     const { code, data, message } = await getUserNavNum(mid);
     if (code) {
       return {
-        msg: `通过uid获取视频失败: ${code}-${message}`,
+        msg: `通过mid获取随机投稿失败: ${code}-${message}`,
         code: -1,
-        data: {},
       };
     }
     await apiDelay();
@@ -192,7 +233,6 @@ export async function getIdByRandom(mid: number) {
       return {
         msg: '用户没有投稿',
         code: 1,
-        data: {},
       };
     }
     const { coinType, page, index } = randmonNumData,
@@ -206,19 +246,17 @@ export async function getIdByRandom(mid: number) {
       return {
         msg: handleData.message,
         code: -1,
-        data: {},
       };
     }
     return {
       code: 0,
-      data: handleData,
+      data: handleData as AidInfo['data'],
     };
   } catch (error) {
     logger.debug(error);
     return {
       msg: error.message,
       code: -2,
-      data: {},
     };
   }
 }
@@ -228,8 +266,8 @@ async function getVideoByRandom(mid: number, page: number, index: number) {
   if (code) {
     return { message };
   }
-  const { aid, title, author } = data.list.vlist[index];
-  return { coinType: TypeEnum.video, id: aid, title, author };
+  const { aid, title, author, copyright } = data.list.vlist[index];
+  return { coinType: TypeEnum.video, id: aid, title, author, copyright };
 }
 
 async function getAudioByRandom(mid: number, page: number, index: number) {
@@ -256,50 +294,57 @@ async function getArticleByRandom(mid: number, page: number, index: number) {
   return { coinType: TypeEnum.article, id, title, author: name, mid };
 }
 
-/**
- * 获取 id 的函数数组
- */
-function getIdFuncArray(): Array<() => Promise<AidInfo>> {
-  const arr = [
-    getAidByCustomizeUp,
-    getAidByFollowing,
-    getAidBySpecialFollowing,
-    getAidByRegionRank,
-  ];
-  //如果没有自定义up则直接删除
-  if (TaskConfig.coin.customizeUp?.length === 0) {
-    arr.shift();
-  }
-  return arr;
+function getAidBySpecialFollowing() {
+  return getAidByFollowing(true);
 }
 
-function getAidBySpecialFollowing() {
-  return getAidByFollowing(false);
-}
+const idFuncArray = [
+  ['customizeUp', getAidByCustomizeUp],
+  ['specialFollow', getAidBySpecialFollowing],
+  ['follow', getAidByFollowing],
+  ['recommend', getAidByRecommend],
+  ['regionRank', getAidByRegionRank],
+] as const;
+export type IdFuncMapKey = typeof idFuncArray[number][0];
+export const idFuncMap = new Map<IdFuncMapKey, () => Promise<AidInfo>>(idFuncArray);
+export const aidFuncName = new (class {
+  private keys = Array.from(idFuncMap.keys());
+  private titles = SourceEnum;
+  value: IdFuncMapKey = 'customizeUp';
+
+  constructor() {
+    if (!TaskConfig.coin.customizeUp?.length) {
+      this.next();
+    }
+  }
+  next() {
+    const index = this.keys.indexOf(this.value) + 1;
+    if (index === this.keys.length) {
+      return (this.value = 'regionRank');
+    }
+    return (this.value = this.keys[index]);
+  }
+  get title() {
+    return this.titles[this.value];
+  }
+})();
 
 /**
  * 按照优先顺序调用不同函数获取aid
  */
 export async function getAidByByPriority() {
-  // 从指定下标开始调用函数
-  const idFunc = getIdFuncByPriority();
+  console.log('aidFuncName.value', aidFuncName.value);
+  console.log('aidFuncName.title', aidFuncName.title);
+  const idFunc = idFuncMap.get(aidFuncName.value);
+  console.log('idFunc', idFunc);
   await apiDelay();
-  return idFunc();
-}
-
-/**
- * 获取获取id的函数数组
- */
-function getIdFuncByPriority() {
-  const idFuncArray = getIdFuncArray();
-  idFuncArray.splice(0, TaskModule.currentStartFun);
-  return idFuncArray[0] || getAidByRegionRank;
+  return idFunc?.() || getAidByRecommend();
 }
 
 // 参数
 export interface CoinToIdParams {
   id: number;
-  coinType?: keyof typeof TypeEnum;
+  coinType?: ValueOf<typeof TypeEnum>;
   coin?: 1 | 2;
   mid: number;
 }
@@ -307,7 +352,7 @@ export interface CoinToIdParams {
 /**
  * 投币给稿件
  */
-export async function coinToId({ id, coin = 1, coinType = 'video', mid }: CoinToIdParams) {
+export async function coinToId({ id, coin = 1, coinType = '视频', mid }: CoinToIdParams) {
   const handle = {
     [TypeEnum.video]: addCoinForVideo,
     [TypeEnum.audio]: addCoinForAudio,
@@ -325,11 +370,11 @@ export async function coinToId({ id, coin = 1, coinType = 'video', mid }: CoinTo
 /**
  * 获取今日投币数量
  */
-export async function getTodayCoinNum() {
+export async function getTodayCoinNum(defCoin?: number) {
   const exp = await getTodayExp();
   if (exp) return exp;
   const coin = await getTodayCoin();
-  return coin || TaskConfig.coin.todayCoins;
+  return coin || defCoin || TaskConfig.coin.todayCoins;
 }
 
 /** 获取已经获得的经验 */
@@ -375,8 +420,40 @@ async function getTodayCoin() {
 /**
  * 获取视频已投币数量
  */
-// export async function getVideoCoinNum(aid: number) {
-//   try {
-//     const { coin } = await request(getVideoRelation, undefined, { aid });
-//   } catch (error) {}
-// }
+async function getVideoCoinNum(aid: number) {
+  const { coin } = await request(getVideoRelation, undefined, { aid });
+  return coin ?? 0;
+}
+
+/**
+ * 获取音频已投币数量
+ */
+async function getAudioCoinNum(sid: number) {
+  const coin = await request(getMusicCoin, undefined, sid);
+  return isNumber(coin) ? coin : 0;
+}
+
+/**
+ * 获取专栏已投币数量
+ */
+async function getArticleCoinNum(id: number) {
+  const { coin } = await request(getArticleInfo, undefined, id);
+  return coin ?? 0;
+}
+
+/**
+ * 获取稿件还能投币数量
+ */
+export async function getContributionCoin(coinType: ValueOf<typeof TypeEnum>, id: number | string) {
+  try {
+    const handle = {
+      [TypeEnum.video]: getVideoCoinNum,
+      [TypeEnum.audio]: getAudioCoinNum,
+      [TypeEnum.article]: getArticleCoinNum,
+    };
+    return handle[coinType](Number(id));
+  } catch (error) {
+    logger.warn(`获取稿件还能投币数量异常 ${error.message}`);
+    return 0;
+  }
+}

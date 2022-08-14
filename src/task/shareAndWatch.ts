@@ -1,6 +1,6 @@
 import { apiDelay, random } from '../utils';
 import { addShare, uploadVideoHeartbeat } from '../net/video.request';
-import { getAidByByPriority, getAidByRegionRank } from '../service/coin.service';
+import { getAidByByPriority, getAidByRecommend } from '../service/coin.service';
 import { TaskModule } from '../config/globalVar';
 import { logger } from '../utils/log';
 import { request } from '@/utils/request';
@@ -16,27 +16,15 @@ export default async function shareAndWatch() {
     logger.info('已完成，跳过分享/播放');
     return;
   }
-  let gAid: number | string = 0;
-  //获取aid
-  try {
-    const biliav = await getVideo();
-    if (biliav.code === 0) {
-      const { id, author, title } = biliav.data;
-      gAid = id!;
-      logger.info(`获取视频: ${title} --up【${author}】`);
-    } else {
-      logger.warn(`获取视频失败 ${biliav.msg}`);
-      return false;
-    }
-  } catch (error) {
-    logger.error(`获取视频出现异常: ${error.message}`);
-    return false; //不再执行
+  const aid = TaskModule.videoAid || (await getVideoAid());
+  if (!aid) {
+    return;
   }
 
   //分享
   if (!TaskModule.share) {
     await apiDelay();
-    await request(addShare, { name: '分享视频', okMsg: '分享视频成功！' }, gAid);
+    await request(addShare, { name: '分享视频', okMsg: '分享视频成功！' }, aid);
   }
 
   //播放视频
@@ -46,7 +34,7 @@ export default async function shareAndWatch() {
     await request(
       uploadVideoHeartbeat,
       { name: '播放视频', okMsg: '播放视频成功！' },
-      gAid,
+      aid,
       random(4, 60),
     );
   }
@@ -59,11 +47,29 @@ export async function getVideo() {
   for (let errCount = 5; errCount > 0; errCount--) {
     const biliav = await getAidByByPriority();
     if (biliav.code !== 0) {
-      return await getAidByRegionRank();
+      return await getAidByRecommend();
     }
-    if (biliav && biliav.data.coinType === 'video') {
+    if (biliav && biliav.data?.coinType === '视频') {
       return biliav;
     }
   }
-  return await getAidByRegionRank();
+  return await getAidByRecommend();
+}
+
+async function getVideoAid() {
+  // 获取aid
+  try {
+    const biliav = await getVideo();
+    if (biliav.code === 0) {
+      const { id, author, title } = biliav.data || {};
+      logger.debug(`获取视频: ${title} --up【${author}】`);
+      return id;
+    } else {
+      logger.warn(`获取视频失败 ${biliav.msg}`);
+      return;
+    }
+  } catch (error) {
+    logger.error(`获取视频出现异常: ${error.message}`);
+    return;
+  }
 }

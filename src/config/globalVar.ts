@@ -37,8 +37,6 @@ abstract class TaskModuleTemplate {
   static share = false;
   /**今日是否已经观看视频 */
   static watch = false;
-  /** 确定获取aid的函数开始下标 */
-  static currentStartFun = 0;
   /** B币券余额 */
   static bCoinCouponBalance = 0;
   /** 0为无，1为月度，2为年度 */
@@ -51,6 +49,8 @@ abstract class TaskModuleTemplate {
   static userLevel = 0;
   /** 用户昵称 */
   static nickname: string;
+  /** 用于观看的 aid */
+  static videoAid: number;
 }
 
 export let TaskModule: typeof TaskModuleTemplate;

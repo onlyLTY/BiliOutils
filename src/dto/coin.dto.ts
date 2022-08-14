@@ -3,22 +3,20 @@ import type { ApiBaseProp } from './bili-base-prop';
 /**
  * 用户导航数量（视频，音频，相册...）
  */
-export interface UserNavNumDto extends ApiBaseProp {
-  data: {
-    video: number;
-    bangumi: number;
-    cinema: number;
-    channel: Channel;
-    favourite: Favourite;
-    tag: number;
-    article: number;
-    playlist: number;
-    album: number;
-    audio: number;
-    pugv: number;
-    season_num: number;
-  };
-}
+export type UserNavNumDto = ApiBaseProp<{
+  video: number;
+  bangumi: number;
+  cinema: number;
+  channel: Channel;
+  favourite: Favourite;
+  tag: number;
+  article: number;
+  playlist: number;
+  album: number;
+  audio: number;
+  pugv: number;
+  season_num: number;
+}>;
 
 interface Channel {
   master: number;
@@ -33,23 +31,21 @@ interface Favourite {
 /**
  * 用户视频信息
  */
-export interface VideoSearchDto extends ApiBaseProp {
-  data: {
-    list: {
-      tlist: Tlist;
-      vlist: Vlist[];
-    };
-    page: {
-      pn: number;
-      ps: number;
-      count: number;
-    };
-    episodic_button: {
-      text: string;
-      uri: string;
-    };
+export type VideoSearchDto = ApiBaseProp<{
+  list: {
+    tlist: Tlist;
+    vlist: Vlist[];
   };
-}
+  page: {
+    pn: number;
+    ps: number;
+    count: number;
+  };
+  episodic_button: {
+    text: string;
+    uri: string;
+  };
+}>;
 
 interface Tlist {
   [key: number]: {
@@ -66,6 +62,7 @@ interface Vlist {
   pic: string;
   subtitle: string;
   description: string;
+  /**  1：自制 2：转载 */
   copyright: string;
   title: string;
   review: number;
@@ -114,58 +111,54 @@ export interface AudioSearchDto {
 /**
  * 用户专栏信息
  */
-export interface ArticleSearchDto extends ApiBaseProp {
-  data: {
-    pn: number;
-    ps: number;
-    count: number;
-    articles: {
-      id: number;
-      title: string;
-      author: {
-        mid: number;
-        name: string;
-      };
-    }[];
-  };
-}
+export type ArticleSearchDto = ApiBaseProp<{
+  pn: number;
+  ps: number;
+  count: number;
+  articles: {
+    id: number;
+    title: string;
+    author: {
+      mid: number;
+      name: string;
+    };
+  }[];
+}>;
 
 /**
  * 视频关系
  */
-export interface VideoRelationDto extends ApiBaseProp {
-  data: {
-    attention: boolean;
-    favorite: boolean;
-    season_fav: boolean;
-    like: boolean;
-    dislike: boolean;
-    coin: number;
-  };
-}
+export type VideoRelationDto = ApiBaseProp<{
+  attention: boolean;
+  /** 收藏 */
+  favorite: boolean;
+  season_fav: boolean;
+  like: boolean;
+  dislike: boolean;
+  /** 已投币数量 */
+  coin: number;
+}>;
 
 /**
  * 视频状态
  */
-export interface VideoStatusDto extends ApiBaseProp {
-  data: {
-    aid: number;
-    bvid: string;
-    view: number;
-    danmaku: number;
-    reply: number;
-    favorite: number;
-    coin: number;
-    share: number;
-    like: number;
-    now_rank: number;
-    his_rank: number;
-    no_reprint: 0 | 1;
-    copyright: 1 | 2;
-    argue_msg: '';
-    evaluation: '';
-  };
-}
+export type VideoStatusDto = ApiBaseProp<{
+  aid: number;
+  bvid: string;
+  view: number;
+  danmaku: number;
+  reply: number;
+  favorite: number;
+  coin: number;
+  share: number;
+  like: number;
+  now_rank: number;
+  his_rank: number;
+  no_reprint: 0 | 1;
+  copyright: 1 | 2;
+  argue_msg: '';
+  evaluation: '';
+}>;
 
 /**
  * 音频投币
@@ -175,3 +168,55 @@ export interface AudioCoinDto {
   msg: string;
   data: string;
 }
+
+/**
+ * 音频的投币数量
+ */
+export type AudioCoinNumDto = {
+  code: number;
+  msg: string;
+  data: number;
+};
+
+/**
+ * 专栏信息
+ */
+export type ArticleInfoDto = ApiBaseProp<{
+  // 下面是用户的行为
+  like: number;
+  attention: boolean;
+  favorite: boolean;
+  coin: number;
+  // 这是专栏的信息
+  stats: {
+    view: number;
+    favorite: number;
+    like: number;
+    dislike: number;
+    reply: number;
+    share: number;
+    coin: number;
+    dynamic: number;
+  };
+  title: string;
+  banner_url: string;
+  mid: number;
+  author_name: string;
+  is_author: boolean;
+  image_urls: string[];
+  origin_image_urls: string[];
+  shareable: boolean;
+  show_later_watch: boolean;
+  show_small_window: boolean;
+  in_list: boolean;
+  pre: number;
+  next: number;
+  share_channels: {
+    name: string;
+    picture: string;
+    share_channel: string;
+  }[];
+  type: number;
+  video_url: string;
+  location: string;
+}>;
