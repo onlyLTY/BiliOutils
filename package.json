@@ -1,6 +1,6 @@
 {
   "name": "@catlair/bilitools",
-  "version": "0.5.0",
+  "version": "9.9.9",
   "description": "this is BiliTools",
   "main": "dist/main.js",
   "types": [

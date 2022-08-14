@@ -75,8 +75,8 @@ export function checkVersion(version: string, latestTag: string) {
   if (version === latestTag) {
     return false;
   }
-  const versionArr = version.split('.'),
-    latestTagArr = latestTag.split('.');
+  const versionArr = version.split('.').slice(0, 3),
+    latestTagArr = latestTag.split('.').slice(0, 3);
   for (let i = 0; i < versionArr.length; i++) {
     const versionNum = parseInt(versionArr[i]),
       latestTagNum = parseInt(latestTagArr[i]);
@@ -85,6 +85,9 @@ export function checkVersion(version: string, latestTag: string) {
     }
     if (versionNum < latestTagNum) {
       return true;
+    }
+    if (versionNum > latestTagNum) {
+      return false;
     }
   }
   return false;
