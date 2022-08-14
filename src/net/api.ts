@@ -1,15 +1,17 @@
 import { TaskConfig } from '@/config/globalVar';
-import { baseURLs, RefererURLs } from '../constant/biliUri';
+import { baseURLs, OriginURLs, RefererURLs } from '../constant/biliUri';
 import { biliHttp, createRequest, defHttp } from '../utils/http';
 
-const accountApi = createRequest({
+export { biliHttp, defHttp };
+
+export const accountApi = createRequest({
   baseURL: baseURLs.account,
   headers: {
     'user-agent': TaskConfig.userAgent,
   },
 });
 
-const liveApi = createRequest({
+export const liveApi = createRequest({
   baseURL: baseURLs.live,
   headers: {
     Referer: RefererURLs.www,
@@ -17,7 +19,7 @@ const liveApi = createRequest({
   },
 });
 
-const biliApi = createRequest({
+export const biliApi = createRequest({
   baseURL: baseURLs.api,
   headers: {
     Referer: RefererURLs.www,
@@ -25,14 +27,14 @@ const biliApi = createRequest({
   },
 });
 
-const mangaApi = createRequest({
+export const mangaApi = createRequest({
   baseURL: baseURLs.manga,
   headers: {
     'user-agent': TaskConfig.userAgent,
   },
 });
 
-const vcApi = createRequest({
+export const vcApi = createRequest({
   baseURL: baseURLs.vc,
   headers: {
     'user-agent': TaskConfig.userAgent,
@@ -40,11 +42,18 @@ const vcApi = createRequest({
   },
 });
 
-const liveTraceApi = createRequest({
+export const liveTraceApi = createRequest({
   baseURL: baseURLs.liveTrace,
   headers: {
     'user-agent': TaskConfig.userAgent,
   },
 });
 
-export { biliApi, vcApi, accountApi, mangaApi, liveApi, biliHttp, defHttp, liveTraceApi };
+export const passportApi = createRequest({
+  baseURL: baseURLs.passport,
+  headers: {
+    'user-agent': TaskConfig.userAgent,
+    Referer: RefererURLs.www,
+    Origin: OriginURLs.www,
+  },
+});

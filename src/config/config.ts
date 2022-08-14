@@ -17,7 +17,7 @@ export type TheConfig = Omit<DefaultConfig, keyof typeof compatibleMap>;
 export const defaultConfig = {
   cookie: '',
   accessKey: '',
-  // acTimeValue: '',
+  acTimeValue: '',
   // accessRefreshToken: '',
   message: {
     br: '\n',
@@ -100,19 +100,6 @@ export const defaultConfig = {
   /**【可选】用户代理(浏览器) */
   userAgent: '',
   dailyRunTime: DAILY_RUN_TIME,
-  // 老的配置
-  // 全部是 undefined 是为了更好的合并
-  targetLevel: undefined,
-  stayCoins: undefined,
-  targetCoins: undefined,
-  customizeUp: undefined,
-  giftUp: undefined,
-  chargeUpId: undefined,
-  chargePresetTime: undefined,
-  matchCoins: undefined,
-  matchSelection: undefined,
-  matchDiff: undefined,
-  // 新的配置方式
   match: {
     /** 压硬币数量 */
     coins: 5,

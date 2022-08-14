@@ -23,6 +23,7 @@ export const baseURLs = {
   manga: 'https://manga.bilibili.com',
   vc: 'https://api.vc.bilibili.com',
   liveTrace: 'https://live-trace.bilibili.com',
+  passport: 'https://passport.bilibili.com',
 };
 
 export const defaultHeaders = {

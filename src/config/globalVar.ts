@@ -1,9 +1,10 @@
 import type { Config } from '../types';
 import { getConfig } from './setConfig';
-import { mergeConfig } from './config';
+import { mergeConfig, setCookieValue } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
 import { encodeCookie, getCookie } from '@/utils/cookie';
 import { getBuvid } from '@/utils/pure';
+import { isString } from '@/utils/is';
 
 type TaskConfigType = Config & {
   mobileUA: string;
@@ -23,7 +24,12 @@ export const TaskConfig = new Proxy({} as TaskConfigType, {
       initialize(value);
       return true; // 否则 config 会被覆盖
     }
-    return Reflect.set(_taskConfig, key, value);
+    const r = Reflect.set(_taskConfig, key, value);
+    if (key === 'cookie' && r && isString(value)) {
+      // 修改 cookie 后需要重新设置一次从 cookie 中获取的值
+      setCookieValue(_taskConfig, value);
+    }
+    return r;
   },
 });
 
