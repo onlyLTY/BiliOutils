@@ -186,7 +186,6 @@ function coinSuccessHandle(state: State, { author, id, coinType }: IdInfo, coin:
   TaskModule.money -= coin;
   TaskModule.coinsTask -= coin;
   state.num += coin;
-  console.log(aidFuncName.value, aidFuncName.title);
   logger.info(`给${aidFuncName.title}【${author}】的${coinType}：${id} 投币${coin}颗`);
   return false;
 }

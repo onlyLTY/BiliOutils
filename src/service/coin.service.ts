@@ -333,10 +333,7 @@ export const aidFuncName = new (class {
  * 按照优先顺序调用不同函数获取aid
  */
 export async function getAidByByPriority() {
-  console.log('aidFuncName.value', aidFuncName.value);
-  console.log('aidFuncName.title', aidFuncName.title);
   const idFunc = idFuncMap.get(aidFuncName.value);
-  console.log('idFunc', idFunc);
   await apiDelay();
   return idFunc?.() || getAidByRecommend();
 }
