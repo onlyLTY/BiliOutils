@@ -17,6 +17,7 @@ export function readJsonFile<T = any>(filePath: string): T | undefined {
       return JSON5.parse(content);
     }
   } catch (error) {
+    defLogger.debug(`加载路径为 ${filePath} 的文件失败`);
     defLogger.error(error);
     jsonErrorHandle(error.message);
   }
@@ -36,13 +37,16 @@ export function jsonErrorHandle(message: string) {
  * 通过用户 id 匹配并替换 cookie
  */
 export function replaceAllCookie(filePath: string, userId: number | string, newCookie: string) {
+  if (!filePath) return;
   try {
     const content = readFileSync(filePath, 'utf-8');
     const DedeUserID = `DedeUserID=${userId}`;
-    const reg = new RegExp(`['"](.*${DedeUserID}.*)['"]`, 'g');
+    const reg = new RegExp(`['"]?cookie['"]?:\\s?['"](.*${DedeUserID}.*)['"]`, 'g');
     const newJson5 = content.replaceAll(reg, substring => {
-      const quote = substring.at(0);
-      return `${quote}${newCookie}${quote}`;
+      let quote = substring.at(0) || '';
+      /['"]/.test(quote) || (quote = '');
+      const quote2 = substring.match(/^['"]?cookie['"]?:\s?(['"])/)?.[1] || '"';
+      return `${quote}cookie${quote}: ${quote2}${newCookie}${quote2}`;
     });
     writeFileSync(filePath, newJson5);
     return true;
