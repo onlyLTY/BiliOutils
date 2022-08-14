@@ -58,11 +58,9 @@ async function getMangaEpList(comic_id: number) {
     if (!data || !data.ep_list) {
       return;
     }
-    let epList = data.ep_list;
-    if (data.disable_coupon_amount !== 0) {
-      // 去掉没有漫读券的章节
-      epList = epList.slice(0, epList.length - data.disable_coupon_amount);
-    }
+    const { disable_coupon_amount, ep_list } = data;
+    // 去掉没有漫读券的章节
+    const epList = disable_coupon_amount ? ep_list.slice(disable_coupon_amount) : ep_list;
     return epList.filter(ep => ep.is_locked);
   } catch (error) {
     logger.error(`获取漫画详情异常: ${error}`);
@@ -83,8 +81,9 @@ async function getBuyCoupon(ep_id: number) {
     if (!data) {
       return;
     }
+    if (!data.is_locked) return;
     if (!data.allow_coupon) {
-      logger.info('漫画不支持漫读券');
+      logger.info(`漫画 ${ep_id} 不支持漫读券`);
       return;
     }
     if (data.recommend_coupon_id === 0 || data.remain_coupon === 0) {
@@ -93,6 +92,7 @@ async function getBuyCoupon(ep_id: number) {
       return;
     }
     if (!data.remain_lock_ep_num) {
+      logger.info(`漫画${data.comic_id}已经全部购买了`);
       return;
     }
     return data.recommend_coupon_id;
