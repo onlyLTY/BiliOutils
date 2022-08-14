@@ -116,7 +116,11 @@ function setConfig() {
 }
 
 export function getConfig<T extends boolean>(more?: T): T extends false ? Config : Config[] {
-  return checkConfig(setConfig(), more);
+  const config = checkConfig(setConfig(), more);
+  if (isArray(config) && config.length === 0) {
+    logger.error('配置文件为空，或配置的cookie缺少三要素（bili_jct, SESSDATA, DedeUserID）！');
+  }
+  return config;
 }
 
 /** 检查 config */

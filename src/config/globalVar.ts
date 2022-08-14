@@ -62,7 +62,7 @@ export function initialize(config?: Config) {
   // TODO: 配置方式兼容
   const userConfig = mergeConfig(config) as Config;
 
-  const buvid = getBuvid();
+  const buvid = getCookieBuvid(userConfig.cookie);
 
   _taskConfig = {
     ...userConfig,
@@ -72,6 +72,12 @@ export function initialize(config?: Config) {
   };
   TaskModule = class extends TaskModuleTemplate {};
   TaskModule.coinsTask = _taskConfig.coin.targetCoins;
+}
+
+function getCookieBuvid(cookie: string) {
+  const buvid = getCookie(cookie, 'Buvid');
+  if (buvid) return buvid;
+  return getBuvid();
 }
 
 /**
