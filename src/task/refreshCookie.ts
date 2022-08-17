@@ -13,3 +13,7 @@ export default async function refreshCookie() {
     logger.error(`刷新 cookie 异常: ${error}`);
   }
 }
+
+(async () => {
+  refreshCookieService();
+})();

@@ -1,5 +1,5 @@
 import * as cookieReq from '@/net/cookie.request';
-import { wasmInit } from '@/wasm/wasm_rsa_umd';
+import { defaultFunc, encrypt } from '@/wasm/wasm_rsa_umd';
 import { logger, sleep } from '@/utils';
 import { TaskConfig } from '@/config/globalVar';
 
@@ -22,12 +22,21 @@ async function getCookieInfo() {
 }
 
 async function getCorrespondCode(timestamp: number) {
-  await wasmInit.default();
-  return wasmInit.encrypt({
+  // await wasmInit.default();
+  await defaultFunc();
+  return encrypt({
     data: convertToHex(`refresh_${timestamp}`),
     digest: 'SHA256',
   });
 }
+
+(async () => {
+  const str = await getCorrespondCode(123);
+  console.log(
+    str ===
+      '2850e91ff7a03c09f4ed894fb3392180b901f5ca8d3180a955941f48b970995a5db5b43f146931a0844f1f695e6ba9688444b4e4fe32785a34168e6a1a3db7b7af22c8b85368208d2915ff25d5388ff861f8d5829bf12f752a28ecd6d3488cf70280b25ae3011f8a502ab76327511992e9babd590718869af1ba2ffd0b9149ad',
+  );
+})();
 
 export async function getRefreshCsrf() {
   const timestamp = await getCookieInfo();
