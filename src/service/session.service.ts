@@ -1,12 +1,12 @@
 import type { Sessionlist, SessionMessage10Dto } from '@/dto/session.dto';
-import { TaskConfig } from '@/config/globalVar';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
 import { deleteSession, getSession, getSessionHistory, readSession } from '@/net/session.request';
-import { apiDelay, isBoolean, logger } from '@/utils';
+import { apiDelay, isBoolean, logger, pushIfNotExist } from '@/utils';
 import { User } from './tags.service';
 import { request } from '@/utils/request';
 
 // 直播小喇叭是否存在未读信息
-let liveLoudspeakerNow;
+let liveLoudspeakerNow: boolean;
 
 /**
  * 判断时间戳是否是 n 小时内
@@ -130,5 +130,6 @@ export async function printLiveUserSession() {
   if (messages.length <= 0) {
     return;
   }
+  pushIfNotExist(TaskModule.pushTitle, '【天选】');
   messages.forEach(message => logger.info(`【最近 48 小时可能中奖的消息】：${message}`));
 }

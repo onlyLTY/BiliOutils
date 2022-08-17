@@ -61,6 +61,7 @@ async function getOnePrivilege(type: number): Promise<boolean> {
 
 async function getPrivilege(type: number) {
   if (![1, 3].includes(type)) {
+    logger.info('跳过（已领取30天有效期的）');
     return;
   }
   let errCount = 0,

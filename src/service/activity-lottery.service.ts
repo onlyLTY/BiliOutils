@@ -1,4 +1,4 @@
-import { TaskConfig } from '@/config/globalVar';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
 import { ActivityLotteryStatus } from '@/enums/activity-lottery.emumm';
 import { defHttp } from '@/net/api';
 import { ActivityLotteryIdType } from '@/types';
@@ -128,6 +128,7 @@ export async function doLottery({ sid, title }: ActivityLotteryIdType) {
         return false;
       }
       logger.info(`【${title}】中奖【${gift_name}】`);
+      pushIfNotExist(TaskModule.pushTitle, '【转盘】');
       return;
     }
     logger.warn(`【${title}】抽奖失败 ${code} ${message}`);
@@ -229,6 +230,7 @@ async function getActivityList(
 ): Promise<ActivityLotteryIdType[] | undefined> {
   const { isRequest } = TaskConfig.activityLottery;
   if (!isRequest) {
+    logger.info(`用户想要自己管理活动，不需要请求活动列表`);
     return;
   }
   logger.verbose(`通过网络获取活动列表`);

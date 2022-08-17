@@ -30,18 +30,16 @@ function setLevelInfo(data: UserNavData) {
   if (currentLevel < 6) {
     const upLevelExp = levelInfo.next_exp - levelInfo.current_exp;
     // 实际天数肯定会少一些
-    logger.info(
-      `距离升级还需要 ${upLevelExp} 经验，预计 ${estimatedDays(upLevelExp).toFixed(2)} 天`,
-    );
+    logger.info(`距升级还需 ${upLevelExp} 经验，预计 ${estimatedDays(upLevelExp).toFixed(2)} 天`);
     return;
   }
   if (TaskConfig.limit.level6) {
-    logger.info('已经满级，不需要再投币了，做个白嫖怪吧（关闭部分功能）');
+    logger.info('已经满级（关闭部分功能）');
     const funcs = TaskConfig.function;
     funcs.shareAndWatch = false;
     funcs.addCoins = false;
   } else {
-    logger.info('已经满级，但设置要求继续获取经验（投币，分享等）');
+    logger.info('已经满级，但要求继续（投币，分享等）');
   }
 }
 

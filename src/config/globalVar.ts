@@ -51,6 +51,8 @@ abstract class TaskModuleTemplate {
   static nickname: string;
   /** 用于观看的 aid */
   static videoAid: number;
+  /** 推送消息标题附加 */
+  static pushTitle: string[] = [];
 }
 
 export let TaskModule: typeof TaskModuleTemplate;

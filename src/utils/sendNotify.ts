@@ -763,5 +763,8 @@ export async function sendMessage(title: string, text: string) {
   logger.info('----【消息推送】----');
   // 处理 title
   title = `Bili-${conciseNickname(TaskModule?.nickname) || TaskConfig.USERID}-${title}`;
+  if (TaskModule.pushTitle.length) {
+    title = `${title}-${TaskModule.pushTitle.join('')}`;
+  }
   await sendNotify(title, text, undefined, '');
 }

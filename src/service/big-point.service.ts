@@ -26,6 +26,7 @@ import { TaskConfig, TaskModule } from '@/config/globalVar';
 const bigLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'big-point');
 
 let isRetry = false;
+let isError = false;
 
 /**
  * 查看当前状态
@@ -45,6 +46,7 @@ async function getTaskStatus() {
 
 export async function bigPointService() {
   isRetry = false;
+  isError = false;
   const taskStatus = await getTaskStatus();
   if (!taskStatus) {
     return;
@@ -78,6 +80,7 @@ async function bigPointTask(taskStatus: TaskStatus) {
   const signCode = await sign(task_info.sing_task_item?.histories);
   if (signCode === -401) {
     logger.error('出现非法访问异常，可能账号存在异常，放弃大积分任务');
+    isError = true;
     return;
   }
   await apiDelay(100, 200);
@@ -237,6 +240,7 @@ async function sign(histories: SingTaskHistory[]) {
       return code;
     }
     logger.error(`签到失败: ${code} ${message}`);
+    isError = true;
     return code;
   } catch (error) {
     logger.error(error);
@@ -323,9 +327,12 @@ async function getPoint() {
 async function printPoint() {
   const todayPoint = await getPoint();
   if (!isDef(todayPoint)) return;
-  if (todayPoint < 75) {
-    logger.error(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
-  } else {
+  if (todayPoint > 75) {
     logger.info(`今日获取积分【${todayPoint}】√`);
+    return;
+  }
+  logger.error(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
+  if (todayPoint === 0 && !isError) {
+    logger.info('可能是完成获取，但是接口数据延迟。');
   }
 }
