@@ -2,10 +2,10 @@ import type { Config } from '../types';
 import { getConfig } from './setConfig';
 import { mergeConfig } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
-import { encodeCookie, getCookie } from '@/utils/cookie';
+import getCookie, { encodeCookie, getCookieItem } from '@/utils/cookie';
 import { getBuvid } from '@/utils/pure';
 
-type TaskConfigType = Config & {
+export type TaskConfigType = Config & {
   mobileUA: string;
   buvid: string;
 };
@@ -77,8 +77,8 @@ export function initialize(config?: Config) {
 }
 
 function getCookieBuvid(cookie: string) {
-  const buvid = getCookie(cookie, 'Buvid');
-  if (buvid) return buvid;
+  const buvid = getCookieItem(cookie, 'Buvid');
+  if (buvid && buvid !== 'undefined') return buvid;
   return getBuvid();
 }
 
