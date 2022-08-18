@@ -81,7 +81,7 @@ async function setUserInfo(data: UserNavData) {
     TaskModule.nickname = data.uname;
     TaskModule.money = money || 0;
     TaskModule.userLevel = data.level_info.current_level;
-    TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
+    TaskModule.couponBalance = data.wallet?.coupon_balance || 0;
 
     setLevelInfo(data);
     setVipStatus(data);

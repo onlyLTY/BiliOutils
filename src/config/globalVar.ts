@@ -38,7 +38,7 @@ abstract class TaskModuleTemplate {
   /**今日是否已经观看视频 */
   static watch = false;
   /** B币券余额 */
-  static bCoinCouponBalance = 0;
+  static couponBalance = 0;
   /** 0为无，1为月度，2为年度 */
   static vipType = 0;
   /** 大会员状态 0 无 1 有 */

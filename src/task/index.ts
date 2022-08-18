@@ -10,6 +10,7 @@ export const biliTaskArray = [
   ['mangaTask', () => import('./mangaTask')],
   ['supGroupSign', () => import('./supGroupSign')],
   ['liveSendMessage', () => import('./liveSendMessage')],
+  ['useCouponBp', () => import('./useCouponBp')],
   ['charging', () => import('./charging')],
   ['getVipPrivilege', () => import('./getVipPrivilege')],
   ['matchGame', () => import('./matchGame')],

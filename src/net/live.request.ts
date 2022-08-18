@@ -1,6 +1,7 @@
 import type { IdType } from '../types';
 import type {
   BagSendResDto,
+  Bp2GoldDto,
   FansMedalPanelDto,
   JoinLotteryDto,
   JoinRedPacketRes,
@@ -49,6 +50,27 @@ export function exchangeSilver2Coin(): Promise<Silver2CoinDto> {
 }
 
 /**
+ * b币兑换电池
+ */
+export function exchangeBattery(couponBalance: number) {
+  const pay_bp = couponBalance * 1000;
+  return liveApi.post<Bp2GoldDto>('xlive/revenue/v1/order/createOrder', {
+    platform: 'pc',
+    pay_bp,
+    context_id: 6726252, // 直播间相关，未知
+    context_type: 1, // 直播间相关，未知
+    goods_id: 1,
+    goods_num: couponBalance,
+    goods_type: 2, // 未知
+    ios_bp: 0, // 消耗
+    common_bp: pay_bp, // 消耗
+    csrf_token: TaskConfig.BILIJCT,
+    csrf: TaskConfig.BILIJCT,
+    visit_id: getVisitId(),
+  });
+}
+
+/**
  * 瓜子交换信息
  */
 export function exchangeStatus(): Promise<SilverStatusDto> {
@@ -56,7 +78,7 @@ export function exchangeStatus(): Promise<SilverStatusDto> {
 }
 
 /**
- * 瓜子交换信息
+ * 我的钱包
  */
 export function getMyWallet(): Promise<MyWalletDto> {
   return liveApi.get('/xlive/revenue/v1/wallet/myWallet?need_bp=1&need_metal=1&platform=pc');

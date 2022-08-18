@@ -15,6 +15,7 @@ import {
   apiDelay,
   getRandomItem,
   getUnixTime,
+  isBoolean,
   isDef,
   isToday,
   Logger,
@@ -65,9 +66,10 @@ export async function bigPointService() {
   if (isEmpty) {
     return await printPoint();
   }
-  if (TaskConfig.bigPoint.isRetry) {
+  const cfgIsRetry = TaskConfig.bigPoint.isRetry;
+  if (cfgIsRetry) {
     isRetry = true;
-    await apiDelay(5000);
+    await apiDelay(isBoolean(cfgIsRetry) ? 5000 : cfgIsRetry * 1000);
     await bigPointTask(taskStatus);
   }
   return await printPoint();

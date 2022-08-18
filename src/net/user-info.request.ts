@@ -153,18 +153,23 @@ export function createTag(name: string): Promise<CreateTagDto> {
 }
 
 /**
- * 取关
+ * 操作用户关系
  * @param mid 用户 id
+ * @param action 动作 1 关注 2 取关
  */
-export function unFollow(mid: IdType): Promise<ApiBaseProp> {
-  return biliApi.post('x/relation/modify', {
+export function modeRelation(mid: IdType, action = 1) {
+  return biliApi.post<ApiBaseProp>('x/relation/modify', {
     fid: mid,
-    act: 2,
+    act: action,
     re_src: 11,
     spmid: '333.999.0.0',
     jsonp: 'jsonp',
     csrf: TaskConfig.BILIJCT,
   });
+}
+
+export function unFollow(mid: IdType) {
+  return modeRelation(mid, 2);
 }
 
 /**

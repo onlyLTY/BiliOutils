@@ -1,5 +1,5 @@
 import type { LevelType } from '@/types/log';
-import type { ActivityLotteryIdType } from '@/types';
+import type { ActivityLotteryIdType, CouponBalanceUseType } from '@/types';
 import {
   DAILY_RUN_TIME,
   LOTTERY_EXCLUDE,
@@ -56,7 +56,9 @@ export const defaultConfig = {
     supGroupSign: false,
     // 直播发送弹幕
     liveSendMessage: false,
-    // 充电
+    // 使用 b 币券
+    useCouponBp: false,
+    // 充电（废弃）
     charging: false,
     // 获取 vip 权益
     getVipPrivilege: false,
@@ -121,11 +123,14 @@ export const defaultConfig = {
     /** 比赛赔率差距需要大于多少才压 */
     diff: 0,
   },
-  charge: {
+  charge: {} as any,
+  couponBalance: {
     /** 充电的 up 默认自己 */
     mid: 0,
-    /** 充电预设时间，哪一天？ */
+    /** 预设时间，哪一天？ */
     presetTime: [10, 20],
+    /** 使用方式 */
+    use: '充电' as CouponBalanceUseType,
   },
   gift: {
     /** 自定义投喂礼物用户列表 */
@@ -227,8 +232,8 @@ export const defaultConfig = {
     liveFamineTime: 400,
   },
   bigPoint: {
-    // 是否重试
-    isRetry: true,
+    // 是否重试，或者重试间隔时间，单位秒
+    isRetry: true as boolean | number,
     // 是否观看视频
     isWatch: true,
     // 自定义观看视频的章节
@@ -287,6 +292,11 @@ function oldConfigHandle(config: DefaultConfig): TheConfig {
     }
     delete config[oldKey];
   });
+
+  // couponBalance charge
+  config.couponBalance.mid ||= config.charge.mid;
+  config.couponBalance.presetTime ||= config.charge.presetTime;
+
   return config;
 }
 
@@ -296,7 +306,7 @@ function oldConfigHandle(config: DefaultConfig): TheConfig {
  */
 function configValueHandle(config: TheConfig) {
   setConstValue(config);
-  const { coin, gift, charge, match } = config;
+  const { coin, gift, charge, match, couponBalance } = config;
   // TODO: 兼容旧配置
   if (!isArray(config.apiDelay)) {
     config.apiDelay = [Number(config.apiDelay)];
@@ -306,6 +316,20 @@ function configValueHandle(config: TheConfig) {
 
   coin.customizeUp = arr2numArr(coin.customizeUp);
   gift.mids = arr2numArr(gift.mids);
+
+  // 处理 charge
+  const couponBalanceUse = couponBalance.use;
+  switch (couponBalanceUse) {
+    case 'battery':
+      couponBalance.use = '电池';
+      break;
+    case 'charge':
+      couponBalance.use = '充电';
+      break;
+    default:
+      couponBalance.use = '充电';
+      break;
+  }
 
   /**
    * 部分默认值处理

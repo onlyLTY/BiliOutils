@@ -6,7 +6,7 @@ import { logger } from '../utils/log';
 type UserNav = UserInfoNavDto['data'];
 
 function getBCoinBalance(data: UserNav) {
-  TaskModule.bCoinCouponBalance = data.wallet?.coupon_balance || 0;
+  TaskModule.couponBalance = data.wallet?.coupon_balance || 0;
 }
 
 export async function updateNav() {

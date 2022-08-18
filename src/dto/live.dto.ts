@@ -19,9 +19,11 @@ export interface LiveSignInfoDto extends ApiBaseProp {
 /** 获取瓜子状态 */
 export interface SilverStatusDto extends ApiBaseProp {
   data: {
-    silver: number; //银瓜子
-    gold: number; //金瓜子
-    coin: number; //硬币
+    /** 银瓜子 */
+    silver: number;
+    /** 金瓜子，现在为电池（数量需要除以 1000，即显示 1000，实际为 1 电池） */
+    gold: number;
+    coin: number; // 硬币
     coin_2_silver_left: number; //
     silver_2_coin_left: 1 | 0; // (银瓜子到硬币)
     status: number;
@@ -48,13 +50,32 @@ export interface Silver2CoinDto extends PureDataProp {
 /** 我的钱包 */
 export interface MyWalletDto extends ApiBaseProp {
   data: {
+    /** 金瓜子，现在为电池（数量需要除以 100，即显示 1000，实际为 10 电池） */
     gold: number;
+    /** 银瓜子 */
     silver: number;
-    bp: string;
+    /** b 币 */
+    bp: string; // 数字字符串，如："0"
     /** 硬币数 */
     metal: number;
+    need_use_new_bp: boolean;
+    ios_bp: number; // n * 1000
+    common_bp: number; // n * 1000
+    new_bp: string; // 数字字符串，如："1"
+    /** 可以兑换的电池数量 */
+    bp_2_gold_amount: number; // 如果是普通 bp，则可以兑换的金瓜子数量 = bp * 1000，如果是 ios bp，则数量 = ios_bp * 700
   };
 }
+
+/**
+ * b币兑换金瓜子
+ */
+export type Bp2GoldDto = ApiBaseProp<{
+  status: number; // 目前成功了返回了 2
+  order_id: string; // 订单号
+  gold: number; // 显示 gold，但未知，返回了 0
+  bp: number; // 剩余b币数量 * 1000
+}>;
 
 export interface FansMedalDto {
   medal: {
