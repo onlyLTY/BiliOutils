@@ -46,6 +46,11 @@ async function getOnePrivilege(type: number): Promise<boolean> {
     const name = getPrivilegeName(type);
     const { code, message } = await receiveVipPrivilege(type);
 
+    if (code === 73319) {
+      logger.error(`${name}领取失败，账号存在异常（可能异地登陆）`);
+      return true;
+    }
+
     let status = '成功';
     if (code !== 0) {
       status = `失败 ${message}`;
