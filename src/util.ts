@@ -132,7 +132,7 @@ function getDelayTime(delay = '') {
 export async function waitForArgs() {
   const delay = getArg('delay', false);
   if (delay) {
-    const { defLogger } = await import('./utils');
+    const { defLogger } = await import('./utils/Logger');
     const [delay1, delay2] = getDelayTime(delay);
     const delayTime = random(delay1, delay2);
     defLogger.info(`运行前休眠 ${delayTime}ms`);

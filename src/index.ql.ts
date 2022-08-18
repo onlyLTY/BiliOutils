@@ -5,17 +5,18 @@ process.env.IS_QING_LONG = 'true';
 
 (async () => {
   if (isArg('config')) {
+    await waitForArgs();
     const configs = await config();
     if (!configs) {
       return;
     }
     const taskArg = getArg('task');
-    await waitForArgs();
     if (taskArg) {
       return await runTask(configs, './bin/inputTask', taskArg);
     }
     return await runTask(configs);
   }
+  await waitForArgs();
   const { getConfig } = await import('./config/setConfig');
   const configs = getConfig(true);
   return await runTask(configs);
