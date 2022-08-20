@@ -431,3 +431,21 @@ export class Sleep {
     while (Date.now() - now < delay);
   }
 }
+
+export function getDelayTime(delay = '') {
+  return delay.split('-').map(t => {
+    if (/\d+ms$/.test(t)) {
+      return parseInt(t);
+    }
+    if (/\d+s$/.test(t)) {
+      return parseInt(t) * 1000;
+    }
+    if (/\d+$/.test(t) || /\d+m(in)?$/.test(t)) {
+      return parseInt(t) * 60000;
+    }
+    if (/\d+h$/.test(t)) {
+      return parseInt(t) * 3600000;
+    }
+    return 0;
+  });
+}

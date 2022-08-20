@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { fork } from 'child_process';
 import * as path from 'path';
 import { getArg } from './utils/args';
-import { random, Sleep } from './utils/pure';
+import { getDelayTime, random, Sleep } from './utils/pure';
 
 /**
  * 获取配置
@@ -110,33 +110,30 @@ async function runTaskAsync(forkPromises: Promise<any>[]) {
   process.stdout.write('执行完毕\n\n');
 }
 
-function getDelayTime(delay = '') {
-  return delay.split('-').map(t => {
-    if (/\d+ms$/.test(t)) {
-      return parseInt(t.slice(0, -2));
-    }
-    if (/\d+s$/.test(t)) {
-      return parseInt(t.slice(0, -1)) * 1000;
-    }
-    if (/\d+$/.test(t) || /\d+m$/.test(t)) {
-      return parseInt(t.slice(0, -1)) * 60000;
-    }
-    if (/\d+h$/.test(t)) {
-      return parseInt(t.slice(0, -1)) * 3600000;
-    }
-    return 0;
-  });
-}
-
 /** 运行前休眠 */
 export async function waitForArgs() {
   const delay = getArg('delay', false);
   if (delay) {
-    const { defLogger } = await import('./utils/Logger');
     const [delay1, delay2] = getDelayTime(delay);
     const delayTime = random(delay1, delay2);
-    defLogger.info(`运行前休眠 ${delayTime}ms`);
+    await printWaitTime(delayTime);
     await Sleep.wait(delayTime);
     return true;
   }
+}
+
+async function printWaitTime(delayTime: number) {
+  const { defLogger } = await import('./utils/log/def');
+  if (delayTime < 1000) {
+    defLogger.info(`休眠 ${delayTime} 毫秒`);
+    return;
+  }
+  const endTime = new Date(new Date().getTime() + delayTime),
+    endTimeString = endTime.toLocaleTimeString('zh-CN');
+  if (delayTime < 60000) {
+    // 输出预计运行时间
+    defLogger.info(`休眠大约 ${delayTime} 毫秒，预计运行时间 ${endTimeString}`);
+    return;
+  }
+  defLogger.info(`休眠大约 ${delayTime} 毫秒，预计运行时间 ${endTimeString}`);
 }

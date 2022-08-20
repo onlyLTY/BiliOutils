@@ -5,16 +5,6 @@ const cookie = `PVID=2; b_lsid=DC1063E54_17E335AC2B4; innersign=1; buvid3=3EC0C0
 // 是否成功处理兼容
 const userConfig = {
   cookie,
-  targetLevel: 1,
-  stayCoins: 1,
-  targetCoins: 1,
-  customizeUp: [1],
-  giftUp: [1],
-  chargeUpId: 1,
-  chargePresetTime: 1,
-  matchCoins: 1,
-  matchSelection: 1,
-  matchDiff: 1,
   intimacy: {
     liveSendMessage: true,
     liveShare: false,
@@ -70,41 +60,52 @@ const theConfig = {
     bigPoint: false,
     liveFamine: false,
     batchUnfollow: false,
+    activityLottery: false,
+    useCouponBp: false,
   },
   apiDelay: [2, 6],
   userAgent: '',
   dailyRunTime: '17:30:00-23:40:00',
   match: {
-    coins: 1,
+    coins: 2,
     selection: 1,
-    diff: 1,
+    diff: 7,
   },
   jury: {
     mode: 1,
     once: true,
     opinionMin: 3,
-    vote: [0, 1],
+    vote: [0, 0, 1],
     waitTime: 20,
+    insiders: 0.8,
   },
   log: {
     pushLevel: 'debug',
+    consoleLevel: 'debug',
+    fileLevel: 'debug',
     useEmoji: true,
+    fileSplit: 'month',
   },
-  charge: {
-    mid: 1,
-    presetTime: 1,
+  limit: {
+    level6: true,
+    coins5: true,
+  },
+  couponBalance: {
+    mid: 11111111,
+    presetTime: [10, 20],
+    use: '充电',
   },
   gift: {
-    mids: [1],
+    mids: [],
     id: [1, 30607, 30426, 31531, 31674],
     name: [],
   },
   coin: {
-    customizeUp: [1],
+    customizeUp: [],
     todayCoins: 0,
-    targetLevel: 1,
-    stayCoins: 1,
-    targetCoins: 1,
+    targetLevel: 6,
+    stayCoins: 0,
+    targetCoins: 5,
   },
   activity: {
     liveFamineTime: 400,
@@ -168,8 +169,14 @@ const theConfig = {
     epids: [],
     isRetry: true,
     isWatch: true,
-    watchDelay: 20,
+    watchDelay: 40,
   },
+  activityLottery: {
+    list: [],
+    isRequest: false,
+    delay: [1.8, 3.2],
+  },
+  charge: {},
 };
 const newConfig = mergeConfig(userConfig);
 
