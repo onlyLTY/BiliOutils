@@ -1,8 +1,8 @@
-import type { SCFEvent, SCFContext } from '../types/scf';
-import type { SlSOptions } from '../types/sls';
-import { getPRCDate, randomDailyRunTime } from './pure';
-import { TaskConfig } from '../config/globalVar';
-import { logger } from './log';
+import type { SCFEvent, SCFContext } from '@/types/scf';
+import type { SlSOptions } from '@/types/sls';
+import { getPRCDate, randomDailyRunTime } from '../pure';
+import { TaskConfig } from '@/config/globalVar';
+import { logger } from '../log';
 
 /**
  * 获取 tencentcloud-sdk-nodejs

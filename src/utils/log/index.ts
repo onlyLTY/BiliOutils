@@ -1,8 +1,8 @@
 import type { LoggerInitOptions, LoggerOptions } from '@/types/log';
 import { TaskConfig } from '@/config/globalVar';
-import { defLogger, EmptyLogger, SimpleLogger } from './Logger';
-import { resolvePath } from './path';
-import { getPRCDate } from './pure';
+import { defLogger, EmptyLogger, SimpleLogger } from './def';
+import { resolvePath } from '../path';
+import { getPRCDate } from '../pure';
 
 export { defLogger };
 export const emptyLogger = new EmptyLogger() as unknown as Logger;

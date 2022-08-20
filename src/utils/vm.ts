@@ -3,7 +3,7 @@ import type { VGotOptions } from '@/types/got';
 import { unzipSync } from 'zlib';
 import { defHttp } from './http';
 import * as VM from 'vm';
-import { defLogger } from './Logger';
+import { defLogger } from './log/def';
 
 const options = {
   headers: {

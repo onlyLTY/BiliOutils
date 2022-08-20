@@ -13,7 +13,6 @@ on:
 
 jobs:
   build-docker:
-    if: github.repository == 'KudouRan/BiliTools'
     runs-on: ubuntu-latest
     environment: Build
     steps:

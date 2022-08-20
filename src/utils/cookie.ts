@@ -98,3 +98,11 @@ export class CookieJar {
     return getCookieItem(this.cookie, key);
   }
 }
+
+export function isBiliCookie(cookie: string) {
+  return Boolean(
+    cookie &&
+      cookie.length > 90 &&
+      ['bili_jct', 'SESSDATA', 'DedeUserID'].every(str => cookie.includes(str)),
+  );
+}

@@ -1,8 +1,8 @@
-import { getPRCDate } from './pure';
-import { dailyTasks } from '../task/dailyTask';
-import type { FCContext, FCEvent } from '../types/fc';
-import type { SCFContext, SCFEvent, SLSType } from '../types';
-import { JSON5 } from './json5';
+import { getPRCDate } from '../pure';
+import { dailyTasks } from '@/task/dailyTask';
+import type { FCContext, FCEvent } from '@/types/fc';
+import type { SCFContext, SCFEvent, SLSType } from '@/types';
+import { JSON5 } from '../json5';
 
 interface Params {
   event: FCEvent | SCFEvent;

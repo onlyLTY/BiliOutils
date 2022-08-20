@@ -1,7 +1,6 @@
 import { isArray, isNumber, isObject } from './is';
 import { getUnixTime, md5, stringify } from './pure';
 import * as crypto from 'crypto';
-import { TaskConfig } from '@/config/globalVar';
 
 type Params = Record<string, string | boolean | number | Array<any>>;
 
@@ -51,13 +50,14 @@ function getAppSign(
     s_locale: 'zh_CN',
     ts: getUnixTime(),
   };
-  if (!TaskConfig.accessKey && !params.access_key) {
+  // 某些情况下不需要也不能从配置文件中读取
+  params.access_key = params.access_key || require('../config/globalVar')?.TaskConfig.access_key;
+  if (!params.access_key) {
     return getSign(params, appsec, true);
   }
   delete params.csrf;
   delete params.csrf_token;
   params = {
-    access_key: TaskConfig.accessKey,
     ...params,
     actionKey: 'appkey',
     appkey,

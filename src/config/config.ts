@@ -117,11 +117,11 @@ export const defaultConfig = {
   // 新的配置方式
   match: {
     /** 压硬币数量 */
-    coins: 5,
+    coins: 2,
     /** 压硬币规则 大于0 是正压，小于反压 */
     selection: 1,
     /** 比赛赔率差距需要大于多少才压 */
-    diff: 0,
+    diff: 7,
   },
   charge: {} as any,
   couponBalance: {
@@ -306,7 +306,7 @@ function oldConfigHandle(config: DefaultConfig): TheConfig {
  */
 function configValueHandle(config: TheConfig) {
   setConstValue(config);
-  const { coin, gift, charge, match, couponBalance } = config;
+  const { coin, gift, match, couponBalance } = config;
   // TODO: 兼容旧配置
   if (!isArray(config.apiDelay)) {
     config.apiDelay = [Number(config.apiDelay)];
@@ -337,8 +337,8 @@ function configValueHandle(config: TheConfig) {
   if (gift.mids.length === 0) {
     gift.mids = coin.customizeUp;
   }
-  if (!charge.mid) {
-    charge.mid = config.USERID;
+  if (!couponBalance.mid) {
+    couponBalance.mid = config.USERID;
   }
   if (coin.targetCoins > 5) {
     coin.targetCoins = 5;

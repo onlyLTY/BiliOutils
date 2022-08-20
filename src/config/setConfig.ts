@@ -1,11 +1,12 @@
 import type { Config, MultiConfig } from '@/types';
 import * as path from 'path';
-import { defLogger as logger } from '@/utils/Logger';
+import { defLogger as logger } from '@/utils/log/def';
 import { gzipDecode } from '@/utils/gzip';
 import { SystemConfig } from './systemConfig';
 import { readJsonFile } from '@/utils/file';
 import { JSON5 } from '@/utils/json5';
 import { isArray } from '@/utils/is';
+import { isBiliCookie } from '@/utils/cookie';
 
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
@@ -165,10 +166,7 @@ function isMultiUserConfig(config: MultiConfig | Config[]) {
  * @param config
  */
 function filterMultiUserConfig(config: MultiConfig | Config[]) {
-  const filter = (conf: Config) =>
-    conf.cookie &&
-    conf.cookie.length > 90 &&
-    ['bili_jct', 'SESSDATA', 'DedeUserID'].every(str => conf.cookie.includes(str));
+  const filter = (conf: Config) => isBiliCookie(conf.cookie);
   if (Array.isArray(config)) {
     return config.filter(filter);
   }

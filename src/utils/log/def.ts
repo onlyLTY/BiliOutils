@@ -1,9 +1,9 @@
 import type { LevelType, LogOptions, MessageType, SimpleLoggerOptions } from '@/types/log';
 import * as fs from 'fs';
-import { isServerless, isQingLongPanel } from './env';
-import { isBoolean } from './is';
-import { resolvePath } from './path';
-import { getPRCDate } from './pure';
+import { isServerless, isQingLongPanel } from '@/utils/env';
+import { isBoolean } from '../is';
+import { resolvePath } from '../path';
+import { getPRCDate } from '../pure';
 
 const LEVEL_VALUE = ['error', 'warn', 'info', 'verbose', 'debug'];
 

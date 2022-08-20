@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { isString } from './is';
 import { JSON5 } from './json5';
-import { defLogger } from './Logger';
+import { defLogger } from './log/def';
 
 /**
  * 读取 json 文件

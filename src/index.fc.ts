@@ -1,5 +1,5 @@
 import type { FCCallback, FCContext, FCEvent } from './types/fc';
-import { defLogger } from './utils/Logger';
+import { defLogger } from './utils/log/def';
 import { JSON5 } from './utils/json5';
 import { runInVM } from './utils/vm';
 
@@ -12,7 +12,7 @@ const notice = async (msg?: string) => {
 
 export async function dailyMain(event: FCEvent, context: FCContext) {
   notice();
-  const { dailyHandle } = await import('./utils/sls');
+  const { dailyHandle } = await import('./utils/serverless');
   return await dailyHandle({
     event,
     context,

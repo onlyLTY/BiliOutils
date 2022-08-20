@@ -1,3 +1,4 @@
+import type { BiliCookieJar } from '@/config/globalVar';
 import type { RequestOptions } from '#/request';
 import type { VGotOptions } from '#/got';
 import type { Got, Response } from 'got';
@@ -5,7 +6,6 @@ import got from 'got';
 import { isFunction, isObject, isString } from '../is';
 import { jsonp2Object, mergeHeaders, stringify } from '../pure';
 import { CookieJar } from '../cookie';
-import { BiliCookieJar } from '@/config/globalVar';
 
 const transformRequestHook = (res: Response, options: RequestOptions = {}) => {
   const { isTransformResponse, isReturnNativeResponse } = options;
@@ -84,10 +84,12 @@ function axiosHandle(options: VGotOptions) {
   return options;
 }
 
+export type CookieJarType = CookieJar | BiliCookieJar | undefined;
+
 export class VGot {
-  private gotInstance: Got;
-  private options: VGotOptions;
-  cookieJar: CookieJar | BiliCookieJar;
+  protected gotInstance: Got;
+  protected options: VGotOptions;
+  cookieJar: CookieJarType;
   name = 'VGot';
 
   constructor(options: VGotOptions) {
@@ -96,14 +98,14 @@ export class VGot {
       options.prefixUrl = options.baseURL;
     }
     this.options = options;
+  }
+
+  init() {
     // 处理 cookie
-    const { withBiliCookie, withCredentials } = this.options.requestOptions || {};
-    if (withBiliCookie) {
-      this.cookieJar = new BiliCookieJar();
-    } else if (withCredentials) {
+    if (!this.cookieJar) {
       this.cookieJar = new CookieJar();
     }
-    this.gotInstance = got.extend(options, {
+    this.gotInstance = got.extend(this.options, {
       cookieJar: this.cookieJar,
     });
   }
