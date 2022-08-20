@@ -4,7 +4,7 @@ import { CookieJar } from '../cookie';
 import { CookieJarType, VGot } from './Got';
 
 export class BiliGot extends VGot {
-  cookieJar: CookieJarType = null;
+  cookieJar: CookieJarType = undefined;
 
   constructor(options: VGotOptions) {
     super(options);

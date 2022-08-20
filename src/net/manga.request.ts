@@ -8,6 +8,7 @@ import type {
   MangaPointShopDto,
   PointShopBuyDto,
   SearchMangaDto,
+  TakeSeasonGiftDto,
   WalletDto,
 } from '../dto/manga.dto';
 import { mangaApi } from './api';
@@ -131,5 +132,19 @@ export function exchangeMangaShop(product_id = 195, point = 100, product_num = 1
     product_id,
     point,
     product_num,
+  });
+}
+
+/**
+ * 领取任务奖励
+ */
+export function takeSeasonGift() {
+  return mangaApi.post<TakeSeasonGiftDto>(`twirp/user.v1.Season/TakeSeasonGifts`, {
+    id: 0,
+    is_teenager: 0,
+    no_recommend: 0,
+    season_id: 30,
+    take_type: 1,
+    ts: new Date().getTime(),
   });
 }

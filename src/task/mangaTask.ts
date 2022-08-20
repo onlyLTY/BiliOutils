@@ -1,4 +1,4 @@
-import { mangaSign, buyMangaService } from '@/service/manga.service';
+import { mangaSign, buyMangaService, takeSeasonGift } from '@/service/manga.service';
 import { logger } from '../utils/log';
 
 export default async function mangaTask() {
@@ -6,6 +6,8 @@ export default async function mangaTask() {
   try {
     // 漫画签到
     await mangaSign();
+    // 领取任务奖励
+    await takeSeasonGift();
     // 购买漫画
     await buyMangaService();
   } catch (error) {

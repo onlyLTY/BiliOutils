@@ -387,3 +387,13 @@ export type PointShopBuyDto = OnlyMsg<{
   remain_amount: number;
   deadline: string;
 }>;
+
+/**
+ * 领取任务奖励反馈
+ */
+export type TakeSeasonGiftDto = {
+  /** 7 已领取或未完成 */
+  code: number;
+  msg: string;
+  data: null | undefined;
+};

@@ -269,6 +269,20 @@ export async function mangaSign() {
   }
 }
 
+export async function takeSeasonGift() {
+  try {
+    const { code, msg } = await mangaApi.takeSeasonGift();
+    if (code === 0) return;
+    if (code === 7) {
+      logger.debug(`获取任务礼包失败：${msg}`);
+      return;
+    }
+    logger.error(`获取任务礼包失败：${msg}`);
+  } catch (error) {
+    logger.error(`获取任务礼包异常: ${error}`);
+  }
+}
+
 /**
  * 商城兑换
  */
