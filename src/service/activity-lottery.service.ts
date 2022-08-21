@@ -1,3 +1,9 @@
+/**
+ * 在抽奖次数中：
+ * 大于等于 0 的表示正常抽奖次数，接下来进行抽奖或进入下一个
+ * -1 表示获取抽奖次数上限或其他原因，接下来进入下一个
+ * -2 表示被风控等已知无法继续进行的原因，直接结束任务
+ */
 import { TaskConfig, TaskModule } from '@/config/globalVar';
 import { ActivityLotteryStatus } from '@/enums/activity-lottery.emumm';
 import { defHttp } from '@/net/api';
@@ -8,18 +14,18 @@ import {
   getPRCDate,
   gzipDecode,
   isArray,
-  isBoolean,
   isServerless,
   Logger,
   logger,
+  mergeArray,
   pushIfNotExist,
   sleep,
-  uniqueObjectArray,
 } from '@/utils';
 import { readJsonFile } from '@/utils/file';
 import { existsSync, writeFileSync } from 'fs';
 import { dirname } from 'path';
 import * as activityRequest from '../net/activity-lottery.request';
+import { addAndDelBangumiFollow } from './bangumi.service';
 
 const ltyLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'activity-lottery');
 
@@ -48,28 +54,48 @@ export async function activityLotteryService() {
   }
   try {
     logger.info(`总计获取到 ${list.length} 个活动`);
-    for (const item of list) {
-      const { sid, title } = item;
-      const nums = await getLotteryMyTimes(sid);
-      await sleep(80, 150);
-      if (nums === true) return;
-      if (nums === false) continue;
-      if ((await addTimesContinue(sid)) === true) return;
-      const finalNum = await getLotteryMyTimes(sid);
-      await sleep(150, 300);
-      ltyLogger.debug(`【${title}】剩余次数 ${finalNum}`);
-      if (finalNum === true) return;
-      if (finalNum === false || finalNum === 0) continue;
-      await doLotteryContinue(finalNum, item as ActivityLotteryIdType);
-      // ltyLogger.verbose(`完成【${title}】转盘的抽奖`);
-      await sleep(300, 500);
-    }
+    await lotteryActivity(list);
   } catch (error) {
     logger.error(`转盘抽奖异常`);
     logger.error(error);
   }
   logger.info(`转盘抽奖完成，共进行 ${okCount} 次转盘`);
   writeStatus(localStatus, list);
+}
+
+/**
+ * 完成一个活动的次数获取、抽奖
+ */
+async function lotteryActivity(list: ActivityLotteryIdType[]) {
+  for (const item of list) {
+    const { sid, title } = item;
+    // 检测活动是否过期
+    const nums = await getLotteryMyTimes(sid);
+    await sleep(80, 150);
+    if (nums === -2) return;
+    if (nums === -1) continue;
+
+    // 添加抽奖次数（分享）
+    if ((await addTimesContinue(sid)) === -2) return;
+    // 添加抽奖次数（追番）
+    const bangumi = TaskConfig.activityLottery.bangumi;
+    if (item.bangumis?.length && !item.followBangumi && bangumi) {
+      await addTimesByBangumis(item.bangumis);
+      item.followBangumi = true;
+    }
+
+    // 获取当前抽奖的次数
+    const finalNum = await getLotteryMyTimes(sid);
+    await sleep(150, 300);
+    ltyLogger.debug(`【${title}】剩余次数 ${finalNum}`);
+    if (finalNum === -2) return;
+    if (finalNum <= 0) continue;
+
+    // 抽奖
+    await doLotteryContinue(finalNum, item as ActivityLotteryIdType);
+    // ltyLogger.verbose(`完成【${title}】转盘的抽奖`);
+    await sleep(300, 500);
+  }
 }
 
 /**
@@ -84,7 +110,7 @@ async function getActivityLotteryList(localStatus: LocalStatusDto = {}) {
   const netList = (await getActivityList(localStatus)) || [];
   // config 文件中的活动列表
   const { list: userList } = TaskConfig.activityLottery;
-  return uniqueObjectArray(
+  return mergeArray(
     (localStatus.activity_list || [])
       .concat(netList)
       .concat(userList.filter(item => expiredIdsFilter(item, localStatus)) || []),
@@ -104,7 +130,7 @@ export async function getLotteryMyTimes(sid: string) {
     if (code === ActivityLotteryStatus.NotExist || code === ActivityLotteryStatus.End) {
       pushIfNotExist(EXPIRED_LIST, sid);
       ltyLogger.info(`【${sid}】活动已结束或不存在【${message}】`);
-      return false;
+      return -1;
     }
     logger.warn(`获取抽奖次数失败【${sid}】 ${code} ${message}`);
     return await commonError(code);
@@ -112,7 +138,7 @@ export async function getLotteryMyTimes(sid: string) {
     logger.error(`获取抽奖次数异常`);
     logger.error(error);
   }
-  return false;
+  return -1;
 }
 
 /**
@@ -125,7 +151,7 @@ export async function doLottery({ sid, title }: ActivityLotteryIdType) {
       okCount++;
       const { gift_name } = data?.[0] || {};
       if (!gift_name || gift_name.includes('未中奖')) {
-        return false;
+        return -1;
       }
       logger.info(`【${title}】中奖【${gift_name}】`);
       pushIfNotExist(TaskModule.pushTitle, '【转盘】');
@@ -133,14 +159,14 @@ export async function doLottery({ sid, title }: ActivityLotteryIdType) {
     }
     logger.warn(`【${title}】抽奖失败 ${code} ${message}`);
     if (code === ActivityLotteryStatus.NoTimes) {
-      return false;
+      return -1;
     }
     return await commonError(code);
   } catch (error) {
     logger.error(`获取抽奖次数异常`);
     logger.error(error);
   }
-  return false;
+  return -1;
 }
 
 /**
@@ -150,10 +176,10 @@ export async function addTimes(sid: string) {
   try {
     const { code, message, data } = await activityRequest.addLotteryTimes(sid);
     if (code === 0) {
-      return data.add_num ? data.add_num : false;
+      return data.add_num ? data.add_num : -1;
     }
     if (code === ActivityLotteryStatus.Max) {
-      return false;
+      return -1;
     }
     logger.warn(`增加次数失败 ${code} ${message}`);
     return await commonError(code);
@@ -161,22 +187,22 @@ export async function addTimes(sid: string) {
     logger.error(`增加次数异常`);
     logger.error(error);
   }
-  return false;
+  return -1;
 }
 
 async function commonError(code: number | string) {
   if (code === ActivityLotteryStatus.Frequent || code === ActivityLotteryStatus.TooManyRequests) {
     await sleep(2000, 5000);
-    return false;
+    return -1;
   }
   if (
     code === ActivityLotteryStatus.PreconditionFailed ||
     code === ActivityLotteryStatus.NetworkError
   ) {
     logger.warn(`可能被风控，停止抽奖`);
-    return true;
+    return -2;
   }
-  return false;
+  return -1;
 }
 
 /**
@@ -187,12 +213,24 @@ export async function addTimesContinue(sid: string) {
     for (let index = 0; index < 10; index++) {
       await sleep(1000, 2000);
       const nums = await addTimes(sid);
-      if (isBoolean(nums)) return nums;
+      if (nums < 0) return nums;
     }
   } catch (error) {
     logger.error(`增加次数异常`);
     logger.error(error);
   }
+}
+
+/**
+ * 通过追番添加次数
+ */
+export async function addTimesByBangumis(ssids: number[] = []) {
+  for (let index = 0; index < ssids.length; index++) {
+    const ssid = ssids[index];
+    await addAndDelBangumiFollow(ssid);
+    await sleep(1000, 2000);
+  }
+  await sleep();
 }
 
 export async function doLotteryContinue(num: number, item: ActivityLotteryIdType) {
@@ -203,10 +241,10 @@ export async function doLotteryContinue(num: number, item: ActivityLotteryIdType
     for (let index = 0; index < num; index++) {
       await sleep(delay1Time, delay2Time);
       const data = await doLottery(item);
-      if (data) return;
+      if (data === -2) return;
     }
   } catch (error) {
-    logger.error(`增加次数异常`);
+    logger.error(`转盘抽奖异常`);
     logger.error(error);
   }
 }

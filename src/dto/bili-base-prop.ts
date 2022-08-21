@@ -50,3 +50,12 @@ export interface PureDataProp<T = object | [] | null> {
  * -400：请求错误
  */
 export type ResponseCode = 0 | -101 | -111 | -400;
+
+/**
+ * result 请求
+ */
+export interface ResponseResult<T = any> {
+  code: number;
+  message: string;
+  result: T;
+}

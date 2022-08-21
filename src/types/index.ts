@@ -14,4 +14,8 @@ export interface CronDateType {
 export interface ActivityLotteryIdType {
   sid: string;
   title?: string;
+  bangumis?: number[];
+  followBangumi?: boolean;
+  follows?: number[];
+  followed?: boolean;
 }

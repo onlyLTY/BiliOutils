@@ -5,6 +5,7 @@ import type {
   DonatedCoinsForVideoDto,
   HeartbeatDto,
   RecommendVideoDto,
+  BangumiFollowDto,
 } from '../dto/video.dto';
 import { biliApi } from './api';
 import { TaskConfig } from '../config/globalVar';
@@ -121,6 +122,26 @@ export function videoHeartbeat({
     epid,
     spmid: '666.25',
     from_spmid: '..0.0',
+    csrf: TaskConfig.BILIJCT,
+  });
+}
+
+/**
+ * 追剧
+ */
+export function addBangumi(season_id: number | string) {
+  return biliApi.post<BangumiFollowDto>('pgc/web/follow/add', {
+    season_id,
+    csrf: TaskConfig.BILIJCT,
+  });
+}
+
+/**Promise<BangumiFollowD
+ * 取消追剧
+ */
+export function cancelBangumi(season_id: number | string) {
+  return biliApi.post<BangumiFollowDto>('pgc/web/follow/del', {
+    season_id,
     csrf: TaskConfig.BILIJCT,
   });
 }

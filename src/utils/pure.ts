@@ -449,3 +449,29 @@ export function getDelayTime(delay = '') {
     return 0;
   });
 }
+
+/**
+ * 数组合并同类项（会影响原数组）
+ * @param arr 数组
+ * @param key 合并的 key
+ * @param deep 是否深拷贝
+ * @param direction 合并的方向，默认为合并到前面
+ */
+export function mergeArray<T extends Record<string, any>>(
+  arr: T[],
+  key: string,
+  deep = false,
+  direction: 'right' | 'left' = 'left',
+) {
+  const reduceKey = direction === 'right' ? 'reduceRight' : 'reduce',
+    mergeFunc = deep ? deepMergeObject : Object.assign;
+  return arr[reduceKey]((result, item) => {
+    const index = result.findIndex(i => i[key] === item[key]);
+    if (index > -1) {
+      result[index] = mergeFunc(result[index], item);
+    } else {
+      result.push(item);
+    }
+    return result;
+  }, [] as T[]);
+}

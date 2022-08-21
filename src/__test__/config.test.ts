@@ -175,6 +175,8 @@ const theConfig = {
     list: [],
     isRequest: false,
     delay: [1.8, 3.2],
+    bangumi: false,
+    follow: false,
   },
   charge: {},
 };

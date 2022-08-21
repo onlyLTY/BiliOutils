@@ -1,4 +1,4 @@
-import { ApiBaseProp } from './bili-base-prop';
+import { ApiBaseProp, ResponseResult } from './bili-base-prop';
 
 /** 传递视频播放时长 */
 export interface HeartbeatDto extends ApiBaseProp {
@@ -108,3 +108,15 @@ interface RecommendVideo {
   room_info?: any;
   ogv_info?: any;
 }
+
+/**
+ * 番剧/影视操作
+ */
+export type BangumiFollowDto = ResponseResult<{
+  fmid: number;
+  relation: boolean;
+  /** 2 追番成功，0 取消追番 */
+  status: number;
+  /** 操作后的提示 */
+  toast: string;
+}>;

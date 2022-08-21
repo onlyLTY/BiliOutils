@@ -248,6 +248,10 @@ export const defaultConfig = {
     isRequest: false,
     // 抽奖延时（秒）
     delay: [1.8, 3.2],
+    // 追番？
+    bangumi: false,
+    // 关注？
+    follow: false,
   },
   BILIJCT: '',
   USERID: 0,
