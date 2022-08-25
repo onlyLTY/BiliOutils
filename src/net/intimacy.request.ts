@@ -2,7 +2,7 @@ import { TaskConfig } from '@/config/globalVar';
 import type { ApiBaseProp } from '@/dto/bili-base-prop';
 import type { LiveHeartBeatRes, ShareLiveRoomRes } from '@/dto/intimacy.dto';
 import { clientSign } from '@/utils/bili';
-import { createUUID, getBuvid, randomString } from '@/utils/pure';
+import { createUUID, createBuvid, randomString } from '@/utils/pure';
 import { liveApi, liveTraceApi } from './api';
 
 /**
@@ -48,7 +48,7 @@ export interface MobileHeartBeatParams {
  * 直播心跳（移动端）
  */
 export function liveMobileHeartBeat({
-  buvid = getBuvid(),
+  buvid = createBuvid(),
   gu_id = randomString(43).toLocaleUpperCase(),
   visit_id = randomString(32).toLocaleLowerCase(),
   uuid = createUUID(),

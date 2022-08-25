@@ -22,7 +22,7 @@ import type {
 import type { PureDataProp } from '../dto/bili-base-prop';
 import { liveApi } from './api';
 import { TaskConfig } from '../config/globalVar';
-import { getVisitId, random } from '../utils';
+import { createVisitId, getUnixTime, random } from '../utils';
 import { OriginURLs } from '../constant/biliUri';
 
 /**
@@ -66,7 +66,7 @@ export function exchangeBattery(couponBalance: number) {
     common_bp: pay_bp, // 消耗
     csrf_token: TaskConfig.BILIJCT,
     csrf: TaskConfig.BILIJCT,
-    visit_id: getVisitId(),
+    visit_id: createVisitId(),
   });
 }
 
@@ -88,22 +88,25 @@ export function getMyWallet(): Promise<MyWalletDto> {
  * 发送一个直播弹幕
  * @param roomid 直播房间号
  * @param msg 消息
+ * @param dm_type 弹幕类型，1 为表情
  */
-export function sendMessage(roomid: number, msg: string): Promise<PureDataProp> {
+export function sendMessage(roomid: number, msg: string, dm_type?: number): Promise<PureDataProp> {
   const csrf = TaskConfig.BILIJCT;
   const csrf_token = csrf;
   msg || (msg = random(10).toString());
-  return liveApi.post('/msg/send', {
-    color: 5566168,
-    fontsize: 25,
-    mode: 1,
-    msg,
-    rnd: Date.now(),
-    roomid,
+  const data: Record<string, any> = {
     bubble: 0,
+    msg,
+    color: 5566168,
+    mode: 1,
+    fontsize: 25,
+    rnd: getUnixTime(),
+    roomid,
     csrf,
     csrf_token,
-  });
+  };
+  dm_type && (data.dm_type = dm_type);
+  return liveApi.post('/msg/send', data);
 }
 
 /**
@@ -227,7 +230,7 @@ export function joinLottery(options: {
     ...options,
     csrf: TaskConfig.BILIJCT,
     csrf_token: TaskConfig.BILIJCT,
-    visit_id: getVisitId(),
+    visit_id: createVisitId(),
     platform: 'pc',
   });
 }
@@ -252,11 +255,23 @@ export function joinRedPacket(params: { room_id: IdType; ruid: IdType; lot_id: I
     {
       ...params,
       spm_id: '444.8.red_envelope.extract',
-      jump_from: '',
+      jump_from: '26000',
+      c_locale: 'en_US',
+      device: 'android',
+      mobi_app: 'android',
+      platform: 'android',
+      channel: 'xiaomi',
+      version: '6.79.0',
+      statistics: { appId: 1, platform: 3, version: '6.79.0', abtest: '' },
       session_id: '',
       csrf_token: TaskConfig.BILIJCT,
       csrf: TaskConfig.BILIJCT,
       visit_id: '',
+    },
+    {
+      headers: {
+        'user-agent': TaskConfig.mobileUA,
+      },
     },
   );
 }

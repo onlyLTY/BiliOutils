@@ -42,9 +42,9 @@ interface UAOption {
 }
 
 export function getAndroidUA({
-  version = '6.78.0',
+  version = '6.79.0',
   phone = 'MI 10 Pro',
-  build = '6780300',
+  build = '6790300',
   channel = 'xiaomi',
   os = '10',
 }: UAOption = {}) {

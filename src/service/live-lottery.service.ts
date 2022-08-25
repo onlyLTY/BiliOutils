@@ -5,7 +5,7 @@ import type {
   LiveRoomList,
 } from '../dto/live.dto';
 import type { IdType } from '@/types';
-import { apiDelay, logger, pushIfNotExist } from '../utils';
+import { apiDelay, getRandomItem, getUnixTime, logger, pushIfNotExist, sleep } from '../utils';
 import {
   checkLottery,
   getArea,
@@ -14,11 +14,14 @@ import {
   joinRedPacket,
   checkRedPacket,
   getFollowLiveRoomList,
+  sendMessage,
 } from '../net/live.request';
 import { PendentID, RequireType, TianXuanStatus } from '../enums/live-lottery.enum';
 import { TaskConfig, TaskModule } from '../config/globalVar';
-import { entryRoomPc, getAnchorInRoom } from '@/net/live-heart.request';
-import { request } from '@/utils/request';
+import { biliWS } from '@/utils/ws';
+// import { getAnchorInRoom } from '@/net/live-heart.request';
+// import { request } from '@/utils/request';
+import { DMEmoji } from '@/constant/dm';
 
 interface LiveAreaType {
   areaId: string;
@@ -252,7 +255,7 @@ export async function liveLotteryService() {
  * 检测直播间是否有红包
  * @param roomId
  */
-async function getRedPacketId(roomId: IdType) {
+async function getRedPacket(roomId: IdType) {
   try {
     const { data, code } = await checkRedPacket(roomId);
     if (code !== 0) {
@@ -262,11 +265,11 @@ async function getRedPacketId(roomId: IdType) {
     if (!popularity_red_pocket) {
       return;
     }
-    const { lot_id, lot_status } = popularity_red_pocket[0];
-    if (lot_status === 2) {
+    const { lot_status, end_time } = popularity_red_pocket[0];
+    if (lot_status === 2 || end_time - getUnixTime() < 5) {
       return;
     }
-    return lot_id;
+    return popularity_red_pocket[0];
   } catch (error) {
     logger.debug(`检测红包异常: ${error.message}`);
   }
@@ -277,6 +280,7 @@ interface RedPacket {
   uname: string;
   lot_id: number;
   room_id: number;
+  end_time: number;
 }
 
 /**
@@ -289,13 +293,14 @@ export async function getRedPacketRoom(areaId: string, parentId: string, page = 
   const roomList = await getLotteryRoomList(areaId, parentId, page, 'redPack');
   const checkedRoomList: RedPacket[] = [];
   for (const room of roomList) {
-    const lotId = await getRedPacketId(room.roomid);
-    if (lotId) {
+    const redPacket = await getRedPacket(room.roomid);
+    if (redPacket) {
       checkedRoomList.push({
         uid: room.uid,
         uname: room.uname,
-        lot_id: lotId,
+        lot_id: redPacket.lot_id,
         room_id: room.roomid,
+        end_time: redPacket.end_time,
       });
       await apiDelay(100);
     }
@@ -311,6 +316,10 @@ async function doRedPacket(redPacket: RedPacket) {
   try {
     const { lot_id, uid, uname, room_id } = redPacket;
     logger.info(`红包主播：【${uname}】`);
+    const wsTime = redPacket.end_time - getUnixTime();
+    console.log('redPacket.end_time', redPacket.end_time);
+    const ws = await biliWS(redPacket.room_id, (wsTime + 20) * 1000);
+    await sleep(5000);
     const { code, message } = await joinRedPacket({
       room_id,
       lot_id,
@@ -318,10 +327,20 @@ async function doRedPacket(redPacket: RedPacket) {
     });
     if (code !== 0) {
       logger.info(`红包失败: ${code}-${message}`);
+      ws.close();
       return;
     }
     newFollowUp.push(uid);
     logger.info(`红包成功 √`);
+    let msgTimes = Math.ceil(wsTime / 5);
+    msgTimes = msgTimes > 10 ? 10 : msgTimes;
+    for (let i = 0; i < msgTimes; i++) {
+      setTimeout(() => {
+        sendMessage(room_id, getRandomItem(DMEmoji).emoticon_unique, 1).catch(error => {
+          logger.error(`发送红包消息异常: ${error.message}`);
+        });
+      }, i * 5000);
+    }
   } catch (error) {
     logger.info(`红包异常: ${error.message}`);
   }
@@ -337,9 +356,11 @@ async function doRedPackArea(areaId: string, parentId: string, num = 2) {
   for (let page = 1; page <= num; page++) {
     const rooms = await getRedPacketRoom(areaId, parentId, page);
     for (const room of rooms) {
-      await request(getAnchorInRoom, undefined, room.room_id);
-      await apiDelay(40);
-      await request(entryRoomPc, undefined, room.room_id);
+      // await request(entryRoomMoblie, undefined, room);
+      // await apiDelay(40);
+      // await request(getAnchorInRoom, undefined, room.room_id);
+      // await apiDelay(40);
+      // await request(entryActionMobile, undefined, room);
       await apiDelay(1000);
       await doRedPacket(room);
     }

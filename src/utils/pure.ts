@@ -213,7 +213,7 @@ export function randomString(length: number, lower?: boolean) {
  * 获取 visitorId
  * @description 获取 visitorId，部分请求需要
  */
-export function getVisitId() {
+export function createVisitId() {
   // 1 ~ 9
   const randomNum = random(1, 9);
   // 10 位随机数字字母字符串
@@ -390,6 +390,7 @@ export function isToday(date: Date | number, isUnix = true): boolean {
   }
   return getPRCDate().toDateString() === date.toDateString();
 }
+
 /**
  * 获取 unix 时间戳
  */
@@ -402,7 +403,7 @@ export function getUnixTime() {
  * @description buvid 以 XY 开头，后面跟 35 位 16 进制字符串大写
  * @param prefix 前缀
  */
-export function getBuvid(prefix = 'XY') {
+export function createBuvid(prefix = 'XY') {
   return `${prefix}${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
 }
 

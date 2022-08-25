@@ -3,7 +3,7 @@ import { getConfig } from './setConfig';
 import { mergeConfig } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
 import getCookie, { encodeCookie, getCookieItem } from '@/utils/cookie';
-import { getBuvid } from '@/utils/pure';
+import { createBuvid } from '@/utils/pure';
 
 export type TaskConfigType = Config & {
   mobileUA: string;
@@ -79,7 +79,7 @@ export function initialize(config?: Config) {
 function getCookieBuvid(cookie: string) {
   const buvid = getCookieItem(cookie, 'Buvid');
   if (buvid && buvid !== 'undefined') return buvid;
-  return getBuvid();
+  return createBuvid();
 }
 
 /**
