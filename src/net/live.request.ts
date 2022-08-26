@@ -2,6 +2,7 @@ import type { IdType } from '../types';
 import type {
   BagSendResDto,
   Bp2GoldDto,
+  DanmuDto,
   FansMedalPanelDto,
   JoinLotteryDto,
   JoinRedPacketRes,
@@ -16,6 +17,7 @@ import type {
   LiveSignDto,
   LiveSignInfoDto,
   MyWalletDto,
+  OnlineGoldRankDto,
   Silver2CoinDto,
   SilverStatusDto,
 } from '../dto/live.dto';
@@ -282,5 +284,21 @@ export function joinRedPacket(params: { room_id: IdType; ruid: IdType; lot_id: I
 export function getFollowLiveRoomList(page = 1, page_size = 9) {
   return liveApi.get<LiveFollowListDto>(
     `/xlive/web-ucenter/user/following?page=${page}&page_size=${page_size}`,
+  );
+}
+
+/**
+ * 获取弹幕信息
+ */
+export function getDanmuInfo(room_id: number) {
+  return liveApi.get<DanmuDto>(`xlive/web-room/v1/index/getDanmuInfo?id=${room_id}`);
+}
+
+/**
+ * 获取在线排名
+ */
+export function getOnlineGoldRank(ruid: number, room_id: number) {
+  return liveApi.get<OnlineGoldRankDto>(
+    `xlive/general-interface/v1/rank/getOnlineGoldRank?ruid=${ruid}&roomId=${room_id}&page=1&pageSize=1`,
   );
 }

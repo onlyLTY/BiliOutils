@@ -1,6 +1,6 @@
 import { moveUsersToTag, User } from '../service/tags.service';
 import { logger } from '../utils';
-import { liveRedPackService } from '../service/live-lottery.service';
+import { liveRedPackService } from '../service/red-pack.service';
 import { getLastFollow, getTeamUsers } from '../service/tags.service';
 import { updateSession } from '@/service/session.service';
 import { TaskConfig } from '@/config/globalVar';
@@ -10,7 +10,7 @@ export default async function liveRedPack() {
   try {
     // 获取最后一个关注的UP
     const lastFollow = await getLastFollow();
-    logger.info(`最后一个关注的UP: ${lastFollow.uname}`);
+    lastFollow && logger.info(`最后一个关注的UP: ${lastFollow.uname}`);
     const newFollowUps = await liveRedPackService();
     logger.info('扫描完成，获取新关注的UP');
     // 获取天选时刻关注的用户

@@ -504,3 +504,62 @@ export interface JoinRedPacketRes extends ApiBaseProp {
     join_status: number;
   };
 }
+
+/**
+ * 弹幕信息
+ */
+export type DanmuDto = ApiBaseProp<{
+  group: string;
+  business_id: number;
+  refresh_row_factor: number;
+  refresh_rate: number;
+  max_delay: number;
+  token: string;
+  host_list: HostList[];
+}>;
+
+interface HostList {
+  host: string;
+  port: number;
+  wss_port: number;
+  ws_port: number;
+}
+
+export type OnlineGoldRankDto = ApiBaseProp<{
+  onlineNum: number;
+  OnlineRankItem: OnlineRankItem[];
+  ownInfo: OwnInfo;
+  tips_text: string;
+  value_text: string;
+}>;
+
+interface OwnInfo {
+  uid: number;
+  name: string;
+  face: string;
+  rank: number;
+  needScore: number;
+  score: number;
+  guard_level: number;
+}
+
+interface OnlineRankItem {
+  userRank: number;
+  uid: number;
+  name: string;
+  face: string;
+  score: number;
+  medalInfo: MedalInfo;
+  guard_level: number;
+}
+
+interface MedalInfo {
+  guardLevel: number;
+  medalColorStart: number;
+  medalColorEnd: number;
+  medalColorBorder: number;
+  medalName: string;
+  level: number;
+  targetId: number;
+  isLight: number;
+}
