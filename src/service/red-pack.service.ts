@@ -110,22 +110,14 @@ async function doRedPacket(redPacket: RedPacket) {
       ruid: uid,
     });
     if (code !== 0) {
-      logger.warn(`【${uname}】红包失败: ${code} ${message}`);
       closeWs(ws);
-      return;
+      return joinErrorHandle(uname, code, message);
     }
     pushIfNotExist(newFollowUp, uid);
     logger.debug(`【${uname}】红包成功 √`);
     const clearDmTimes = sendDm(room_id, wsTime);
     await sleep(5000);
     const { ownInfo } = await request(getOnlineGoldRank, undefined, uid, room_id);
-    console.log(
-      'room_id, needScore, score, rank',
-      room_id,
-      ownInfo.needScore,
-      ownInfo.score,
-      ownInfo.rank,
-    );
     if (ownInfo?.score === 0) {
       logger.debug(`可能账号已被风控，等待${riskSleepTime}分！`);
       closeWs(ws);
@@ -134,6 +126,20 @@ async function doRedPacket(redPacket: RedPacket) {
     }
   } catch (error) {
     logger.error(`红包异常: ${error.message}`);
+  }
+}
+
+function joinErrorHandle(uname: string, code: number, message: string) {
+  switch (code) {
+    case 1009109: // 今日参与次数已用完
+      logger.info(message);
+      return ReturnStatus.退出;
+    case 1009114: // 已经参与过了
+    case 1009108: // 不在时间范围内
+      return;
+    default:
+      logger.info(`【${uname}】红包失败 ${code} ${message}`);
+      return;
   }
 }
 
@@ -161,7 +167,6 @@ function sendDm(room_id: number, wsTime: number) {
  * 对一个分区进行天选
  * @param areaId
  * @param parentId
- * @param num 天选的页数
  */
 async function doRedPackArea(areaId: string, parentId: string) {
   const linkRoomNum = TaskConfig.redPack.linkRoomNum;
