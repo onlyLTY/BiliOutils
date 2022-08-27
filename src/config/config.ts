@@ -89,7 +89,7 @@ export const defaultConfig = {
     consoleLevel: 'debug' as LevelType | boolean,
     fileLevel: 'debug' as LevelType | boolean,
     useEmoji: true,
-    fileSplit: 'month' as 'day' | 'month',
+    fileSplit: 'day' as 'day' | 'month',
   },
   limit: {
     // 获取经验限制为 6 级

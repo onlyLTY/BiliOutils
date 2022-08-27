@@ -4,6 +4,7 @@ import { fork } from 'child_process';
 import * as path from 'path';
 import { getArg } from './utils/args';
 import { getDelayTime, random, Sleep } from './utils/pure';
+import { deleteLogFile } from './utils/log/file';
 
 /**
  * 获取配置
@@ -69,6 +70,7 @@ export function runForkSync(config: Config, index: number, forkPath = './bin/for
 }
 
 export async function runTask(configs?: Config[], forkPath = './bin/fork', tasks = '') {
+  deleteLogFile();
   if (!configs) {
     const { getConfig } = await import('./config/setConfig');
     configs = getConfig(true);

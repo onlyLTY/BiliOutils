@@ -84,7 +84,7 @@ const theConfig = {
     consoleLevel: 'debug',
     fileLevel: 'debug',
     useEmoji: true,
-    fileSplit: 'month',
+    fileSplit: 'day',
   },
   limit: {
     level6: true,
