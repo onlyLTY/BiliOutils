@@ -1,5 +1,6 @@
 import type { Sessionlist, SessionMessage10Dto } from '@/dto/session.dto';
-import { TaskConfig, TaskModule } from '@/config/globalVar';
+import type { SessionHandleType } from '@/types';
+import { TaskModule } from '@/config/globalVar';
 import { deleteSession, getSession, getSessionHistory, readSession } from '@/net/session.request';
 import { apiDelay, isBoolean, logger, pushIfNotExist } from '@/utils';
 import { User } from './tags.service';
@@ -52,7 +53,7 @@ async function getMessageList(followUps: User[]) {
 /**
  * 读取或者删除会话
  */
-export async function updateSession(followUps: User[]) {
+export async function updateSession(followUps: User[], actFollowMsg: SessionHandleType) {
   if (!followUps || followUps.length <= 0) {
     return;
   }
@@ -65,18 +66,18 @@ export async function updateSession(followUps: User[]) {
   try {
     for (let index = 0; index < sessionList.length; index++) {
       const session = sessionList[index];
-      await handleSession(session);
+      await handleSession(session, actFollowMsg);
     }
   } catch (error) {
     logger.error(`更新会话异常：${error.message}`);
   }
   if (sessionList.length >= 19) {
-    await updateSession(followUps);
+    await updateSession(followUps, actFollowMsg);
   }
 }
 
-async function handleSession(session: Sessionlist) {
-  switch (TaskConfig.lottery.actFollowMsg) {
+async function handleSession(session: Sessionlist, actFollowMsg: SessionHandleType) {
+  switch (actFollowMsg) {
     case 'del':
     case 'delete':
       await deleteSession(session);

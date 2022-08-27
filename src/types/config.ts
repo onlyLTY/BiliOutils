@@ -11,10 +11,6 @@ export type Config = Required<
         to?: string;
       };
     };
-    lottery: {
-      actFollowMsg?: 'read' | 'del' | 'delete' | 'none' | undefined;
-      scanFollow?: string | 'only';
-    };
   }
 >;
 

@@ -1,14 +1,26 @@
 import type { IdType } from '@/types';
-import { getRandomItem, getUnixTime, logger, pushIfNotExist, sleep } from '@/utils';
+import { getRandomItem, getUnixTime, logger, pushIfNotExist, random, sleep } from '@/utils';
 import { joinRedPacket, checkRedPacket, sendMessage, getOnlineGoldRank } from '@/net/live.request';
 import { TaskConfig } from '@/config/globalVar';
-import { biliWS, clearWs, closeWs, wsList } from '@/utils/ws';
+import { biliDmWs, clearWs, closeWs, wsList } from '@/utils/ws';
 import { DMEmoji } from '@/constant/dm';
-import { getLiveArea, getLotteryRoomList } from './live-lottery.service';
+import { getLiveArea, getLotteryRoomList, handleFollowUps } from './live-lottery.service';
 import { request } from '@/utils/request';
+import { getLastFollow } from './tags.service';
 
 // 可能是新关注的UP
-let newFollowUp: (number | string)[];
+let newFollowUp: (number | string)[],
+  joinCount = 0,
+  restCount = 0;
+
+/**
+ * 状态枚举
+ */
+const ReturnStatus = {
+  退出: 0,
+  中场休眠: -1,
+  风控休眠: -2,
+};
 
 /**
  * 检测直播间是否有红包
@@ -73,11 +85,23 @@ async function getRedPacketRoom(areaId: string, parentId: string, page = 1) {
  */
 async function doRedPacket(redPacket: RedPacket) {
   const { lot_id, uid, uname, room_id, end_time } = redPacket;
+  const { restTime, totalNum, riskSleepTime } = TaskConfig.redPack;
   const wsTime = end_time - getUnixTime();
-  if (wsTime < 2) return;
+  if (wsTime < 4) return;
+  if (joinCount >= totalNum) {
+    logger.debug(`已经参与了${totalNum}次，停止运行`);
+    return ReturnStatus.退出;
+  }
+  if (restCount >= restTime[0]) {
+    restCount = 0;
+    logger.debug(`中场休息时间到，暂停运行${restTime[1]}分`);
+    return ReturnStatus.中场休眠;
+  }
+  joinCount++;
+  restCount++;
   try {
-    logger.debug(`红包主播：【${uname}】`);
-    const ws = await biliWS(room_id, (wsTime + 20) * 1000);
+    const ws = await biliDmWs(room_id, (wsTime + 20) * 1000);
+    if (!ws) return;
     wsList.add(ws);
     await sleep(3000);
     const { code, message } = await joinRedPacket({
@@ -86,20 +110,27 @@ async function doRedPacket(redPacket: RedPacket) {
       ruid: uid,
     });
     if (code !== 0) {
-      logger.warn(`红包失败: ${code}-${message}`);
+      logger.warn(`【${uname}】红包失败: ${code} ${message}`);
       closeWs(ws);
       return;
     }
     pushIfNotExist(newFollowUp, uid);
-    logger.debug(`红包成功 √`);
-    sendDm(room_id, wsTime);
+    logger.debug(`【${uname}】红包成功 √`);
+    const clearDmTimes = sendDm(room_id, wsTime);
     await sleep(5000);
     const { ownInfo } = await request(getOnlineGoldRank, undefined, uid, room_id);
-    console.log(room_id, ownInfo.needScore, ownInfo.score, ownInfo.rank);
+    console.log(
+      'room_id, needScore, score, rank',
+      room_id,
+      ownInfo.needScore,
+      ownInfo.score,
+      ownInfo.rank,
+    );
     if (ownInfo?.score === 0) {
-      logger.warn(`score 为 0，可能账号已被风控，等待 2 分钟！`);
+      logger.debug(`可能账号已被风控，等待${riskSleepTime}分！`);
       closeWs(ws);
-      return true;
+      clearDmTimes();
+      return ReturnStatus.风控休眠;
     }
   } catch (error) {
     logger.error(`红包异常: ${error.message}`);
@@ -110,10 +141,11 @@ async function doRedPacket(redPacket: RedPacket) {
  * 发送直播间弹幕
  */
 function sendDm(room_id: number, wsTime: number) {
-  let msgTimes = Math.ceil(wsTime / 5);
-  msgTimes = msgTimes > 10 ? 10 : msgTimes;
+  const [dm1, dm2] = TaskConfig.redPack.dmNum,
+    danmuNum = dm2 ? random(dm1, dm2) : dm1,
+    times = Math.min(10, Math.ceil(wsTime / 5), danmuNum);
   const timers: NodeJS.Timer[] = [];
-  for (let i = 0; i < msgTimes; i++) {
+  for (let i = 0; i < times; i++) {
     timers.push(
       setTimeout(() => {
         sendMessage(room_id, getRandomItem(DMEmoji).emoticon_unique, 1).catch(err => {
@@ -122,7 +154,7 @@ function sendDm(room_id: number, wsTime: number) {
       }, i * 5000),
     );
   }
-  return timers;
+  return () => timers.forEach(timer => timer && clearTimeout(timer));
 }
 
 /**
@@ -131,23 +163,23 @@ function sendDm(room_id: number, wsTime: number) {
  * @param parentId
  * @param num 天选的页数
  */
-async function doRedPackArea(areaId: string, parentId: string, num = 2) {
-  for (let page = 1; page <= num; page++) {
-    const rooms = await getRedPacketRoom(areaId, parentId, page);
-    for (const room of rooms) {
-      console.log('room', room);
-      await waitForRedPacket();
-      if (await doRedPacket(room)) return true;
-    }
+async function doRedPackArea(areaId: string, parentId: string) {
+  const linkRoomNum = TaskConfig.redPack.linkRoomNum;
+  const rooms = await getRedPacketRoom(areaId, parentId);
+  for (const room of rooms) {
+    await waitForWebSocket(linkRoomNum);
+    const status = await doRedPacket(room);
+    if (status !== undefined) return status;
   }
 }
 
-function waitForRedPacket(conditions = 2) {
+/**
+ * 通过 ws 数量限制红包并发数
+ */
+function waitForWebSocket(conditions = 2) {
   return new Promise(resolve => {
     const timer = setInterval(() => {
-      console.log('waitForRedPacket', conditions, wsList.size);
       if (wsList.size < conditions) {
-        console.log('wsList.size', wsList.size);
         clearInterval(timer);
         resolve(true);
       }
@@ -155,13 +187,47 @@ function waitForRedPacket(conditions = 2) {
   });
 }
 
+async function waitForStatus(status: number | undefined) {
+  const { riskSleepTime, restTime } = TaskConfig.redPack;
+  switch (status) {
+    case ReturnStatus.风控休眠: {
+      if (riskSleepTime === -1) {
+        return ReturnStatus.退出;
+      }
+      return await handleSleep(riskSleepTime);
+    }
+    case ReturnStatus.中场休眠: {
+      if (restTime[1] === -1) {
+        return ReturnStatus.退出;
+      }
+      return await handleSleep(restTime[1]);
+    }
+    default:
+      return status;
+  }
+
+  async function handleSleep(time: number) {
+    const last = await getLastFollow();
+    if (TaskConfig.redPack.moveUpInWait) {
+      const { moveTag, actFollowMsg } = TaskConfig.redPack;
+      await handleFollowUps(newFollowUp, last, moveTag, actFollowMsg, false);
+    }
+    await sleep(time * 60000);
+  }
+}
+
 /**
  * 进行天选
  */
 export async function liveRedPackService() {
-  newFollowUp = [];
-  clearWs();
-  const { pageNum } = TaskConfig.lottery;
+  init();
+  await run();
+  await waitForWebSocket(1);
+  return newFollowUp;
+}
+
+async function run() {
+  if (joinCount >= 100) return;
   // 获取直播分区
   const areaList = await getLiveArea();
   // 遍历大区
@@ -170,11 +236,17 @@ export async function liveRedPackService() {
     // 遍历小区
     for (const area of areas) {
       await sleep(2000);
-      if (await doRedPackArea(area.areaId, area.parentId, pageNum)) {
-        await sleep(200000);
-      }
+      const status = await waitForStatus(await doRedPackArea(area.areaId, area.parentId));
+      if (status === undefined) continue;
+      if (status === ReturnStatus.退出) return;
     }
   }
-  await waitForRedPacket(1);
-  return newFollowUp;
+  return await run();
+}
+
+function init() {
+  newFollowUp = [];
+  clearWs();
+  joinCount = 0;
+  restCount = 0;
 }

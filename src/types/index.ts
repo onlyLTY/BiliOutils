@@ -19,3 +19,5 @@ export interface ActivityLotteryIdType {
   follows?: number[];
   followed?: boolean;
 }
+
+export type SessionHandleType = 'read' | 'del' | 'delete' | 'none' | undefined;

@@ -19,11 +19,15 @@ export interface User {
  * 获取最后一个关注
  */
 export async function getLastFollow() {
-  const { data, code } = await getFollowingsByTag(1, 1, 0);
-  if (code !== 0) {
-    throw new Error(`获取最后一个关注失败: ${code}`);
+  try {
+    const { data, code } = await getFollowingsByTag(1, 1, 0);
+    if (code !== 0) {
+      logger.warn(`获取最后一个关注失败: ${code}`);
+    }
+    return data?.[0];
+  } catch (error) {
+    logger.warn(error);
   }
-  return data[0];
 }
 
 /**
@@ -154,7 +158,7 @@ export async function unFollowUsers(users: User[], num = -1) {
 export async function getTeamUsers(
   users: User[],
   lotteryFollows: (number | string)[],
-  lastFollow: number,
+  lastFollow?: number,
   ps = 1,
 ) {
   if (users.length > lotteryFollows.length) {

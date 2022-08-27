@@ -1,5 +1,5 @@
 import type { LevelType } from '@/types/log';
-import type { ActivityLotteryIdType, CouponBalanceUseType } from '@/types';
+import type { ActivityLotteryIdType, CouponBalanceUseType, SessionHandleType } from '@/types';
 import {
   DAILY_RUN_TIME,
   LOTTERY_EXCLUDE,
@@ -166,22 +166,38 @@ export const defaultConfig = {
     includeAward: LOTTERY_INCLUDE,
     /** 黑名单 */
     blackUid: LOTTERY_UP_BLACKLIST,
-    /** 是否将天选时刻关注 UP 移动到分组 */
-    isMoveTag: true,
     /** 天选时刻关注 UP 移动到分组 */
     moveTag: '天选时刻',
     /** 天选获取的直播页数 */
     pageNum: 2,
     /** 关注回复处理方式  */
-    actFollowMsg: 'read',
+    actFollowMsg: 'read' as SessionHandleType,
     /** 扫描关注的用户 */
-    scanFollow: undefined,
+    scanFollow: undefined as string | 'only' | undefined,
     /** 跳过需要关注的天选 */
     skipNeedFollow: false,
     // 打印可能中奖的消息
     mayBeWinMsg: true,
   },
-  redPack: {},
+  redPack: {
+    // 中场休息时间，当每参加了几个直播间的时候，休息一下 [参加个数，休息时间（分，-1 为直接结束）]
+    restTime: [0, -1],
+    // 同时参与的直播间数量
+    linkRoomNum: 0,
+    // 疑似触发风控时休眠时间（分），-1 为直接结束
+    riskSleepTime: -1,
+    // 总参与次数，达到后不管结果如何，直接结束
+    totalNum: 0,
+    // 参与直播时发送的弹幕数量（与内置数量比，较小者生效）
+    // [固定值]，[最少,最多]
+    dmNum: [5],
+    // 是否在等待时处理关注用户（读取消息，移动）
+    moveUpInWait: true,
+    /** 天选时刻关注 UP 移动到分组 */
+    moveTag: 'rp关注',
+    /** 关注回复处理方式  */
+    actFollowMsg: 'read' as SessionHandleType,
+  },
   intimacy: {
     // 直播弹幕
     liveSendMessage: true,
