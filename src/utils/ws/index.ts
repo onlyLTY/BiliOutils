@@ -36,8 +36,10 @@ export function clearWs() {
 
 function clearWsTimer(ws: WebSocket) {
   const options = timerMap.get(ws);
-  clearTimer(options || {});
-  timerMap.delete(ws);
+  if (options) {
+    clearTimer(options);
+    timerMap.delete(ws);
+  }
 }
 
 function clearTimer(options: TimerOptions) {
@@ -72,7 +74,7 @@ async function getWsLink(room_id: number) {
   }
 }
 
-export async function biliDmWs(room_id = 7734200, time = 0) {
+export async function biliDmWs(room_id = 7734200, time = 0, msgCallback?: () => void) {
   const wsLink = await getWsLink(room_id);
   if (!wsLink) return;
   const json = {
@@ -97,6 +99,7 @@ export async function biliDmWs(room_id = 7734200, time = 0) {
   // WebSocket 连接关闭
   ws.addEventListener('close', () => {
     // console.log(`WebSocket：直播间${room_id}连接已关闭`);
+    clearWsTimer(ws);
   });
 
   ws.addEventListener('error', () => {
@@ -112,9 +115,8 @@ export async function biliDmWs(room_id = 7734200, time = 0) {
         if (isRedPackWs(body)) {
           closeWs(ws);
           const my = body.data.winner_info.find(item => item[0] === TaskConfig.USERID);
-          if (my) {
-            logger.debug(`直播间${room_id}，恭喜您获得${body.data.awards[my[3]].award_name}`);
-          }
+          my && logger.debug(`直播间${room_id}，恭喜您获得${body.data.awards[my[3]].award_name}`);
+          msgCallback && msgCallback();
         }
       });
     }
@@ -127,7 +129,6 @@ export async function biliDmWs(room_id = 7734200, time = 0) {
     }, 30000);
     if (time > 0) {
       timeout = setTimeout(() => {
-        console.log(`定时关闭连接${room_id}`);
         closeWs(ws);
       }, time);
     }

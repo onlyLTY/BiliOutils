@@ -1,12 +1,15 @@
-import { apiDelay, Logger, logger } from '../utils';
+import type { TagsFollowingsDto } from '@/dto/user-info.dto';
+import type { SessionHandleType } from '@/types';
+import { apiDelay, Logger, logger } from '@/utils';
 import {
   createTag,
   getFollowingsByTag,
   getTags,
   moveToTag,
   unFollow,
-} from '../net/user-info.request';
-import type { TagListDto } from '../dto/user-info.dto';
+} from '@/net/user-info.request';
+import type { TagListDto } from '@/dto/user-info.dto';
+import { updateSession } from './session.service';
 
 const tagLogger = new Logger({ console: 'debug', file: 'warn', push: 'warn' }, 'live');
 
@@ -186,4 +189,25 @@ export async function getTeamUsers(
     return;
   }
   return await getTeamUsers(users, lotteryFollows, lastFollow, ps + 1);
+}
+
+export async function handleFollowUps(
+  newFollowUps: (string | number)[],
+  lastFollow?: TagsFollowingsDto['data'][number],
+  moveTag?: string,
+  actFollowMsg?: SessionHandleType,
+  log = true,
+) {
+  // 获取天选时刻关注的用户
+  const followUps: User[] = [];
+  await getTeamUsers(followUps, newFollowUps, lastFollow?.mid);
+  // 读取消息
+  log && logger.debug('开始读取消息');
+  await updateSession(followUps, actFollowMsg);
+  // 移动关注UP到分组
+  if (moveTag) {
+    log && logger.debug('移动关注UP到分组');
+    await moveUsersToTag(followUps, moveTag);
+    log && logger.debug('移动关注UP到分组成功');
+  }
 }

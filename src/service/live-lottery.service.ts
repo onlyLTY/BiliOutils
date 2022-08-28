@@ -4,8 +4,6 @@ import type {
   LiveFollowDto,
   LiveRoomList,
 } from '@/dto/live.dto';
-import type { TagsFollowingsDto } from '@/dto/user-info.dto';
-import type { SessionHandleType } from '@/types';
 import { sleep, logger, pushIfNotExist } from '@/utils';
 import {
   checkLottery,
@@ -16,8 +14,6 @@ import {
 } from '@/net/live.request';
 import { PendentID, RequireType, TianXuanStatus } from '@/enums/live-lottery.enum';
 import { TaskConfig, TaskModule } from '@/config/globalVar';
-import { getTeamUsers, moveUsersToTag, User } from './tags.service';
-import { updateSession } from './session.service';
 
 interface LiveAreaType {
   areaId: string;
@@ -28,27 +24,6 @@ type CheckedLottery = LiveCheckLotteryDto & { uid: number; uname: string };
 
 // 可能是新关注的UP
 let newFollowUp: (number | string)[];
-
-export async function handleFollowUps(
-  newFollowUps: (string | number)[],
-  lastFollow?: TagsFollowingsDto['data'][number],
-  moveTag?: string,
-  actFollowMsg?: SessionHandleType,
-  log = true,
-) {
-  // 获取天选时刻关注的用户
-  const followUps: User[] = [];
-  await getTeamUsers(followUps, newFollowUps, lastFollow?.mid);
-  // 读取消息
-  log && logger.debug('开始读取消息');
-  await updateSession(followUps, actFollowMsg);
-  // 移动关注UP到分组
-  if (moveTag) {
-    log && logger.debug('移动关注UP到分组');
-    await moveUsersToTag(followUps, moveTag);
-    log && logger.debug('移动关注UP到分组成功');
-  }
-}
 
 /**
  * 获取直播分区

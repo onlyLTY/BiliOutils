@@ -1,10 +1,6 @@
 import { logger } from '@/utils';
-import {
-  handleFollowUps,
-  liveFollowLotteryService,
-  liveLotteryService,
-} from '@/service/live-lottery.service';
-import { getLastFollow } from '@/service/tags.service';
+import { liveFollowLotteryService, liveLotteryService } from '@/service/live-lottery.service';
+import { getLastFollow, handleFollowUps } from '@/service/tags.service';
 import { TaskConfig } from '@/config/globalVar';
 import { printLiveUserSession } from '@/service/session.service';
 

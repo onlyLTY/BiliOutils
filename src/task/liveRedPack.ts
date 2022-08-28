@@ -1,7 +1,6 @@
 import { logger } from '@/utils';
 import { liveRedPackService } from '@/service/red-pack.service';
-import { getLastFollow } from '@/service/tags.service';
-import { handleFollowUps } from '@/service/live-lottery.service';
+import { getLastFollow, handleFollowUps } from '@/service/tags.service';
 import { TaskConfig } from '@/config/globalVar';
 
 export default async function liveRedPack() {
