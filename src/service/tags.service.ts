@@ -1,6 +1,7 @@
 import type { TagsFollowingsDto } from '@/dto/user-info.dto';
 import type { SessionHandleType } from '@/types';
-import { apiDelay, Logger, logger } from '@/utils';
+import type { TagListDto } from '@/dto/user-info.dto';
+import { apiDelay, Logger, logger, sleep } from '@/utils';
 import {
   createTag,
   getFollowingsByTag,
@@ -8,8 +9,8 @@ import {
   moveToTag,
   unFollow,
 } from '@/net/user-info.request';
-import type { TagListDto } from '@/dto/user-info.dto';
 import { updateSession } from './session.service';
+import { TaskConfig } from '@/config/globalVar';
 
 const tagLogger = new Logger({ console: 'debug', file: 'warn', push: 'warn' }, 'live');
 
@@ -17,6 +18,8 @@ export interface User {
   mid: number;
   uname: string;
 }
+
+let unCount = 0;
 
 /**
  * 获取最后一个关注
@@ -96,59 +99,67 @@ export async function moveUsersToTag(users: User[], tagName = '天选时刻') {
 /**
  * 取关分组
  * @param tagName 分组名称
- * @param num 取关数量
+ * @param restNum 剩余取关数量
  */
-export async function unFollowTag(tagName = '天选时刻', num = -1) {
+export async function unFollowTag(tagName = '天选时刻', restNum = -1): Promise<number> {
   const tag = await getTag(tagName);
   if (!tag) {
-    return;
+    return restNum;
   }
   await apiDelay();
   if (!tag.tagid) {
-    return;
+    return restNum;
   }
   try {
     const { data, code } = await getFollowingsByTag(1, 20, tag.tagid);
     if (code !== 0 || !data.length) {
-      return;
+      return restNum;
     }
-    num = await unFollowUsers(data, num);
+    restNum = await unFollowUsers(data, restNum);
     // 取关完成
     if (data.length < 20) {
-      return;
+      return restNum;
     }
     // 如果还有剩余，则继续取关
-    if (num !== 0) {
-      await unFollowTag(tagName, num);
+    if (restNum !== 0) {
+      return await unFollowTag(tagName, restNum);
     }
   } catch (error) {
     logger.warn(`取关分组异常: ${error.message}`);
   }
+  return restNum;
 }
 
 /**
  * 取关用户
  * @param users 用户列表
- * @param num 取关数量
+ * @param restNum 剩余取关数量
  */
-export async function unFollowUsers(users: User[], num = -1) {
+export async function unFollowUsers(users: User[], restNum = -1) {
+  const [unNum, sleepTime] = TaskConfig.unFollow.restTime;
   for (const user of users) {
-    if (num === 0) {
-      return num;
+    if (restNum === 0) {
+      return restNum;
     }
     try {
       const { code, message } = await unFollow(user.mid);
-      tagLogger.info(`取关【${user.uname}】成功！`);
+      tagLogger.debug(`取关【${user.uname}】成功！`);
       if (code !== 0) {
-        logger.warn(`取关【${user.uname}】失败: ${code}-${message}`);
+        logger.warn(`取关【${user.uname}】失败: ${code} ${message}`);
       }
-      num !== -1 && num--;
-      await apiDelay(1500);
+      restNum > 0 && restNum--;
+      unCount++;
+      if (unNum > 0 && unCount >= unNum && sleepTime > 0) {
+        unCount = 0;
+        await sleep(sleepTime * 60000);
+        continue;
+      }
+      await sleep(TaskConfig.unFollow.delay * 1000);
     } catch (error) {
       logger.warn(`取关【${user.uname}】异常: ${error.message}`);
     }
   }
-  return num;
+  return restNum;
 }
 
 /**

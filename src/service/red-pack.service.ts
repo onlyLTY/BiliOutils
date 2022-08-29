@@ -2,12 +2,14 @@ import type { IdType } from '@/types';
 import { getRandomItem, getUnixTime, logger, pushIfNotExist, random, sleep } from '@/utils';
 import { joinRedPacket, checkRedPacket, sendMessage, getOnlineGoldRank } from '@/net/live.request';
 import { TaskConfig } from '@/config/globalVar';
-import { biliDmWs, clearWs, closeWs, wsList } from '@/utils/ws';
+import { biliDmWs, clearWs, closeWs, wsMap } from '@/utils/ws';
 import { DMEmoji } from '@/constant/dm';
 import { getLiveArea, getLotteryRoomList } from './live-lottery.service';
 import { request } from '@/utils/request';
 import { handleFollowUps } from './tags.service';
-import { WebSocket } from 'ws';
+import { getRedPacketController } from '@/net/red-packet.request';
+import { noWinRef } from '@/store/red-packet';
+import { ReturnStatus } from '@/enums/packet.enum';
 
 // 可能是新关注的UP
 let newFollowUp: (number | string)[],
@@ -15,15 +17,6 @@ let newFollowUp: (number | string)[],
   restCount = 0,
   riskCount = 0;
 const waitting: Ref<boolean> = { value: false };
-
-/**
- * 状态枚举
- */
-const ReturnStatus = {
-  退出: 0,
-  中场休眠: -1,
-  风控休眠: -2,
-};
 
 /**
  * 检测直播间是否有红包
@@ -54,8 +47,21 @@ interface RedPacket {
   uname: string;
   lot_id: number;
   room_id: number;
-  wait_num: number;
-  end_time: number;
+  wait_num?: number;
+  end_time?: number;
+  ws_time?: number;
+}
+
+/**
+ * 通过活动链接获取直播间
+ */
+async function getRoomListByLink() {
+  const roomList = await getRedPacketController();
+  if (!roomList?.length) {
+    return;
+  }
+  const { countDown } = TaskConfig.redPack;
+  return roomList?.filter(room => room.countDown >= countDown ?? 20);
 }
 
 /**
@@ -63,27 +69,31 @@ interface RedPacket {
  * @param redPacket
  */
 async function doRedPacket(redPacket: RedPacket) {
-  const { end_time } = redPacket;
-  const wsTime = end_time - getUnixTime();
-  if (wsTime < 4) return;
+  const { end_time, ws_time } = redPacket;
+  const wsTime = end_time ? end_time - getUnixTime() : ws_time;
+  if (!wsTime || wsTime < 4) return;
   joinCount++;
   restCount++;
   return await joinRedPacketHandle(redPacket, wsTime);
 }
 
 async function returnStatusHandle() {
-  const { restTime, totalNum } = TaskConfig.redPack;
-  if (joinCount >= totalNum) {
+  const { restTime, totalNum, riskNum, noWinNum } = TaskConfig.redPack;
+  if (totalNum > 0 && joinCount >= totalNum) {
     logger.debug(`已经参与了${totalNum}次，停止运行`);
     return ReturnStatus.退出;
   }
-  if (restTime[0] && restCount >= restTime[0]) {
+  if (restTime[0] > 0 && restCount >= restTime[0]) {
     restCount = 0;
     logger.debug(`中场休息时间到，暂停运行${restTime[1]}分`);
     return ReturnStatus.中场休眠;
   }
-  if (riskCount >= 5) {
-    logger.warn(`疑似风控连续出现5次，停止运行`);
+  if (riskNum > 0 && riskCount >= riskNum) {
+    logger.warn(`疑似风控连续${riskCount}次，停止运行`);
+    return ReturnStatus.退出;
+  }
+  if (noWinNum > 0 && noWinRef.value >= noWinNum) {
+    logger.warn(`连续未中奖${noWinRef.value}次，停止运行`);
     return ReturnStatus.退出;
   }
 }
@@ -93,8 +103,9 @@ async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
   try {
     const ws = await createBiliDmWs(redPacket, wsTime);
     if (!ws) return;
-    wsList.add(ws);
+    wsMap.set(room_id, ws);
     await sleep(2000);
+    noWinRef.value++;
     const { code, message } = await joinRedPacket({
       room_id,
       lot_id,
@@ -102,11 +113,11 @@ async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
     });
     pushIfNotExist(newFollowUp, uid);
     if (code !== 0) {
-      closeWs(ws);
+      closeWs(room_id);
       return joinErrorHandle(uname, code, message);
     }
     logger.debug(`【${uname}】红包成功 √`);
-    return biliDmHandle(ws, redPacket, wsTime);
+    return biliDmHandle(redPacket, wsTime);
   } catch (error) {
     logger.error(`红包异常: ${error.message}`);
   }
@@ -114,25 +125,23 @@ async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
 
 function createBiliDmWs({ room_id, wait_num, uid, uname }: RedPacket, wsTime: number) {
   return biliDmWs(room_id, (wsTime + 20) * 1000, async () => {
-    if (wait_num > 0) return;
+    if (!wait_num || wait_num > 0) return;
     await sleep(20000);
-    if (waitting.value === false && wsList.size < TaskConfig.redPack.linkRoomNum) {
+    if (waitting.value === false && wsMap.size < TaskConfig.redPack.linkRoomNum) {
       const redPacket = await getRedPacket(room_id);
       redPacket && (await doRedPacket({ ...redPacket, uid, uname, room_id }));
     }
   });
 }
 
-async function biliDmHandle(ws: WebSocket, { room_id, uid }: RedPacket, wsTime: number) {
+async function biliDmHandle({ room_id, uid }: RedPacket, wsTime: number) {
   const clearDmTimes = sendDm(room_id, wsTime);
   await sleep(5000);
   const { ownInfo } = await request(getOnlineGoldRank, undefined, uid, room_id);
   if (ownInfo?.score === 0) {
     restCount = 0;
     riskCount++;
-    const { riskSleepTime } = TaskConfig.redPack;
-    logger.debug(`可能账号已被风控，等待${riskSleepTime}分！`);
-    closeWs(ws);
+    closeWs(room_id);
     clearDmTimes();
     return ReturnStatus.风控休眠;
   }
@@ -182,9 +191,9 @@ async function doRedPackArea(areaId: string, parentId: string) {
   const linkRoomNum = TaskConfig.redPack.linkRoomNum;
   const rooms = await getLotteryRoomList(areaId, parentId, 2, 'redPack');
 
-  for (const room of rooms) {
-    await waitForWebSocket(linkRoomNum);
+  await waitForWebSocket(linkRoomNum);
 
+  for (const room of rooms) {
     const redPacket = await getRedPacket(room.roomid);
     if (!redPacket) continue;
 
@@ -198,6 +207,7 @@ async function doRedPackArea(areaId: string, parentId: string) {
     });
 
     const returnStatus = status || (await returnStatusHandle());
+    await waitForWebSocket(linkRoomNum);
     if (returnStatus !== undefined) return returnStatus;
   }
 }
@@ -208,7 +218,7 @@ async function doRedPackArea(areaId: string, parentId: string) {
 function waitForWebSocket(conditions = 2) {
   return new Promise(resolve => {
     const timer = setInterval(() => {
-      if (wsList.size < conditions) {
+      if (wsMap.size < conditions) {
         clearInterval(timer);
         resolve(true);
       }
@@ -220,13 +230,16 @@ async function waitForStatus(status: number | undefined) {
   const { riskSleepTime, restTime } = TaskConfig.redPack;
   switch (status) {
     case ReturnStatus.风控休眠: {
-      if (riskSleepTime === -1) {
+      if (riskSleepTime < 0) {
+        logger.debug(`可能账号已被风控，停止运行！`);
         return ReturnStatus.退出;
       }
+      logger.debug(`可能账号已被风控，等待${riskSleepTime}分！`);
       return await handleSleep(riskSleepTime);
     }
     case ReturnStatus.中场休眠: {
-      if (restTime[1] === -1) {
+      if (restTime[1] < 0) {
+        logger.debug(`不执行中场休眠！`);
         return ReturnStatus.退出;
       }
       return await handleSleep(restTime[1]);
@@ -258,7 +271,21 @@ export async function liveRedPackService() {
 }
 
 async function run() {
-  if (joinCount >= 100) return;
+  const { source } = TaskConfig.redPack;
+  switch (source) {
+    case 1:
+      return await runByActivity();
+    case 2:
+      return await runByScanArea();
+    default: {
+      if ((await runByActivity()) === ReturnStatus.未获取到房间) {
+        return await runByScanArea();
+      }
+    }
+  }
+}
+
+async function runByScanArea() {
   // 获取直播分区
   const areaList = await getLiveArea();
   // 遍历大区
@@ -266,13 +293,36 @@ async function run() {
     await sleep(3000);
     // 遍历小区
     for (const area of areas) {
-      await sleep(1000);
       const status = await waitForStatus(await doRedPackArea(area.areaId, area.parentId));
       if (status === undefined) continue;
       if (status === ReturnStatus.退出) return;
     }
   }
-  return await run();
+  return await runByScanArea();
+}
+
+async function runByActivity() {
+  const roomList = await getRoomListByLink();
+  if (!roomList || !roomList.length) {
+    return ReturnStatus.未获取到房间;
+  }
+  const { linkRoomNum, intervalActive } = TaskConfig.redPack;
+
+  for (const room of roomList) {
+    const status = await doRedPacket({
+      uid: +room.ruid,
+      uname: room.runame,
+      lot_id: +room.lotId,
+      room_id: +room.roomId,
+      ws_time: room.countDown,
+    });
+
+    const returnStatus = await waitForStatus(status || (await returnStatusHandle()));
+    if (returnStatus !== undefined) return returnStatus;
+    await waitForWebSocket(linkRoomNum);
+  }
+  await sleep(intervalActive * 1000);
+  return await runByActivity();
 }
 
 function init() {
@@ -281,5 +331,6 @@ function init() {
   joinCount = 0;
   restCount = 0;
   riskCount = 0;
+  noWinRef.value = 0;
   waitting.value = false;
 }

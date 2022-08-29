@@ -180,23 +180,49 @@ export const defaultConfig = {
     mayBeWinMsg: true,
   },
   redPack: {
-    // 中场休息时间，当每参加了几个直播间的时候，休息一下 [参加个数，休息时间（分，-1 为直接结束）]
-    restTime: [0, -1],
+    /**
+     * 声明：
+     * 表示次数时，小于等于0的数表示不限制次数
+     */
+    // 直播间来源方式 1 活动（活动链接可能更新不及时），2 扫描。其它值 所有方式依次尝试。
+    source: 0,
+    // 活动链接
+    uri: 'https://api.live.bilibili.com/xlive/fuxi-interface/AugRedPacket2022Controller/redPocketPlaying',
+    // 仅使用活动时有效，参与的红包剩余开奖时间（秒）
+    countDown: 60,
+    // 仅使用活动时有效，每轮抢红包的间隔时间（秒）
+    intervalActive: 60,
+    // 中场休息时间，当每参加了几个直播间的时候，休息一下 [参加个数，休息时间（分，小于1为直接结束）]
+    restTime: [-1, -1],
     // 同时参与的直播间数量
-    linkRoomNum: 0,
-    // 疑似触发风控时休眠时间（分），-1 为直接结束
+    linkRoomNum: 1,
+    // 疑似触发风控时休眠时间（分），小于1为直接结束
     riskSleepTime: -1,
     // 总参与次数，达到后不管结果如何，直接结束
-    totalNum: 0,
-    // 参与直播时发送的弹幕数量（与内置数量比，较小者生效）
+    totalNum: -1,
+    // 参与直播时发送的弹幕数量（与内置数量比，min(10，剩余时间/5，配置)）
     // [固定值]，[最少,最多]
-    dmNum: [5],
+    dmNum: [10],
     // 是否在等待时处理关注用户（读取消息，移动）
     moveUpInWait: true,
     /** 天选时刻关注 UP 移动到分组 */
     moveTag: 'rp关注',
     /** 关注回复处理方式  */
     actFollowMsg: 'read' as SessionHandleType,
+    // 连续超过多少次没有中，直接结束，小于1为不限制
+    noWinNum: 10, // 避免一直运行
+    // 连续疑似触发风控多少次，直接结束，小于1为不限制
+    riskNum: 5, // 避免一直运行
+  },
+  unFollow: {
+    // 单个取消的时间间隔（秒）
+    delay: 3,
+    // 中场休息，[取消数量, 休息时间（分）] 取消数量和休息时间都应该为正数（非0），否则无效
+    restTime: [20, -1],
+    // 总数 -1 无限制
+    totalNum: -1,
+    // 取消关注的 tag
+    tags: ['天选时刻', 'rp关注'],
   },
   intimacy: {
     // 直播弹幕

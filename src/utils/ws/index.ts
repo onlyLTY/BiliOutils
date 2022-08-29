@@ -6,6 +6,7 @@ import { isNumber } from '../is';
 import { getDanmuInfo } from '@/net/live.request';
 import { PacketCmdEnum } from '@/enums/packet.enum';
 import { logger } from '../log';
+import { noWinRef } from '@/store/red-packet';
 
 interface TimerOptions {
   timer?: NodeJS.Timeout;
@@ -16,29 +17,29 @@ function isRedPackWs(body: number | PacketBody): body is PacketBody<RedPackListD
   return !isNumber(body) && body.cmd === PacketCmdEnum.红包中奖名单 && body.data.lot_id;
 }
 
-export const wsList = new Set<WebSocket>();
-const timerMap = new Map<WebSocket, TimerOptions>();
+export const wsMap = new Map<number, WebSocket>();
+const timerMap = new Map<number, TimerOptions>();
 
-export function closeWs(ws: WebSocket) {
-  ws.close();
-  wsList.delete(ws);
-  clearWsTimer(ws);
+export function closeWs(roomid: number) {
+  wsMap.get(roomid)?.close();
+  wsMap.delete(roomid);
+  clearWsTimer(roomid);
 }
 
 export function clearWs() {
-  wsList.forEach(ws => {
+  wsMap.forEach((ws, roomid) => {
     ws.close();
-    clearWsTimer(ws);
+    clearWsTimer(roomid);
   });
-  wsList.clear();
+  wsMap.clear();
   timerMap.clear();
 }
 
-function clearWsTimer(ws: WebSocket) {
-  const options = timerMap.get(ws);
+function clearWsTimer(roomid: number) {
+  const options = timerMap.get(roomid);
   if (options) {
     clearTimer(options);
-    timerMap.delete(ws);
+    timerMap.delete(roomid);
   }
 }
 
@@ -74,7 +75,7 @@ async function getWsLink(room_id: number) {
   }
 }
 
-export async function biliDmWs(room_id = 7734200, time = 0, msgCallback?: () => void) {
+export async function biliDmWs(room_id: number, time = 0, msgCallback?: () => void) {
   const wsLink = await getWsLink(room_id);
   if (!wsLink) return;
   const json = {
@@ -85,51 +86,52 @@ export async function biliDmWs(room_id = 7734200, time = 0, msgCallback?: () => 
     clientver: '1.6.3',
     key: wsLink.token,
   };
-  const ws = new WebSocket('wss://broadcastlv.chat.bilibili.com/sub');
-  // const ws = new WebSocket('wss://hw-gz-live-comet-01.chat.bilibili.com/sub');
+  const ws = new WebSocket(`wss://${wsLink.uri || 'broadcastlv.chat.bilibili.com'}/sub`);
 
   // WebSocket 连接成功
   ws.addEventListener('open', () => {
     // console.log(`WebSocket：直播间${room_id}已连接，将在${time / 1000}秒后断开连接`);
     ws.send(getCertification(JSON.stringify(json)).buffer);
     // 心跳包的定时器
-    timerMap.set(ws, sendInterval());
+    timerMap.set(room_id, sendInterval());
   });
 
   // WebSocket 连接关闭
   ws.addEventListener('close', () => {
     // console.log(`WebSocket：直播间${room_id}连接已关闭`);
-    clearWsTimer(ws);
+    clearWsTimer(room_id);
   });
 
   ws.addEventListener('error', () => {
-    closeWs(ws);
+    closeWs(room_id);
   });
 
-  //WebSocket 接收数据
+  // WebSocket 接收数据
   ws.addEventListener('message', evt => {
-    //对数据进行解码 decode方法
+    // 对数据进行解码 decode方法
     const packet = decode(evt.data as Uint8Array);
     if (packet.op === 5) {
       packet?.body.forEach(body => {
-        if (isRedPackWs(body)) {
-          closeWs(ws);
-          const my = body.data.winner_info.find(item => item[0] === TaskConfig.USERID);
-          my && logger.debug(`直播间${room_id}，恭喜您获得${body.data.awards[my[3]].award_name}`);
-          msgCallback && msgCallback();
+        if (!isRedPackWs(body)) return;
+        closeWs(room_id);
+        const my = body.data.winner_info.find(item => item[0] === TaskConfig.USERID);
+        if (my) {
+          logger.debug(`直播间${room_id}，恭喜您获得${body.data.awards[my[3]].award_name}`);
+          noWinRef.value = 0;
         }
+        msgCallback && msgCallback();
       });
     }
   });
 
   function sendInterval() {
-    let timeout: NodeJS.Timer | undefined = undefined;
+    let timeout: NodeJS.Timeout | undefined = undefined;
     const timer = setInterval(() => {
       ws.send(formatDataView().buffer);
     }, 30000);
     if (time > 0) {
       timeout = setTimeout(() => {
-        closeWs(ws);
+        closeWs(room_id);
       }, time);
     }
     return { timer, timeout };
