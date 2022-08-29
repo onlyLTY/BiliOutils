@@ -397,3 +397,112 @@ export type TakeSeasonGiftDto = {
   msg: string;
   data: null | undefined;
 };
+
+/**
+ * 赛季信息
+ */
+export type SeasonInfoDto = OnlyMsg<{
+  current_time: string;
+  start_time: string;
+  end_time: string;
+  remain_amount: number;
+  season_id: string;
+  tasks: any[];
+  welfare: SeasonWelfare[];
+  next: SeasonNext;
+  cover: string;
+  today_tasks: SeasonTodaytask[];
+  text: SeasonText;
+  season_clock_in: Seasonclockin;
+  announcement: SeasonAnnouncement;
+  lottery: SeasonLottery;
+  mission_point_rate: number;
+  season_title: string;
+  point_rate: SeasonPointrate;
+  rank: {
+    is_visible: boolean;
+  };
+}>;
+
+interface SeasonPointrate {
+  sign_in: number;
+  game: number;
+  daily_mission: number;
+  week_mission: number;
+}
+
+interface SeasonLottery {
+  lottery_act_id: string;
+  enable_lottery: boolean;
+  lottery_id: string;
+  advance_lottery_act_id: string;
+  advance_pool_id: string;
+}
+
+interface SeasonAnnouncement {
+  title: string;
+  jump_url: string;
+  enable: boolean;
+}
+
+interface Seasonclockin {
+  is_super_luck: boolean;
+  draw_luck_time: string;
+  prize_type: number;
+  prize_title: string;
+  add_up_sign: number;
+  title: string;
+  sign_old_amount: number;
+  preluck_amount: number;
+  continuous_days: number;
+  address_id: string;
+  has_super_prize: boolean;
+  subtitle: string;
+  prize_image: string;
+  prize_target_days: number;
+  prize_amount: number;
+}
+
+interface SeasonText {
+  notice: string;
+  clonckInRule: string;
+}
+
+interface SeasonTodaytask {
+  type: number;
+  title: string;
+  amount: number;
+  status: number;
+  duration: number;
+  comics: SeasonComic[];
+  page_url: string;
+  progress: number;
+  sub_id: number;
+  share_type: number;
+}
+
+interface SeasonComic {
+  comic_id: number;
+  title: string;
+  vertical_cover: string;
+  styles: string[];
+}
+
+interface SeasonNext {
+  title: string;
+  amount: number;
+  gap_time: number;
+  current_time: number;
+}
+
+interface SeasonWelfare {
+  type: number;
+  success: number;
+  exchange_amount: number;
+  boss_welfare: boolean;
+  boss_remain: number;
+  rank: number;
+  title: string;
+  url: string;
+  kind_address_id: string;
+}

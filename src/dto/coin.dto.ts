@@ -132,6 +132,7 @@ export type VideoRelationDto = ApiBaseProp<{
   attention: boolean;
   /** 收藏 */
   favorite: boolean;
+  /** 订阅合集 */
   season_fav: boolean;
   like: boolean;
   dislike: boolean;

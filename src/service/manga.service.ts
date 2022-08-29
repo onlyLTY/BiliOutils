@@ -269,17 +269,33 @@ export async function mangaSign() {
   }
 }
 
+async function getSeasonInfo() {
+  try {
+    const { code, data, msg } = await mangaApi.getSeasonInfo();
+    if (code === 0) {
+      return data;
+    }
+    logger.warn(`获取赛季信息失败：${code} ${msg}`);
+  } catch (error) {
+    logger.error(`获取赛季异常: ${error.message}`);
+  }
+}
+
 export async function takeSeasonGift() {
   try {
-    const { code, msg } = await mangaApi.takeSeasonGift();
+    const seasonInfo = await getSeasonInfo();
+    if (!seasonInfo) return;
+
+    const { code, msg } = await mangaApi.takeSeasonGift(seasonInfo.season_id);
     if (code === 0) return;
     if (code === 7) {
-      logger.debug(`获取任务礼包失败：${msg}`);
+      // 已领取或者未完成
+      logger.debug(`获取任务礼包失败：${code} ${msg}`);
       return;
     }
-    logger.error(`获取任务礼包失败：${msg}`);
+    logger.warn(`获取任务礼包失败：${code} ${msg}`);
   } catch (error) {
-    logger.error(`获取任务礼包异常: ${error}`);
+    logger.error(`获取任务礼包异常: ${error.message}`);
   }
 }
 
