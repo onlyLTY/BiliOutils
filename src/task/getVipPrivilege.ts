@@ -16,7 +16,6 @@ async function getPrivilegeStatus() {
     const { list } = data;
     const stateList = list.filter(item => item.state === 0);
     if (stateList.length === 0) {
-      logger.info('暂无可领取权益（已领取）');
       return;
     }
     return stateList;
@@ -66,7 +65,6 @@ async function getOnePrivilege(type: number): Promise<boolean> {
 
 async function getPrivilege(type: number) {
   if (![1, 3].includes(type)) {
-    logger.info('跳过（已领取30天有效期的）');
     return;
   }
   let errCount = 0,
@@ -94,6 +92,7 @@ export default async function getVipPrivilege() {
     const privilegeList = await getPrivilegeStatus();
 
     if (!privilegeList || privilegeList.length === 0) {
+      logger.info('暂无可领取权益（除保留）');
       return;
     }
 

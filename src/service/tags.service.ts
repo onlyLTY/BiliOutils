@@ -206,18 +206,18 @@ export async function handleFollowUps(
   newFollowUps: (string | number)[],
   lastFollow?: TagsFollowingsDto['data'][number],
   moveTag?: string,
-  actFollowMsg?: SessionHandleType,
+  actFollowMsg: SessionHandleType = 'read',
   log = true,
 ) {
   // 获取天选时刻关注的用户
   const followUps: User[] = [];
   await getTeamUsers(followUps, newFollowUps, lastFollow?.mid);
   // 读取消息
-  log && logger.debug('开始读取消息');
+  log && logger.debug(`开始处理消息：${actFollowMsg}}`);
   await updateSession(followUps, actFollowMsg);
   // 移动关注UP到分组
   if (moveTag) {
-    log && logger.debug('移动关注UP到分组');
+    log && logger.debug(`移动关注UP${followUps.length}个到分组${moveTag}`);
     await moveUsersToTag(followUps, moveTag);
     log && logger.debug('移动关注UP到分组成功');
   }

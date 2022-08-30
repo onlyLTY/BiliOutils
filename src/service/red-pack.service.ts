@@ -2,7 +2,7 @@ import type { IdType } from '@/types';
 import { getRandomItem, getUnixTime, logger, pushIfNotExist, random, sleep } from '@/utils';
 import { joinRedPacket, checkRedPacket, sendMessage, getOnlineGoldRank } from '@/net/live.request';
 import { TaskConfig } from '@/config/globalVar';
-import { biliDmWs, clearWs, closeWs, wsMap } from '@/utils/ws';
+import { addWs, biliDmWs, clearWs, closeWs, wsMap } from '@/utils/ws';
 import { DMEmoji } from '@/constant/dm';
 import { getLiveArea, getLotteryRoomList } from './live-lottery.service';
 import { request } from '@/utils/request';
@@ -13,9 +13,10 @@ import { ReturnStatus } from '@/enums/packet.enum';
 
 // 可能是新关注的UP
 let newFollowUp: (number | string)[],
-  joinCount = 0,
-  restCount = 0,
-  riskCount = 0;
+  joinCount: number,
+  restCount: number,
+  riskCount: number,
+  riskTotalCount: number;
 const waitting: Ref<boolean> = { value: false };
 
 /**
@@ -77,21 +78,38 @@ async function doRedPacket(redPacket: RedPacket) {
   return await joinRedPacketHandle(redPacket, wsTime);
 }
 
+function initCount() {
+  restCount = 0;
+  riskCount = 0;
+}
+
+/**
+ * 处理 join 的返回值
+ */
 async function returnStatusHandle() {
-  const { restTime, totalNum, riskNum, noWinNum } = TaskConfig.redPack;
+  const { restTime, totalNum, riskNum, noWinNum, riskTime } = TaskConfig.redPack;
+  // 中场处理
   if (totalNum > 0 && joinCount >= totalNum) {
     logger.debug(`已经参与了${totalNum}次，停止运行`);
     return ReturnStatus.退出;
   }
   if (restTime[0] > 0 && restCount >= restTime[0]) {
-    restCount = 0;
+    initCount();
     logger.debug(`中场休息时间到，暂停运行${restTime[1]}分`);
     return ReturnStatus.中场休眠;
   }
-  if (riskNum > 0 && riskCount >= riskNum) {
-    logger.warn(`疑似风控连续${riskCount}次，停止运行`);
+  // 风控处理
+  if (riskNum > 0 && riskTotalCount >= riskNum) {
+    logger.warn(`疑似风控连续${riskTotalCount}次，停止运行`);
     return ReturnStatus.退出;
   }
+  if (riskTime[0] > 0 && riskCount >= riskTime[0]) {
+    // 当风控需要休眠时，重置中场次数
+    initCount();
+    logger.warn(`疑似风控连续${riskCount}次，暂停运行${riskTime[1]}分`);
+    return ReturnStatus.风控休眠;
+  }
+  // 总参与次数处理
   if (noWinNum > 0 && noWinRef.value >= noWinNum) {
     logger.warn(`连续未中奖${noWinRef.value}次，停止运行`);
     return ReturnStatus.退出;
@@ -103,7 +121,7 @@ async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
   try {
     const ws = await createBiliDmWs(redPacket, wsTime);
     if (!ws) return;
-    wsMap.set(room_id, ws);
+    addWs(room_id, ws);
     await sleep(2000);
     noWinRef.value++;
     const { code, message } = await joinRedPacket({
@@ -139,13 +157,12 @@ async function biliDmHandle({ room_id, uid }: RedPacket, wsTime: number) {
   await sleep(5000);
   const { ownInfo } = await request(getOnlineGoldRank, undefined, uid, room_id);
   if (ownInfo?.score === 0) {
-    restCount = 0;
-    riskCount++;
+    addRiskCount();
     closeWs(room_id);
     clearDmTimes();
-    return ReturnStatus.风控休眠;
+    return;
   }
-  riskCount = 0;
+  clearRiskCount();
 }
 
 function joinErrorHandle(uname: string, code: number, message: string) {
@@ -226,20 +243,22 @@ function waitForWebSocket(conditions = 2) {
   });
 }
 
+/**
+ * 根据返回状态做出相应的处理（等待/退出）
+ */
 async function waitForStatus(status: number | undefined) {
-  const { riskSleepTime, restTime } = TaskConfig.redPack;
+  const { riskTime, restTime } = TaskConfig.redPack;
   switch (status) {
     case ReturnStatus.风控休眠: {
-      if (riskSleepTime < 0) {
-        logger.debug(`可能账号已被风控，停止运行！`);
+      if (riskTime[1] < 1) {
+        logger.debug(`不执行风控休眠，直接退出！`);
         return ReturnStatus.退出;
       }
-      logger.debug(`可能账号已被风控，等待${riskSleepTime}分！`);
-      return await handleSleep(riskSleepTime);
+      return await handleSleep(riskTime[1]);
     }
     case ReturnStatus.中场休眠: {
-      if (restTime[1] < 0) {
-        logger.debug(`不执行中场休眠！`);
+      if (restTime[1] < 1) {
+        logger.debug(`不执行中场休眠，直接退出！`);
         return ReturnStatus.退出;
       }
       return await handleSleep(restTime[1]);
@@ -330,7 +349,17 @@ function init() {
   clearWs();
   joinCount = 0;
   restCount = 0;
-  riskCount = 0;
+  clearRiskCount();
   noWinRef.value = 0;
   waitting.value = false;
+}
+
+function addRiskCount() {
+  riskCount++;
+  riskTotalCount++;
+}
+
+function clearRiskCount() {
+  riskCount = 0;
+  riskTotalCount = 0;
 }

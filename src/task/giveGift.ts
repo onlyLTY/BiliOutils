@@ -37,19 +37,7 @@ async function getExpiredGift() {
       data: { list },
     } = await getGiftBagList();
     if (!list) return;
-    return list.filter(gift => {
-      if (gift.expire_at <= 0) {
-        return false;
-      }
-      const isExpire = (gift.expire_at * 1000 - new Date().getTime()) / MS2DATE < EXPIRE_DATE;
-      const { id, name } = TaskConfig.gift;
-      const isSimple = id.includes(gift.gift_id) || name.includes(gift.gift_name);
-      if (!isSimple && isExpire) {
-        logger.info(`${gift.gift_name} 即将过期请尽快投喂`);
-      }
-      // 判断 是否需要投喂的
-      return isSimple ? isExpire : false;
-    });
+    return list.filter(isExpiredFilter);
   } catch (error) {
     // 重试一次
     if (!countGetExpiredGift++) {
@@ -58,6 +46,23 @@ async function getExpiredGift() {
       return null;
     }
   }
+}
+
+type LiveGiftBag = LiveGiftBagListDto['data']['list'][number];
+
+function isExpiredFilter(gift: LiveGiftBag) {
+  if (gift.expire_at <= 0) {
+    return false;
+  }
+  const isExpire = (gift.expire_at * 1000 - new Date().getTime()) / MS2DATE < EXPIRE_DATE;
+  const { id, name, all } = TaskConfig.gift;
+  if (all) return isExpire;
+  const isSimple = id.includes(gift.gift_id) || name.includes(gift.gift_name);
+  if (!isSimple && isExpire) {
+    logger.info(`${gift.gift_name} 即将过期请尽快投喂`);
+  }
+  // 判断 是否需要投喂的
+  return isSimple ? isExpire : false;
 }
 
 async function findOneRoom() {
@@ -128,10 +133,10 @@ async function sendGift(
         continue;
       }
       data.gift_list.forEach(gift => {
-        logger.info(`成功给 [${name}] 投喂${gift.gift_name}`);
+        logger.info(`成功给 【${name}】 投喂${gift.gift_name}`);
       });
     } catch {
-      logger.debug(`向[${name}]投喂[${gift.gift_name}]，异常`);
+      logger.warn(`向【${name}】投喂[${gift.gift_name}]，异常`);
     }
   }
 }

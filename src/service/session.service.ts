@@ -83,9 +83,8 @@ async function handleSession(session: Sessionlist, actFollowMsg: SessionHandleTy
       await deleteSession(session);
       break;
     case 'read':
-      await readSession(session);
-      break;
     default:
+      await readSession(session);
       break;
   }
   await apiDelay(50);

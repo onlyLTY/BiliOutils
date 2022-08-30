@@ -35,6 +35,12 @@ export function clearWs() {
   timerMap.clear();
 }
 
+export function addWs(room_id: number, ws: WebSocket) {
+  // 取消旧的 ws
+  wsMap.get(room_id)?.close();
+  wsMap.set(room_id, ws);
+}
+
 function clearWsTimer(roomid: number) {
   const options = timerMap.get(roomid);
   if (options) {

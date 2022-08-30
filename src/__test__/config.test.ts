@@ -99,6 +99,7 @@ const theConfig = {
     mids: [],
     id: [1, 30607, 30426, 31531, 31674],
     name: [],
+    all: false,
   },
   coin: {
     customizeUp: [],
@@ -161,6 +162,7 @@ const theConfig = {
     intervalActive: 60,
     restTime: [-1, -1],
     linkRoomNum: 1,
+    riskTime: [-1, -1],
     riskSleepTime: -1,
     totalNum: -1,
     dmNum: [10],

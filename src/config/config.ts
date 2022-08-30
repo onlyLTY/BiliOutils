@@ -140,6 +140,8 @@ export const defaultConfig = {
     id: [1, 30607, 30426, 31531, 31674],
     // 投喂礼物 name
     name: [] as string[],
+    // 无视其它礼物配置，投喂所有即将过期礼物
+    all: false,
   },
   coin: {
     /** 自定义高优先级用户列表 */
@@ -194,10 +196,12 @@ export const defaultConfig = {
     intervalActive: 60,
     // 中场休息时间，当每参加了几个直播间的时候，休息一下 [参加个数，休息时间（分，小于1为直接结束）]
     restTime: [-1, -1],
+    // 疑似触发风控时休眠时间，[连续出现次数，休眠时间（分，小于1为直接结束）]
+    riskTime: [-1, -1], // 与 riskNum 不同，该参数会与 restTime 互相影响重置次数
+    // 【废弃】
+    riskSleepTime: -1,
     // 同时参与的直播间数量
     linkRoomNum: 1,
-    // 疑似触发风控时休眠时间（分），小于1为直接结束
-    riskSleepTime: -1,
     // 总参与次数，达到后不管结果如何，直接结束
     totalNum: -1,
     // 参与直播时发送的弹幕数量（与内置数量比，min(10，剩余时间/5，配置)）
@@ -420,5 +424,12 @@ function beforeMergeConfig(config: RecursivePartial<DefaultConfig>) {
     message.api.url = url;
     message.api.method = 'GET';
   }
+
+  // 处理 redPack
+  const { redPack } = config;
+  if (redPack && Reflect.has(redPack, 'riskSleepTime') && !Reflect.has(redPack, 'riskTime')) {
+    redPack.riskTime = [1, redPack.riskSleepTime];
+  }
+
   return config;
 }
