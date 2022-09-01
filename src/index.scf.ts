@@ -1,7 +1,7 @@
 import type { SCFContext, SCFEvent } from './types/scf';
 import { defLogger } from './utils/log/def';
 import { JSON5 } from './utils/json5';
-import { runInVM } from './utils/vm';
+import { useVm } from './vm/useVm';
 
 /**
  * 公告
@@ -22,12 +22,8 @@ export async function dailyMain(event: SCFEvent, context: SCFContext) {
 }
 
 export async function main_handler(event: SCFEvent, context: SCFContext) {
-  if (process.env.USE_NETWORK_CODE) {
-    const isGetCode = await runInVM('vm.scf.js', { event, context });
-    if (isGetCode) {
-      return isGetCode;
-    }
-  }
+  const isGetCode = await useVm('vm.scf.js', { event, context });
+  if (isGetCode) return isGetCode;
   let isReturn = false;
   if (event.Message) {
     isReturn = await runTasks(event.Message);

@@ -47,7 +47,7 @@ jobs:
           echo ${{ env.BILI_VERSION }} >> dist/version.txt
           cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
           cd dist
-          npm prune --production
+          npm prune --omit=dev
           yarn autoclear
           mv index.cfc.js cfc
           rm -rf bin.js index*.js main.js tools package*.json yarn.lock .yarnclean

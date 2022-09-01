@@ -7,12 +7,12 @@ import {
   LOTTERY_UP_BLACKLIST,
   TODAY_MAX_FEED,
 } from '@/constant';
-import { cloneObject, getNewObject, deepMergeObject, arr2numArr } from '@/utils/pure';
+import { cloneObject, deepMergeObject, arr2numArr } from '@/utils/pure';
 import { getBiliJct, getUserId } from '../utils/cookie';
-import { isArray, isString } from '../utils/is';
+import { isString } from '../utils/is';
 
 type DefaultConfig = typeof defaultConfig;
-export type TheConfig = Omit<DefaultConfig, keyof typeof compatibleMap>;
+export type TheConfig = DefaultConfig;
 
 export const defaultConfig = {
   cookie: '',
@@ -314,35 +314,10 @@ export function mergeConfig(config: RecursivePartial<DefaultConfig>) {
 }
 
 /**
- * 兼容映射
- */
-const compatibleMap = {
-  targetLevel: ['coin', 'targetLevel'],
-  stayCoins: ['coin', 'stayCoins'],
-  targetCoins: ['coin', 'targetCoins'],
-  customizeUp: ['coin', 'customizeUp'],
-  giftUp: ['gift', 'mids'],
-  chargeUpId: ['charge', 'mid'],
-  chargePresetTime: ['charge', 'presetTime'],
-  matchCoins: ['match', 'coins'],
-  matchSelection: ['match', 'selection'],
-  matchDiff: ['match', 'diff'],
-};
-
-/**
  * 旧配置兼容处理
  * @param config
  */
 function oldConfigHandle(config: DefaultConfig): TheConfig {
-  Object.keys(compatibleMap).forEach(oldKey => {
-    if (config[oldKey] !== undefined) {
-      const [newKey, newKey2] = compatibleMap[oldKey];
-      config[newKey] = getNewObject(config[newKey]);
-      config[newKey][newKey2] = config[oldKey];
-    }
-    delete config[oldKey];
-  });
-
   // couponBalance charge
   config.couponBalance.mid ||= config.charge.mid;
   config.couponBalance.presetTime ||= config.charge.presetTime;
@@ -357,12 +332,6 @@ function oldConfigHandle(config: DefaultConfig): TheConfig {
 function configValueHandle(config: TheConfig) {
   setConstValue(config);
   const { coin, gift, match, couponBalance } = config;
-  // TODO: 兼容旧配置
-  if (!isArray(config.apiDelay)) {
-    config.apiDelay = [Number(config.apiDelay)];
-  } else {
-    config.apiDelay = arr2numArr(config.apiDelay);
-  }
 
   coin.customizeUp = arr2numArr(coin.customizeUp);
   gift.mids = arr2numArr(gift.mids);

@@ -36,7 +36,7 @@ export async function request<
     if (transform === false) {
       return resp;
     }
-    return data as R['data'];
+    return data as any;
   } catch (error) {
     thatlogger.error(`${name || reqFunc.name}请求出现异常`);
     thatlogger.error(error);

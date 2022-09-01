@@ -40,7 +40,7 @@ export const plugins = ({ node, replaceValues = {}, noTerser }: BaseConfigOption
           '@babel/env',
           {
             useBuiltIns: 'usage',
-            corejs: 3.22,
+            corejs: 3.25,
             targets: {
               node: node || '14',
             },
