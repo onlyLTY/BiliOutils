@@ -1,4 +1,4 @@
-import { createBaseConfig, createRollupOption } from './rollup.config.base';
+import { createBaseConfig, createRollupOption, vmDependencies } from './rollup.config.base';
 
 export default createRollupOption([
   createBaseConfig({
@@ -9,7 +9,7 @@ export default createRollupOption([
     },
     node: '12.2',
     noTerser: true,
-    external: false,
+    external: vmDependencies,
   }),
   createBaseConfig({
     input: 'vm/fc.ts',
@@ -18,7 +18,7 @@ export default createRollupOption([
       __IS_FC__: 'true',
     },
     noTerser: true,
-    external: false,
+    external: vmDependencies,
   }),
   createBaseConfig({
     input: 'vm/scf.ts',
@@ -27,6 +27,6 @@ export default createRollupOption([
       __IS_SCF__: 'true',
     },
     noTerser: true,
-    external: false,
+    external: vmDependencies,
   }),
 ]);

@@ -57,14 +57,17 @@ export const plugins = ({ node, replaceValues = {}, noTerser }: BaseConfigOption
     sizes(),
   ].filter(Boolean);
 };
-export const optionalDependencies = Object.keys(pkgJson.optionalDependencies);
-export const external = [...Object.keys(pkgJson.dependencies), ...optionalDependencies];
+const optionalDependencies = Object.keys(pkgJson.optionalDependencies);
+const EXTERNAL = [...Object.keys(pkgJson.dependencies), ...optionalDependencies];
+// 手动排除这些以前就有的依赖，减少体积
+const baseDependencies = ['core-js', 'got', 'nodemailer', 'tunnel'];
+export const vmDependencies = [...optionalDependencies, ...baseDependencies];
 
 interface BaseConfigOption {
   input: string;
   output: string;
   node?: string;
-  external?: boolean;
+  external?: boolean | string[];
   replaceValues?: Record<string, string>;
   noTerser?: boolean;
 }
@@ -74,6 +77,11 @@ export function createBaseConfig(
   options: RollupOptions = {},
   callback?: (option: RollupOptions) => RollupOptions,
 ): RollupOptions {
+  const external = Array.isArray(config.external)
+    ? config.external
+    : config.external === false
+    ? optionalDependencies
+    : EXTERNAL;
   const rOptions: RollupOptions = {
     plugins: plugins(config),
     input: `src/${config.input}`,
@@ -82,7 +90,7 @@ export function createBaseConfig(
       format: 'cjs',
       inlineDynamicImports: true,
     },
-    external: config.external === false ? optionalDependencies : external,
+    external,
   };
   return {
     ...rOptions,
