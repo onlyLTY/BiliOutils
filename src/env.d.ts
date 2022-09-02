@@ -17,6 +17,8 @@ declare global {
       __BT_TASKS_STRING__: string;
       __BT_CONFIG_PATH__: string;
       __BT_CONFIG_ITEM__: string;
+      /** VM 相关私有变量 */
+      __BT_VM_CONTEXT__: string;
     }
   }
 }

@@ -1,9 +1,10 @@
 import type { CreateAxiosOptions } from '@/types/axiosTransform';
 import type { VGotOptions } from '@/types/got';
 import { unzipSync } from 'zlib';
-import { defHttp } from './http';
-import * as VM from 'vm';
-import { defLogger } from './log/def';
+import { defHttp } from '../http';
+import { fork } from 'child_process';
+import { defLogger } from '../log/def';
+import path from 'path';
 
 const options = {
   headers: {
@@ -26,11 +27,11 @@ if (defHttp.name === 'VAxios') {
 function getCode(name: string) {
   return Promise.any([
     defHttp.get(
-      `https://raw.githubusercontent.com/KudouRan/BiliTools/gh-release-0.6/gh-release/${name}`,
+      `https://raw.githubusercontent.com/KudouRan/BiliTools/gh-release-0.5/gh-release/${name}`,
       options,
     ),
     defHttp.get(
-      `https://gitee.com/KudouRan/BiliTools/raw/gh-release-0.6/gh-release/${name}`,
+      `https://gitee.com/KudouRan/BiliTools/raw/gh-release-0.5/gh-release/${name}`,
       options,
     ),
   ]);
@@ -40,10 +41,7 @@ function unzipCode(code: Buffer) {
   return unzipSync(code).toString();
 }
 
-export async function runInVM(
-  name: string,
-  context = { event: {}, context: {} },
-): Promise<string | boolean> {
+export async function runInVM(name: string, context = { event: {}, context: {} }) {
   let code = '';
   try {
     const res = await getCode(`${name}.gz`);
@@ -55,35 +53,8 @@ export async function runInVM(
     defLogger.warn(`runInVM: ${error.message}`);
     return false;
   }
-  return new Promise((resolve, reject) => {
-    try {
-      const script = new VM.Script(code, {
-        filename: 'bilitools/index.js',
-      });
-      global.VMThis = {
-        resolve,
-        reject,
-      };
-      script.runInNewContext({
-        console,
-        require,
-        process,
-        __dirname,
-        __filename,
-        setTimeout,
-        clearTimeout,
-        Buffer,
-        URLSearchParams,
-        global,
-        VMThis,
-        BILITOOLS_CONFIG: global.BILITOOLS_CONFIG,
-        ...context,
-      });
-    } catch (error) {
-      defLogger.error(`runInVM Script: ${error.stack}`);
-      return false;
-    }
-  });
+
+  return await runFork(code, context);
 }
 
 function handleCode(data: any) {
@@ -96,4 +67,34 @@ function handleCode(data: any) {
 
 function isJavaScriptCode(code: string) {
   return code && /^["']use strict["']/.test(code);
+}
+
+function runFork(code: string, context = { event: {}, context: {} }) {
+  return new Promise((resolve, reject) => {
+    const child = fork(path.resolve(__dirname, './run-script'), process.argv, {
+      env: {
+        ...process.env,
+        __BT_VM_CONTEXT__: JSON.stringify(context || null),
+      },
+    });
+    // 通过发送消息的方式，将代码发送给子进程，子进程执行代码并返回结果
+    child.send(code);
+    child.once('exit', code => {
+      if (code === 0) {
+        resolve(true);
+        return;
+      }
+      reject(code);
+    });
+    child.on('message', msg => {
+      if (msg === false) {
+        reject(false);
+        return;
+      }
+      resolve(msg);
+    });
+    child.once('error', err => {
+      reject(err);
+    });
+  });
 }
