@@ -213,7 +213,7 @@ export async function handleFollowUps(
   const followUps: User[] = [];
   await getTeamUsers(followUps, newFollowUps, lastFollow?.mid);
   // 读取消息
-  log && logger.debug(`开始处理消息：${actFollowMsg}}`);
+  log && logger.debug(`开始处理消息：${actFollowMsg}`);
   await updateSession(followUps, actFollowMsg);
   // 移动关注UP到分组
   if (moveTag) {

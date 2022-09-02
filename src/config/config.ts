@@ -190,8 +190,6 @@ export const defaultConfig = {
     source: 0,
     // 活动链接
     uri: 'https://api.live.bilibili.com/xlive/fuxi-interface/AugRedPacket2022Controller/redPocketPlaying',
-    // 仅使用活动时有效，参与的红包剩余开奖时间（秒）
-    countDown: 60,
     // 仅使用活动时有效，每轮抢红包的间隔时间（秒）
     intervalActive: 60,
     // 中场休息时间，当每参加了几个直播间的时候，休息一下 [参加个数，休息时间（分，小于1为直接结束）]

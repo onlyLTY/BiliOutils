@@ -158,7 +158,6 @@ const theConfig = {
   redPack: {
     source: 0,
     uri: 'https://api.live.bilibili.com/xlive/fuxi-interface/AugRedPacket2022Controller/redPocketPlaying',
-    countDown: 60,
     intervalActive: 60,
     restTime: [-1, -1],
     linkRoomNum: 1,

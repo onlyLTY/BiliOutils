@@ -81,7 +81,7 @@ async function getWsLink(room_id: number) {
   }
 }
 
-export async function biliDmWs(room_id: number, time = 0, msgCallback?: () => void) {
+export async function biliDmWs(room_id: number, time = 0) {
   const wsLink = await getWsLink(room_id);
   if (!wsLink) return;
   const json = {
@@ -112,7 +112,23 @@ export async function biliDmWs(room_id: number, time = 0, msgCallback?: () => vo
     closeWs(room_id);
   });
 
-  // WebSocket 接收数据
+  function sendInterval() {
+    let timeout: NodeJS.Timeout | undefined = undefined;
+    const timer = setInterval(() => {
+      ws.send(formatDataView().buffer);
+    }, 30000);
+    if (time > 0) {
+      timeout = setTimeout(() => {
+        closeWs(room_id);
+      }, time);
+    }
+    return { timer, timeout };
+  }
+
+  return ws;
+}
+
+export function bindMessageForRedPacket(ws: WebSocket, room_id: number, msgCallback?: () => void) {
   ws.addEventListener('message', evt => {
     // 对数据进行解码 decode方法
     const packet = decode(evt.data as Uint8Array);
@@ -129,21 +145,12 @@ export async function biliDmWs(room_id: number, time = 0, msgCallback?: () => vo
       });
     }
   });
+}
 
-  function sendInterval() {
-    let timeout: NodeJS.Timeout | undefined = undefined;
-    const timer = setInterval(() => {
-      ws.send(formatDataView().buffer);
-    }, 30000);
-    if (time > 0) {
-      timeout = setTimeout(() => {
-        closeWs(room_id);
-      }, time);
-    }
-    return { timer, timeout };
-  }
-
-  return ws;
+export function bindMessageForLottery(ws: WebSocket) {
+  ws.addEventListener('message', () => {
+    // console.log(evt.data);
+  });
 }
 
 function str2bytes(str: string) {

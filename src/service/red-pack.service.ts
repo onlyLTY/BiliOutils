@@ -1,8 +1,8 @@
 import type { IdType } from '@/types';
-import { getRandomItem, getUnixTime, logger, pushIfNotExist, random, sleep } from '@/utils';
+import { getRandomItem, getUnixTime, Logger, logger, pushIfNotExist, random, sleep } from '@/utils';
 import { joinRedPacket, checkRedPacket, sendMessage, getOnlineGoldRank } from '@/net/live.request';
-import { TaskConfig } from '@/config/globalVar';
-import { addWs, biliDmWs, clearWs, closeWs, wsMap } from '@/utils/ws';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
+import { addWs, biliDmWs, bindMessageForRedPacket, clearWs, closeWs, wsMap } from '@/utils/ws';
 import { DMEmoji } from '@/constant/dm';
 import { getLiveArea, getLotteryRoomList } from './live-lottery.service';
 import { request } from '@/utils/request';
@@ -10,6 +10,11 @@ import { handleFollowUps } from './tags.service';
 import { getRedPacketController } from '@/net/red-packet.request';
 import { noWinRef } from '@/store/red-packet';
 import { ReturnStatus } from '@/enums/packet.enum';
+
+const liveLogger = new Logger(
+  { console: 'debug', file: 'warn', push: 'warn', payload: TaskModule.nickname },
+  'redPacket',
+);
 
 // 可能是新关注的UP
 let newFollowUp: (number | string)[],
@@ -61,8 +66,7 @@ async function getRoomListByLink() {
   if (!roomList?.length) {
     return;
   }
-  const { countDown } = TaskConfig.redPack;
-  return roomList?.filter(room => room.countDown >= countDown ?? 20);
+  return roomList?.filter(room => room.countDown >= 20).reverse();
 }
 
 /**
@@ -90,12 +94,12 @@ async function returnStatusHandle() {
   const { restTime, totalNum, riskNum, noWinNum, riskTime } = TaskConfig.redPack;
   // 中场处理
   if (totalNum > 0 && joinCount >= totalNum) {
-    logger.debug(`已经参与了${totalNum}次，停止运行`);
+    liveLogger.debug(`已经参与了${totalNum}次，停止运行`);
     return ReturnStatus.退出;
   }
   if (restTime[0] > 0 && restCount >= restTime[0]) {
     initCount();
-    logger.debug(`中场休息时间到，暂停运行${restTime[1]}分`);
+    liveLogger.debug(`中场休息时间到，暂停运行${restTime[1]}分`);
     return ReturnStatus.中场休眠;
   }
   // 风控处理
@@ -106,7 +110,7 @@ async function returnStatusHandle() {
   if (riskTime[0] > 0 && riskCount >= riskTime[0]) {
     // 当风控需要休眠时，重置中场次数
     initCount();
-    logger.warn(`疑似风控连续${riskCount}次，暂停运行${riskTime[1]}分`);
+    liveLogger.warn(`疑似风控连续${riskCount}次，暂停运行${riskTime[1]}分`);
     return ReturnStatus.风控休眠;
   }
   // 总参与次数处理
@@ -119,7 +123,7 @@ async function returnStatusHandle() {
 async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
   const { lot_id, uid, uname, room_id } = redPacket;
   try {
-    const ws = await createBiliDmWs(redPacket, wsTime);
+    const ws = await createRedPacketDmWs(redPacket, wsTime);
     if (!ws) return;
     addWs(room_id, ws);
     await sleep(2000);
@@ -134,15 +138,17 @@ async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
       closeWs(room_id);
       return joinErrorHandle(uname, code, message);
     }
-    logger.debug(`【${uname}】红包成功 √`);
+    liveLogger.debug(`【${uname}】红包成功 √`);
     return biliDmHandle(redPacket, wsTime);
   } catch (error) {
     logger.error(`红包异常: ${error.message}`);
   }
 }
 
-function createBiliDmWs({ room_id, wait_num, uid, uname }: RedPacket, wsTime: number) {
-  return biliDmWs(room_id, (wsTime + 20) * 1000, async () => {
+async function createRedPacketDmWs({ room_id, wait_num, uid, uname }: RedPacket, wsTime: number) {
+  const ws = await biliDmWs(room_id, (wsTime + 20) * 1000);
+  if (!ws) return;
+  bindMessageForRedPacket(ws, room_id, async () => {
     if (!wait_num || wait_num > 0) return;
     await sleep(20000);
     if (waitting.value === false && wsMap.size < TaskConfig.redPack.linkRoomNum) {
@@ -150,6 +156,7 @@ function createBiliDmWs({ room_id, wait_num, uid, uname }: RedPacket, wsTime: nu
       redPacket && (await doRedPacket({ ...redPacket, uid, uname, room_id }));
     }
   });
+  return ws;
 }
 
 async function biliDmHandle({ room_id, uid }: RedPacket, wsTime: number) {
