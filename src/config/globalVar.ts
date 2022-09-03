@@ -53,6 +53,8 @@ abstract class TaskModuleTemplate {
   static videoAid: number;
   /** 推送消息标题附加 */
   static pushTitle: string[] = [];
+  /** 存在错误 */
+  static hasError = false;
 }
 
 export let TaskModule: typeof TaskModuleTemplate;

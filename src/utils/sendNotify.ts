@@ -766,5 +766,8 @@ export async function sendMessage(title: string, text: string) {
   if (TaskModule.pushTitle.length) {
     title = `${title}-${TaskModule.pushTitle.join('')}`;
   }
+  if (TaskModule.hasError) {
+    title = `【Err】${title}`;
+  }
   await sendNotify(title, text, undefined, '');
 }

@@ -1,5 +1,5 @@
-import type { LoggerInitOptions, LoggerOptions } from '@/types/log';
-import { TaskConfig } from '@/config/globalVar';
+import type { LoggerInitOptions, LoggerOptions, MessageType } from '@/types/log';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
 import { defLogger, EmptyLogger, SimpleLogger } from './def';
 import { resolvePath } from '../path';
 import { getPRCDate } from '../pure';
@@ -24,6 +24,11 @@ export class Logger extends SimpleLogger {
   protected setFilename(file: string) {
     this.errorFile = resolvePath(`./logs/bt_error-${file}.log`);
     this.logFile = resolvePath(`./logs/bt_combined-${file}.log`);
+  }
+
+  public error(message: MessageType) {
+    this.log({ level: 'error' }, message);
+    TaskModule.hasError = true;
   }
 
   static setEmoji(useEmoji = true) {

@@ -333,7 +333,7 @@ async function printPoint() {
     logger.info(`今日获取积分【${todayPoint}】√`);
     return;
   }
-  logger.error(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
+  logger.warn(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
   if (todayPoint === 0 && !isError) {
     logger.info('可能是完成获取，但是接口数据延迟。');
   }
