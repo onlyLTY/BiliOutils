@@ -19,7 +19,7 @@ async function init() {
     presetTime = [presetTime];
   }
 
-  const isInPresetTime = presetTime.some(time => time === today);
+  const isInPresetTime = presetTime.some(time => time === today) || presetTime.length === 0;
   const isLastDay = monthHasDays === today;
   // 判断是否在指定时间内
   if (!isInPresetTime && !isLastDay) {
@@ -77,7 +77,7 @@ export async function chargingService() {
   }
 
   try {
-    const bp_num = TaskModule.couponBalance || 0;
+    const bp_num = 4 || TaskModule.couponBalance || 0;
     let errorCount = 0;
     const up_mid = TaskConfig.couponBalance.mid;
     // 固定为 up 模式

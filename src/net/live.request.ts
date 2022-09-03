@@ -59,7 +59,7 @@ export function exchangeBattery(couponBalance: number) {
   return liveApi.post<Bp2GoldDto>('xlive/revenue/v1/order/createOrder', {
     platform: 'pc',
     pay_bp,
-    context_id: 6726252, // 直播间相关，未知
+    context_id: 13142548, // 直播间 id
     context_type: 1, // 直播间相关，未知
     goods_id: 1,
     goods_num: couponBalance,

@@ -127,7 +127,7 @@ export const defaultConfig = {
   couponBalance: {
     /** 充电的 up 默认自己 */
     mid: 0,
-    /** 预设时间，哪一天？ */
+    /** 预设时间，哪一天？设置为空数组即每一天 */
     presetTime: [10, 20],
     /** 使用方式 */
     use: '充电' as CouponBalanceUseType,

@@ -14,7 +14,7 @@ async function getPrivilegeStatus() {
       return;
     }
     const { list } = data;
-    const stateList = list.filter(item => item.state === 0);
+    const stateList = list.filter(item => item.state === 0 && [1, 3].includes(item.type));
     if (stateList.length === 0) {
       return;
     }
@@ -64,9 +64,6 @@ async function getOnePrivilege(type: number): Promise<boolean> {
 }
 
 async function getPrivilege(type: number) {
-  if (![1, 3].includes(type)) {
-    return;
-  }
   let errCount = 0,
     suc = false;
 
