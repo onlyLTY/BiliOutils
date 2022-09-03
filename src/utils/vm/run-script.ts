@@ -28,17 +28,14 @@ function createScript(code: string) {
         reject,
       };
       script.runInNewContext({
+        ...global,
         console,
         require,
         process,
         __dirname,
         __filename,
-        setTimeout,
-        clearTimeout,
         Buffer,
         URLSearchParams,
-        global,
-        VMThis,
         BILITOOLS_CONFIG: global.BILITOOLS_CONFIG,
         ...context,
       });

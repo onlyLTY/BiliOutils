@@ -77,21 +77,9 @@ export function isArray(val: any): val is Array<any> {
   return val && Array.isArray(val);
 }
 
-export function isWindow(val: any): val is Window {
-  return typeof window !== 'undefined' && is(val, 'Window');
-}
-
-export function isElement(val: unknown): val is Element {
-  return isObject(val) && !!val.tagName;
-}
-
 export function isMap(val: unknown): val is Map<any, any> {
   return is(val, 'Map');
 }
-
-export const isServer = typeof window === 'undefined';
-
-export const isClient = !isServer;
 
 export function isUrl(path: string): boolean {
   const reg =

@@ -33,6 +33,7 @@ async function login(page: Page): Promise<boolean> {
     await Promise.all([
       page.waitForNavigation(),
       page.evaluate(() => {
+        // @ts-ignore
         document.querySelector<HTMLButtonElement>('.field input[type="submit"]')?.click();
       }),
     ]);
@@ -75,6 +76,7 @@ async function createRelease(page: Page): Promise<void> {
     core.debug('start submitting');
     await Promise.all([
       page.waitForNavigation(),
+      // @ts-ignore
       page.evaluate((sub: HTMLElement) => sub.click(), btn),
     ]);
     core.info('created release');

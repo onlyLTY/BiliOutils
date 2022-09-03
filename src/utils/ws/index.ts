@@ -7,6 +7,7 @@ import { getDanmuInfo } from '@/net/live.request';
 import { PacketCmdEnum } from '@/enums/packet.enum';
 import { logger } from '../log';
 import { noWinRef } from '@/store/red-packet';
+import { TextDecoder, TextEncoder } from 'util';
 
 interface TimerOptions {
   timer?: NodeJS.Timeout;

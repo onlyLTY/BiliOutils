@@ -1,3 +1,4 @@
+import './fix';
 import { dailyTasks } from '@/task/dailyTask';
 import { logger } from '@/utils';
 

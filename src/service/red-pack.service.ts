@@ -109,8 +109,8 @@ async function returnStatusHandle() {
   }
   if (riskTime[0] > 0 && riskCount >= riskTime[0]) {
     // 当风控需要休眠时，重置中场次数
-    initCount();
     liveLogger.warn(`疑似风控连续${riskCount}次，暂停运行${riskTime[1]}分`);
+    initCount();
     return ReturnStatus.风控休眠;
   }
   // 总参与次数处理

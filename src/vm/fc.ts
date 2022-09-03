@@ -1,3 +1,4 @@
+import './fix';
 import type { FCContext, FCEvent } from '#/fc';
 import { logger } from '@/utils';
 import { dailyMain, runTasks } from '../index.fc';

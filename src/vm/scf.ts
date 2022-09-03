@@ -1,3 +1,4 @@
+import './fix';
 import { logger } from '@/utils';
 import { dailyMain, runTasks } from '../index.scf';
 

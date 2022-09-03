@@ -15,7 +15,7 @@
       "@/*": ["./src/*"],
       "#/*": ["./src/types/*"]
     },
-    "lib": ["esnext", "DOM"],
+    "lib": ["esnext"],
     "skipLibCheck": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
