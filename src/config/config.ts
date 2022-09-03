@@ -338,9 +338,11 @@ function configValueHandle(config: TheConfig) {
   const couponBalanceUse = couponBalance.use;
   switch (couponBalanceUse) {
     case 'battery':
+    case '电池':
       couponBalance.use = '电池';
       break;
     case 'charge':
+    case '充电':
       couponBalance.use = '充电';
       break;
     default:

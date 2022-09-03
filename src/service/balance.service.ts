@@ -34,7 +34,7 @@ async function init() {
   // 判断余额是否足够
   const useType = TaskConfig.couponBalance.use,
     bp_num = TaskModule.couponBalance;
-  if (useType === '充电' || bp_num < 2) {
+  if (useType === '充电' && bp_num < 2) {
     logger.info(`剩余券为${bp_num}，不足2跳过充电`);
     return false;
   }
