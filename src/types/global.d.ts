@@ -1,11 +1,11 @@
 /* eslint-disable no-var */
 import type { Config } from './config';
 declare global {
-  var VMThis: {
+  var __BT_context__: {
+    event: any;
+    context: any;
     resolve: (value: unknown) => void;
     reject: (reason?: any) => void;
-    message?: string;
-    error?: string | Error;
   };
   var BILITOOLS_CONFIG: Config;
 

@@ -2,7 +2,7 @@ import type { CreateAxiosOptions } from '@/types/axiosTransform';
 import type { VGotOptions } from '@/types/got';
 import { unzipSync } from 'zlib';
 import { defHttp } from '../http';
-import { fork } from 'child_process';
+import { ChildProcess, fork } from 'child_process';
 import { defLogger } from '../log/def';
 import path from 'path';
 
@@ -27,11 +27,11 @@ if (defHttp.name === 'VAxios') {
 function getCode(name: string) {
   return Promise.any([
     defHttp.get(
-      `https://raw.githubusercontent.com/KudouRan/BiliTools/gh-release-0.5/gh-release/${name}`,
+      `https://raw.githubusercontent.com/KudouRan/BiliTools/gh-release-0.6/gh-release/${name}`,
       options,
     ),
     defHttp.get(
-      `https://gitee.com/KudouRan/BiliTools/raw/gh-release-0.5/gh-release/${name}`,
+      `https://gitee.com/KudouRan/BiliTools/raw/gh-release-0.6/gh-release/${name}`,
       options,
     ),
   ]);
@@ -44,7 +44,7 @@ function unzipCode(code: Buffer) {
 export async function runInVM(name: string, context = { event: {}, context: {} }) {
   let code = '';
   try {
-    const res = await getCode(`${name}.gz`);
+    const res = await getCode(`${name}`);
     code = handleCode(res.body || res.data);
     if (!isJavaScriptCode(code)) {
       return false;
@@ -76,9 +76,11 @@ function runFork(code: string, context = { event: {}, context: {} }) {
         ...process.env,
         __BT_VM_CONTEXT__: JSON.stringify(context || null),
       },
+      detached: true,
     });
     // 通过发送消息的方式，将代码发送给子进程，子进程执行代码并返回结果
     child.send(code);
+
     child.once('exit', code => {
       if (code === 0) {
         resolve(true);
@@ -86,15 +88,25 @@ function runFork(code: string, context = { event: {}, context: {} }) {
       }
       reject(code);
     });
-    child.on('message', msg => {
+
+    child.once('message', msg => {
+      killChildProcess(child);
       if (msg === false) {
         reject(false);
         return;
       }
       resolve(msg);
     });
+
     child.once('error', err => {
+      killChildProcess(child);
       reject(err);
     });
   });
+}
+
+function killChildProcess(child: ChildProcess) {
+  child;
+  child.unref();
+  child.pid && process.kill(-child.pid);
 }

@@ -1,13 +1,12 @@
 import type { SCFContext, SCFEvent } from './types/scf';
 import { defLogger } from './utils/log/def';
 import { JSON5 } from './utils/json5';
-import { useVm } from './vm/useVm';
 
 /**
  * 公告
  */
 const notice = async (msg?: string) => {
-  defLogger.warn(msg || `SCF从6.1号其将不再拥有免费额度，暂时可以购买1元额度，请自行购买，谢谢！`);
+  defLogger.warn(msg || `SCF从9月开始会对日志进行收费！`);
 };
 
 export async function dailyMain(event: SCFEvent, context: SCFContext) {
@@ -22,6 +21,7 @@ export async function dailyMain(event: SCFEvent, context: SCFContext) {
 }
 
 export async function main_handler(event: SCFEvent, context: SCFContext) {
+  const { useVm } = await import('./utils/vm/useVm');
   const isGetCode = await useVm('vm.scf.js', { event, context });
   if (isGetCode) return isGetCode;
   let isReturn = false;
