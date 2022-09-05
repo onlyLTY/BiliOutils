@@ -1,32 +1,20 @@
 import * as VM from 'vm';
+import { JSON5 } from '../json5';
 import { defLogger } from '../log/def';
 
 process.once('message', async (code: string) => {
-  try {
-    process.send?.(await createScript(code));
-  } catch (error) {
-    if (typeof error === 'number') {
-      process.exit(error);
-    }
-    if (typeof error === 'string') {
-      defLogger.error(`createScript: ${error}`);
-    }
-    process.exit(1);
-  }
+  const msg = await createScript(code);
+  process.send?.(msg);
 });
 
 function createScript(code: string) {
   if (!code) process.exit(1);
   return new Promise((resolve, reject) => {
     try {
-      const context = JSON.parse(process.env.__BT_VM_CONTEXT__ || '{"event":{},"context":{}}');
+      const context = JSON5.parse(process.env.__BT_VM_CONTEXT__ || '{"event":{},"context":{}}');
       const script = new VM.Script(code, {
         filename: 'bilitools/index.js',
       });
-      global.VMThis = {
-        resolve,
-        reject,
-      };
       script.runInNewContext({
         ...global,
         console,
@@ -37,7 +25,7 @@ function createScript(code: string) {
         Buffer,
         URLSearchParams,
         BILITOOLS_CONFIG: global.BILITOOLS_CONFIG,
-        ...context,
+        __BT_context__: { ...context, resolve, reject },
       });
     } catch (error) {
       defLogger.error(`runInNewContext: ${error.stack}`);

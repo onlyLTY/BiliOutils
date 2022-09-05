@@ -5,18 +5,15 @@ import { dailyMain, runTasks } from '../index.scf';
 (async () => {
   logger.info('开始执行网络代码');
   let isReturn = false;
-  // @ts-ignore
-  if (event.Message) {
-    // @ts-ignore
-    isReturn = await runTasks(event.Message);
+  if (__BT_context__.event.Message) {
+    isReturn = await runTasks(__BT_context__.event.Message);
   }
-  if (isReturn) return 'success';
+  if (isReturn) return __BT_context__.resolve('success');
   try {
-    // @ts-ignore
-    VMThis.message = await dailyMain(event, context);
-    VMThis.resolve(VMThis.message);
+    const message = await dailyMain(__BT_context__.event, __BT_context__.context);
+    __BT_context__.resolve(message);
     return;
   } catch (error) {
-    VMThis.reject(error);
+    __BT_context__.reject(error);
   }
 })();
