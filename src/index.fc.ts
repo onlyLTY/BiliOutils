@@ -20,9 +20,6 @@ export async function dailyMain(event: FCEvent, context: FCContext) {
 }
 
 export async function handler(event: Buffer, context: FCContext, callback: FCCallback) {
-  const { useVm } = await import('./utils/vm/useVm');
-  const isGetCode = await useVm('vm.fc.js', { event, context });
-  if (isGetCode) return callback(null, isGetCode === true ? 'success' : isGetCode);
   try {
     const eventJson: FCEvent = JSON5.parse(event.toString());
     let isReturn = false;

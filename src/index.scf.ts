@@ -21,9 +21,6 @@ export async function dailyMain(event: SCFEvent, context: SCFContext) {
 }
 
 export async function main_handler(event: SCFEvent, context: SCFContext) {
-  const { useVm } = await import('./utils/vm/useVm');
-  const isGetCode = await useVm('vm.scf.js', { event, context });
-  if (isGetCode) return isGetCode;
   let isReturn = false;
   if (event.Message) {
     isReturn = await runTasks(event.Message);
