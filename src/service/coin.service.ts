@@ -27,6 +27,7 @@ import {
   getVideoRelation,
   getMusicCoin,
   getArticleInfo,
+  getTodayAccountExp,
 } from '../net/coin.request';
 import type { ApiBaseProp } from '../dto/bili-base-prop';
 import { request } from '@/utils/request';
@@ -368,14 +369,17 @@ export async function coinToId({ id, coin = 1, coinType = '视频', mid }: CoinT
  * 获取今日投币数量
  */
 export async function getTodayCoinNum(defCoin?: number) {
-  const exp = await getTodayExp();
-  if (exp) return exp;
-  const coin = await getTodayCoin();
-  return coin || defCoin || TaskConfig.coin.todayCoins;
+  return (
+    (await getTodayAccountCoin()) ||
+    (await getTodayCoin()) ||
+    (await getTodayExpenseCoin()) ||
+    defCoin ||
+    0
+  );
 }
 
-/** 获取已经获得的经验 */
-async function getTodayExp() {
+/** 获取已投硬币 */
+async function getTodayCoin() {
   try {
     const { data: coinExp, code } = await getDonateCoinExp();
     if (code === 0) {
@@ -386,8 +390,20 @@ async function getTodayExp() {
   }
 }
 
+/** 获取已投硬币 */
+async function getTodayAccountCoin() {
+  try {
+    const { number, code } = await getTodayAccountExp();
+    if (code === 0) {
+      return number / 10;
+    }
+  } catch (error) {
+    logger.debug(`获取投币数量异常[exp.php] ${error.message}`);
+  }
+}
+
 /** 获取今日投币消耗硬币 */
-async function getTodayCoin() {
+async function getTodayExpenseCoin() {
   try {
     const { code, message, data } = await getCoinHistory();
     if (code !== 0) {

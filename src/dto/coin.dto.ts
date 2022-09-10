@@ -221,3 +221,13 @@ export type ArticleInfoDto = ApiBaseProp<{
   video_url: string;
   location: string;
 }>;
+
+/**
+ * 今日获取的经验值
+ */
+export type TodayExpDto = {
+  code: number;
+  message: string;
+  /** 经验值，10 为单位 */
+  number: number;
+};

@@ -103,7 +103,6 @@ const theConfig = {
   },
   coin: {
     customizeUp: [],
-    todayCoins: 0,
     targetLevel: 6,
     stayCoins: 0,
     targetCoins: 5,

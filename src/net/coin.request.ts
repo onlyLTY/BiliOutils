@@ -7,6 +7,7 @@ import type {
   AudioCoinDto,
   AudioCoinNumDto,
   ArticleInfoDto,
+  TodayExpDto,
 } from '../dto/coin.dto';
 import type { AddCoinDto } from '../dto/video.dto';
 import type { IdType } from '../types';
@@ -188,4 +189,11 @@ export function getMusicCoin(sid: number) {
  */
 export function getArticleInfo(id: number) {
   return biliApi.get<ArticleInfoDto>(`x/article/viewinfo?id=${id}&mobi_app=pc&from=web`);
+}
+
+/**
+ * 获取今日投币的经验
+ */
+export function getTodayAccountExp() {
+  return biliHttp.get<TodayExpDto>('https://www.bilibili.com/plus/account/exp.php');
 }

@@ -152,8 +152,6 @@ export const defaultConfig = {
     stayCoins: 0,
     /** 预计投币数,默认5 */
     targetCoins: 5,
-    /** 如果获取今日已投币数量失败，假设已投币数量为多少 */
-    todayCoins: 0,
   },
   sls: {
     name: '',
