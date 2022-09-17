@@ -287,13 +287,17 @@ export const defaultConfig = {
     // 活动列表
     list: [] as ActivityLotteryIdType[],
     // 是否从网络请求活动列表
-    isRequest: false,
+    isRequest: true,
     // 抽奖延时（秒）
     delay: [1.8, 3.2],
     // 追番？
     bangumi: false,
     // 关注？
     follow: false,
+    // 请求 GitHub 使用的代理前缀
+    proxyPrefix: '',
+    // 自定义活动列表链接
+    customUrl: '',
   },
   BILIJCT: '',
   USERID: 0,

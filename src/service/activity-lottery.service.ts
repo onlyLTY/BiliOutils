@@ -250,6 +250,7 @@ export async function doLotteryContinue(num: number, item: ActivityLotteryIdType
 }
 
 function getCode() {
+  const { customUrl, proxyPrefix } = TaskConfig.activityLottery;
   const header = {
     headers: {
       'Accept-Encoding': 'gzip, deflate, br',
@@ -258,8 +259,11 @@ function getCode() {
     timeout: 10000,
   };
   const protocol = `\u0068\u0074\u0074\u0070\u0073`;
-  const ghUrl = `${protocol}:\u002f\u002f\u0072\u0061\u0077.\u0067\u0069\u0074\u0068\u0075\u0062\u0075\u0073\u0065\u0072\u0063\u006f\u006e\u0074\u0065\u006e\u0074.\u0063\u006f\u006d\u002f\u004b\u0075\u0064\u006f\u0075\u0052\u0061\u006e\u002f\u0065\u0039\u0062\u0034\u0037\u0035\u0066\u0032\u0061\u0061\u002f\u0061\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u002f\u0064\u0061\u0074\u0061\u002f\u0065\u0039\u0062\u0034\u0037\u0035\u0066\u0032\u0061\u0061.go`;
-  return Promise.any([defHttp.get(ghUrl, header)]);
+  let ghUrl = `${protocol}:\u002f\u002f\u0072\u0061\u0077.\u0067\u0069\u0074\u0068\u0075\u0062\u0075\u0073\u0065\u0072\u0063\u006f\u006e\u0074\u0065\u006e\u0074.\u0063\u006f\u006d\u002f\u004b\u0075\u0064\u006f\u0075\u0052\u0061\u006e\u002f\u0065\u0039\u0062\u0034\u0037\u0035\u0066\u0032\u0061\u0061\u002f\u0061\u0063\u0074\u0069\u0076\u0069\u0074\u0079\u002f\u0064\u0061\u0074\u0061\u002f\u0065\u0039\u0062\u0034\u0037\u0035\u0066\u0032\u0061\u0061.go`;
+  if (proxyPrefix) {
+    ghUrl = `${proxyPrefix}${ghUrl}`;
+  }
+  return Promise.any([ghUrl, customUrl].map(url => defHttp.get(url, header)));
 }
 
 async function getActivityList(
