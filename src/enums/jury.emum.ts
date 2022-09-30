@@ -20,3 +20,14 @@ export const JuryVoteResult = {
   /** Opinion 太少 */
   FEW_OPINION: 2,
 } as const;
+
+/**
+ * 获取 vote 返回结果
+ */
+export const VoteResCode = {
+  成功: 0,
+  没有资格: 25005,
+  资格过期: 25006,
+  没有新案件: 25008,
+  已完成: 25014,
+} as const;

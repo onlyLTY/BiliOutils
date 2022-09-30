@@ -21,6 +21,8 @@ export const defaultConfig = {
   // accessRefreshToken: '',
   message: {
     br: '\n',
+    // 仅错误时发送
+    onlyError: false,
     email: {
       host: 'smtp.163.com',
       port: 465,
@@ -85,7 +87,7 @@ export const defaultConfig = {
     activityLottery: false,
   },
   log: {
-    pushLevel: 'debug' as LevelType,
+    pushLevel: 'debug' as LevelType | boolean,
     consoleLevel: 'debug' as LevelType | boolean,
     fileLevel: 'debug' as LevelType | boolean,
     useEmoji: true,
@@ -239,7 +241,6 @@ export const defaultConfig = {
     limitFeed: TODAY_MAX_FEED,
   },
   jury: {
-    mode: 1,
     once: true,
     vote: [0, 0, 1],
     opinionMin: 3,

@@ -761,6 +761,14 @@ function pushPlusNotify(text, desp) {
  */
 export async function sendMessage(title: string, text: string) {
   logger.info('----【消息推送】----');
+  if (TaskConfig.log.pushLevel === false) {
+    logger.info('消息推送已关闭');
+    return;
+  }
+  if (TaskConfig.message.onlyError && TaskModule.hasError) {
+    logger.info('仅在任务出错时发送消息');
+    return;
+  }
   // 处理 title
   title = `Bili-${conciseNickname(TaskModule?.nickname) || TaskConfig.USERID}-${title}`;
   if (TaskModule.pushTitle.length) {

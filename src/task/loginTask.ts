@@ -95,7 +95,7 @@ export default async function loginTask() {
   logger.info('----【登录】----');
   const { data, message, code } = await loginByCookie();
   if (code !== 0) {
-    logger.error(`登录错误 ${code} ${message}`);
+    logger.error(`[${TaskConfig.USERID}]登录错误 ${code} ${message}`);
     throw new Error(message);
   }
   if (!data.isLogin) {

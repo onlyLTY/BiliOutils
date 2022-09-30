@@ -14,7 +14,7 @@ export async function dailyTasks<T = unknown>(
     await loginTask();
   } catch (error) {
     logger.error(`登录失败: ${error}`);
-    await sendMessage('登录失败', Logger.pushValue);
+    await sendMessage('【登录失败】', Logger.pushValue);
     return '未完成';
   }
   const biliArr = getWaitRuningFunc();

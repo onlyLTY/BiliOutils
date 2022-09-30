@@ -247,7 +247,6 @@ export async function mangaSign() {
   if (!sign) {
     return;
   }
-  logger.info('开始签到');
   try {
     const { code } = await mangaApi.clockIn();
     if (code == 0) {
@@ -290,7 +289,7 @@ export async function takeSeasonGift() {
     if (code === 0) return;
     if (code === 7) {
       // 已领取或者未完成
-      logger.debug(`获取任务礼包失败：${code} ${msg}`);
+      // logger.debug(`获取任务礼包失败：${code} ${msg}`);
       return;
     }
     logger.warn(`获取任务礼包失败：${code} ${msg}`);
