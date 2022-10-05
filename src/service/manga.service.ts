@@ -1,6 +1,6 @@
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
-import { exchangeMangaShop, getMangaPoint } from '@/net/manga.request';
+import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
 import { apiDelay, getPRCDate, logger } from '@/utils';
 import { request } from '@/utils/request';
 
@@ -355,5 +355,21 @@ export async function exchangeCouponService() {
     isRepeat = await exchangeCoupon(num);
     // 等待 2s 再次尝试
     await apiDelay(delay - 50, delay + 150);
+  }
+}
+
+/**
+ * 每日首次分享
+ */
+export async function shareComicService() {
+  try {
+    const { code, msg } = await shareComic();
+    if (code === 0) {
+      logger.info(msg || '每日分享成功！');
+      return;
+    }
+    logger.warn(`每日分享失败：${code} ${msg}`);
+  } catch (error) {
+    logger.error(`每日分享异常: ${error.message}`);
   }
 }

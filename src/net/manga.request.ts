@@ -9,6 +9,7 @@ import type {
   PointShopBuyDto,
   SearchMangaDto,
   SeasonInfoDto,
+  ShareComicDto,
   TakeSeasonGiftDto,
   WalletDto,
 } from '../dto/manga.dto';
@@ -160,6 +161,16 @@ export function getSeasonInfo() {
     no_recommend: 0,
     take_type: 1,
     mobi_app: 'android_comic',
+    ts: new Date().getTime(),
+  });
+}
+
+/**
+ * 获取赛季信息
+ */
+export function shareComic() {
+  return mangaApi.post<ShareComicDto>(`twirp/activity.v1.Activity/ShareComic`, {
+    platform: 'android',
     ts: new Date().getTime(),
   });
 }

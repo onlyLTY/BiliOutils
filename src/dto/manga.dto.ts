@@ -506,3 +506,7 @@ interface SeasonWelfare {
   url: string;
   kind_address_id: string;
 }
+
+export type ShareComicDto = OnlyMsg<{
+  point: number;
+}>;
