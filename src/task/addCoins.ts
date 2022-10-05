@@ -79,6 +79,10 @@ async function coinHandle(state: State) {
   }
   // 这个函数不会报错的
   const { data, code, msg } = await getAidByByPriority();
+  console.log(code);
+  console.log(msg);
+  console.log(data);
+
   if (code === 1) {
     aidFuncName.next();
     return false;
@@ -170,7 +174,7 @@ async function coinToIdOnce(data: IdInfo, state: State) {
 function coinFilledHandle(id: number, state: State) {
   state.fillCount++;
   state.prevFillId = id;
-  logger.verbose(`当前稿件[${id}]不能再投币了`);
+  logger.debug(`当前稿件[${id}]不能再投币了`);
   if (state.fillCount >= 3) {
     logger.warn(`该类型的用户组似乎没有币可投了`);
     state.fillCount = 0;
@@ -186,7 +190,7 @@ function coinSuccessHandle(state: State, { author, id, coinType }: IdInfo, coin:
   TaskModule.money -= coin;
   TaskModule.coinsTask -= coin;
   state.num += coin;
-  logger.info(`给${aidFuncName.title}【${author}】的${coinType}：${id} 投币${coin}颗`);
+  logger.info(`给${aidFuncName.value}【${author}】的${coinType}：${id} 投币${coin}颗`);
   return false;
 }
 
@@ -209,7 +213,7 @@ function coinErrorHandle(id: number, coinData: CoinData) {
 function coinOtherHandle(state: State, { id, coinType }: IdInfo, coinData: CoinData) {
   state.eCount++;
   logger.warn(
-    `给${aidFuncName.title}的${coinType} ${id} 投币失败 ${coinData.code} ${coinData.message}`,
+    `给${aidFuncName.value}的${coinType} ${id} 投币失败 ${coinData.code} ${coinData.message}`,
   );
   // 如果重复错误就直接退出
   if (state.prevCode === coinData.code) {

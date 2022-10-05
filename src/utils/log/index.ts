@@ -57,3 +57,10 @@ export const logger = new Logger({
   push: TaskConfig.log.pushLevel,
   payload: process.env.BILITOOLS_IS_ASYNC && TaskConfig.USERID,
 });
+
+export const _logger = new Logger({
+  console: 'debug',
+  file: false,
+  push: false,
+  payload: 'cat',
+});

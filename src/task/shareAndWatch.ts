@@ -45,7 +45,7 @@ export default async function shareAndWatch() {
  */
 export async function getVideo() {
   for (let errCount = 5; errCount > 0; errCount--) {
-    const biliav = await getAidByByPriority();
+    const biliav = await getAidByByPriority(['视频']);
     if (biliav.code !== 0) {
       return await getAidByRecommend();
     }

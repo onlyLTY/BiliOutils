@@ -16,6 +16,7 @@ import {
 import { getRecommendVideos, getRegionRankingVideos } from '../net/video.request';
 import { TaskConfig } from '../config/globalVar';
 import type { FollowingsDto, TagsFollowingsDto } from '../dto/user-info.dto';
+import type { UserNavNumDto } from '@/dto/coin.dto';
 import {
   addCoinForVideo,
   addCoinForArticle,
@@ -31,7 +32,7 @@ import {
 } from '../net/coin.request';
 import type { ApiBaseProp } from '../dto/bili-base-prop';
 import { request } from '@/utils/request';
-import { SourceEnum, TypeEnum } from '@/enums/coin.emum';
+import { TypeEnum } from '@/enums/coin.emum';
 
 // const AidInfoCodeEnum = {
 //   '-2': '获取异常',
@@ -94,7 +95,7 @@ function getRandmonNum([video, audio, article]: number[]) {
  * 从关注列表随机获取一个视频
  * @param special 是否只获取特别关注列表
  */
-export async function getAidByFollowing(special = false): Promise<AidInfo> {
+export async function getAidByFollowing(types?: string[], special = false): Promise<AidInfo> {
   try {
     const uid = TaskConfig.USERID;
     const { data, message, code }: ApiBaseProp = await (special
@@ -115,7 +116,7 @@ export async function getAidByFollowing(special = false): Promise<AidInfo> {
     if (code === 0) {
       await apiDelay();
       const { mid } = getRandomItem(followList) || {};
-      return await getIdByRandom(mid);
+      return await getIdByRandom(mid, types);
     }
     return {
       msg: special
@@ -197,7 +198,7 @@ export async function getAidByRegionRank(): Promise<AidInfo> {
 /**
  * 从自定义up主列表中随机选择
  */
-export async function getAidByCustomizeUp(): Promise<AidInfo> {
+export async function getAidByCustomizeUp(types?: string[]): Promise<AidInfo> {
   const customizeUp = TaskConfig.coin.customizeUp;
   if (customizeUp.length === 0) {
     return {
@@ -205,14 +206,13 @@ export async function getAidByCustomizeUp(): Promise<AidInfo> {
       msg: '没有自定义up主',
     };
   }
-  const a = getRandomItem(customizeUp);
-  return await getIdByRandom(a);
+  return await getIdByRandom(getRandomItem(customizeUp), types);
 }
 
 /**
  * 获取随机投稿（视频，音频，专栏）
  */
-export async function getIdByRandom(mid: number) {
+export async function getIdByRandom(mid: number, types?: string[]) {
   if (!mid) {
     return {
       code: 1,
@@ -220,6 +220,7 @@ export async function getIdByRandom(mid: number) {
     };
   }
   try {
+    // 获取目标用户的投稿
     const { code, data, message } = await getUserNavNum(mid);
     if (code) {
       return {
@@ -228,21 +229,16 @@ export async function getIdByRandom(mid: number) {
       };
     }
     await apiDelay();
-    const { video, audio, article } = data;
-    const randmonNumData = getRandmonNum([video, audio, article]);
+    // 获取随机投稿
+    const randmonNumData = getRandmonNumData(data, types);
     if (!randmonNumData) {
       return {
         msg: '用户没有投稿',
         code: 1,
       };
     }
-    const { coinType, page, index } = randmonNumData,
-      handle = {
-        [TypeEnum.video]: getVideoByRandom,
-        [TypeEnum.audio]: getAudioByRandom,
-        [TypeEnum.article]: getArticleByRandom,
-      },
-      handleData = await handle[coinType](mid, page, index);
+    // 获取稿件的详情
+    const handleData = await getRandomInfo(mid, randmonNumData);
     if (handleData.message) {
       return {
         msg: handleData.message,
@@ -260,6 +256,25 @@ export async function getIdByRandom(mid: number) {
       code: -2,
     };
   }
+}
+
+function getRandmonNumData(navData: UserNavNumDto['data'], types: string[] = []) {
+  types = types.length === 0 ? ['video', 'audio', 'article'] : types;
+  return getRandmonNum(
+    (['video', 'audio', 'article'] as const).map(item =>
+      types.includes(item) ? navData[item] : 0,
+    ),
+  );
+}
+
+async function getRandomInfo(mid: number, data: Defined<ReturnType<typeof getRandmonNumData>>) {
+  const { coinType, page, index } = data,
+    handle = {
+      [TypeEnum.video]: getVideoByRandom,
+      [TypeEnum.audio]: getAudioByRandom,
+      [TypeEnum.article]: getArticleByRandom,
+    };
+  return await handle[coinType](mid, page, index);
 }
 
 async function getVideoByRandom(mid: number, page: number, index: number) {
@@ -295,48 +310,43 @@ async function getArticleByRandom(mid: number, page: number, index: number) {
   return { coinType: TypeEnum.article, id, title, author: name, mid };
 }
 
-function getAidBySpecialFollowing() {
-  return getAidByFollowing(true);
+function getAidBySpecialFollowing(types?: string[]) {
+  return getAidByFollowing(types, true);
 }
 
-const idFuncArray = [
-  ['customizeUp', getAidByCustomizeUp],
-  ['specialFollow', getAidBySpecialFollowing],
-  ['follow', getAidByFollowing],
-  ['recommend', getAidByRecommend],
-  ['regionRank', getAidByRegionRank],
-] as const;
-export type IdFuncMapKey = typeof idFuncArray[number][0];
-export const idFuncMap = new Map<IdFuncMapKey, () => Promise<AidInfo>>(idFuncArray);
+const idFuncObject = {
+  自定义UP: getAidByCustomizeUp,
+  特别关注: getAidBySpecialFollowing,
+  关注: getAidByFollowing,
+  首页推荐: getAidByRecommend,
+  分区排行: getAidByRegionRank,
+};
+export type IdFuncMapKey = keyof typeof idFuncObject;
+const idFuncArray: [IdFuncMapKey, () => Promise<AidInfo>][] = [];
+TaskConfig.coin.src.forEach(name => idFuncArray.push([name as IdFuncMapKey, idFuncObject[name]]));
+export const idFuncMap = new Map<IdFuncMapKey, (types?: string[]) => Promise<AidInfo>>(idFuncArray);
 export const aidFuncName = new (class {
-  private keys = Array.from(idFuncMap.keys());
-  private titles = SourceEnum;
-  value: IdFuncMapKey = 'customizeUp';
+  private srcs: IdFuncMapKey[] = (TaskConfig.coin.src || []) as IdFuncMapKey[];
+  value: IdFuncMapKey = this.srcs[0] || '首页推荐';
 
-  constructor() {
-    if (!TaskConfig.coin.customizeUp?.length) {
-      this.next();
-    }
-  }
   next() {
-    const index = this.keys.indexOf(this.value) + 1;
-    if (index === this.keys.length) {
-      return (this.value = 'regionRank');
+    // 获取下一个
+    const index = this.srcs.indexOf(this.value) + 1;
+    // 下一个不存在时，设置为 首页推荐
+    if (index === this.srcs.length) {
+      return (this.value = '首页推荐');
     }
-    return (this.value = this.keys[index]);
-  }
-  get title() {
-    return this.titles[this.value];
+    return (this.value = this.srcs[index]);
   }
 })();
 
 /**
  * 按照优先顺序调用不同函数获取aid
  */
-export async function getAidByByPriority() {
+export async function getAidByByPriority(types?: string[]) {
   const idFunc = idFuncMap.get(aidFuncName.value);
   await apiDelay();
-  return idFunc?.() || getAidByRecommend();
+  return idFunc?.(types && types.map(el => TypeEnum[el])) || getAidByRecommend();
 }
 
 // 参数

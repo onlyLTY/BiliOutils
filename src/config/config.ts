@@ -154,6 +154,8 @@ export const defaultConfig = {
     stayCoins: 0,
     /** 预计投币数,默认5 */
     targetCoins: 5,
+    /** 获取稿件的来源（排序），留空则来自 首页推荐 */
+    src: ['自定义UP', '特别关注', '关注', '首页推荐', '分区排行'],
   },
   sls: {
     name: '',
