@@ -1,4 +1,4 @@
-import type { Config, MultiConfig } from '@/types';
+import type { Config, ConfigArray, MultiConfig } from '@/types';
 import * as path from 'path';
 import { defLogger as logger } from '@/utils/log/def';
 import { gzipDecode } from '@/utils/gzip';
@@ -53,7 +53,7 @@ function handleMultiUserConfig(config: MultiConfig | Config[]) {
   let newConfig: Config[];
   const isArrayConf = isArray(config);
   if (isArrayConf) {
-    newConfig = config;
+    newConfig = config.filter(Boolean);
   } else {
     // [兼容]
     // 防止错误的将 account 用在配置中
@@ -74,7 +74,7 @@ function handleMultiUserConfig(config: MultiConfig | Config[]) {
   return conf;
 }
 
-export function getConfigPathFile(filepath: string): Config[] {
+export function getConfigPathFile(filepath: string): ConfigArray {
   try {
     const config = readJsonFile(filepath);
     if (!config) {
@@ -84,7 +84,7 @@ export function getConfigPathFile(filepath: string): Config[] {
     logger.verbose(`读取配置文件 ${filepath}`);
     process.env.__BT_CONFIG_PATH__ = filepath;
     if (isMultiUserConfig(config)) {
-      return filterMultiUserConfig(config);
+      return mapMultiUserConfig(config);
     }
     return [config];
   } catch (error) {
@@ -116,7 +116,7 @@ function setConfig() {
   return getEnvConfig();
 }
 
-export function getConfig<T extends boolean>(more?: T): T extends false ? Config : Config[] {
+export function getConfig<T extends boolean>(more?: T): T extends false ? Config : ConfigArray {
   const config = checkConfig(setConfig(), more);
   if (isArray(config) && config.length === 0) {
     logger.error('配置文件为空，或配置的cookie缺少三要素（bili_jct, SESSDATA, DedeUserID）！');
@@ -131,7 +131,7 @@ export function checkConfig(config: any, more = false) {
   }
 
   if (more) {
-    return filterMultiUserConfig(isMultiUserConfig(config) ? config : [config]);
+    return mapMultiUserConfig(isMultiUserConfig(config) ? config : [config]);
   }
 
   if (isMultiUserConfig(config)) {
@@ -162,14 +162,14 @@ function isMultiUserConfig(config: MultiConfig | Config[]) {
 }
 
 /**
- * 过滤出有效的多用户配置
+ * 处理无效的多用户配置
  * @param config
  */
-function filterMultiUserConfig(config: MultiConfig | Config[]) {
-  const filter = (conf: Config) => isBiliCookie(conf.cookie);
+function mapMultiUserConfig(config: MultiConfig | Config[]) {
+  const map = (conf: Config) => (isBiliCookie(conf.cookie) ? conf : undefined);
   if (Array.isArray(config)) {
-    return config.filter(filter);
+    return config.map(map);
   }
   // [兼容]
-  return config.account.filter(filter);
+  return config.account.map(map);
 }

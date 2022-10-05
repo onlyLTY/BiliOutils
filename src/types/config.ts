@@ -14,6 +14,9 @@ export type Config = Required<
   }
 >;
 
+export type MabEmptyConfig = Config | undefined;
+export type ConfigArray = MabEmptyConfig[];
+
 export interface MultiConfig {
   account: Config[];
   message: Config['message'];

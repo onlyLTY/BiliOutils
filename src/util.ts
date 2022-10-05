@@ -1,4 +1,4 @@
-import type { Config } from './types';
+import type { Config, ConfigArray } from './types';
 import { resolve } from 'path';
 import { fork } from 'child_process';
 import * as path from 'path';
@@ -32,13 +32,17 @@ export async function config() {
 /**
  * 通过 item 列表获取配置
  */
-export function getConfigByItem(configs: Config[], item: string) {
+export function getConfigByItem(configs: ConfigArray, item: string) {
   const len = configs.length;
   return item
     .split(',')
-    .filter(el => el)
-    .map(item => configs.at(getItemIndex(item, len))!)
-    .filter(el => el);
+    .filter(Boolean)
+    .map(item => {
+      const config = configs.at(getItemIndex(item, len));
+      if (config) return config;
+      process.stdout.write(`配置item[${item}]为错误索引或该索引下的配置存在问题\n`);
+    })
+    .filter(Boolean);
 }
 
 export function runForkSync(config: Config, index: number, forkPath = './bin/fork', tasks = '') {
@@ -69,7 +73,7 @@ export function runForkSync(config: Config, index: number, forkPath = './bin/for
   });
 }
 
-export async function runTask(configs?: Config[], forkPath = './bin/fork', tasks = '') {
+export async function runTask(configs?: ConfigArray, forkPath = './bin/fork', tasks = '') {
   deleteLogFile();
   if (!configs) {
     const { getConfig } = await import('./config/setConfig');
@@ -78,12 +82,16 @@ export async function runTask(configs?: Config[], forkPath = './bin/fork', tasks
   const length = configs.length;
   if (process.env.BILITOOLS_IS_ASYNC) {
     return await runTaskAsync(
-      configs.map((config, index) => runForkSync(config, index, forkPath, tasks)),
+      configs.filter(Boolean).map((config, index) => runForkSync(config!, index, forkPath, tasks)),
     );
   }
   for (let index = 0; index < length; index++) {
     const config = configs[index];
     process.stdout.write(`正在执行第${index + 1}/${length}个配置\n`);
+    if (!config) {
+      process.stdout.write(`该配置为无效配置，跳过执行\n\n`);
+      continue;
+    }
     try {
       await runForkSync(config, index, forkPath, tasks);
     } catch (error) {

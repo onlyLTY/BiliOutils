@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-import type { Config } from './types/config';
+import type { ConfigArray } from './types/config';
 import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
@@ -121,7 +121,7 @@ async function run() {
   return await argTaskHandle(jobsPath, configs);
 }
 
-async function argTaskHandle(jobsPath: string, configs: Config[]) {
+async function argTaskHandle(jobsPath: string, configs: ConfigArray) {
   if (isArg('task')) {
     return await runTask(configs, './bin/inputTask', getArg('task'));
   }
