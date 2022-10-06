@@ -68,10 +68,8 @@ function getRandmonNum([video, audio, article]: number[]) {
   if (num < video) {
     return {
       coinType: TypeEnum.video,
-      /** 第几页 */
-      page: getPageNum(30, tempNum + 1),
-      /** 第几个 */
-      index: tempNum % 30,
+      total: video,
+      ...getPageInfo(30, tempNum),
     };
   }
   const mid = video + audio;
@@ -79,16 +77,23 @@ function getRandmonNum([video, audio, article]: number[]) {
   if (num < mid) {
     return {
       coinType: TypeEnum.audio,
-      page: getPageNum(30, tempNum + 1),
-      index: tempNum % 30,
+      total: audio,
+      ...getPageInfo(30, tempNum),
     };
   }
   tempNum = num - mid;
   return {
     coinType: TypeEnum.article,
-    page: getPageNum(12, tempNum + 1),
-    index: tempNum % 12,
+    total: article,
+    ...getPageInfo(12, tempNum),
   };
+
+  function getPageInfo(ps: number, tempNum: number) {
+    return {
+      page: getPageNum(ps, tempNum + 1),
+      index: tempNum % ps,
+    };
+  }
 }
 
 /**
@@ -268,21 +273,36 @@ function getRandmonNumData(navData: UserNavNumDto['data'], types: string[] = [])
 }
 
 async function getRandomInfo(mid: number, data: Defined<ReturnType<typeof getRandmonNumData>>) {
-  const { coinType, page, index } = data,
+  const { coinType, page, index, total } = data,
     handle = {
       [TypeEnum.video]: getVideoByRandom,
       [TypeEnum.audio]: getAudioByRandom,
       [TypeEnum.article]: getArticleByRandom,
     };
-  return await handle[coinType](mid, page, index);
+  return await handle[coinType](mid, page, index, total);
 }
 
-async function getVideoByRandom(mid: number, page: number, index: number) {
+let countVideo = 0;
+async function getVideoByRandom(mid: number, page: number, index: number, total: number) {
+  if (countVideo >= 5)
+    return {
+      message: '获取 upperAccMatch 视频失败',
+    };
+
   const { code, data, message } = await searchVideosByUpId(mid, 30, page);
-  if (code) {
-    return { message };
+  if (code) return { message };
+  countVideo++;
+
+  const { aid, title, author, copyright, mid: upperMid } = data.list.vlist[index];
+
+  if (upperMid !== mid && TaskConfig.coin.upperAccMatch) {
+    console.log('upperMid', upperMid, 'mid', mid);
+    console.log(author, title, '不是指定up主的视频，跳过');
+    const { page, index } = getRandmonNum([total, 0, 0]) || { page: 1, index: 0 };
+    return await getVideoByRandom(mid, page, index, total);
   }
-  const { aid, title, author, copyright } = data.list.vlist[index];
+
+  countVideo = 0;
   return { coinType: TypeEnum.video, id: aid, title, author, copyright };
 }
 

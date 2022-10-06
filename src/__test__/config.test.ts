@@ -20,6 +20,7 @@ const theConfig = {
   cookie,
   message: {
     br: '\n',
+    onlyError: false,
     email: {
       host: 'smtp.163.com',
       port: 465,
@@ -72,7 +73,6 @@ const theConfig = {
     diff: 7,
   },
   jury: {
-    mode: 1,
     once: true,
     opinionMin: 3,
     vote: [0, 0, 1],
@@ -106,6 +106,8 @@ const theConfig = {
     targetLevel: 6,
     stayCoins: 0,
     targetCoins: 5,
+    upperAccMatch: false,
+    src: ['自定义UP', '特别关注', '关注', '首页推荐', '分区排行'],
   },
   activity: {
     liveFamineTime: 400,
@@ -193,10 +195,12 @@ const theConfig = {
   },
   activityLottery: {
     list: [],
-    isRequest: false,
+    isRequest: true,
     delay: [1.8, 3.2],
     bangumi: false,
     follow: false,
+    proxyPrefix: '',
+    customUrl: '',
   },
   charge: {},
 };

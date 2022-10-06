@@ -104,19 +104,6 @@ export const defaultConfig = {
   /**【可选】用户代理(浏览器) */
   userAgent: '',
   dailyRunTime: DAILY_RUN_TIME,
-  // 老的配置
-  // 全部是 undefined 是为了更好的合并
-  targetLevel: undefined,
-  stayCoins: undefined,
-  targetCoins: undefined,
-  customizeUp: undefined,
-  giftUp: undefined,
-  chargeUpId: undefined,
-  chargePresetTime: undefined,
-  matchCoins: undefined,
-  matchSelection: undefined,
-  matchDiff: undefined,
-  // 新的配置方式
   match: {
     /** 压硬币数量 */
     coins: 2,
@@ -154,6 +141,8 @@ export const defaultConfig = {
     stayCoins: 0,
     /** 预计投币数,默认5 */
     targetCoins: 5,
+    /** 稿件必须是 up 的稿件，而非合作视频中的参与者 */
+    upperAccMatch: false,
     /** 获取稿件的来源（排序），留空则来自 首页推荐 */
     src: ['自定义UP', '特别关注', '关注', '首页推荐', '分区排行'],
   },

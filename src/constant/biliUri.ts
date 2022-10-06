@@ -27,7 +27,7 @@ export const baseURLs = {
 
 export const defaultHeaders = {
   'user-agent':
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.41 Safari/537.36 Edg/101.0.1210.32',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 Edg/106.0.1370.34',
   'content-type': ContentTypeEnum.FORM_URLENCODED,
   'accept-language': 'zh-CN,zh;q=0.9',
   'accept-encoding': 'gzip, deflate, br',
