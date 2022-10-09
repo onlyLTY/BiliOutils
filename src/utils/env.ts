@@ -1,3 +1,5 @@
+import type { SLSType } from '@/types';
+
 /**
  * 是否是青龙面板
  */
@@ -69,4 +71,19 @@ export function isSCF() {
 
 export function isServerless() {
   return isSCF() || isFC() || isAGC() || isCFC();
+}
+
+export function getServerlessType(): SLSType | undefined {
+  if (isSCF()) {
+    return 'scf';
+  }
+  if (isFC()) {
+    return 'fc';
+  }
+  if (isAGC()) {
+    return 'agc';
+  }
+  if (isCFC()) {
+    return 'cfc';
+  }
 }

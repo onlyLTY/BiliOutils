@@ -1,7 +1,7 @@
 import type { SlSOptions } from '@/types/sls';
 import { getPRCDate, randomDailyRunTime } from '../pure';
 import { TaskConfig } from '@/config/globalVar';
-import { logger } from '../log';
+import { logger, _logger } from '../log';
 import type { FCContext, FCEvent } from '@/types/fc';
 
 /**
@@ -30,7 +30,7 @@ export default async function (
     return false;
   }
   if (!process.env.ALI_SECRET_ID || !process.env.ALI_SECRET_KEY) {
-    logger.info('环境变量不存在ALI_SECRET_ID和ALI_SECRET_KEY');
+    _logger.info('环境变量不存在ALI_SECRET_ID和ALI_SECRET_KEY');
     return false;
   }
   const sdk = await getSDK();

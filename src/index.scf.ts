@@ -11,13 +11,14 @@ const notice = async (msg?: string) => {
 
 export async function dailyMain(event: SCFEvent, context: SCFContext) {
   notice();
-  const { dailyHandle } = await import('./utils/serverless');
-
-  return await dailyHandle({
-    event,
-    context,
-    slsType: 'scf',
-  });
+  const { dailyHandler } = await import('./utils/serverless');
+  return await dailyHandler
+    .init({
+      event,
+      context,
+      slsType: 'scf',
+    })
+    .run();
 }
 
 export async function main_handler(event: SCFEvent, context: SCFContext) {

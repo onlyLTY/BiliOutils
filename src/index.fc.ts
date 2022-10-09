@@ -11,12 +11,14 @@ const notice = async (msg?: string) => {
 
 export async function dailyMain(event: FCEvent, context: FCContext) {
   notice();
-  const { dailyHandle } = await import('./utils/serverless');
-  return await dailyHandle({
-    event,
-    context,
-    slsType: 'fc',
-  });
+  const { dailyHandler } = await import('./utils/serverless');
+  return await dailyHandler
+    .init({
+      event,
+      context,
+      slsType: 'fc',
+    })
+    .run();
 }
 
 export async function handler(event: Buffer, context: FCContext, callback: FCCallback) {

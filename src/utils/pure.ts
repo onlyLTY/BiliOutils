@@ -172,6 +172,13 @@ export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, slsType?: SLST
  */
 export function formatCron({ hours, minutes, seconds }: CronDateType, type?: SLSType) {
   seconds = seconds || 0;
+  if (minutes >= 60) {
+    minutes = minutes % 60;
+    hours++;
+  }
+  if (hours >= 24) {
+    minutes = minutes % 24;
+  }
   let value: string;
   switch (type) {
     case 'scf':

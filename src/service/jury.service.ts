@@ -10,9 +10,19 @@ import {
   getJuryCaseVote,
   juryCaseVote,
 } from '@/net/jury.request';
-import { apiDelay, getRandomItem, Logger, logger } from '@/utils';
+import {
+  apiDelay,
+  formatCron,
+  getPRCDate,
+  getRandomItem,
+  isFC,
+  isSCF,
+  Logger,
+  logger,
+} from '@/utils';
 import { JuryVote, JuryVoteResult, VoteResCode } from '@/enums/jury.emum';
 import { getRequestNameWrapper } from '@/utils/request';
+import { getUpdateTrigger } from '@/utils/serverless';
 
 const juryLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'jury');
 const request = getRequestNameWrapper({ logger: juryLogger });
@@ -178,7 +188,34 @@ async function handleNoNewCase(message: string, errRef?: Ref<number>) {
   if (!TaskConfig.jury.once && errRef) {
     return true;
   }
+  // 判断是云函数
+  if (isFC() || isSCF()) {
+    const r = await waitForServerless();
+    // 如果失败还是保持原来的逻辑
+    if (r) return true;
+  }
   return await waitFor();
+}
+
+/**
+ * 更新云函数
+ */
+async function waitForServerless() {
+  const { dailyHandler } = await import('@/utils/serverless');
+  const updateTrigger = await getUpdateTrigger(
+    dailyHandler.slsType,
+    dailyHandler.event,
+    dailyHandler.context,
+  );
+  const now = getPRCDate(),
+    nowMinutes = now.getMinutes() + (TaskConfig.jury.waitTime || 20),
+    minutes = nowMinutes % 60,
+    hours = now.getHours() + (nowMinutes >= 60 ? 1 : 0);
+
+  return await updateTrigger({
+    customArg: { task: 'loginTask,judgement' },
+    triggerDesc: formatCron({ hours, minutes }, dailyHandler.slsType),
+  });
 }
 
 /**
