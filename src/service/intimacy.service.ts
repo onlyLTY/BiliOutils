@@ -146,8 +146,13 @@ async function liveMobileHeart(
   }
 }
 
-async function likeAndShare(fansMealList: FansMedalDto[]) {
-  for (let index = 0; index < fansMealList.length; index++) {
+async function likeAndShare(fansMealList: FansMedalDto[], doneNumber = 0) {
+  const fansLength = fansMealList.length,
+    skipNum = TaskConfig.intimacy.skipNum;
+  if (skipNum >= 0 && fansLength === doneNumber && doneNumber > skipNum) {
+    return;
+  }
+  for (let index = 0; index < fansLength; index++) {
     const fansMedal = fansMealList[index];
     await liveInteract(fansMedal);
   }
@@ -181,12 +186,14 @@ function getLiveHeartNeedTime(medal = { today_feed: 0 }): NeedTimeType {
   // 今日还需要 feed
   const { today_feed } = medal;
   let needFeed = limitFeed - today_feed;
+  // < 200 则其它活动没做，如果做完可以增加 200 点
   if (today_feed < 200) {
     needFeed -= 200;
   }
   if (needFeed <= 0) {
     return {
       value: 0,
+      increase: true,
     };
   }
   // 所需要挂机时间 （每 100 feed 需要挂机 5 分钟）,加 1 是因为 1 分钟需要 1 + 1 次
@@ -206,13 +213,16 @@ type LiveHeartRunOptions = {
 
 function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
   for (const fansMedal of roomList) {
-    const countRef: Ref<number> = { value: 0 };
     const timerRef: Ref<NodeJS.Timer> = { value: undefined as unknown as NodeJS.Timer };
-    const options = getRandomOptions();
-    const needTime = getLiveHeartNeedTime(fansMedal.medal);
-    const runOptions = { fansMedal, options, countRef, needTime, timerRef };
+    const runOptions = {
+      fansMedal,
+      options: getRandomOptions(),
+      countRef: { value: 0 } as Ref<number>,
+      needTime: getLiveHeartNeedTime(fansMedal.medal),
+      timerRef,
+    };
     run(runOptions);
-    timerRef.value = setInterval(run, 60000, runOptions);
+    timerRef.value = setInterval(run, 60030, runOptions);
     apiDelaySync(50, 150);
   }
   resolve('直播间心跳');
@@ -242,13 +252,15 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
       return;
     }
     timerRef && timerRef.value && clearInterval(timerRef.value);
+    await retryLiveHeart();
   }
 }
 
-function liveHeartPromiseSync(roomList: FansMedalDto[]) {
-  return Promise.all(
+async function liveHeartPromiseSync(roomList: FansMedalDto[]) {
+  await Promise.all(
     roomList.map(fansMedal => allLiveHeart(fansMedal, getRandomOptions(), { value: 0 })),
   );
+  return await retryLiveHeart();
 }
 
 /**
@@ -311,13 +323,25 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   await apiDelay(11000, 16000);
 }
 
+/**
+ * 重试心跳
+ */
+async function retryLiveHeart() {
+  if (!TaskConfig.intimacy.isRetryHeart) {
+    return;
+  }
+  liveLogger.debug('尝试检查直播心跳');
+  await liveIntimacyService();
+}
+
 // 发送直播弹幕 1 次 间隔 10s 以上
 // 点赞 1 次 间隔 3s 以上
 
 export async function liveIntimacyService() {
   // 获取到可能需要操作的粉丝牌
-  const fansMealList = filterFansMedalList(await getFansMealList());
+  const fansMealList = filterFansMedalList(await getFansMealList()),
+    doneLength = fansMealList.filter(fans => fans.medal?.today_feed > 200).length;
   // 获取到点亮的粉丝牌
-  await Promise.allSettled([likeAndShare(fansMealList), liveHeart(fansMealList)]);
+  await Promise.allSettled([likeAndShare(fansMealList, doneLength), liveHeart(fansMealList)]);
   return;
 }

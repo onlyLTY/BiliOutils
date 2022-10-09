@@ -186,6 +186,8 @@ const theConfig = {
     limitFeed: 1500,
     blackList: [],
     liveHeart: false,
+    skipNum: 10,
+    isRetryHeart: false,
   },
   bigPoint: {
     epids: [],

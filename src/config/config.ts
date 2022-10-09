@@ -222,7 +222,7 @@ export const defaultConfig = {
     liveSendMessage: true,
     // 点赞直播间
     liveLike: true,
-    // 30 分钟直播心跳
+    // 直播心跳
     liveHeart: false,
     // 白名单
     whiteList: [] as number[],
@@ -230,6 +230,10 @@ export const defaultConfig = {
     blackList: [] as number[],
     // 每日亲密度上限 （系统 1500）
     limitFeed: TODAY_MAX_FEED,
+    // 同时有多少个直播间已获取请密度超过200时，强制跳过弹幕和点赞。小于 0 不跳过
+    skipNum: 10,
+    // 完成直播心跳后是否再检查一次，可能因为数据延迟而重复操作，不建议云函数开启
+    isRetryHeart: false,
   },
   jury: {
     once: true,
