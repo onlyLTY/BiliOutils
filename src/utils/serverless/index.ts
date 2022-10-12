@@ -18,13 +18,27 @@ function getPayload(slsType: SLSType, event: Params['event']) {
 export async function getUpdateTrigger(
   slsType: SLSType,
   event: any,
-  context: any,
 ): Promise<(slsOptions?: SlSOptions) => Promise<boolean>> {
   const caller =
     slsType === 'scf'
       ? (await import('./updateScfTrigger')).default
       : (await import('./updateFcTrigger')).default;
-  return slsOptions => caller(event, context, slsOptions);
+  return slsOptions => caller(event, slsOptions);
+}
+
+export async function getClinet<T extends SLSType>(slsType: T) {
+  if (slsType === 'scf') {
+    return (await import('./updateScfTrigger')).scfClient;
+  }
+  return (await import('./updateFcTrigger')).fcClient;
+}
+
+async function initClient(slsType: SLSType, context: SCFContext | FCContext) {
+  const client = await getClinet(slsType);
+  if (!client) {
+    return false;
+  }
+  return client.init(context as any);
 }
 
 class DailyHandler {
@@ -38,6 +52,8 @@ class DailyHandler {
     this.event = event;
     this.slsType = slsType;
     this.payload = getPayload(slsType, event);
+
+    initClient(slsType, context);
 
     return this;
   }
@@ -54,7 +70,7 @@ class DailyHandler {
       return '今日重复执行';
     }
 
-    const updateTrigger = await getUpdateTrigger(this.slsType, this.event, this.context);
+    const updateTrigger = await getUpdateTrigger(this.slsType, this.event);
     return await dailyTasks(updateTrigger);
   }
 }

@@ -22,7 +22,6 @@ import {
 } from '@/utils';
 import { JuryVote, JuryVoteResult, VoteResCode } from '@/enums/jury.emum';
 import { getRequestNameWrapper } from '@/utils/request';
-import { getUpdateTrigger } from '@/utils/serverless';
 
 const juryLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'jury');
 const request = getRequestNameWrapper({ logger: juryLogger });
@@ -192,7 +191,10 @@ async function handleNoNewCase(message: string, errRef?: Ref<number>) {
   if (isFC() || isSCF()) {
     const r = await waitForServerless();
     // 如果失败还是保持原来的逻辑
-    if (r) return true;
+    if (r) {
+      logger.info(`通过新建云函数休眠！`);
+      return true;
+    }
   }
   return await waitFor();
 }
@@ -201,21 +203,34 @@ async function handleNoNewCase(message: string, errRef?: Ref<number>) {
  * 更新云函数
  */
 async function waitForServerless() {
-  const { dailyHandler } = await import('@/utils/serverless');
-  const updateTrigger = await getUpdateTrigger(
-    dailyHandler.slsType,
-    dailyHandler.event,
-    dailyHandler.context,
-  );
+  if (!TaskConfig.jury.newTrigger) {
+    return false;
+  }
+  const { dailyHandler, getClinet } = await import('@/utils/serverless');
+  const client = await getClinet(dailyHandler.slsType);
   const now = getPRCDate(),
     nowMinutes = now.getMinutes() + (TaskConfig.jury.waitTime || 20),
     minutes = nowMinutes % 60,
     hours = now.getHours() + (nowMinutes >= 60 ? 1 : 0);
 
-  return await updateTrigger({
-    customArg: { task: 'loginTask,judgement' },
-    triggerDesc: formatCron({ hours, minutes }, dailyHandler.slsType),
-  });
+  const triggerTime = formatCron({ hours, minutes }, dailyHandler.slsType);
+  logger.info(`更新云函数定时器为：${triggerTime.string}`);
+  return await client.createTrigger(
+    {
+      TriggerDesc: triggerTime.value,
+      TriggerName: 'jury_wait',
+    },
+    { task: 'loginTask,judgement' },
+  );
+}
+
+async function deleteServerless() {
+  if (!TaskConfig.jury.newTrigger) {
+    return false;
+  }
+  const { dailyHandler, getClinet } = await import('@/utils/serverless');
+  const client = await getClinet(dailyHandler.slsType);
+  return await client.deleteTrigger('jury_wait');
 }
 
 /**
@@ -223,6 +238,7 @@ async function waitForServerless() {
  */
 async function handleCaseFull(message: string) {
   logger.info(`${message}`);
+  await deleteServerless();
   return true;
 }
 

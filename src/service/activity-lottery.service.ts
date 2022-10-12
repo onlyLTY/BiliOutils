@@ -346,7 +346,7 @@ function writeStatus(oldData: LocalStatusDto = {}, activityList: ActivityLottery
 function isTodayRun(lastRunAt: Record<number, string> | undefined) {
   if (!lastRunAt) return false;
   return lastRunAt[TaskConfig.USERID]?.startsWith(
-    getPRCDate().toLocaleString('zh-CN').substring(0, 9),
+    getPRCDate().toLocaleString('zh-CN').split(' ')[0],
   );
 }
 

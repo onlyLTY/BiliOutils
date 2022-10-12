@@ -1,5 +1,6 @@
 import type { SCFEvent, SCFContext } from '@/types/scf';
 import type { SlSOptions } from '@/types/sls';
+import type { Client } from 'tencentcloud-sdk-nodejs/tencentcloud/services/scf/v20180416/scf_client';
 import { getPRCDate, randomDailyRunTime } from '../pure';
 import { TaskConfig } from '@/config/globalVar';
 import { logger, _logger } from '../log';
@@ -17,72 +18,62 @@ async function getSDK() {
   }
 }
 
-/**
- * 更新触发器
- * @param event SCF 事件
- * @param context SCF 上下文
- * @param options 自定义 SCF 参数
- */
-export default async function (
-  event: SCFEvent,
-  context: SCFContext,
-  { customArg, triggerDesc }: SlSOptions = {},
-) {
-  if (!event.TriggerName) {
-    return false;
-  }
-  if (!process.env.TENCENT_SECRET_ID || !process.env.TENCENT_SECRET_KEY) {
-    _logger.info('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
-    return false;
-  }
-  const sdk = await getSDK();
-  if (!sdk) {
-    return false;
-  }
-  const ScfClient = sdk.scf.v20180416.Client;
+type TriggerRequest = {
+  TriggerName: string;
+  TriggerDesc?: string;
+};
 
-  const FUNCTION_NAME = context.function_name;
-  const TRIGGER_NAME = event.TriggerName;
-  const clientConfig = {
-    credential: {
-      secretId: process.env.TENCENT_SECRET_ID.trim(),
-      secretKey: process.env.TENCENT_SECRET_KEY.trim(),
-    },
-    region: context.tencentcloud_region,
-    profile: {
-      httpProfile: {
-        endpoint: 'scf.tencentcloudapi.com',
-      },
-    },
+export class SCF {
+  client: Client;
+  params = {
+    FunctionName: '',
+    TriggerName: '',
+    Type: 'timer',
+    TriggerDesc: '',
+    Qualifier: '$DEFAULT',
   };
-  const client = new ScfClient(clientConfig);
 
-  async function createTrigger(params) {
-    const today = getPRCDate();
-    params.CustomArgument = JSON.stringify({ ...customArg, lastTime: today.getDate().toString() });
-    try {
-      return await client.CreateTrigger(params);
-    } catch ({ code, message }) {
-      logger.error(`创建trigger失败 ${code} => ${message}`);
+  async init(context: SCFContext) {
+    const sdk = await getSDK();
+    if (!sdk) {
       return false;
     }
+    this.params.FunctionName = context.function_name;
+    const clientConfig = {
+      credential: {
+        secretId: process.env.TENCENT_SECRET_ID?.trim(),
+        secretKey: process.env.TENCENT_SECRET_KEY?.trim(),
+      },
+      region: context.tencentcloud_region,
+      profile: {
+        httpProfile: {
+          endpoint: 'scf.tencentcloudapi.com',
+        },
+      },
+    };
+    const ScfClient = sdk.scf.v20180416.Client;
+    this.client = new ScfClient(clientConfig);
+    return this.client;
   }
 
-  async function deleteTrigger(params) {
+  async deleteTrigger(TriggerName?: string) {
     try {
-      return await client.DeleteTrigger(params);
+      return await this.client.DeleteTrigger({
+        ...this.params,
+        TriggerName: TriggerName || this.params.TriggerName,
+      });
     } catch ({ code, message }) {
       logger.warn(`删除trigger失败 ${code} => ${message}`);
       return false;
     }
   }
 
-  async function getHasTrigger() {
+  async getHasTrigger(triggerName: string) {
     try {
-      const { Triggers } = await client.ListTriggers({
-        FunctionName: FUNCTION_NAME,
+      const { Triggers } = await this.client.ListTriggers({
+        FunctionName: this.params.FunctionName,
       });
-      const triggerIndex = Triggers?.findIndex(trigger => trigger.TriggerName === TRIGGER_NAME);
+      const triggerIndex = Triggers?.findIndex(trigger => trigger.TriggerName === triggerName);
 
       return triggerIndex !== -1;
     } catch ({ code, message }) {
@@ -91,28 +82,60 @@ export default async function (
     }
   }
 
+  async createTrigger(params: TriggerRequest, customArg: Record<string, any> = {}) {
+    const today = getPRCDate();
+    const CustomArgument = JSON.stringify({
+      ...customArg,
+      lastTime: today.getDate().toString(),
+    });
+    try {
+      return await this.client.CreateTrigger({ ...this.params, ...params, CustomArgument });
+    } catch ({ code, message }) {
+      logger.error(`创建trigger失败 ${code} => ${message}`);
+      return false;
+    }
+  }
+}
+export const scfClient = new SCF();
+
+/**
+ * 更新触发器
+ * @param event SCF 事件
+ * @param options 自定义 SCF 参数
+ */
+export default async function (
+  event: SCFEvent,
+  { customArg, triggerDesc, triggerName }: SlSOptions = {},
+) {
+  if (!event.TriggerName && !triggerName) {
+    return false;
+  }
+  if (!process.env.TENCENT_SECRET_ID || !process.env.TENCENT_SECRET_KEY) {
+    _logger.info('环境变量不存在TENCENT_SECRET_ID和TENCENT_SECRET_KEY');
+    return false;
+  }
+  const TRIGGER_NAME = triggerName || event.TriggerName || 'daily';
+  if (!scfClient.client) return false;
+
   async function aSingleUpdate() {
     const runTime = triggerDesc || randomDailyRunTime(TaskConfig.dailyRunTime, 'scf');
     const params = {
-      FunctionName: FUNCTION_NAME,
       TriggerName: TRIGGER_NAME,
-      Type: 'timer',
       TriggerDesc: runTime.value,
-      Qualifier: '$DEFAULT',
     };
 
-    const hasTrigger = await getHasTrigger();
+    const hasTrigger = await scfClient.getHasTrigger(TRIGGER_NAME);
 
     logger.info(`修改时间为：${runTime.string}`);
 
     if (hasTrigger) {
-      const deleteResult = await deleteTrigger(params);
+      const deleteResult = await scfClient.deleteTrigger(TRIGGER_NAME);
       if (!deleteResult) {
         return false;
       }
     }
 
-    return !!(await createTrigger(params));
+    return !!(await scfClient.createTrigger(params, customArg));
   }
 
   let updateResults = false,

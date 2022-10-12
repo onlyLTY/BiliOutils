@@ -78,6 +78,7 @@ const theConfig = {
     vote: [0, 0, 1],
     waitTime: 20,
     insiders: 0.8,
+    newTrigger: false,
   },
   log: {
     pushLevel: 'debug',

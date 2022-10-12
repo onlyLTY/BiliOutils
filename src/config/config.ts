@@ -230,7 +230,7 @@ export const defaultConfig = {
     blackList: [] as number[],
     // 每日亲密度上限 （系统 1500）
     limitFeed: TODAY_MAX_FEED,
-    // 同时有多少个直播间已获取请密度超过200时，强制跳过弹幕和点赞。小于 0 不跳过
+    // 同时有多少个直播间已获取亲密度超过200时，强制跳过弹幕和点赞。小于 0 不跳过
     skipNum: 10,
     // 完成直播心跳后是否再检查一次，可能因为数据延迟而重复操作，不建议云函数开启
     isRetryHeart: false,
@@ -243,6 +243,8 @@ export const defaultConfig = {
     waitTime: 20,
     // insiders 参考值
     insiders: 0.8,
+    // 云函数下使用新的触发器进行休眠
+    newTrigger: true,
   },
   manga: {
     // 签到
