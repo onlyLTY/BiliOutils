@@ -9,25 +9,25 @@ const notice = async (msg?: string) => {
   defLogger.warn(msg || `SCF从9月开始会对日志进行收费！`);
 };
 
-export async function dailyMain(event: SCFEvent, context: SCFContext) {
+export async function dailyMain() {
   notice();
   const { dailyHandler } = await import('./utils/serverless');
-  return await dailyHandler
-    .init({
-      event,
-      context,
-      slsType: 'scf',
-    })
-    .run();
+  return await dailyHandler.run();
 }
 
 export async function main_handler(event: SCFEvent, context: SCFContext) {
+  const { dailyHandler } = await import('./utils/serverless');
+  dailyHandler.init({
+    event,
+    context,
+    slsType: 'scf',
+  });
   let isReturn = false;
   if (event.Message) {
     isReturn = await runTasks(event.Message);
   }
   if (isReturn) return 'success';
-  return dailyMain(event, context);
+  return dailyMain();
 }
 
 export async function runTasks(payload: string) {

@@ -52,7 +52,7 @@ export class FC {
     const today = getPRCDate();
     const cronExpression = `CRON_TZ=Asia/Shanghai ${cron}`;
     try {
-      return await this.client.updateTrigger(
+      return await this.client?.updateTrigger(
         this.sericeName,
         this.functionName,
         triggerName || this.params.TriggerName,
@@ -78,7 +78,7 @@ export class FC {
       ...params,
     };
     const cronExpression = `CRON_TZ=Asia/Shanghai ${params.TriggerDesc}`;
-    return await this.client.createTrigger(this.sericeName, this.functionName, {
+    return await this.client?.createTrigger(this.sericeName, this.functionName, {
       triggerName: params.TriggerName,
       triggerType: 'timer',
       triggerConfig: {
@@ -93,7 +93,7 @@ export class FC {
   }
 
   deleteTrigger(TriggerName?: string) {
-    return this.client.deleteTrigger(
+    return this.client?.deleteTrigger(
       this.sericeName,
       this.functionName,
       TriggerName || this.params.TriggerName,

@@ -9,21 +9,21 @@ const notice = async (msg?: string) => {
   defLogger.info(msg || `阿里云 FC 测试ing`);
 };
 
-export async function dailyMain(event: FCEvent, context: FCContext) {
+export async function dailyMain() {
   notice();
   const { dailyHandler } = await import('./utils/serverless');
-  return await dailyHandler
-    .init({
-      event,
-      context,
-      slsType: 'fc',
-    })
-    .run();
+  return await dailyHandler.run();
 }
 
 export async function handler(event: Buffer, context: FCContext, callback: FCCallback) {
   try {
     const eventJson: FCEvent = JSON5.parse(event.toString());
+    const { dailyHandler } = await import('./utils/serverless');
+    dailyHandler.init({
+      event: eventJson,
+      context,
+      slsType: 'fc',
+    });
     let isReturn = false;
     if (eventJson.payload) {
       isReturn = await runTasks(eventJson.payload);
@@ -32,7 +32,7 @@ export async function handler(event: Buffer, context: FCContext, callback: FCCal
       callback(null, 'success');
       return;
     }
-    const message = await dailyMain(eventJson, context);
+    const message = await dailyMain();
     callback(null, message);
   } catch (error) {
     callback(error);

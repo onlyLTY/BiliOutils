@@ -208,6 +208,8 @@ async function waitForServerless() {
   }
   const { dailyHandler, getClinet } = await import('@/utils/serverless');
   const client = await getClinet(dailyHandler.slsType);
+  if (!client.client) return false;
+
   const now = getPRCDate(),
     nowMinutes = now.getMinutes() + (TaskConfig.jury.waitTime || 20),
     minutes = nowMinutes % 60,
@@ -225,14 +227,13 @@ async function waitForServerless() {
 }
 
 async function deleteServerless() {
-  if (!(isFC() || isSCF())) {
-    return false;
-  }
-  if (!TaskConfig.jury.newTrigger) {
-    return false;
-  }
+  if (!(isFC() || isSCF())) return false;
+  if (!TaskConfig.jury.newTrigger) return false;
   const { dailyHandler, getClinet } = await import('@/utils/serverless');
+
   const client = await getClinet(dailyHandler.slsType);
+  if (!client.client) return false;
+
   return await client?.deleteTrigger('jury_wait');
 }
 

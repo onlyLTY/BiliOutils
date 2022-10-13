@@ -58,7 +58,7 @@ export class SCF {
 
   async deleteTrigger(TriggerName?: string) {
     try {
-      return await this.client.DeleteTrigger({
+      return await this.client?.DeleteTrigger({
         ...this.params,
         TriggerName: TriggerName || this.params.TriggerName,
       });
@@ -70,9 +70,10 @@ export class SCF {
 
   async getHasTrigger(triggerName: string) {
     try {
-      const { Triggers } = await this.client.ListTriggers({
-        FunctionName: this.params.FunctionName,
-      });
+      const { Triggers } =
+        (await this.client?.ListTriggers({
+          FunctionName: this.params.FunctionName,
+        })) || {};
       const triggerIndex = Triggers?.findIndex(trigger => trigger.TriggerName === triggerName);
 
       return triggerIndex !== -1;
@@ -89,7 +90,7 @@ export class SCF {
       lastTime: today.getDate().toString(),
     });
     try {
-      return await this.client.CreateTrigger({ ...this.params, ...params, CustomArgument });
+      return await this.client?.CreateTrigger({ ...this.params, ...params, CustomArgument });
     } catch ({ code, message }) {
       logger.error(`创建trigger失败 ${code} => ${message}`);
       return false;
