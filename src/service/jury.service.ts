@@ -220,7 +220,7 @@ async function waitForServerless() {
       TriggerDesc: triggerTime.value,
       TriggerName: 'jury_wait',
     },
-    { task: 'loginTask,judgement' },
+    { task: 'loginTask,judgement,noPush' },
   );
 }
 

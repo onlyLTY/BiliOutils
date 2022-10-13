@@ -71,5 +71,9 @@ export async function runInputBiliTask(taskNameStr: string) {
   logger.info(`----【版本信息】----`);
   const { printVersion } = await import('../utils/version');
   await printVersion();
-  await sendMessage('任务完成', Logger.pushValue);
+  if (taskNameStr.includes('noPush')) {
+    logger.info(`已设置不推送通知`);
+  } else {
+    await sendMessage('任务完成', Logger.pushValue);
+  }
 }
