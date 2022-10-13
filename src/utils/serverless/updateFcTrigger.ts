@@ -80,6 +80,7 @@ export class FC {
     const cronExpression = `CRON_TZ=Asia/Shanghai ${params.TriggerDesc}`;
     return await this.client.createTrigger(this.sericeName, this.functionName, {
       triggerName: params.TriggerName,
+      triggerType: 'timer',
       triggerConfig: {
         cronExpression,
         enable: true,

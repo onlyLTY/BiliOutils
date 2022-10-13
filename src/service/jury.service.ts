@@ -215,7 +215,7 @@ async function waitForServerless() {
 
   const triggerTime = formatCron({ hours, minutes }, dailyHandler.slsType);
   logger.info(`更新云函数定时器为：${triggerTime.string}`);
-  return await client.createTrigger(
+  return await client?.createTrigger(
     {
       TriggerDesc: triggerTime.value,
       TriggerName: 'jury_wait',
@@ -225,12 +225,15 @@ async function waitForServerless() {
 }
 
 async function deleteServerless() {
+  if (!(isFC() || isSCF())) {
+    return false;
+  }
   if (!TaskConfig.jury.newTrigger) {
     return false;
   }
   const { dailyHandler, getClinet } = await import('@/utils/serverless');
   const client = await getClinet(dailyHandler.slsType);
-  return await client.deleteTrigger('jury_wait');
+  return await client?.deleteTrigger('jury_wait');
 }
 
 /**
