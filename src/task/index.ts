@@ -1,4 +1,5 @@
 export const biliTaskArray = [
+  ['beforeTask', () => import('./beforeTask')],
   ['loginTask', () => import('./loginTask')],
   ['exchangeCoupon', () => import('./exchangeCoupon')],
   ['liveSignTask', () => import('./liveSignTask')],
@@ -45,7 +46,7 @@ export async function getBiliTask(funcName: BiliTaskName) {
  */
 export function getInputBiliTask(taskNameStr: string) {
   const taskNameArr = taskNameStr.split(',');
-  const taskArr: Defined<ReturnType<typeof biliTasks.get>>[] = [];
+  const taskArr: Defined<ReturnType<typeof biliTasks.get>>[] = [biliTaskArray[0][1]];
   taskNameArr.forEach(name => {
     const task = biliTasks.get(name);
     if (task) {

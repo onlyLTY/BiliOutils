@@ -19,6 +19,7 @@ export const defaultConfig = {
   accessKey: '',
   // acTimeValue: '',
   // accessRefreshToken: '',
+  createCookieDay: undefined,
   message: {
     br: '\n',
     // 仅错误时发送

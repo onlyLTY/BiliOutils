@@ -10,7 +10,9 @@ export async function dailyTasks<T = unknown>(
   await Logger.init();
   await printVersion();
   try {
+    const beforeTask = await getBiliTask('beforeTask');
     const loginTask = await getBiliTask('loginTask');
+    await beforeTask();
     await loginTask();
   } catch (error) {
     logger.error(`登录失败: ${error}`);

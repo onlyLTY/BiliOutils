@@ -3,10 +3,11 @@
 import type { ConfigArray } from './types/config';
 import { getArg, isArg } from './utils/args';
 import { resolve, dirname } from 'path';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { config, runTask, waitForArgs } from './util';
 import * as cron from 'node-cron';
 import { isBiliCookie } from './utils/cookie';
+import { writeJsonFile } from './utils/file';
 
 const pkg = require('../package.json');
 
@@ -63,10 +64,9 @@ Options:
  */
 function remember(jobsPath: string) {
   // 写进 config 同级 bt_jobs.json
-  const jobsObj = {
+  writeJsonFile(jobsPath, {
     lastRun: new Date().getTime(),
-  };
-  writeFileSync(jobsPath, JSON.stringify(jobsObj));
+  });
 }
 
 /**

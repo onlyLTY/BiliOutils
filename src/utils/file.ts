@@ -54,3 +54,23 @@ export function replaceAllCookie(filePath: string, userId: number | string, newC
     defLogger.error(error);
   }
 }
+
+/**
+ * 重写配置文件
+ * @param filepath
+ * @param obj
+ */
+export function writeJsonFile(filepath: string, obj: Record<string, any>) {
+  try {
+    const oldObj = readJsonFile(filepath);
+    writeFileSync(
+      filepath,
+      JSON.stringify({
+        ...oldObj,
+        ...obj,
+      }),
+    );
+  } catch (err) {
+    defLogger.debug(err);
+  }
+}

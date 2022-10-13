@@ -18,6 +18,7 @@ const theConfig = {
   accessKey: '',
   USERID: 11111111,
   cookie,
+  createCookieDay: undefined,
   message: {
     br: '\n',
     onlyError: false,
@@ -78,7 +79,7 @@ const theConfig = {
     vote: [0, 0, 1],
     waitTime: 20,
     insiders: 0.8,
-    newTrigger: false,
+    newTrigger: true,
   },
   log: {
     pushLevel: 'debug',

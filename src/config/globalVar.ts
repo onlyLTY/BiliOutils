@@ -1,6 +1,6 @@
 import type { Config } from '../types';
 import { getConfig } from './setConfig';
-import { mergeConfig } from './config';
+import { mergeConfig, setCookieValue } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
 import getCookie, { encodeCookie, getCookieItem } from '@/utils/cookie';
 import { createBuvid } from '@/utils/pure';
@@ -22,6 +22,11 @@ export const TaskConfig = new Proxy({} as TaskConfigType, {
     if (key === 'config' && value) {
       initialize(value);
       return true; // 否则 config 会被覆盖
+    }
+    if (key === 'cookie' && value) {
+      _taskConfig.cookie = getCookie(_taskConfig.cookie, value?.split(';'));
+      setCookieValue(_taskConfig, value);
+      return true;
     }
     return Reflect.set(_taskConfig, key, value);
   },
