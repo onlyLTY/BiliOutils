@@ -77,7 +77,7 @@ export async function chargingService() {
   }
 
   try {
-    const bp_num = 4 || TaskModule.couponBalance || 0;
+    const bp_num = TaskModule.couponBalance || 0;
     let errorCount = 0;
     const up_mid = TaskConfig.couponBalance.mid;
     // 固定为 up 模式
