@@ -1,5 +1,4 @@
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/KudouRan/BiliTools/blob/main/LICENSE)
-[![node-current (scoped)](https://img.shields.io/node/v/@catlair/bilitools)](https://www.npmjs.com/package/@catlair/bilitools)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/KudouRan/BiliTools)](https://github.com/KudouRan/BiliTools/releases)
 [![欢迎 PRs](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/KudouRan/BiliTools/pulls)
 [![GitHub issues](https://img.shields.io/github/issues/KudouRan/BiliTools)](https://github.com/KudouRan/BiliTools/issues)
@@ -26,8 +25,7 @@
 - [x] 直播礼物红包（停止）
 - [x] 粉丝勋章/亲密度
 - [x] 支持 Docker 、腾讯 SCF 、阿里 FC、百度 CFC、华为 FG、青龙面板等方式运行，支持执行自定义消息推送
-- [x] 代码自动在线更新，发包任你发
-- [ ] ~~风纪委员 headless 版（不支持 scf）见 [bili-task-puppeteer](https://github.com/catlair/bili-task-puppeteer)~~（没有资格）
+- [ ] 等等
 
 ## 使用方法
 
@@ -35,9 +33,15 @@
 
 **[详细文档查看](https://btdocs.vercel.app/)**
 
+**[备用文档](https://catlair.github.io/BiliOutils/)**
+
 ## 说明
 
 是时候停更了，暂时不会删库，让它留个纪念吧，偶尔修复反馈的 bug。
+
+由于某些原因，现将 BiliTools 更名为 BiliOutils（法语），此更名只影响仓库和文档，npm 包和 docker 镜像依然使用原名称。
+
+反馈 bug 或提意见时，请务必清晰的描述你的问题或想法，写 100 行代码很容易，但是弄清楚一个逻辑很难，何况功能是给所有用户用的。如果你觉得这一切理所应当，那么希望你不要打扰我。
 
 ## 开发
 
@@ -53,7 +57,7 @@ yarn install
 yarn dev
 ```
 
-格式化代码
+检查和格式化代码
 
 ```bash
 yarn lint:prettier
