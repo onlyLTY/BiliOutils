@@ -1,7 +1,10 @@
 import { resolvePath } from '../path';
 import * as fs from 'fs';
+import { isServerless } from '@/utils/env';
 
 export function clearLogs() {
+  // 如果是云函数则直接退出
+  if (isServerless()) return;
   deleteLogLineByDay();
   deleteLogFile();
 }

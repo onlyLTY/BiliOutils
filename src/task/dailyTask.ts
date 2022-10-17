@@ -2,21 +2,19 @@ export async function dailyTasks<T = unknown>(
   cb?: (...arg: T[]) => Promise<unknown>,
   ...cbArg: T[]
 ) {
-  const { getBiliTask } = await import('./index');
+  const { getBiliTasks } = await import('./index');
   const { apiDelay, logger, Logger } = await import('../utils');
   const { getWaitRuningFunc } = await import('../config/configOffFun');
-  const { sendMessage } = await import('@/utils/sendNotify');
   const { printVersion } = await import('@/utils/version');
   await Logger.init();
   await printVersion();
   try {
-    const beforeTask = await getBiliTask('beforeTask');
-    const loginTask = await getBiliTask('loginTask');
+    const { beforeTask, loginTask } = await getBiliTasks(['beforeTask', 'loginTask']);
     await beforeTask();
     await loginTask();
   } catch (error) {
     logger.error(`登录失败: ${error}`);
-    await sendMessage('【登录失败】', Logger.pushValue);
+    await Logger.push('【登录失败】');
     return '未完成';
   }
   const biliArr = getWaitRuningFunc();
@@ -33,6 +31,6 @@ export async function dailyTasks<T = unknown>(
 
   cb && (await cb(...cbArg));
 
-  await sendMessage('每日完成', Logger.pushValue);
+  await Logger.push('每日完成');
   return '完成';
 }

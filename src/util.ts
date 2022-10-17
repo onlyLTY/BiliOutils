@@ -3,8 +3,8 @@ import { resolve } from 'path';
 import { fork } from 'child_process';
 import * as path from 'path';
 import { getArg } from './utils/args';
-import { getDelayTime, random, Sleep } from './utils/pure';
-import { clearLogs } from './utils/log/file';
+import { getDelayTime, random, Sleep } from '@/utils/pure';
+import { clearLogs } from '@/utils/log/file';
 
 /**
  * 获取配置
@@ -16,7 +16,7 @@ export async function config() {
     const configs = getConfigPathFile(resolve(process.cwd(), configPath));
     if (!configs.length) {
       process.stderr.write('配置文件不存在');
-      throw new Error('配置文件不存在');
+      return;
     }
     const itemIndex = getArg('item');
     if (itemIndex) {

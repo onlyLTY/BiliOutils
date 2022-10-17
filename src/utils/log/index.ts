@@ -1,10 +1,11 @@
 import type { LoggerInitOptions, LoggerOptions, MessageType } from '@/types/log';
 import { TaskConfig, TaskModule } from '@/config/globalVar';
 import { defLogger, EmptyLogger, SimpleLogger } from './def';
+import { clearLogs } from '@/utils/log/file';
 import { resolvePath } from '../path';
 import { getPRCDate } from '../pure';
 
-export { defLogger };
+export { defLogger, clearLogs };
 export const emptyLogger = new EmptyLogger() as unknown as Logger;
 
 export class Logger extends SimpleLogger {
@@ -48,6 +49,11 @@ export class Logger extends SimpleLogger {
     this.setEmoji(useEmoji || TaskConfig.log.useEmoji);
     SimpleLogger.pushValue = '';
     SimpleLogger.brChar = br || TaskConfig.message.br || '\n';
+  }
+  
+  static async push(title = '日志推送') {
+    const { sendMessage } = await import('@/utils/sendNotify');
+    return sendMessage(title, this.pushValue);
   }
 }
 

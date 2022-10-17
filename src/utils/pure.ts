@@ -1,6 +1,6 @@
-import type { CronDateType, SLSType } from '../types';
+import type { CronDateType, SLSType } from '@/types';
 import * as crypto from 'crypto';
-import { DAILY_RUN_TIME, MS2HOUR } from '../constant';
+import { DAILY_RUN_TIME, MS2HOUR } from '@/constant';
 import { isArray, isNumber, isObject } from './is';
 
 const MAX_MINUTES = 59,
@@ -80,6 +80,7 @@ export function getPageNum(n: number, m: number) {
 /**
  * 设置 cron 表达式
  * @param time 时间戳
+ * @param slsType
  */
 export function setCron(time = 60_000, slsType?: SLSType) {
   time = time || 60_000;
@@ -91,6 +92,9 @@ export function setCron(time = 60_000, slsType?: SLSType) {
   return formatCron({ hours, minutes, seconds }, slsType);
 }
 
+export function random(floating?: boolean);
+export function random(lower: number, floating?: boolean);
+export function random(lower: number, upper: number, floating?: boolean);
 /**
  * 生成随机数
  * @description 生成一个随机数，范围在 min 和 max 之间（包括 min 和 max）
@@ -98,10 +102,7 @@ export function setCron(time = 60_000, slsType?: SLSType) {
  * @param upper
  * @param floating
  */
-export function random(lower?: number, upper?: number, floating?: boolean) {
-  if (floating && typeof floating !== 'boolean') {
-    upper = floating = undefined;
-  }
+export function random(lower?: number | boolean, upper?: number | boolean, floating?: boolean) {
   if (floating === undefined) {
     if (typeof upper === 'boolean') {
       floating = upper;
@@ -138,6 +139,7 @@ export function random(lower?: number, upper?: number, floating?: boolean) {
 /**
  * 每日任务随机时间设置
  * @param dailyRunTime 每日任务执行时间
+ * @param slsType
  */
 export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, slsType?: SLSType) {
   const taskTime = dailyRunTime.split('-');
@@ -145,7 +147,7 @@ export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, slsType?: SLST
   const endTime = taskTime[1].split(':').map(str => +str);
 
   const hours = random(startTime[0] ?? DAILY_MIN_HOURS, endTime[0] ?? MAX_HOURS);
-  let minutes = 0;
+  let minutes: number;
   if (hours == startTime[0]) {
     minutes = random(startTime[1], MAX_MINUTES);
   } else if (hours == endTime[0]) {
@@ -153,7 +155,7 @@ export function randomDailyRunTime(dailyRunTime = DAILY_RUN_TIME, slsType?: SLST
   } else {
     minutes = random(MAX_MINUTES);
   }
-  let seconds = 0;
+  let seconds: number;
   if (hours == startTime[0]) {
     seconds = random(startTime[2], MAX_MINUTES);
   } else if (hours == endTime[0]) {
@@ -436,7 +438,9 @@ export class Sleep {
 
   static waitSync(delay: number) {
     const now = Date.now();
-    while (Date.now() - now < delay);
+    while (Date.now() - now < delay) {
+      // empty 
+    }
   }
 }
 

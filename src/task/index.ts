@@ -26,8 +26,9 @@ export const biliTaskArray = [
 ] as const;
 
 export type BiliTaskName = typeof biliTaskArray[number][0];
+export type TaskFunc = () => Promise<{ default: () => Promise<any> }>
 
-export const biliTasks = new Map<string, () => Promise<{ default: () => Promise<any> }>>(
+export const biliTasks = new Map<string, TaskFunc>(
   biliTaskArray,
 );
 
@@ -39,6 +40,16 @@ export async function getBiliTask(funcName: BiliTaskName) {
     return () => Promise.resolve(0);
   }
   return (await biliTask()).default;
+}
+
+export async function getBiliTasks<T extends BiliTaskName>(funcNames: T[]): Promise<Record<T, TaskFunc>> {
+  const tasks: Record<BiliTaskName, TaskFunc> = {} as any;
+  for (const funcName of funcNames) {
+    const biliTask = biliTasks.get(funcName);
+    if (!biliTask) continue;
+    tasks[funcName] = (await biliTask()).default;
+  }
+  return tasks;
 }
 
 /**
@@ -60,9 +71,9 @@ export function getInputBiliTask(taskNameStr: string) {
  * 运行用户输入的任务
  */
 export async function runInputBiliTask(taskNameStr: string) {
-  const { logger, Logger } = await import('../utils/log');
-  const { sendMessage } = await import('../utils/sendNotify');
+  const { logger, Logger, clearLogs } = await import('../utils/log');
   await Logger.init();
+  clearLogs();
   logger.info(`开始执行自定义任务！`);
   const taskArr = getInputBiliTask(taskNameStr);
   for await (const task of taskArr) {
@@ -75,6 +86,6 @@ export async function runInputBiliTask(taskNameStr: string) {
   if (taskNameStr.includes('noPush')) {
     logger.info(`已设置不推送通知`);
   } else {
-    await sendMessage('任务完成', Logger.pushValue);
+    await Logger.push('自定义任务完成');
   }
 }
