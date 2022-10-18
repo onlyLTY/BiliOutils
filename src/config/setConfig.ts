@@ -11,12 +11,6 @@ import { isBiliCookie } from '@/utils/cookie';
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
 
-function jsonErrorHandle(message: string) {
-  if (message.includes && message.includes('in JSON at position')) {
-    throw new Error('配置文件存在，但是无法解析！可能 JSON 格式不正确！');
-  }
-}
-
 const configPathArr = Array.from(
   new Set([
     resolveCWD('./config/config.dev.json'),
@@ -42,7 +36,7 @@ function getEnvConfig() {
     return JSON5.parse(gzipDecode(config.trim()));
   } catch (error) {
     logger.error(error);
-    throw new Error('环境中的配置不是有效的 JSON 字符串！');
+    throw new Error('环境中的配置不是有效的 JSON5 字符串！');
   }
 }
 
@@ -75,23 +69,17 @@ function handleMultiUserConfig(config: MultiConfig | Config[]) {
 }
 
 export function getConfigPathFile(filepath: string): ConfigArray {
-  try {
-    const config = readJsonFile(filepath);
-    if (!config) {
-      logger.error('配置文件为空，或配置内容缺失！');
-      throw new Error('配置文件为空，或配置内容缺失！');
-    }
-    logger.verbose(`读取配置文件 ${filepath}`);
-    process.env.__BT_CONFIG_PATH__ = filepath;
-    if (isMultiUserConfig(config)) {
-      return mapMultiUserConfig(config);
-    }
-    return [config];
-  } catch (error) {
-    logger.error(error);
-    jsonErrorHandle(error.message);
-    throw new Error(error.message || '配置文件不存在！');
+  const config = readJsonFile(filepath);
+  if (!config) {
+    logger.error('配置文件为空，或配置内容缺失！');
+    throw new Error('配置文件为空，或配置内容缺失！');
   }
+  logger.debug(`读取配置文件 ${filepath}`);
+  process.env.__BT_CONFIG_PATH__ = filepath;
+  if (isMultiUserConfig(config)) {
+    return mapMultiUserConfig(config);
+  }
+  return [config];
 }
 
 /** 设置 config */
@@ -108,7 +96,7 @@ function setConfig() {
     let filepath = configPathArr[index];
     const config = readJsonFile<Config>(filepath) || readJsonFile<Config>((filepath += '5'));
     if (config) {
-      logger.verbose(`读取配置文件 ${filepath}`);
+      logger.debug(`读取配置文件 ${filepath}`);
       process.env.__BT_CONFIG_PATH__ = filepath;
       return config;
     }

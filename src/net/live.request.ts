@@ -26,6 +26,7 @@ import { liveApi } from './api';
 import { TaskConfig } from '../config/globalVar';
 import { createVisitId, getUnixTime, random } from '../utils';
 import { OriginURLs } from '../constant/biliUri';
+import { appSignString } from '@/utils/bili';
 
 /**
  * 直播签到
@@ -117,7 +118,12 @@ export function sendMessage(roomid: number, msg: string, dm_type?: number): Prom
  * @param pageSize 页大小
  */
 export function getFansMedalPanel(page = 1, pageSize = 50): Promise<FansMedalPanelDto> {
-  return liveApi.get(`xlive/app-ucenter/v1/fansMedal/panel?page=${page}&page_size=${pageSize}`);
+  return liveApi.get(
+    `xlive/app-ucenter/v1/fansMedal/panel?${appSignString({
+      page,
+      page_size: pageSize,
+    })}`,
+  );
 }
 
 /**

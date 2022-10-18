@@ -1,7 +1,7 @@
-import type { FansMedalDto } from '../dto/live.dto';
-import { TaskConfig, TaskModule } from '../config/globalVar';
+import type { FansMedalDto } from '@/dto/live.dto';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
 import * as liveRequest from '../net/live.request';
-import { kaomoji, TODAY_MAX_FEED } from '../constant';
+import { kaomoji, TODAY_MAX_FEED } from '@/constant';
 import {
   random,
   apiDelay,
@@ -31,7 +31,7 @@ export async function getFansMealList() {
   try {
     while (pageNumber < totalNumber) {
       await apiDelay(200, 600);
-      const { code, message, data } = await liveRequest.getFansMedalPanel(pageNumber + 1, 10);
+      const { code, message, data } = await liveRequest.getFansMedalPanel(pageNumber + 1, 50);
       if (code !== 0) {
         logger.verbose(`获取勋章信息失败 ${code} ${message}`);
         return list;
@@ -75,19 +75,13 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
   const { whiteList, blackList } = TaskConfig.intimacy;
   if (!whiteList || !whiteList.length) {
     // 判断是否存在黑名单中
-    if (
+    return !(
       blackList &&
       (blackList.includes(room_info.room_id) || blackList.includes(medal.target_id))
-    ) {
-      return false;
-    }
-    return true;
+    );
   }
   // 如果存在白名单，则只发送白名单里的
-  if (whiteList.includes(room_info.room_id) || whiteList.includes(medal.target_id)) {
-    return true;
-  }
-  return false;
+  return whiteList.includes(room_info.room_id) || whiteList.includes(medal.target_id);
 }
 
 export async function sendOneMessage(roomid: number, nickName: string) {
@@ -267,6 +261,7 @@ async function liveHeartPromiseSync(roomList: FansMedalDto[]) {
  * 完成一个直播间所有轮次的心跳
  * @param fansMedal
  * @param options
+ * @param countRef
  */
 async function allLiveHeart(
   fansMedal: FansMedalDto,

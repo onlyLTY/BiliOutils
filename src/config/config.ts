@@ -8,8 +8,8 @@ import {
   TODAY_MAX_FEED,
 } from '@/constant';
 import { cloneObject, deepMergeObject, arr2numArr } from '@/utils/pure';
-import { getBiliJct, getUserId } from '../utils/cookie';
-import { isString } from '../utils/is';
+import { getBiliJct, getUserId } from '@/utils/cookie';
+import { isString } from '@/utils/is';
 
 type DefaultConfig = typeof defaultConfig;
 export type TheConfig = DefaultConfig;
@@ -88,7 +88,7 @@ export const defaultConfig = {
     activityLottery: false,
   },
   log: {
-    pushLevel: 'debug' as LevelType | boolean,
+    pushLevel: 'verbose' as LevelType | boolean,
     consoleLevel: 'debug' as LevelType | boolean,
     fileLevel: 'debug' as LevelType | boolean,
     useEmoji: true,
@@ -181,7 +181,7 @@ export const defaultConfig = {
     // 直播间来源方式 1 活动（活动链接可能更新不及时），2 扫描。其它值 所有方式依次尝试。
     source: 0,
     // 活动链接
-    uri: 'https://api.live.bilibili.com/xlive/fuxi-interface/AugRedPacket2022Controller/redPocketPlaying',
+    uri: '',
     // 仅使用活动时有效，每轮抢红包的间隔时间（秒）
     intervalActive: 60,
     // 中场休息时间，当每参加了几个直播间的时候，休息一下 [参加个数，休息时间（分，小于1为直接结束）]
@@ -294,7 +294,7 @@ export const defaultConfig = {
     // 关注？
     follow: false,
     // 请求 GitHub 使用的代理前缀
-    proxyPrefix: '',
+    proxyPrefix: 'https://ghproxy.com/',
     // 自定义活动列表链接
     customUrl: '',
   },

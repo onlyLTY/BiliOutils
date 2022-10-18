@@ -26,11 +26,9 @@ export const biliTaskArray = [
 ] as const;
 
 export type BiliTaskName = typeof biliTaskArray[number][0];
-export type TaskFunc = () => Promise<{ default: () => Promise<any> }>
+export type TaskFunc = () => Promise<{ default: () => Promise<any> }>;
 
-export const biliTasks = new Map<string, TaskFunc>(
-  biliTaskArray,
-);
+export const biliTasks = new Map<string, TaskFunc>(biliTaskArray);
 
 export default biliTasks;
 
@@ -42,7 +40,9 @@ export async function getBiliTask(funcName: BiliTaskName) {
   return (await biliTask()).default;
 }
 
-export async function getBiliTasks<T extends BiliTaskName>(funcNames: T[]): Promise<Record<T, TaskFunc>> {
+export async function getBiliTasks<T extends BiliTaskName>(
+  funcNames: T[],
+): Promise<Record<T, TaskFunc>> {
   const tasks: Record<BiliTaskName, TaskFunc> = {} as any;
   for (const funcName of funcNames) {
     const biliTask = biliTasks.get(funcName);

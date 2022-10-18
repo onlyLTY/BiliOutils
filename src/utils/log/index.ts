@@ -50,7 +50,7 @@ export class Logger extends SimpleLogger {
     SimpleLogger.pushValue = '';
     SimpleLogger.brChar = br || TaskConfig.message.br || '\n';
   }
-  
+
   static async push(title = '日志推送') {
     const { sendMessage } = await import('@/utils/sendNotify');
     return sendMessage(title, this.pushValue);

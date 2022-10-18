@@ -439,7 +439,7 @@ export class Sleep {
   static waitSync(delay: number) {
     const now = Date.now();
     while (Date.now() - now < delay) {
-      // empty 
+      // empty
     }
   }
 }
