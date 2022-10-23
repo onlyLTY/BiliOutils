@@ -75,10 +75,14 @@ const theConfig = {
   },
   jury: {
     once: true,
+    opinion: true,
     opinionMin: 3,
+    notOpinion: [3],
     vote: [0, 0, 1],
     waitTime: 20,
-    insiders: 0.8,
+    insiderWeight: 0.8,
+    insiders: [0, 1],
+    anonymous: [0, 1],
     newTrigger: true,
   },
   log: {
@@ -160,7 +164,7 @@ const theConfig = {
   },
   redPack: {
     source: 0,
-    uri: 'https://api.live.bilibili.com/xlive/fuxi-interface/AugRedPacket2022Controller/redPocketPlaying',
+    uri: '',
     intervalActive: 60,
     restTime: [-1, -1],
     linkRoomNum: 1,
