@@ -60,7 +60,13 @@ jobs:
           cp config/config.single.json dist/config/config.json
           cd dist
           mv index.*.js ../
-          rm bin.js main.js
+          rm main.js
+      - name: PKG
+        run: |
+          yarn global add pkg
+          yarn pkg
+          cd dist
+          rm bin.js
       - name: ZIP SCF
         run: |
           cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
@@ -124,6 +130,8 @@ jobs:
             aliyun_fc.zip
             baidu_cfc.zip
             huawei_agc.zip
+            bin/bilitools-linux
+            bin/bilitools-win.exe
           draft: ${{ env.IS_TAG == 'false' }}
           prerelease: ${{ env.IS_TAG == 'true' && env.IS_RC == 'true' }}
         env:

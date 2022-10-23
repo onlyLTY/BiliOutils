@@ -9,3 +9,4 @@ temp/**
 /src/config/config.json
 yarn-error.log
 /logs
+/bin

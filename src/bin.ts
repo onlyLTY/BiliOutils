@@ -7,7 +7,6 @@ import { existsSync, readFileSync } from 'fs';
 import { config, runTask, waitForArgs } from './util';
 import * as cron from 'node-cron';
 import { isBiliCookie } from './utils/cookie';
-import { writeJsonFile } from './utils/file';
 
 const pkg = require('../package.json');
 
@@ -62,7 +61,8 @@ Options:
 /**
  * 记住本次运行情况
  */
-function remember(jobsPath: string) {
+async function remember(jobsPath: string) {
+  const { writeJsonFile } = await import('@/utils/file');
   // 写进 config 同级 bt_jobs.json
   writeJsonFile(jobsPath, {
     lastRun: new Date().getTime(),
@@ -127,7 +127,7 @@ async function argTaskHandle(jobsPath: string, configs: ConfigArray) {
   }
   if (await isTodayRun(jobsPath)) return;
   await runTask(configs);
-  remember(jobsPath);
+  await remember(jobsPath);
 }
 
 async function createCookie() {
