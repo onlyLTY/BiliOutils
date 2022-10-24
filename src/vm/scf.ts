@@ -10,7 +10,7 @@ import { dailyMain, runTasks } from '../index.scf';
   }
   if (isReturn) return __BT_context__.resolve('success');
   try {
-    const message = await dailyMain(__BT_context__.event, __BT_context__.context);
+    const message = await dailyMain();
     __BT_context__.resolve(message);
     return;
   } catch (error) {
