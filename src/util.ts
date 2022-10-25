@@ -5,6 +5,7 @@ import * as path from 'path';
 import { getArg } from './utils/args';
 import { getDelayTime, random, Sleep } from '@/utils/pure';
 import { clearLogs } from '@/utils/log/file';
+import { writeError } from './utils/log/std';
 
 /**
  * 获取配置
@@ -15,7 +16,7 @@ export async function config() {
   try {
     const configs = getConfigPathFile(resolve(process.cwd(), configPath));
     if (!configs.length) {
-      process.stderr.write('配置文件不存在');
+      writeError('配置文件不存在');
       return;
     }
     const itemIndex = getArg('item');
@@ -24,8 +25,8 @@ export async function config() {
     }
     return configs;
   } catch (error) {
-    process.stderr.write('配置路径可能存在问题');
-    process.stderr.write(error.message);
+    writeError('配置路径可能存在问题');
+    writeError(error.message);
   }
 }
 

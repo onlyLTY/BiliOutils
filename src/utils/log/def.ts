@@ -4,6 +4,7 @@ import { isServerless, isQingLongPanel } from '@/utils/env';
 import { isBoolean } from '../is';
 import { resolvePath } from '../path';
 import { getPRCDate } from '../pure';
+import { writeError, writeOut } from './std';
 
 const LEVEL_VALUE = ['error', 'warn', 'info', 'verbose', 'debug'];
 
@@ -141,10 +142,10 @@ export class SimpleLogger {
 
   protected conslole(message: string, stderr: boolean) {
     if (stderr) {
-      process.stderr.write(message);
+      writeError(message);
       return;
     }
-    process.stdout.write(message);
+    writeOut(message);
   }
 
   protected file(message: string, stderr: boolean) {

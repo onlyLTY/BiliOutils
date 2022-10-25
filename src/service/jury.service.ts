@@ -10,16 +10,7 @@ import {
   getJuryCaseVote,
   juryCaseVote,
 } from '@/net/jury.request';
-import {
-  apiDelay,
-  formatCron,
-  getPRCDate,
-  getRandomItem,
-  isFC,
-  isSCF,
-  Logger,
-  logger,
-} from '@/utils';
+import { apiDelay, ENV, formatCron, getPRCDate, getRandomItem, Logger, logger } from '@/utils';
 import { JuryVote, JuryVoteResult, VoteResCode } from '@/enums/jury.emum';
 import { getRequestNameWrapper } from '@/utils/request';
 import { JSON5 } from '@/utils/json5';
@@ -262,7 +253,7 @@ async function handleNoNewCase(message: string, errRef?: Ref<number>) {
     return true;
   }
   // 判断是云函数
-  if (isFC() || isSCF()) {
+  if (ENV.fc || ENV.scf) {
     const r = await waitForServerless();
     // 如果失败还是保持原来的逻辑
     if (r) {
@@ -306,7 +297,7 @@ async function waitForServerless() {
 }
 
 async function deleteServerless() {
-  if (!(isFC() || isSCF())) return false;
+  if (!(ENV.fc || ENV.scf)) return false;
   if (!TaskConfig.jury.newTrigger) return false;
   try {
     const { dailyHandler, getClinet } = await import('@/utils/serverless');

@@ -1,12 +1,36 @@
 import type { SLSType } from '@/types';
 
+type ENVType = {
+  qinglong: boolean;
+  fc: boolean;
+  scf: boolean;
+  cfc: boolean;
+  agc: boolean;
+  serverless: boolean;
+  type: SLSType | 'local';
+};
+
+const ENV_BASE = {
+  qinglong: isQingLongPanel(),
+  fc: isFC(),
+  scf: isSCF(),
+  cfc: isCFC(),
+  agc: isAGC(),
+};
+
+export const ENV: ENVType = {
+  ...ENV_BASE,
+  serverless: isServerless(),
+  type: getEnvType(),
+};
+
 /**
  * 是否是青龙面板
  */
-export const isQingLongPanel = () => {
+export function isQingLongPanel() {
   // @ts-ignore
   return Boolean(process.env.IS_QING_LONG || '__IS_QINGLONG__' === 'true' || process.env.QL_BRANCH);
-};
+}
 
 /**
  * 是否是 CFC
@@ -26,7 +50,7 @@ export function isAGC() {
 }
 
 export function setConfigFileName() {
-  const defaultConfigFileName = isQingLongPanel() ? 'cat_bili_config' : 'config',
+  const defaultConfigFileName = ENV_BASE.qinglong ? 'cat_bili_config' : 'config',
     ext = '.json';
 
   const { BILITOOLS_FILE_NAME } = process.env;
@@ -70,20 +94,21 @@ export function isSCF() {
 }
 
 export function isServerless() {
-  return isSCF() || isFC() || isAGC() || isCFC();
+  return ENV_BASE.fc || ENV_BASE.scf || ENV_BASE.cfc || ENV_BASE.agc;
 }
 
-export function getServerlessType(): SLSType | undefined {
-  if (isSCF()) {
+export function getEnvType(): SLSType | 'local' {
+  if (ENV_BASE.scf) {
     return 'scf';
   }
-  if (isFC()) {
+  if (ENV_BASE.fc) {
     return 'fc';
   }
-  if (isAGC()) {
+  if (ENV_BASE.agc) {
     return 'agc';
   }
-  if (isCFC()) {
+  if (ENV_BASE.cfc) {
     return 'cfc';
   }
+  return 'local';
 }
