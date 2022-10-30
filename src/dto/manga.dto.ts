@@ -205,7 +205,7 @@ interface Styles2 {
   name: string;
 }
 
-interface Eplist {
+export interface Eplist {
   id: number;
   ord: number;
   read: number;
@@ -468,7 +468,7 @@ interface SeasonText {
   clonckInRule: string;
 }
 
-interface SeasonTodaytask {
+export interface SeasonTodaytask {
   type: number;
   title: string;
   amount: number;

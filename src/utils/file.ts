@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
 import { isString } from './is';
 import { JSON5 } from './json5';
 import { defLogger } from './log/def';
@@ -73,4 +74,15 @@ export function writeJsonFile(filepath: string, obj: Record<string, any>) {
   } catch (err) {
     defLogger.debug(err);
   }
+}
+
+/**
+ * 获取 config 路径
+ */
+export function getConfigPath() {
+  const path = process.env.__BT_CONFIG_PATH__;
+  return {
+    path,
+    dir: dirname(path),
+  };
 }

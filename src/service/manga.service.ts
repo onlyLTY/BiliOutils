@@ -1,8 +1,12 @@
+import type { Eplist, SeasonInfoDto, SeasonTodaytask } from '@/dto/manga.dto';
+import * as path from 'path';
+import * as fs from 'fs';
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
-import { apiDelay, getPRCDate, logger } from '@/utils';
+import { apiDelay, getPRCDate, isBoolean, logger } from '@/utils';
 import { request } from '@/utils/request';
+import { getConfigPath } from '@/utils/file';
 
 let expireCouponNum: number;
 
@@ -60,8 +64,7 @@ async function getMangaEpList(comic_id: number) {
     }
     const { disable_coupon_amount, ep_list } = data;
     // 去掉没有漫读券的章节
-    const epList = disable_coupon_amount ? ep_list.slice(disable_coupon_amount) : ep_list;
-    return epList.filter(ep => ep.is_locked);
+    return disable_coupon_amount ? ep_list.slice(disable_coupon_amount) : ep_list;
   } catch (error) {
     logger.error(`获取漫画详情异常: ${error}`);
   }
@@ -143,13 +146,17 @@ async function searchManga(keyword: string) {
  * 购买漫画
  */
 async function buyManga(comic_id: number) {
-  const epList = await getMangaEpList(comic_id);
-  if (!epList || epList.length === 0) {
+  const epList = filterLocked(await getMangaEpList(comic_id));
+  if (epList.length === 0) {
     return false;
   }
   for (let index = 0; index < epList.length; index++) {
     await apiDelay(100);
     if (await buyOneEpManga(epList[index].id)) return true;
+  }
+
+  function filterLocked(epList: Eplist[] = []) {
+    return epList.filter(ep => ep.is_locked);
   }
 }
 
@@ -371,5 +378,125 @@ export async function shareComicService() {
     logger.warn(`每日分享失败：${code} ${msg}`);
   } catch (error) {
     logger.error(`每日分享异常: ${error.message}`);
+  }
+}
+
+/**
+ * 生成阅读请求体
+ */
+function createDataFlow(mangaId: number | string, mangaNum: number) {
+  const { dir } = getConfigPath();
+  const fileBin = fs.readFileSync(path.resolve(dir, `./manga_request_${TaskConfig.USERID}`));
+  const base = fileBin.subarray(fileBin.indexOf('RDIO'));
+  const sub1 = base.subarray(0, base.indexOf('manga_id') + 'manga_id'.length + 2);
+  const sub2 = base.subarray(
+    base.indexOf('flutter') - 4,
+    base.indexOf('manga_num') + 'manga_num'.length + 2,
+  );
+  const sub3 = base.subarray(base.indexOf(Buffer.from([112, 1, 120])));
+  return Buffer.concat([
+    sub1,
+    Buffer.from(mangaId.toString()),
+    sub2,
+    Buffer.from(mangaNum.toString()),
+    sub3,
+  ]);
+}
+
+/**
+ * 判断是否已经阅读
+ */
+function getReadMangaStatus(task15min: SeasonTodaytask, task30min: SeasonTodaytask) {
+  const doneTask30min = task30min.status === 2,
+    doneTask15min = task15min.status === 2;
+  if (doneTask30min && doneTask15min) {
+    return true;
+  }
+  return false;
+}
+
+function getKeyTaskItem(today_tasks: SeasonInfoDto['data']['today_tasks']) {
+  const task30min = today_tasks.find(el => el.type === 17 && el.sub_id === 5),
+    task15min = today_tasks.find(el => el.type === 22 && el.comics.length > 0);
+  return {
+    task15min,
+    task30min,
+  };
+}
+
+async function getTaskInfo() {
+  try {
+    const seasonInfo = await getSeasonInfo();
+    if (!seasonInfo) {
+      logger.error('跳过每日阅读');
+      return false;
+    }
+    const { task15min, task30min } = getKeyTaskItem(seasonInfo.today_tasks);
+
+    if (!task30min || !task15min) {
+      logger.warn('未知异常');
+      return false;
+    }
+
+    const task30minProgress = task30min.progress,
+      task15minProgress = task15min.progress;
+
+    if (getReadMangaStatus(task15min, task30min)) {
+      return true;
+    }
+
+    const time = Math.max(30 - task30minProgress, 15 - task15minProgress);
+    return {
+      comicId: task15min?.comics[0].comic_id,
+      time,
+    };
+  } catch (error) {
+    logger.error(`获取每日阅读进度异常：${error.message}`);
+  }
+  return false;
+}
+
+async function readManga(buffer: Buffer, needTime: number) {
+  for (let index = 0; index < 3; index++) {
+    logger.debug(`开始阅读漫画第${index + 1}轮`);
+    const add = Math.ceil(needTime / 10);
+    for (let count = 0; count < needTime * 2 + add; count++) {
+      await mangaApi.sendRealtime(buffer);
+      await apiDelay();
+    }
+    await apiDelay(5000);
+    const taskInfo = await getTaskInfo();
+    if (isBoolean(taskInfo)) {
+      return taskInfo;
+    }
+    needTime = taskInfo.time;
+  }
+  return false;
+}
+
+/**
+ * 每日漫画阅读
+ */
+export async function readMangaService() {
+  if (!TaskConfig.manga.read) {
+    return;
+  }
+  try {
+    const taskInfo = await getTaskInfo();
+    if (isBoolean(taskInfo)) {
+      return taskInfo;
+    }
+    const { comicId, time } = taskInfo;
+    const eplist = await getMangaEpList(comicId);
+    if (!eplist) {
+      return;
+    }
+    const buffer = createDataFlow(comicId, eplist[0].id);
+    (await readManga(buffer, time))
+      ? logger.info('每日漫画阅读任务完成')
+      : logger.warn('每日漫画阅读未完成×_×');
+  } catch (error) {
+    logger.error(`每日漫画阅读任务出错`);
+    logger.error(error);
   }
 }

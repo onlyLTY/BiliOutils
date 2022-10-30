@@ -4,7 +4,7 @@ import type { VGotOptions } from '#/got';
 import type { Got, Response } from 'got';
 import got from 'got';
 import { isFunction, isObject, isString } from '../is';
-import { jsonp2Object, mergeHeaders, stringify } from '../pure';
+import { jsonp2Object, mergeHeaders } from '../pure';
 import { CookieJar } from '../cookie';
 
 const transformRequestHook = (res: Response, options: RequestOptions = {}) => {
@@ -47,19 +47,7 @@ function axiosHandle(options: VGotOptions) {
       ...options.params,
     };
   }
-  options.headers || (options.headers = {});
-  const contentType = options.headers['content-type'] as string,
-    isFormUrlencoded = contentType?.startsWith('application/x-www-form-urlencoded');
-  if (isObject(options.data)) {
-    if (isFormUrlencoded) {
-      options.body = stringify(options.data);
-    } else {
-      options.json = options.data;
-    }
-  }
-  if (isString(options.data) && isFormUrlencoded) {
-    options.body = options.data;
-  }
+  handleData(options);
 
   function setAgent(pro: string) {
     if (!options.agent) {
@@ -82,6 +70,26 @@ function axiosHandle(options: VGotOptions) {
   }
 
   return options;
+}
+
+function handleData(options: VGotOptions) {
+  options.headers || (options.headers = {});
+  const contentType = options.headers['content-type'] as string,
+    isFormUrlencoded = contentType?.startsWith('application/x-www-form-urlencoded'),
+    isObjectData = isObject(options.data);
+  if (isFormUrlencoded && isObjectData) {
+    options.form = options.data;
+    return;
+  }
+  if (isFormUrlencoded) {
+    options.body = options.data;
+    return;
+  }
+  if (isObjectData) {
+    options.json = options.data;
+    return;
+  }
+  options.body = options.data;
 }
 
 export type CookieJarType = CookieJar | BiliCookieJar | undefined;
