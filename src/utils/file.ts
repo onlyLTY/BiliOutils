@@ -46,7 +46,10 @@ export function replaceAllCookie(filePath: string, userId: number | string, newC
     const newJson5 = content.replaceAll(reg, substring => {
       let quote = substring.at(0) || '';
       /['"]/.test(quote) || (quote = '');
-      const quote2 = substring.match(/^['"]?cookie['"]?:\s?(['"])/)?.[1] || '"';
+      // 避免使用转义符
+      const quote2 = newCookie.includes("'")
+        ? '"'
+        : substring.match(/^['"]?cookie['"]?:\s?(['"])/)?.[1] || '"';
       return `${quote}cookie${quote}: ${quote2}${newCookie}${quote2}`;
     });
     writeFileSync(filePath, newJson5);
