@@ -6,7 +6,8 @@ import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
 import { apiDelay, getPRCDate, isBoolean, logger } from '@/utils';
 import { request } from '@/utils/request';
-import { getConfigPath } from '@/utils/file';
+import { getConfigPath, readJsonFile } from '@/utils/file';
+import { getHeaderNum, setNewLength } from '@/utils/neuron';
 
 let expireCouponNum: number;
 
@@ -385,22 +386,89 @@ export async function shareComicService() {
  * 生成阅读请求体
  */
 function createDataFlow(mangaId: number | string, mangaNum: number) {
+  if (TaskConfig.manga.readSign.length) {
+    return createDateFlowByPart(mangaId.toString(), mangaNum.toString());
+  }
+  return createDataFlowByFile(mangaId.toString(), mangaNum.toString());
+}
+
+function createDataFlowByFile(mangaId: string, mangaNum: string) {
   const { dir } = getConfigPath();
   const fileBin = fs.readFileSync(path.resolve(dir, `./manga_request_${TaskConfig.USERID}`));
+  // 分割请求体
   const base = fileBin.subarray(fileBin.indexOf('RDIO'));
-  const sub1 = base.subarray(0, base.indexOf('manga_id') + 'manga_id'.length + 2);
-  const sub2 = base.subarray(
-    base.indexOf('flutter') - 4,
-    base.indexOf('manga_num') + 'manga_num'.length + 2,
-  );
+  // 替换漫画 id
+  const sub1 = base.subarray(0, base.indexOf('manga_id') + 10);
+  const sub2 = base.subarray(base.indexOf('flutter') - 4, base.indexOf('manga_num') + 11);
   const sub3 = base.subarray(base.indexOf(Buffer.from([112, 1, 120])));
-  return Buffer.concat([
-    sub1,
-    Buffer.from(mangaId.toString()),
-    sub2,
-    Buffer.from(mangaNum.toString()),
-    sub3,
-  ]);
+  // 防止长度发生变法
+  setNewLength(sub1, mangaId, 8);
+  setNewLength(sub2, mangaNum, 9);
+  const newBuffer = Buffer.concat([sub1, Buffer.from(mangaId), sub2, Buffer.from(mangaNum), sub3]);
+  if (newBuffer.length === base.length) {
+    return newBuffer;
+  }
+  // 防止长度出现了变化
+  const bitsNum = newBuffer[7];
+  const newBitsNum = bitsNum + newBuffer.length - base.length;
+  newBuffer[7] = newBitsNum;
+  newBuffer[8] = getHeaderNum(2147483904 + newBitsNum);
+  return newBuffer;
+}
+
+function createDateFlowByPart(mangaId: string, mangaNum: string) {
+  const arr = readJsonFile<(number | string | number[])[]>(
+    path.resolve(__dirname, '../config/mangaBuffer'),
+  );
+  if (!arr) {
+    throw new Error('作者没有准备该数据');
+  }
+  const readSign = TaskConfig.manga.readSign;
+  if (readSign.length !== 18) {
+    throw new Error('配置 readSign 长度有问题');
+  }
+  const configIndex = {
+    bits: 7,
+    calc: 8,
+    mid_v_len: 348,
+    mid: 349,
+    unk1: 351,
+    k1: 352,
+    unk2: 363,
+    manga_id_len: 367,
+    manga_id_v_len: 379,
+    manga_id: 380,
+    manga_num_len: 456,
+    manga_num_v_len: 469,
+    manga_num: 470,
+    unk3: 474,
+  };
+  const mangaIdLen = mangaId.length;
+  const mangaNumLen = mangaNum.length;
+  arr[configIndex.manga_id] = Buffer.from(mangaId).toJSON().data;
+  arr[configIndex.manga_num] = Buffer.from(mangaNum).toJSON().data;
+  arr[configIndex.manga_id_v_len] = mangaIdLen;
+  arr[configIndex.manga_num_v_len] = mangaNumLen;
+  arr[configIndex.manga_id_len] = mangaIdLen + 12;
+  arr[configIndex.manga_num_len] = mangaNumLen + 13;
+
+  arr[configIndex.mid] = Buffer.from(TaskConfig.USERID.toString()).toJSON().data;
+  const midLen = TaskConfig.USERID.toString().length;
+  arr[configIndex.mid_v_len] = midLen;
+  const bitsLen = 224 + mangaIdLen + mangaNumLen + midLen;
+  arr[configIndex.bits] = bitsLen;
+  arr[configIndex.calc] = getHeaderNum(2147483904 + bitsLen);
+
+  // readSign 前两位给 unk1
+  arr[configIndex.unk1] = readSign.slice(0, 2);
+  // 中间两位给 unk2
+  arr[configIndex.unk2] = readSign.slice(2, 4);
+  // 最后全部给 unk3
+  arr[configIndex.unk3] = readSign.slice(4);
+  // 重复位置
+  arr[configIndex.k1] = readSign.slice(readSign.length - 4, readSign.length - 1);
+
+  return Buffer.from(arr.flat() as number[]);
 }
 
 /**

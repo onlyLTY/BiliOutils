@@ -121,11 +121,13 @@ const theConfig = {
   manga: {
     sign: true,
     buy: false,
+    read: false,
     mc: [],
     name: [],
     love: true,
     buyInterval: 2,
     buyWeek: [],
+    readSign: [],
   },
   exchangeCoupon: {
     num: 1,
