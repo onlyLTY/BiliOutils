@@ -8,6 +8,7 @@ import { apiDelay, getPRCDate, isBoolean, logger } from '@/utils';
 import { request } from '@/utils/request';
 import { getConfigPath, readJsonFile } from '@/utils/file';
 import { getHeaderNum, setNewLength } from '@/utils/neuron';
+import { gunzipSync } from 'zlib';
 
 let expireCouponNum: number;
 
@@ -379,11 +380,24 @@ function createDataFlow(mangaId: number | string, mangaNum: number) {
   return createDataFlowByFile(mangaId.toString(), mangaNum.toString());
 }
 
-function createDataFlowByFile(mangaId: string, mangaNum: string) {
-  const { dir } = getConfigPath();
-  const fileBin = fs.readFileSync(path.resolve(dir, `./manga_request_${TaskConfig.USERID}`));
+function getConfigMangaRequest() {
+  const fileBin = fs.readFileSync(
+    path.resolve(getConfigPath().dir, `./manga_request_${TaskConfig.USERID}`),
+  );
   // 分割请求体
-  const base = fileBin.subarray(fileBin.indexOf('RDIO'));
+  const bodyIndex = fileBin.indexOf('RDIO');
+  if (bodyIndex !== -1) {
+    return fileBin.subarray(bodyIndex);
+  }
+  if (fileBin.indexOf('POST') === 0) {
+    return gunzipSync(fileBin.subarray(fileBin.indexOf(Buffer.from([0, 0, 0, 0, 0, 0])) - 3));
+  }
+  // 解压 gzip
+  return gunzipSync(fileBin);
+}
+
+function createDataFlowByFile(mangaId: string, mangaNum: string) {
+  const base = getConfigMangaRequest();
   // 替换漫画 id
   const sub1 = base.subarray(0, base.indexOf('manga_id') + 10);
   const sub2 = base.subarray(base.indexOf('flutter') - 4, base.indexOf('manga_num') + 11);
@@ -505,6 +519,7 @@ async function getTaskInfo() {
     return {
       comicId: task15min?.comics[0].comic_id,
       time,
+      time30: 30 - task30minProgress,
     };
   } catch (error) {
     logger.error(`获取每日阅读进度异常：${error.message}`);
@@ -512,11 +527,12 @@ async function getTaskInfo() {
   return false;
 }
 
-async function readManga(buffer: Buffer, needTime: number) {
+async function readManga(buffer: Buffer, needTime: number, time30?: number) {
+  let time = needTime;
   for (let index = 0; index < 3; index++) {
     logger.debug(`开始阅读漫画第${index + 1}轮`);
-    const add = Math.ceil(needTime / 10);
-    for (let count = 0; count < needTime * 2 + add; count++) {
+    const add = Math.ceil(time / 10);
+    for (let count = 0; count < time * 2 + add; count++) {
       await mangaApi.sendRealtime(buffer);
       await apiDelay(1000);
     }
@@ -525,7 +541,30 @@ async function readManga(buffer: Buffer, needTime: number) {
     if (isBoolean(taskInfo)) {
       return taskInfo;
     }
-    needTime = taskInfo.time;
+    time = taskInfo.time;
+    // 如果一轮下来时间一点没变，直接跳过
+    if (time === needTime) break;
+  }
+  if (time === needTime) {
+    return await readMangaDefault(time30);
+  }
+  return false;
+}
+
+async function readMangaDefault(time30 = 30) {
+  logger.debug('尝试直接发送配置好的阅读请求');
+  const buffer = getConfigMangaRequest();
+  for (let count = 0; count <= time30 * 2; count++) {
+    await mangaApi.sendRealtime(buffer);
+    await apiDelay(1000);
+  }
+  const taskInfo = await getTaskInfo();
+  if (isBoolean(taskInfo)) {
+    return taskInfo;
+  }
+  if (taskInfo.time30 > 0) {
+    logger.warn(`垃圾程序，怎么回事，基本的阅读都没有完成？`);
+    return false;
   }
   return false;
 }
@@ -542,13 +581,13 @@ export async function readMangaService() {
     if (isBoolean(taskInfo)) {
       return taskInfo;
     }
-    const { comicId, time } = taskInfo;
+    const { comicId, time, time30 } = taskInfo;
     const eplist = await getMangaEpList(comicId);
     if (!eplist) {
       return;
     }
     const buffer = createDataFlow(comicId, eplist[0].id);
-    (await readManga(buffer, time))
+    (await readManga(buffer, time, time30))
       ? logger.info('每日漫画阅读任务完成')
       : logger.warn('每日漫画阅读未完成×_×');
   } catch (error) {
