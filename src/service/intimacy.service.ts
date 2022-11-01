@@ -11,6 +11,7 @@ import {
   randomString,
   createUUID,
   isServerless,
+  getOnceFunc,
 } from '@/utils';
 import { likeLiveRoom, liveMobileHeartBeat } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
@@ -205,7 +206,8 @@ type LiveHeartRunOptions = {
   timerRef?: Ref<NodeJS.Timer>;
 };
 
-function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
+async function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
+  const retryLiveHeartOnce = await getOnceFunc(retryLiveHeart);
   for (const fansMedal of roomList) {
     const timerRef: Ref<NodeJS.Timer> = { value: undefined as unknown as NodeJS.Timer };
     const runOptions = {
@@ -246,7 +248,7 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
       return;
     }
     timerRef && timerRef.value && clearInterval(timerRef.value);
-    await retryLiveHeart();
+    await retryLiveHeartOnce();
   }
 }
 

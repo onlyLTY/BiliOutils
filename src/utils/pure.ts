@@ -487,3 +487,16 @@ export function mergeArray<T extends Record<string, any>>(
     return result;
   }, [] as T[]);
 }
+
+/**
+ * 只会运行一次的函数
+ */
+export async function getOnceFunc(cb: (...args: any[]) => any) {
+  let flag = true;
+  return async (...args: any[]) => {
+    if (flag) {
+      await cb(...args);
+      flag = false;
+    }
+  };
+}
