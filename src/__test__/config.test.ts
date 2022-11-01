@@ -125,8 +125,6 @@ const theConfig = {
     mc: [],
     name: [],
     love: true,
-    buyInterval: 2,
-    buyWeek: [],
     readSign: [],
   },
   exchangeCoupon: {

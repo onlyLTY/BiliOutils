@@ -223,10 +223,6 @@ export async function buyMangaService() {
   if (!buy) {
     return;
   }
-  if (!isTodayRunning()) {
-    logger.info('非购买漫画时间，不购买');
-    return;
-  }
   expireCouponNum = (await getExpireCouponNum()) as number;
   if (!expireCouponNum) {
     return;
@@ -239,15 +235,6 @@ export async function buyMangaService() {
   await buyMangaByMc();
   await buyMangaByName();
   await buyMangaByLove();
-
-  function isTodayRunning() {
-    const { buyWeek, buyInterval } = TaskConfig.manga;
-    if (buyInterval === 1) return true;
-    const now = new Date();
-    const weekDay = now.getDay();
-    const today = now.getDate();
-    return buyWeek.includes(weekDay) || (today % buyInterval) - 1 === 0;
-  }
 }
 
 export async function mangaSign() {
@@ -408,6 +395,7 @@ function createDataFlowByFile(mangaId: string, mangaNum: string) {
   if (newBuffer.length === base.length) {
     return newBuffer;
   }
+  logger.verbose(`对阅读请求体进行了修改`);
   // 防止长度出现了变化
   const bitsNum = newBuffer[7];
   const newBitsNum = bitsNum + newBuffer.length - base.length;
@@ -530,7 +518,7 @@ async function readManga(buffer: Buffer, needTime: number) {
     const add = Math.ceil(needTime / 10);
     for (let count = 0; count < needTime * 2 + add; count++) {
       await mangaApi.sendRealtime(buffer);
-      await apiDelay();
+      await apiDelay(1000);
     }
     await apiDelay(5000);
     const taskInfo = await getTaskInfo();
