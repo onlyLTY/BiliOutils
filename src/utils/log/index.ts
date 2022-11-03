@@ -70,3 +70,7 @@ export const _logger = new Logger({
   push: false,
   payload: 'cat',
 });
+
+export function notPush() {
+  return TaskConfig.message.onlyError && !TaskModule.hasError && TaskModule.pushTitle.length === 0;
+}

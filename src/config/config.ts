@@ -284,7 +284,7 @@ export const defaultConfig = {
   },
   bigPoint: {
     // 是否重试，或者重试间隔时间，单位秒
-    isRetry: true as boolean | number,
+    isRetry: 20 as boolean | number,
     // 是否观看视频
     isWatch: true,
     // 自定义观看视频的章节

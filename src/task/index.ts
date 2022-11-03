@@ -73,7 +73,6 @@ export function getInputBiliTask(taskNameStr: string) {
 export async function runInputBiliTask(taskNameStr: string) {
   const { logger, Logger, clearLogs } = await import('../utils/log');
   await Logger.init();
-  clearLogs();
   logger.info(`开始执行自定义任务！`);
   const taskArr = getInputBiliTask(taskNameStr);
   for await (const task of taskArr) {
@@ -88,4 +87,5 @@ export async function runInputBiliTask(taskNameStr: string) {
   } else {
     await Logger.push('自定义任务完成');
   }
+  clearLogs();
 }

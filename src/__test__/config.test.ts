@@ -197,7 +197,7 @@ const theConfig = {
   },
   bigPoint: {
     epids: [],
-    isRetry: true,
+    isRetry: 20,
     isWatch: true,
     watchDelay: 40,
   },

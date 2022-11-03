@@ -49,6 +49,6 @@ function isNeedCreateCookie(timestamp: number, day: number) {
   if (!timestamp) {
     return true;
   }
-  const dayDiff = Date.now() - timestamp / MS2DATE;
+  const dayDiff = (Date.now() - timestamp) / MS2DATE;
   return dayDiff > day;
 }

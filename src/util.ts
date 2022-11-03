@@ -75,7 +75,6 @@ export function runForkSync(config: Config, index: number, forkPath = './bin/for
 }
 
 export async function runTask(configs?: ConfigArray, forkPath = './bin/fork', tasks = '') {
-  clearLogs();
   if (!configs) {
     const { getConfig } = await import('./config/setConfig');
     configs = getConfig(true);
@@ -100,6 +99,7 @@ export async function runTask(configs?: ConfigArray, forkPath = './bin/fork', ta
     }
     process.stdout.write('执行完毕\n\n');
   }
+  clearLogs();
 }
 
 function getItemIndex(item: string, len: number) {

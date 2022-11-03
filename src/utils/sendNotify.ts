@@ -13,7 +13,7 @@ import type { Method } from 'got/dist/source/as-promise/types';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { conciseNickname } from './bili';
 import { defHttp } from './http';
-import { logger } from './log';
+import { logger, notPush } from './log';
 import { stringify } from './pure';
 
 // 使用一个变量来记录当前的环境变量，避免多个账号复用同一个环境变量
@@ -765,7 +765,7 @@ export async function sendMessage(title: string, text: string) {
     logger.info('消息推送已关闭');
     return;
   }
-  if (TaskConfig.message.onlyError && TaskModule.hasError) {
+  if (notPush()) {
     logger.info('仅在任务出错时发送消息');
     return;
   }
