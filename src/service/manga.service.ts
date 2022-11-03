@@ -381,8 +381,12 @@ function createDataFlow(mangaId: number | string, mangaNum: number) {
 }
 
 function getConfigMangaRequest() {
+  const configPath = getConfigPath();
+  if (!configPath) {
+    throw new Error('未找到配置文件');
+  }
   const fileBin = fs.readFileSync(
-    path.resolve(getConfigPath().dir, `./manga_request_${TaskConfig.USERID}`),
+    path.resolve(configPath.dir, `./manga_request_${TaskConfig.USERID}`),
   );
   // 分割请求体
   const bodyIndex = fileBin.indexOf('RDIO');

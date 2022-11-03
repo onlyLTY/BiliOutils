@@ -84,6 +84,9 @@ export function writeJsonFile(filepath: string, obj: Record<string, any>) {
  */
 export function getConfigPath() {
   const path = process.env.__BT_CONFIG_PATH__;
+  if (!path) {
+    return undefined;
+  }
   return {
     path,
     dir: dirname(path),

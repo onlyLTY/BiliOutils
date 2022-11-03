@@ -6,9 +6,16 @@ import { readJsonFile, writeJsonFile } from '@/utils/file';
 import { dirname, resolve } from 'path';
 
 export default async function getNewCookie() {
+  const day = TaskConfig.createCookieDay;
+  if (!day || day < 1) {
+    return false;
+  }
   const btJonPath = getBtJonPath();
+  if (!btJonPath) {
+    return false;
+  }
   const btJob = readJsonFile(btJonPath);
-  if (!isNeedCreateCookie(btJob?.lastNewCookie, TaskConfig.createCookieDay)) {
+  if (!isNeedCreateCookie(btJob?.lastNewCookie, day)) {
     return;
   }
   const newCookie = await auth.getNewCookie(TaskConfig.cookie);
@@ -26,6 +33,9 @@ export default async function getNewCookie() {
  * 获取 bt_job.json 路径
  */
 function getBtJonPath() {
+  if (!process.env.__BT_CONFIG_PATH__) {
+    return undefined;
+  }
   const configDir = dirname(process.env.__BT_CONFIG_PATH__);
   return resolve(configDir, 'bt_jobs.json');
 }
@@ -35,10 +45,7 @@ function getBtJonPath() {
  * @param timestamp 上次运行时间
  * @param day 间隔天数
  */
-function isNeedCreateCookie(timestamp: number, day?: number) {
-  if (!day || day < 1) {
-    return false;
-  }
+function isNeedCreateCookie(timestamp: number, day: number) {
   if (!timestamp) {
     return true;
   }
