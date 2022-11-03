@@ -120,8 +120,21 @@ export class SimpleLogger {
     }
   }
 
-  public error(message: MessageType) {
-    this.log({ level: 'error' }, message);
+  public error(message: MessageType | Error, error?: Error) {
+    if (message instanceof Error) {
+      error = message;
+      message = '';
+    }
+    if (!error) {
+      this.log({ level: 'error' }, message);
+      return;
+    }
+    if (Reflect.has(error, 'message')) {
+      this.log({ level: 'error' }, `${message} ${error.message}`);
+    }
+    if (Reflect.has(error, 'stack')) {
+      this.log({ level: 'debug' }, error.stack);
+    }
   }
 
   public warn(message: MessageType) {

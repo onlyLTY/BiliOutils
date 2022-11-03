@@ -38,8 +38,7 @@ export async function request<
     }
     return data as any;
   } catch (error) {
-    thatlogger.error(`${name || reqFunc.name}请求出现异常`);
-    thatlogger.error(error);
+    thatlogger.error(`${name || reqFunc.name}请求出现异常`, error);
   }
   return {} as Record<string, any>;
 }

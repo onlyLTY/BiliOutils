@@ -13,7 +13,7 @@ export async function dailyTasks<T = unknown>(
     await beforeTask();
     await loginTask();
   } catch (error) {
-    logger.error(`登录失败: ${error}`);
+    logger.error(`登录失败:`, error);
     await Logger.push('【登录失败】');
     return '未完成';
   }

@@ -27,8 +27,8 @@ export class Logger extends SimpleLogger {
     this.logFile = resolvePath(`./logs/bt_combined-${file}.log`);
   }
 
-  public error(message: MessageType) {
-    this.log({ level: 'error' }, message);
+  public error(message: MessageType | Error, error?: Error) {
+    super.error(message, error);
     TaskModule.hasError = true;
   }
 
