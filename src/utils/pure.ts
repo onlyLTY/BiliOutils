@@ -500,3 +500,20 @@ export async function getOnceFunc(cb: (...args: any[]) => any) {
     }
   };
 }
+
+/**
+ * 补足位数
+ */
+export function pad(num: string, length = 8, char = '0') {
+  return num.padStart(length, char);
+}
+
+/**
+ * 进制转换
+ * @param num 要转换的数字字符串
+ * @param fromRadix 要转换的进制
+ * @param toRadix 转换后的进制
+ */
+export function radixConvert(num: string | number, fromRadix: number, toRadix: number) {
+  return parseInt(num + '', fromRadix).toString(toRadix);
+}

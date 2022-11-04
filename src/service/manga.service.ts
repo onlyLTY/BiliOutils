@@ -1,14 +1,13 @@
-import type { Eplist, SeasonInfoDto, SeasonTodaytask } from '@/dto/manga.dto';
+import type { Eplist, SeasonInfoDto } from '@/dto/manga.dto';
 import * as path from 'path';
-import * as fs from 'fs';
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
 import { apiDelay, getPRCDate, isBoolean, logger } from '@/utils';
 import { request } from '@/utils/request';
-import { getConfigPath, readJsonFile } from '@/utils/file';
-import { getHeaderNum, setNewLength } from '@/utils/neuron';
-import { gunzipSync } from 'zlib';
+import { readJsonFile } from '@/utils/file';
+import { getHeaderNum } from '@/utils/neuron';
+import { toProtobufNumber } from '@/utils/http/protobuf';
 
 let expireCouponNum: number;
 
@@ -374,52 +373,7 @@ export async function shareComicService() {
  * 生成阅读请求体
  */
 function createDataFlow(mangaId: number | string, mangaNum: number) {
-  if (TaskConfig.manga.readSign.length) {
-    return createDateFlowByPart(mangaId.toString(), mangaNum.toString());
-  }
-  return createDataFlowByFile(mangaId.toString(), mangaNum.toString());
-}
-
-function getConfigMangaRequest() {
-  const configPath = getConfigPath();
-  if (!configPath) {
-    throw new Error('未找到配置文件');
-  }
-  const fileBin = fs.readFileSync(
-    path.resolve(configPath.dir, `./manga_request_${TaskConfig.USERID}`),
-  );
-  // 分割请求体
-  const bodyIndex = fileBin.indexOf('RDIO');
-  if (bodyIndex !== -1) {
-    return fileBin.subarray(bodyIndex);
-  }
-  if (fileBin.indexOf('POST') === 0) {
-    return gunzipSync(fileBin.subarray(fileBin.indexOf(Buffer.from([0, 0, 0, 0, 0, 0])) - 3));
-  }
-  // 解压 gzip
-  return gunzipSync(fileBin);
-}
-
-function createDataFlowByFile(mangaId: string, mangaNum: string) {
-  const base = getConfigMangaRequest();
-  // 替换漫画 id
-  const sub1 = base.subarray(0, base.indexOf('manga_id') + 10);
-  const sub2 = base.subarray(base.indexOf('flutter') - 4, base.indexOf('manga_num') + 11);
-  const sub3 = base.subarray(base.indexOf(Buffer.from([112, 1, 120])));
-  // 防止长度发生变法
-  setNewLength(sub1, mangaId, 8);
-  setNewLength(sub2, mangaNum, 9);
-  const newBuffer = Buffer.concat([sub1, Buffer.from(mangaId), sub2, Buffer.from(mangaNum), sub3]);
-  if (newBuffer.length === base.length) {
-    return newBuffer;
-  }
-  logger.verbose(`对阅读请求体进行了修改`);
-  // 防止长度出现了变化
-  const bitsNum = newBuffer[7];
-  const newBitsNum = bitsNum + newBuffer.length - base.length;
-  newBuffer[7] = newBitsNum;
-  newBuffer[8] = getHeaderNum(2147483904 + newBitsNum);
-  return newBuffer;
+  return createDateFlowByPart(mangaId.toString(), mangaNum.toString());
 }
 
 function createDateFlowByPart(mangaId: string, mangaNum: string) {
@@ -429,25 +383,20 @@ function createDateFlowByPart(mangaId: string, mangaNum: string) {
   if (!arr) {
     throw new Error('作者没有准备该数据');
   }
-  const readSign = TaskConfig.manga.readSign;
-  if (readSign.length !== 18) {
-    throw new Error('配置 readSign 长度有问题');
-  }
   const configIndex = {
     bits: 7,
     calc: 8,
     mid_v_len: 348,
     mid: 349,
-    unk1: 351,
-    k1: 352,
-    unk2: 363,
+    ctime: 351,
     manga_id_len: 367,
     manga_id_v_len: 379,
     manga_id: 380,
     manga_num_len: 456,
     manga_num_v_len: 469,
     manga_num: 470,
-    unk3: 474,
+    sn_gen_time: 474,
+    upload_time: 477,
   };
   const mangaIdLen = mangaId.length;
   const mangaNumLen = mangaNum.length;
@@ -461,32 +410,16 @@ function createDateFlowByPart(mangaId: string, mangaNum: string) {
   arr[configIndex.mid] = Buffer.from(TaskConfig.USERID.toString()).toJSON().data;
   const midLen = TaskConfig.USERID.toString().length;
   arr[configIndex.mid_v_len] = midLen;
-  const bitsLen = 224 + mangaIdLen + mangaNumLen + midLen;
+  const bitsLen = 225 + mangaIdLen + mangaNumLen + midLen;
   arr[configIndex.bits] = bitsLen;
   arr[configIndex.calc] = getHeaderNum(2147483904 + bitsLen);
 
-  // readSign 前两位给 unk1
-  arr[configIndex.unk1] = readSign.slice(0, 2);
-  // 中间两位给 unk2
-  arr[configIndex.unk2] = readSign.slice(2, 4);
-  // 最后全部给 unk3
-  arr[configIndex.unk3] = readSign.slice(4);
-  // 重复位置
-  arr[configIndex.k1] = readSign.slice(readSign.length - 4, readSign.length - 1);
+  const now = new Date().getTime();
+  arr[configIndex.ctime] = toProtobufNumber((now - 1000).toString());
+  arr[configIndex.sn_gen_time] = toProtobufNumber((now - 4000).toString());
+  arr[configIndex.upload_time] = toProtobufNumber(now.toString());
 
   return Buffer.from(arr.flat() as number[]);
-}
-
-/**
- * 判断是否已经阅读
- */
-function getReadMangaStatus(task15min: SeasonTodaytask, task30min: SeasonTodaytask) {
-  const doneTask30min = task30min.status === 2,
-    doneTask15min = task15min.status === 2;
-  if (doneTask30min && doneTask15min) {
-    return true;
-  }
-  return false;
 }
 
 function getKeyTaskItem(today_tasks: SeasonInfoDto['data']['today_tasks']) {
@@ -515,7 +448,7 @@ async function getTaskInfo() {
     const task30minProgress = task30min.progress,
       task15minProgress = task15min.progress;
 
-    if (getReadMangaStatus(task15min, task30min)) {
+    if (task30minProgress === 30 && task15minProgress === 15) {
       return true;
     }
 
@@ -523,7 +456,6 @@ async function getTaskInfo() {
     return {
       comicId: task15min?.comics[0].comic_id,
       time,
-      time30: 30 - task30minProgress,
     };
   } catch (error) {
     logger.error(`获取每日阅读进度异常：${error.message}`);
@@ -531,7 +463,7 @@ async function getTaskInfo() {
   return false;
 }
 
-async function readManga(buffer: Buffer, needTime: number, time30?: number) {
+async function readManga(buffer: Buffer, needTime: number) {
   let time = needTime;
   for (let index = 0; index < 3; index++) {
     logger.debug(`开始阅读漫画第${index + 1}轮`);
@@ -549,27 +481,6 @@ async function readManga(buffer: Buffer, needTime: number, time30?: number) {
     // 如果一轮下来时间一点没变，直接跳过
     if (time === needTime) break;
   }
-  if (time === needTime) {
-    return await readMangaDefault(time30);
-  }
-  return false;
-}
-
-async function readMangaDefault(time30 = 30) {
-  logger.debug('尝试直接发送配置好的阅读请求');
-  const buffer = getConfigMangaRequest();
-  for (let count = 0; count <= time30 * 2; count++) {
-    await mangaApi.sendRealtime(buffer);
-    await apiDelay(1000);
-  }
-  const taskInfo = await getTaskInfo();
-  if (isBoolean(taskInfo)) {
-    return taskInfo;
-  }
-  if (taskInfo.time30 > 0) {
-    logger.warn(`垃圾程序，怎么回事，基本的阅读都没有完成？`);
-    return false;
-  }
   return false;
 }
 
@@ -585,13 +496,13 @@ export async function readMangaService() {
     if (isBoolean(taskInfo)) {
       return taskInfo;
     }
-    const { comicId, time, time30 } = taskInfo;
+    const { comicId, time } = taskInfo;
     const eplist = await getMangaEpList(comicId);
     if (!eplist) {
       return;
     }
     const buffer = createDataFlow(comicId, eplist[0].id);
-    (await readManga(buffer, time, time30))
+    (await readManga(buffer, time))
       ? logger.info('每日漫画阅读任务完成')
       : logger.warn('每日漫画阅读未完成×_×');
   } catch (error) {
@@ -599,3 +510,63 @@ export async function readMangaService() {
     logger.error(error);
   }
 }
+
+// function getConfigMangaRequest() {
+//   const configPath = getConfigPath();
+//   if (!configPath) {
+//     throw new Error('未找到配置文件');
+//   }
+//   const fileBin = fs.readFileSync(
+//     path.resolve(configPath.dir, `./manga_request_${TaskConfig.USERID}`),
+//   );
+//   // 分割请求体
+//   const bodyIndex = fileBin.indexOf('RDIO');
+//   if (bodyIndex !== -1) {
+//     return fileBin.subarray(bodyIndex);
+//   }
+//   if (fileBin.indexOf('POST') === 0) {
+//     return gunzipSync(fileBin.subarray(fileBin.indexOf(Buffer.from([0, 0, 0, 0, 0, 0])) - 3));
+//   }
+//   // 解压 gzip
+//   return gunzipSync(fileBin);
+// }
+
+// export function createDataFlowByFile(mangaId: string, mangaNum: string) {
+//   const base = getConfigMangaRequest();
+//   // 替换漫画 id
+//   const sub1 = base.subarray(0, base.indexOf('manga_id') + 10);
+//   const sub2 = base.subarray(base.indexOf('flutter') - 4, base.indexOf('manga_num') + 11);
+//   const sub3 = base.subarray(base.indexOf(Buffer.from([112, 1, 120])));
+//   // 防止长度发生变法
+//   setNewLength(sub1, mangaId, 8);
+//   setNewLength(sub2, mangaNum, 9);
+//   const newBuffer = Buffer.concat([sub1, Buffer.from(mangaId), sub2, Buffer.from(mangaNum), sub3]);
+//   if (newBuffer.length === base.length) {
+//     return newBuffer;
+//   }
+//   logger.verbose(`对阅读请求体进行了修改`);
+//   // 防止长度出现了变化
+//   const bitsNum = newBuffer[7];
+//   const newBitsNum = bitsNum + newBuffer.length - base.length;
+//   newBuffer[7] = newBitsNum;
+//   newBuffer[8] = getHeaderNum(2147483904 + newBitsNum);
+//   return newBuffer;
+// }
+
+// async function readMangaDefault(time30 = 30) {
+//   logger.debug('尝试直接发送配置好的阅读请求');
+//   const buffer = getConfigMangaRequest();
+//   for (let count = 0; count <= time30 * 2; count++) {
+//     await mangaApi.sendRealtime(buffer);
+//     await apiDelay(1000);
+//   }
+//   const taskInfo = await getTaskInfo();
+//   if (isBoolean(taskInfo)) {
+//     return taskInfo;
+//   }
+//   if (taskInfo.time30 > 0) {
+//     logger.warn(`垃圾程序，怎么回事，基本的阅读都没有完成？`);
+//     return false;
+//   }
+//   return false;
+// }
