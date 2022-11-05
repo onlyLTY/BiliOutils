@@ -125,7 +125,6 @@ const theConfig = {
     mc: [],
     name: [],
     love: true,
-    readSign: [],
   },
   exchangeCoupon: {
     num: 1,

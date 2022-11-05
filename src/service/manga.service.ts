@@ -7,7 +7,7 @@ import { apiDelay, getPRCDate, isBoolean, logger } from '@/utils';
 import { request } from '@/utils/request';
 import { readJsonFile } from '@/utils/file';
 import { getHeaderNum } from '@/utils/neuron';
-import { toProtobufNumber } from '@/utils/http/protobuf';
+import { toVarint } from '@/utils/http/protobuf';
 
 let expireCouponNum: number;
 
@@ -415,9 +415,9 @@ function createDateFlowByPart(mangaId: string, mangaNum: string) {
   arr[configIndex.calc] = getHeaderNum(2147483904 + bitsLen);
 
   const now = new Date().getTime();
-  arr[configIndex.ctime] = toProtobufNumber((now - 1000).toString());
-  arr[configIndex.sn_gen_time] = toProtobufNumber((now - 4000).toString());
-  arr[configIndex.upload_time] = toProtobufNumber(now.toString());
+  arr[configIndex.ctime] = toVarint(now - 1000);
+  arr[configIndex.sn_gen_time] = toVarint(now - 4000);
+  arr[configIndex.upload_time] = toVarint(now);
 
   return Buffer.from(arr.flat() as number[]);
 }

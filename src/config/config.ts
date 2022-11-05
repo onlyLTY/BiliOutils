@@ -270,8 +270,6 @@ export const defaultConfig = {
     name: [] as string[],
     // 购买追漫（优先级低）
     love: true,
-    // 长度 18
-    readSign: [] as number[],
   },
   exchangeCoupon: {
     // 兑换漫读券数量
@@ -419,36 +417,5 @@ function beforeMergeConfig(config: RecursivePartial<DefaultConfig>) {
     }
   }
 
-  // 处理 manga
-  const { manga } = config;
-  if (manga) {
-    handleReadSign(manga);
-  }
-
   return config;
-}
-
-function handleReadSign(manga: RecursivePartial<DefaultConfig['manga']>) {
-  if (!manga.readSign?.length) {
-    return;
-  }
-  // 如果是一个字符串
-  if (isString(manga.readSign)) {
-    const words = manga.readSign.split('');
-    manga.readSign = [];
-    words.forEach((word, index) => {
-      if (index % 2 === 1) {
-        manga.readSign!.push(+`0x${words[index - 1]}${word}`);
-      }
-    });
-    return;
-  }
-  // 如果是 0x 开头或者只有两位的字符串数组
-  if (
-    manga.readSign.join().includes('0x') ||
-    (manga.readSign[0] as unknown as string)?.length === 2
-  ) {
-    manga.readSign = (manga.readSign as (number | string)[]).map(el => parseInt(el.toString(), 16));
-    return;
-  }
 }
