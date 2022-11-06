@@ -1,4 +1,4 @@
-import type { Config, ConfigArray, MultiConfig } from '@/types';
+import type { UserConfig, ConfigArray, MultiConfig } from '@/types';
 import * as path from 'path';
 import { defLogger as logger } from '@/utils/log/def';
 import { gzipDecode } from '@/utils/gzip';
@@ -43,8 +43,8 @@ function getEnvConfig() {
 /**
  * 处理多用户配置
  */
-function handleMultiUserConfig(config: MultiConfig | Config[]) {
-  let newConfig: Config[];
+function handleMultiUserConfig(config: MultiConfig | UserConfig[]) {
+  let newConfig: UserConfig[];
   const isArrayConf = isArray(config);
   if (isArrayConf) {
     newConfig = config.filter(Boolean);
@@ -94,7 +94,8 @@ function setConfig() {
   }
   for (let index = 0; index < configPathArr.length; index++) {
     let filepath = configPathArr[index];
-    const config = readJsonFile<Config>(filepath) || readJsonFile<Config>((filepath += '5'));
+    const config =
+      readJsonFile<UserConfig>(filepath) || readJsonFile<UserConfig>((filepath += '5'));
     if (config) {
       logger.debug(`读取配置文件 ${filepath}`);
       process.env.__BT_CONFIG_PATH__ = filepath;
@@ -104,7 +105,7 @@ function setConfig() {
   return getEnvConfig();
 }
 
-export function getConfig<T extends boolean>(more?: T): T extends false ? Config : ConfigArray {
+export function getConfig<T extends boolean>(more?: T): T extends false ? UserConfig : ConfigArray {
   const config = checkConfig(setConfig(), more);
   if (isArray(config) && config.length === 0) {
     logger.error('配置文件为空，或配置的cookie缺少三要素（bili_jct, SESSDATA, DedeUserID）！');
@@ -141,7 +142,7 @@ export function checkConfig(config: any, more = false) {
  * 判断 config 是否是多用户配置
  * @param config
  */
-function isMultiUserConfig(config: MultiConfig | Config[]) {
+function isMultiUserConfig(config: MultiConfig | UserConfig[]) {
   if (Array.isArray(config)) {
     return true;
   }
@@ -153,8 +154,8 @@ function isMultiUserConfig(config: MultiConfig | Config[]) {
  * 处理无效的多用户配置
  * @param config
  */
-function mapMultiUserConfig(config: MultiConfig | Config[]) {
-  const map = (conf: Config) => (isBiliCookie(conf.cookie) ? conf : undefined);
+function mapMultiUserConfig(config: MultiConfig | UserConfig[]) {
+  const map = (conf: UserConfig) => (isBiliCookie(conf.cookie) ? conf : undefined);
   if (Array.isArray(config)) {
     return config.map(map);
   }

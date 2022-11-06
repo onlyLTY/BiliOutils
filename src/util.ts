@@ -1,4 +1,4 @@
-import type { Config, ConfigArray } from './types';
+import type { UserConfig, ConfigArray } from './types';
 import { resolve } from 'path';
 import { fork } from 'child_process';
 import * as path from 'path';
@@ -46,7 +46,12 @@ export function getConfigByItem(configs: ConfigArray, item: string) {
     .filter(Boolean);
 }
 
-export function runForkSync(config: Config, index: number, forkPath = './bin/fork', tasks = '') {
+export function runForkSync(
+  config: UserConfig,
+  index: number,
+  forkPath = './bin/fork',
+  tasks = '',
+) {
   return new Promise((resolve, reject) => {
     const child = fork(path.resolve(__dirname, forkPath), [], {
       env: {

@@ -1,5 +1,10 @@
 import type { LevelType } from '@/types/log';
-import type { ActivityLotteryIdType, CouponBalanceUseType, SessionHandleType } from '@/types';
+import type {
+  ActivityLotteryIdType,
+  CouponBalanceUseType,
+  SessionHandleType,
+  UserConfig,
+} from '@/types';
 import {
   DAILY_RUN_TIME,
   LOTTERY_EXCLUDE,
@@ -314,7 +319,7 @@ export function getDefaultConfig() {
   return cloneObject(defaultConfig, true);
 }
 
-export function mergeConfig(config: RecursivePartial<DefaultConfig>) {
+export function mergeConfig(config: UserConfig) {
   return configValueHandle(
     oldConfigHandle(deepMergeObject(getDefaultConfig(), beforeMergeConfig(config))),
   );
@@ -393,7 +398,7 @@ export function setCookieValue(config: TheConfig, cookie: string) {
  * 合并前处理用户配置
  * @param config
  */
-function beforeMergeConfig(config: RecursivePartial<DefaultConfig>) {
+function beforeMergeConfig(config: UserConfig) {
   // 需要注意用户配置可能没有定义各种配置项
   const { message } = config;
   if (message && isString(message.api)) {
