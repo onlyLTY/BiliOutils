@@ -1,4 +1,5 @@
 import { defaultConfig, getDefaultConfig, mergeConfig } from '@/config/config';
+import { mergeCommon } from '@/config/setConfig';
 
 const cookie = `PVID=2; b_lsid=DC1063E54_17E335AC2B4; innersign=1; buvid3=3EC0C0B1-BE9D-A31D-634B-DE9FEBBE438293482infoc; i-wanna-go-back=-1; b_ut=5; _uuid=5CDSADAE8-E10BF-15D4-3549-643624494A3294315infoc; buvid_fp=9D06706F-BDAF-47DB-83C2-B80304C60D9ASDJH623infoc; sid=80t40970; fingerprint=9bf21321335233b0d958e26edff5c6; buvid_fp_plain=9D06706F-BDAF-47DB-83C2-B80304C60D9C167623infoc; SESSDATA=8fd23sdasdb3912312552%asdsa%2C236f1%2A11; bili_jct=asjdklha17238213b213gc213; DedeUserID=11111111; DedeUserID__ckMd5=sjakdjashdjsagdjsdsd; bp_video_offset_415244372=29738123716235135; CURRENT_FNVAL=2000; blackside_state=0; CURRENT_BLACKGAP=0; rpdid=0zbfAHYASDASDSDM|X9|3w1N5JkB`;
 
@@ -221,5 +222,55 @@ describe('config 配置测试', () => {
 
   test('最终结果符合预期？', () => {
     expect(newConfig).toEqual(theConfig);
+  });
+
+  test('mergeCommon 测试', () => {
+    expect(mergeCommon([{ cookie: '1231' }, { cookie: '' }])).toEqual([
+      { cookie: '1231' },
+      { cookie: '' },
+    ]);
+
+    expect(
+      mergeCommon([
+        { cookie: '1231' },
+        {
+          __common__: false,
+        },
+        { cookie: '' },
+      ]),
+    ).toEqual([{ cookie: '1231' }, { cookie: '' }]);
+
+    expect(
+      mergeCommon([
+        {
+          cookie: '1231',
+          message: {
+            pushplusToken: '5555555555',
+          },
+        },
+        { cookie: '', manga: { buy: true } },
+        {
+          __common__: true,
+          cookie: '__common__',
+          message: {
+            pushplusToken: '123',
+          },
+        },
+      ]),
+    ).toEqual([
+      {
+        cookie: '1231',
+        message: {
+          pushplusToken: '5555555555',
+        },
+      },
+      {
+        cookie: '',
+        manga: { buy: true },
+        message: {
+          pushplusToken: '123',
+        },
+      },
+    ]);
   });
 });

@@ -1,4 +1,4 @@
-import type { UserConfig, ConfigArray, MultiConfig } from '@/types';
+import type { UserConfig, ConfigArray, MultiConfig, CommonConfig } from '@/types';
 import * as path from 'path';
 import { defLogger as logger } from '@/utils/log/def';
 import { gzipDecode } from '@/utils/gzip';
@@ -7,6 +7,7 @@ import { readJsonFile } from '@/utils/file';
 import { JSON5 } from '@/utils/json5';
 import { isArray } from '@/utils/is';
 import { isBiliCookie } from '@/utils/cookie';
+import { deepSetObject } from '@/utils/pure';
 
 const resolveCWD = (str: string) => path.resolve(process.cwd(), str);
 const resolveDir = (str: string) => path.resolve(__dirname, '../', str);
@@ -154,11 +155,30 @@ function isMultiUserConfig(config: MultiConfig | UserConfig[]) {
  * 处理无效的多用户配置
  * @param config
  */
-function mapMultiUserConfig(config: MultiConfig | UserConfig[]) {
+function mapMultiUserConfig(config: ConfigArray | MultiConfig) {
   const map = (conf: UserConfig) => (isBiliCookie(conf.cookie) ? conf : undefined);
   if (Array.isArray(config)) {
-    return config.map(map);
+    return mergeCommon(config).map(map);
   }
   // [兼容]
-  return config.account.map(map);
+  return mergeCommon(config.account).map(map);
+}
+
+/**
+ * 合并公共配置
+ */
+export function mergeCommon(config: (UserConfig | CommonConfig | undefined)[]): ConfigArray {
+  const commonIndex = config.findIndex(conf => conf && Reflect.has(conf, '__common__'));
+  if (commonIndex === -1) return config as ConfigArray;
+  const commonConfig = config.splice(commonIndex, 1)[0];
+  if (!commonConfig || !Reflect.get(commonConfig, '__common__')) return config as ConfigArray;
+
+  // clear commonConfig
+  Reflect.deleteProperty(commonConfig, '__common__');
+  Reflect.deleteProperty(commonConfig, 'cookie');
+  Reflect.deleteProperty(commonConfig, 'accessKey');
+
+  config.forEach(conf => conf && deepSetObject(conf, commonConfig));
+  console.log(config);
+  return config as ConfigArray;
 }

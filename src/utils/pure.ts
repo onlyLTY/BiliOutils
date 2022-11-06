@@ -295,6 +295,32 @@ export function deepMergeObject<T = unknown>(target: T, source: any): T {
 }
 
 /**
+ * 为对象设置属性，将 source 中的属性设置到 target 中，如果 target 中已经存在，则不设置（且深度合并）
+ * @param target
+ * @param source
+ */
+export function deepSetObject<T = unknown>(target: T, source: any): T {
+  // 忽略 undefined
+  if (target === undefined || source === undefined) {
+    return (target || source) as T;
+  }
+  if (!isObject(target) || !isObject(source)) {
+    return source as T;
+  }
+  if (Array.isArray(target) && Array.isArray(source)) {
+    return target.concat(source) as unknown as T;
+  }
+  return Object.keys(source).reduce((result, key) => {
+    if (result[key] === undefined) {
+      result[key] = source[key];
+    } else if (isObject(result[key]) && isObject(source[key])) {
+      result[key] = deepSetObject(result[key], source[key]);
+    }
+    return result;
+  }, target);
+}
+
+/**
  *  stringify
  * @param entries
  */
