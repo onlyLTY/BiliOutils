@@ -392,6 +392,7 @@ async function getTaskInfo() {
       task15minProgress = task15min.progress;
 
     if (task30minProgress === 30 && task15minProgress === 15) {
+      logger.info('每日阅读任务已完成');
       return true;
     }
 
@@ -434,6 +435,7 @@ export async function readMangaService() {
   if (!TaskConfig.manga.read) {
     return;
   }
+  logger.debug('开始每日阅读');
   try {
     const taskInfo = await getTaskInfo();
     if (isBoolean(taskInfo)) {
@@ -446,9 +448,7 @@ export async function readMangaService() {
     }
     const { createDataFlow } = await (await import('@/wasm/manga')).wasmInit();
     const buffer = createDataFlow(comicId + '', eplist[0].id + '', TaskConfig.USERID + '');
-    (await readManga(Buffer.from(buffer), time))
-      ? logger.info('每日漫画阅读任务完成')
-      : logger.warn('每日漫画阅读未完成×_×');
+    (await readManga(Buffer.from(buffer), time)) || logger.warn('每日漫画阅读未完成×_×');
   } catch (error) {
     logger.error(`每日漫画阅读任务出错`);
     logger.error(error);
