@@ -220,6 +220,7 @@ async function customApi(title: string, text: string) {
       timeout,
       headers,
       url: '',
+      data: null,
     };
     options.url = apiTemplate.url
       .replace('{title}', encodeURIComponent(title))
@@ -237,17 +238,11 @@ async function customApi(title: string, text: string) {
       Object.assign(options, { httpsAgent });
     }
     // 处理data
-    const keys = Object.keys(data);
-    if (keys.length) {
-      keys.forEach(key => {
-        if (data[key] === '{text}') {
-          data[key] = text;
-        }
-        if (data[key] === '{title}') {
-          data[key] = title;
-        }
-      });
-      Object.assign(options, { data });
+    if (Object.keys(data).length) {
+      const str = JSON.stringify(data)
+        .replace(/{title}/g, title)
+        .replace(/{text}/g, text);
+      options.data = JSON.parse(str);
     }
     await defHttp.request(options);
     logger.info(`自定义接口消息已发送！`);
