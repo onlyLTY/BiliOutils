@@ -20,6 +20,7 @@ export const biliTaskArray = [
   ['batchUnfollow', () => import('./batchUnfollow')],
   ['liveLottery', () => import('./liveLottery')],
   ['liveRedPack', () => import('./liveRedPack')],
+  ['dailyBattery', () => import('./dailyBattery')],
   ['activityLottery', () => import('./activityLottery')],
   ['liveFamine', () => import('./liveFamine')],
   ['judgement', () => import('./judgement')],

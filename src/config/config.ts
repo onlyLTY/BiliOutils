@@ -91,6 +91,8 @@ export const defaultConfig = {
     judgement: false,
     // 转盘抽奖
     activityLottery: false,
+    // 每日电池
+    dailyBattery: false,
   },
   log: {
     pushLevel: 'verbose' as LevelType | boolean,

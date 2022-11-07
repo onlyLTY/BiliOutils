@@ -179,6 +179,5 @@ export function mergeCommon(config: (UserConfig | CommonConfig | undefined)[]): 
   Reflect.deleteProperty(commonConfig, 'accessKey');
 
   config.forEach(conf => conf && deepSetObject(conf, commonConfig));
-  console.log(config);
   return config as ConfigArray;
 }

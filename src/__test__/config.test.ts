@@ -65,6 +65,7 @@ const theConfig = {
     batchUnfollow: false,
     activityLottery: false,
     useCouponBp: false,
+    dailyBattery: false,
   },
   apiDelay: [2, 6],
   userAgent: '',
