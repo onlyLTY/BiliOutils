@@ -241,7 +241,9 @@ async function customApi(title: string, text: string) {
     if (Object.keys(data).length) {
       const str = JSON.stringify(data)
         .replace(/{title}/g, title)
-        .replace(/{text}/g, text);
+        .replace(/{text}/g, text)
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r');
       options.data = JSON.parse(str);
     }
     await defHttp.request(options);
