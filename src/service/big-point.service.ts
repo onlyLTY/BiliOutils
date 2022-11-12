@@ -69,7 +69,7 @@ export async function bigPointService() {
   const cfgIsRetry = TaskConfig.bigPoint.isRetry;
   if (cfgIsRetry) {
     isRetry = true;
-    await apiDelay(isBoolean(cfgIsRetry) ? 5000 : cfgIsRetry * 1000);
+    await apiDelay(isBoolean(cfgIsRetry) ? 20000 : cfgIsRetry * 1000);
     await bigPointTask(taskStatus);
   }
   return await printPoint();

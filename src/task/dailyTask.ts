@@ -1,3 +1,5 @@
+import noLoginTask from './noLoginTask';
+
 export async function dailyTasks<T = unknown>(
   cb?: (...arg: T[]) => Promise<unknown>,
   ...cbArg: T[]
@@ -14,6 +16,7 @@ export async function dailyTasks<T = unknown>(
     await loginTask();
   } catch (error) {
     logger.error(`登录失败:`, error);
+    await noLoginTask();
     await Logger.push('【登录失败】');
     return '未完成';
   }

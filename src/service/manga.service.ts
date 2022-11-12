@@ -431,7 +431,7 @@ async function readManga(buffer: Buffer, needTime: number) {
 /**
  * 每日漫画阅读
  */
-export async function readMangaService() {
+export async function readMangaService(isNoLogin?: boolean) {
   if (!TaskConfig.manga.read) {
     return;
   }
@@ -448,9 +448,15 @@ export async function readMangaService() {
     }
     const { createDataFlow } = await (await import('@/wasm/manga')).wasmInit();
     const buffer = createDataFlow(comicId + '', eplist[0].id + '', TaskConfig.USERID + '');
-    (await readManga(Buffer.from(buffer), time)) || logger.warn('每日漫画阅读未完成×_×');
+    const result = await readManga(Buffer.from(buffer), time);
+    if (isNoLogin) {
+      logger.info('非登录状态，不判断阅读结果');
+      return;
+    }
+    if (!result) {
+      logger.warn('每日漫画阅读未完成×_×');
+    }
   } catch (error) {
-    logger.error(`每日漫画阅读任务出错`);
-    logger.error(error);
+    logger.error(`每日漫画阅读任务异常`, error);
   }
 }
