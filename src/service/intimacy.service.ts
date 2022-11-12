@@ -24,6 +24,9 @@ const liveLogger = new Logger(
 );
 // 发送弹幕失败的直播间
 const sendMessageFailList = new Map<number, FansMedalDto>();
+// 重试次数
+let retryCount = 0,
+  retryRoom = 0;
 
 export async function getFansMealList() {
   let totalNumber = 99,
@@ -136,6 +139,10 @@ async function liveMobileHeart(
     countRef.value++;
     liveLogger.info(`直播心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
   } catch (error) {
+    if (error.message.includes('Timeout awaiting')) {
+      liveLogger.debug(error.message);
+      return;
+    }
     liveLogger.error(error);
     logger.error(`直播间心跳异常 ${error.message}`);
   }
@@ -239,16 +246,20 @@ async function liveHeartPromise(resolve: (value: unknown) => void, roomList: Fan
       countRef,
       needTime.value,
     );
-    if (countRef.value < needTime.value) {
-      return;
-    }
-    if (needTime.increase && sendMessageFailList.has(room_info.room_id)) {
+    const timeDiff = needTime.value - countRef.value;
+    if (timeDiff <= 2 && needTime.increase && sendMessageFailList.has(room_info.room_id)) {
       needTime.value += 5;
+      retryRoom = room_info.room_id;
       sendMessageFailList.delete(room_info.room_id);
       return;
     }
+    if (timeDiff <= 0) return;
     timerRef && timerRef.value && clearInterval(timerRef.value);
-    await retryLiveHeartOnce();
+    if (retryRoom === room_info.room_id) {
+      await retryLiveHeartOnce();
+    } else if (retryRoom === 0) {
+      await retryLiveHeart();
+    }
   }
 }
 
@@ -327,6 +338,10 @@ async function retryLiveHeart() {
   if (!TaskConfig.intimacy.isRetryHeart) {
     return;
   }
+  if (retryCount > 1) {
+    return;
+  }
+  retryCount++;
   liveLogger.debug('尝试检查直播心跳');
   await liveIntimacyService();
 }

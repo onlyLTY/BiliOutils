@@ -341,7 +341,12 @@ export async function exchangeCouponService() {
     logger.info('可兑换的漫读券数量不足 1，跳过任务');
     return;
   }
+  // 循环等待，到 12 点才开始兑换
+  while (new Date().getHours() !== 12) {
+    await apiDelay(10);
+  }
   let isRepeat: boolean | undefined = true;
+  // 尝试兑换
   while (isRepeat) {
     isRepeat = await exchangeCoupon(num);
     // 等待 2s 再次尝试

@@ -1,7 +1,5 @@
 const timerMap = new Map();
 
-process.stdout.write('请尽快主动手动更新程序，以免出现意外情况。\n');
-
 // @ts-ignore
 global.setInterval = function (fn, t) {
   let timer;
