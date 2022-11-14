@@ -6,30 +6,9 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/catlair/bilitools)](https://hub.docker.com/repository/docker/catlair/bilitools)
 [![GitHub release (latest by date)](https://img.shields.io/github/downloads/KudouRan/BiliTools/total)](https://github.com/KudouRan/BiliTools/releases/latest)
 
-## 支持功能
-
-- [x] 部分方式每日随机时间运行
-- [x] 每日签到/分享/播放
-- [x] 直播签到
-- [x] 漫画签到/自动使用漫读券（测试）
-- [x] 每日自动投币（指定数量）
-- [x] 银瓜子兑换硬币
-- [x] 应援团签到
-- [x] 硬币赛事竞猜（不保证胜率，支持正压、反压和随机压）
-- [x] 直播间弹幕（每日首次获得 100 亲密度，自动点亮灰色勋章）
-- [x] 领取年度大会员权益：b 币券，漫读券（更新为每日检测）
-- [x] 自动使用 B 币券充电
-- [x] 直播赠送即将过期的礼物（为确保安全，只赠送辣条和小心心）
-- [x] 多账号独立配置
-- [x] 直播天选时刻（测试）
-- [x] 直播礼物红包（停止）
-- [x] 粉丝勋章/亲密度
-- [x] 支持 Docker 、腾讯 SCF 、阿里 FC、百度 CFC、华为 FG、青龙面板等方式运行，支持执行自定义消息推送
-- [ ] 等等
-
 ## 使用方法
 
-以上内容以文档为准
+支持功能和使用方法请查看文档：
 
 **[详细文档查看](https://btdocs.vercel.app/)**
 
@@ -141,3 +120,8 @@ yarn build
 - [lzghzr/TampermonkeyJS](https://github.com/lzghzr/TampermonkeyJS)
 - [whyour/qinglong](https://github.com/whyour/qinglong)
 - [RayWangQvQ/BiliBiliToolPro](https://github.com/RayWangQvQ/BiliBiliToolPro)
+
+## 相关链接
+
+- [@catlair/bilicomic-dataflow](https://www.npmjs.com/package/@catlair/bilicomic-dataflow)：哔哩哔哩漫画阅读数据流生成器
+- [@catlair/node-got](https://www.npmjs.com/package/@catlair/node-got)：got 的简单封装

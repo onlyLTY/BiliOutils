@@ -13,7 +13,6 @@ import {
 import { apiDelay, ENV, formatCron, getPRCDate, getRandomItem, Logger, logger } from '@/utils';
 import { JuryVote, JuryVoteResult, VoteResCode } from '@/enums/jury.emum';
 import { getRequestNameWrapper } from '@/utils/request';
-import { JSON5 } from '@/utils/json5';
 
 const juryLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'jury');
 const request = getRequestNameWrapper({ logger: juryLogger });
@@ -183,7 +182,6 @@ export async function runJury(err = 3) {
  * 临时DEBUG
  */
 export async function debugInfo() {
-  logger.verbose(`\n[debug] ${JSON5.stringify(Count, null, 2)}`);
   const vote = Count.def + Count.opinion;
   if (vote !== Count.confirm) {
     logger.warn(

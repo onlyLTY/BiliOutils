@@ -8,8 +8,8 @@ declare module 'axios' {
   }
 }
 
-declare module 'got' {
-  export interface NormalizedOptions {
-    requestOptions?: RequestOptions;
+declare module '@catlair/node-got' {
+  export interface RequestOptions {
+    withBiliCookie?: boolean;
   }
 }

@@ -1,9 +1,10 @@
-import type { Eplist, SeasonInfoDto } from '@/dto/manga.dto';
+import type { Eplist, SearchMangaDto, SeasonInfoDto } from '@/dto/manga.dto';
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
 import { apiDelay, getPRCDate, isBoolean, logger } from '@/utils';
 import { request } from '@/utils/request';
+import { create_read_dataflow } from '@catlair/bilicomic-dataflow';
 
 let expireCouponNum: number;
 
@@ -59,9 +60,12 @@ async function getMangaEpList(comic_id: number) {
     if (!data || !data.ep_list) {
       return;
     }
-    const { disable_coupon_amount, ep_list } = data;
+    const { disable_coupon_amount, ep_list, title } = data;
     // 去掉没有漫读券的章节
-    return disable_coupon_amount ? ep_list.slice(disable_coupon_amount) : ep_list;
+    return {
+      title,
+      ep_list: disable_coupon_amount ? ep_list.slice(disable_coupon_amount) : ep_list,
+    };
   } catch (error) {
     logger.error(`获取漫画详情异常: ${error}`);
   }
@@ -113,15 +117,16 @@ async function buyOneEpManga(ep_id: number) {
     }
     const { code, msg } = await mangaApi.buyManga(ep_id, couponId);
     if (code !== 0) {
-      logger.error(`购买漫画失败：${code} ${msg}`);
-      return;
+      logger.error(`购买漫画 ${ep_id} 失败：${code} ${msg}`);
+      return false;
     }
     // 购买成功，则减少漫读券数量
     expireCouponNum--;
-    logger.info(`购买漫画成功`);
+    logger.debug(`购买漫画 ${ep_id} 成功`);
   } catch (error) {
     logger.error(`购买漫画异常: ${error}`);
   }
+  return false;
 }
 
 /**
@@ -143,10 +148,12 @@ async function searchManga(keyword: string) {
  * 购买漫画
  */
 async function buyManga(comic_id: number) {
-  const epList = filterLocked(await getMangaEpList(comic_id));
+  const { title, ep_list } = (await getMangaEpList(comic_id)) || {};
+  const epList = filterLocked(ep_list);
   if (epList.length === 0) {
     return false;
   }
+  logger.info(`购买漫画（${comic_id}）：${title}`);
   for (let index = 0; index < epList.length; index++) {
     await apiDelay(100);
     if (await buyOneEpManga(epList[index].id)) return true;
@@ -166,7 +173,7 @@ async function buyMangaByMc() {
     return;
   }
   for (let index = 0; index < mc.length; index++) {
-    if (expireCouponNum <= 0) return;
+    if (expireCouponNum <= 0) return true;
     const mcId = mc[index];
     await buyManga(mcId);
   }
@@ -180,17 +187,37 @@ async function buyMangaByName() {
   if (name.length === 0) {
     return;
   }
+
+  type SearchList = {
+    keyword: string;
+    mangas: SearchMangaDto['data']['list'];
+  };
+
+  const searchList: SearchList[] = [];
   for (let index = 0; index < name.length; index++) {
-    if (expireCouponNum <= 0) return;
+    if (expireCouponNum <= 0) return true;
     const keyword = name[index];
     const mangas = await searchManga(keyword);
     if (!mangas || mangas.list.length === 0) {
       continue;
     }
-    const manga = mangas.list.find(mange => mange.title === keyword);
+    // 先找完全匹配的
+    const manga = mangas.list.find(manga => manga.title === keyword);
     if (!manga) {
+      searchList.push({
+        keyword,
+        mangas: mangas.list,
+      });
       continue;
     }
+    await buyManga(manga.id);
+  }
+
+  // 模糊匹配 searchList
+  for (const { mangas, keyword } of searchList) {
+    if (expireCouponNum <= 0) return true;
+    const manga = mangas.find(manga => manga.title?.includes(keyword));
+    if (!manga) continue;
     await buyManga(manga.id);
   }
 }
@@ -208,7 +235,7 @@ async function buyMangaByLove() {
     return;
   }
   for (let index = 0; index < favoriteList.length; index++) {
-    if (expireCouponNum <= 0) return;
+    if (expireCouponNum <= 0) return true;
     const favorite = favoriteList[index];
     await buyManga(favorite.comic_id);
   }
@@ -217,20 +244,19 @@ async function buyMangaByLove() {
 export async function buyMangaService() {
   const { buy } = TaskConfig.manga;
   if (!buy) {
-    return;
+    return false;
   }
   expireCouponNum = (await getExpireCouponNum()) as number;
-  if (!expireCouponNum) {
-    return;
-  }
-  if (expireCouponNum < 1) {
+  if (!expireCouponNum || expireCouponNum <= 0) {
     logger.info('没有即将过期的漫读券，跳过任务');
-    return;
+    return false;
   }
-  logger.info('开始购买漫画');
-  await buyMangaByMc();
-  await buyMangaByName();
-  await buyMangaByLove();
+  // 依次购买
+  for (const buy of [buyMangaByMc, buyMangaByName, buyMangaByLove]) {
+    logger.debug(`开始购买漫画：${buy.name}`);
+    if (await buy()) return true;
+  }
+  return false;
 }
 
 export async function mangaSign() {
@@ -447,12 +473,16 @@ export async function readMangaService(isNoLogin?: boolean) {
       return taskInfo;
     }
     const { comicId, time } = taskInfo;
-    const eplist = await getMangaEpList(comicId);
-    if (!eplist) {
+    const { ep_list } = (await getMangaEpList(comicId)) || {};
+    if (!ep_list) {
       return;
     }
-    const { createDataFlow } = await (await import('@/wasm/manga')).wasmInit();
-    const buffer = createDataFlow(comicId + '', eplist[0].id + '', TaskConfig.USERID + '');
+    const buffer = create_read_dataflow(
+      comicId + '',
+      ep_list[0].id + '',
+      TaskConfig.USERID + '',
+      BigInt(new Date().getTime()),
+    );
     const result = await readManga(Buffer.from(buffer), time);
     if (isNoLogin) {
       logger.info('非登录状态，不判断阅读结果');

@@ -12,6 +12,10 @@ async function getTaskStatus() {
       logger.warn(`获取任务进度失败：${code}-${message}`);
       return -1;
     }
+    if (data.is_surplus === -1 || data.target === 0) {
+      logger.info('账号无法完成该任务，故跳过');
+      return -2;
+    }
     const { status, progress } = data;
     if (status === 0 || status === 1) {
       logger.debug(`任务进度：${progress}`);
@@ -48,6 +52,9 @@ async function receiveTaskReward() {
 async function dailyBattery() {
   const status = await getTaskStatus();
   switch (status) {
+    case -2: {
+      return true;
+    }
     case -1: {
       return false;
     }
