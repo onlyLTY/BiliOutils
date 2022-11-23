@@ -20,17 +20,16 @@ export const biliTaskArray = [
   ['batchUnfollow', () => import('./batchUnfollow')],
   ['liveLottery', () => import('./liveLottery')],
   ['liveRedPack', () => import('./liveRedPack')],
+  ['dailyBattery', () => import('./dailyBattery')],
   ['activityLottery', () => import('./activityLottery')],
   ['liveFamine', () => import('./liveFamine')],
   ['judgement', () => import('./judgement')],
 ] as const;
 
 export type BiliTaskName = typeof biliTaskArray[number][0];
-export type TaskFunc = () => Promise<{ default: () => Promise<any> }>
+export type TaskFunc = () => Promise<{ default: () => Promise<any> }>;
 
-export const biliTasks = new Map<string, TaskFunc>(
-  biliTaskArray,
-);
+export const biliTasks = new Map<string, TaskFunc>(biliTaskArray);
 
 export default biliTasks;
 
@@ -42,7 +41,9 @@ export async function getBiliTask(funcName: BiliTaskName) {
   return (await biliTask()).default;
 }
 
-export async function getBiliTasks<T extends BiliTaskName>(funcNames: T[]): Promise<Record<T, TaskFunc>> {
+export async function getBiliTasks<T extends BiliTaskName>(
+  funcNames: T[],
+): Promise<Record<T, TaskFunc>> {
   const tasks: Record<BiliTaskName, TaskFunc> = {} as any;
   for (const funcName of funcNames) {
     const biliTask = biliTasks.get(funcName);
@@ -73,7 +74,6 @@ export function getInputBiliTask(taskNameStr: string) {
 export async function runInputBiliTask(taskNameStr: string) {
   const { logger, Logger, clearLogs } = await import('../utils/log');
   await Logger.init();
-  clearLogs();
   logger.info(`开始执行自定义任务！`);
   const taskArr = getInputBiliTask(taskNameStr);
   for await (const task of taskArr) {
@@ -88,4 +88,5 @@ export async function runInputBiliTask(taskNameStr: string) {
   } else {
     await Logger.push('自定义任务完成');
   }
+  clearLogs();
 }

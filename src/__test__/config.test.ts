@@ -1,4 +1,5 @@
-import { defaultConfig, getDefaultConfig, mergeConfig } from '../config/config';
+import { defaultConfig, getDefaultConfig, mergeConfig } from '@/config/config';
+import { mergeCommon } from '@/config/setConfig';
 
 const cookie = `PVID=2; b_lsid=DC1063E54_17E335AC2B4; innersign=1; buvid3=3EC0C0B1-BE9D-A31D-634B-DE9FEBBE438293482infoc; i-wanna-go-back=-1; b_ut=5; _uuid=5CDSADAE8-E10BF-15D4-3549-643624494A3294315infoc; buvid_fp=9D06706F-BDAF-47DB-83C2-B80304C60D9ASDJH623infoc; sid=80t40970; fingerprint=9bf21321335233b0d958e26edff5c6; buvid_fp_plain=9D06706F-BDAF-47DB-83C2-B80304C60D9C167623infoc; SESSDATA=8fd23sdasdb3912312552%asdsa%2C236f1%2A11; bili_jct=asjdklha17238213b213gc213; DedeUserID=11111111; DedeUserID__ckMd5=sjakdjashdjsagdjsdsd; bp_video_offset_415244372=29738123716235135; CURRENT_FNVAL=2000; blackside_state=0; CURRENT_BLACKGAP=0; rpdid=0zbfAHYASDASDSDM|X9|3w1N5JkB`;
 
@@ -64,6 +65,7 @@ const theConfig = {
     batchUnfollow: false,
     activityLottery: false,
     useCouponBp: false,
+    dailyBattery: false,
   },
   apiDelay: [2, 6],
   userAgent: '',
@@ -75,14 +77,18 @@ const theConfig = {
   },
   jury: {
     once: true,
+    opinion: true,
     opinionMin: 3,
+    notOpinion: [3],
     vote: [0, 0, 1],
     waitTime: 20,
-    insiders: 0.8,
+    insiderWeight: 0.8,
+    insiders: [0, 1],
+    anonymous: [0, 1],
     newTrigger: true,
   },
   log: {
-    pushLevel: 'debug',
+    pushLevel: 'verbose',
     consoleLevel: 'debug',
     fileLevel: 'debug',
     useEmoji: true,
@@ -117,11 +123,10 @@ const theConfig = {
   manga: {
     sign: true,
     buy: false,
+    read: false,
     mc: [],
     name: [],
     love: true,
-    buyInterval: 2,
-    buyWeek: [],
   },
   exchangeCoupon: {
     num: 1,
@@ -160,7 +165,7 @@ const theConfig = {
   },
   redPack: {
     source: 0,
-    uri: 'https://api.live.bilibili.com/xlive/fuxi-interface/AugRedPacket2022Controller/redPocketPlaying',
+    uri: '',
     intervalActive: 60,
     restTime: [-1, -1],
     linkRoomNum: 1,
@@ -193,7 +198,7 @@ const theConfig = {
   },
   bigPoint: {
     epids: [],
-    isRetry: true,
+    isRetry: 20,
     isWatch: true,
     watchDelay: 40,
   },
@@ -203,7 +208,7 @@ const theConfig = {
     delay: [1.8, 3.2],
     bangumi: false,
     follow: false,
-    proxyPrefix: '',
+    proxyPrefix: 'https://ghproxy.com/',
     customUrl: '',
   },
   charge: {},
@@ -218,5 +223,55 @@ describe('config 配置测试', () => {
 
   test('最终结果符合预期？', () => {
     expect(newConfig).toEqual(theConfig);
+  });
+
+  test('mergeCommon 测试', () => {
+    expect(mergeCommon([{ cookie: '1231' }, { cookie: '' }])).toEqual([
+      { cookie: '1231' },
+      { cookie: '' },
+    ]);
+
+    expect(
+      mergeCommon([
+        { cookie: '1231' },
+        {
+          __common__: false,
+        },
+        { cookie: '' },
+      ]),
+    ).toEqual([{ cookie: '1231' }, { cookie: '' }]);
+
+    expect(
+      mergeCommon([
+        {
+          cookie: '1231',
+          message: {
+            pushplusToken: '5555555555',
+          },
+        },
+        { cookie: '', manga: { buy: true } },
+        {
+          __common__: true,
+          cookie: '__common__',
+          message: {
+            pushplusToken: '123',
+          },
+        },
+      ]),
+    ).toEqual([
+      {
+        cookie: '1231',
+        message: {
+          pushplusToken: '5555555555',
+        },
+      },
+      {
+        cookie: '',
+        manga: { buy: true },
+        message: {
+          pushplusToken: '123',
+        },
+      },
+    ]);
   });
 });

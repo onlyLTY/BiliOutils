@@ -1,19 +1,17 @@
+import type { VGotOptions } from '@catlair/node-got';
 import { BiliCookieJar } from '@/config/globalVar';
-import type { VGotOptions } from '@/types/got';
+import { VGot } from '@catlair/node-got';
 import { CookieJar } from '../cookie';
-import { CookieJarType, VGot } from './Got';
 
 export class BiliGot extends VGot {
-  cookieJar: CookieJarType = undefined;
-
   constructor(options: VGotOptions) {
-    super(options);
     // 处理 cookie
-    const { withBiliCookie, withCredentials } = this.options.requestOptions || {};
+    const { withBiliCookie, withCredentials } = options.requestOptions || {};
     if (withBiliCookie) {
-      this.cookieJar = new BiliCookieJar();
+      options.cookieJar = new BiliCookieJar();
     } else if (withCredentials) {
-      this.cookieJar = new CookieJar();
+      options.cookieJar = new CookieJar();
     }
+    super(options);
   }
 }

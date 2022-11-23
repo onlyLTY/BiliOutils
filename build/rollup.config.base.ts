@@ -7,6 +7,8 @@ import nodeResolve from '@rollup/plugin-node-resolve';
 import sizes from 'rollup-plugin-sizes';
 import typescript from '@rollup/plugin-typescript';
 import replace from '@rollup/plugin-replace';
+import { wasm } from '@rollup/plugin-wasm';
+
 let pkgJson: Record<string, any>;
 try {
   pkgJson = require('../package.json');
@@ -22,6 +24,10 @@ export const plugins = ({ node, replaceValues = {}, noTerser }: BaseConfigOption
     }),
     typescript({
       module: 'ESNext',
+    }),
+    wasm({
+      maxFileSize: 50 * 1024,
+      targetEnv: 'node',
     }),
     replace({
       preventAssignment: true,

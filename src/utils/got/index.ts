@@ -1,16 +1,6 @@
-import type { VGotOptions } from '@/types/got';
-import { deepMergeObject } from '../pure';
-import { VGot } from './Got';
+import { createRequest } from '@catlair/node-got';
 import { getOptions } from './config';
 
-export function createRequest(opt: Partial<VGotOptions> = {}) {
-  const vgot = new VGot(deepMergeObject(getOptions(), opt));
-  vgot.init();
-  return vgot;
-}
+export { createRequest };
 
-export const defHttp = createRequest({
-  requestOptions: {
-    withBiliCookie: false,
-  },
-});
+export const defHttp = createRequest(getOptions());

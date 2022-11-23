@@ -8,14 +8,12 @@ on:
 
 jobs:
   release:
-    # if: github.repository == 'KudouRan/BiliTools'
     runs-on: ubuntu-latest
     environment: Build
     env:
       IS_TAG: ${{ startsWith(github.ref, 'refs/tags/v') }}
       IS_RC: ${{ contains(github.ref, '-rc') }}
       IS_PROD: ${{ startsWith(github.ref, 'refs/tags/v') && !contains(github.ref, '-rc') }}
-      VM_VERSION: ${{ secrets.VM_VERSION }}
       COMMIT_GH: ${{ secrets.COMMIT_GH }}
     steps:
       - name: Checkout
@@ -60,7 +58,17 @@ jobs:
           cp config/config.single.json dist/config/config.json
           cd dist
           mv index.*.js ../
-          rm bin.js main.js
+          rm main.js
+      - name: PKG and ZIP
+        run: |
+          yarn global add pkg
+          yarn pkg
+          cd dist
+          rm bin.js
+          cd ../bin
+          zip -r -q bilitools-linux.zip bilitools-linux
+          zip -r -q bilitools-win.zip bilitools-win.exe
+          zip -r -q bilitools-macos.zip bilitools-macos
       - name: ZIP SCF
         run: |
           cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
@@ -88,13 +96,6 @@ jobs:
           mv demo.json package.json
           yarn
           yarn build:rollup
-          yarn build:vm
-      - name: GZip vm
-        run: |
-          cd dist/rollup
-          gzip -c vm.scf.js > vm.scf.js.gz
-          gzip -c vm.fc.js > vm.fc.js.gz
-          gzip -c vm.cfc.js > vm.cfc.js.gz
       - name: ZIP huawei AGC
         run: |
           mkdir temp
@@ -105,17 +106,6 @@ jobs:
         run: |
           rm dist/rollup/index.agc.js
           cp dist/rollup gh-release -r
-      - name: Commit files
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'release: Commit from GitHub Actions (gh-release)'
-          branch: ${{ env.IS_PROD == 'true' && format('{0}-{1}', 'gh-release', env.VM_VERSION) || 'gh-release-dev' }}
-          commit_options: '--no-verify --signoff'
-          file_pattern: gh-release/**
-          push_options: '--force'
-          skip_fetch: true
-          skip_checkout: false
-          create_branch: true
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
@@ -124,20 +114,10 @@ jobs:
             aliyun_fc.zip
             baidu_cfc.zip
             huawei_agc.zip
+            bin/bilitools-linux.zip
+            bin/bilitools-win.zip
+            bin/bilitools-macos.zip
           draft: ${{ env.IS_TAG == 'false' }}
           prerelease: ${{ env.IS_TAG == 'true' && env.IS_RC == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push to Gitee
-        if: ${{ env.IS_PROD == 'true' && env.COMMIT_GH == 'true' }}
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H gitee.com >> ~/.ssh/known_hosts
-          echo "StrictHostKeyChecking no" >> ~/.ssh/config
-          git remote set-url --push origin git@gitee.com:Kudouran/BiliTools.git
-          GIT_BRANCH="${{ env.IS_PROD && format('{0}-{1}', 'gh-release', env.VM_VERSION) || 'gh-release-dev' }}"
-          git push origin "$GIT_BRANCH":"$GIT_BRANCH" --force

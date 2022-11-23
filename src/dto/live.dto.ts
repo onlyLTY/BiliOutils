@@ -123,7 +123,7 @@ export interface FansMedalPanelDto extends ApiBaseProp {
     page_info: {
       number: number;
       current_page: number;
-      has_more: true;
+      has_more: boolean;
       next_page: number;
       next_light_status: number;
       total_page: number;

@@ -78,6 +78,14 @@ export function getPageNum(n: number, m: number) {
 }
 
 /**
+ * 安全的随机数
+ * @description 我不需要安全，但是它总是给 Math.random 一个警告
+ */
+export function safeRandom() {
+  return crypto.randomBytes(4).readUInt32LE() / 0xffffffff;
+}
+
+/**
  * 设置 cron 表达式
  * @param time 时间戳
  * @param slsType
@@ -92,9 +100,9 @@ export function setCron(time = 60_000, slsType?: SLSType) {
   return formatCron({ hours, minutes, seconds }, slsType);
 }
 
-export function random(floating?: boolean);
-export function random(lower: number, floating?: boolean);
-export function random(lower: number, upper: number, floating?: boolean);
+export function random(floating?: boolean): number;
+export function random(lower: number, floating?: boolean): number;
+export function random(lower: number, upper: number, floating?: boolean): number;
 /**
  * 生成随机数
  * @description 生成一个随机数，范围在 min 和 max 之间（包括 min 和 max）
@@ -127,13 +135,13 @@ export function random(lower?: number | boolean, upper?: number | boolean, float
     upper = temp;
   }
   if (floating || lower % 1 || upper % 1) {
-    const rand = Math.random();
+    const rand = safeRandom();
     return Math.min(
       lower + rand * (upper - lower + parseFloat('1e-' + ((rand + '').length - 1))),
       upper,
     );
   }
-  return lower + Math.floor(Math.random() * (upper - lower + 1));
+  return lower + Math.floor(safeRandom() * (upper - lower + 1));
 }
 
 /**
@@ -295,6 +303,32 @@ export function deepMergeObject<T = unknown>(target: T, source: any): T {
 }
 
 /**
+ * 为对象设置属性，将 source 中的属性设置到 target 中，如果 target 中已经存在，则不设置（且深度合并）
+ * @param target
+ * @param source
+ */
+export function deepSetObject<T = unknown>(target: T, source: any): T {
+  // 忽略 undefined
+  if (target === undefined || source === undefined) {
+    return (target || source) as T;
+  }
+  if (!isObject(target) || !isObject(source)) {
+    return source as T;
+  }
+  if (Array.isArray(target) && Array.isArray(source)) {
+    return target.concat(source) as unknown as T;
+  }
+  return Object.keys(source).reduce((result, key) => {
+    if (result[key] === undefined) {
+      result[key] = source[key];
+    } else if (isObject(result[key]) && isObject(source[key])) {
+      result[key] = deepSetObject(result[key], source[key]);
+    }
+    return result;
+  }, target);
+}
+
+/**
  *  stringify
  * @param entries
  */
@@ -413,7 +447,9 @@ export function getUnixTime() {
  * @param prefix 前缀
  */
 export function createBuvid(prefix = 'XY') {
-  return `${prefix}${crypto.randomBytes(16).toString('hex').toUpperCase()}`;
+  const rs = crypto.randomBytes(16).toString('hex').toUpperCase();
+  // 其实随机生成就行了，但是万一哪天他要校验呢
+  return `${prefix}${rs[2]}${rs[12]}${rs[22]}${rs}`;
 }
 
 /**
@@ -439,7 +475,7 @@ export class Sleep {
   static waitSync(delay: number) {
     const now = Date.now();
     while (Date.now() - now < delay) {
-      // empty 
+      // empty
     }
   }
 }
@@ -486,4 +522,34 @@ export function mergeArray<T extends Record<string, any>>(
     }
     return result;
   }, [] as T[]);
+}
+
+/**
+ * 只会运行一次的函数
+ */
+export async function getOnceFunc(cb: (...args: any[]) => any) {
+  let flag = true;
+  return async (...args: any[]) => {
+    if (flag) {
+      await cb(...args);
+      flag = false;
+    }
+  };
+}
+
+/**
+ * 补足位数
+ */
+export function pad(num: string, length = 8, char = '0') {
+  return num.padStart(length, char);
+}
+
+/**
+ * 进制转换
+ * @param num 要转换的数字字符串
+ * @param fromRadix 要转换的进制
+ * @param toRadix 转换后的进制
+ */
+export function radixConvert(num: string | number, fromRadix: number, toRadix: number) {
+  return parseInt(num + '', fromRadix).toString(toRadix);
 }

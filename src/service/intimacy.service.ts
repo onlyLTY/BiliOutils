@@ -1,7 +1,7 @@
-import type { FansMedalDto } from '../dto/live.dto';
-import { TaskConfig, TaskModule } from '../config/globalVar';
+import type { FansMedalDto } from '@/dto/live.dto';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
 import * as liveRequest from '../net/live.request';
-import { kaomoji, TODAY_MAX_FEED } from '../constant';
+import { kaomoji, TODAY_MAX_FEED } from '@/constant';
 import {
   random,
   apiDelay,
@@ -11,6 +11,7 @@ import {
   randomString,
   createUUID,
   isServerless,
+  getOnceFunc,
 } from '@/utils';
 import { likeLiveRoom, liveMobileHeartBeat } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
@@ -23,6 +24,9 @@ const liveLogger = new Logger(
 );
 // 发送弹幕失败的直播间
 const sendMessageFailList = new Map<number, FansMedalDto>();
+// 重试次数
+let retryCount = 0,
+  retryRoom = 0;
 
 export async function getFansMealList() {
   let totalNumber = 99,
@@ -31,7 +35,7 @@ export async function getFansMealList() {
   try {
     while (pageNumber < totalNumber) {
       await apiDelay(200, 600);
-      const { code, message, data } = await liveRequest.getFansMedalPanel(pageNumber + 1, 10);
+      const { code, message, data } = await liveRequest.getFansMedalPanel(pageNumber + 1, 50);
       if (code !== 0) {
         logger.verbose(`获取勋章信息失败 ${code} ${message}`);
         return list;
@@ -75,19 +79,13 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
   const { whiteList, blackList } = TaskConfig.intimacy;
   if (!whiteList || !whiteList.length) {
     // 判断是否存在黑名单中
-    if (
+    return !(
       blackList &&
       (blackList.includes(room_info.room_id) || blackList.includes(medal.target_id))
-    ) {
-      return false;
-    }
-    return true;
+    );
   }
   // 如果存在白名单，则只发送白名单里的
-  if (whiteList.includes(room_info.room_id) || whiteList.includes(medal.target_id)) {
-    return true;
-  }
-  return false;
+  return whiteList.includes(room_info.room_id) || whiteList.includes(medal.target_id);
 }
 
 export async function sendOneMessage(roomid: number, nickName: string) {
@@ -141,6 +139,10 @@ async function liveMobileHeart(
     countRef.value++;
     liveLogger.info(`直播心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
   } catch (error) {
+    if (error.message.includes('Timeout awaiting')) {
+      liveLogger.debug(error.message);
+      return;
+    }
     liveLogger.error(error);
     logger.error(`直播间心跳异常 ${error.message}`);
   }
@@ -211,7 +213,8 @@ type LiveHeartRunOptions = {
   timerRef?: Ref<NodeJS.Timer>;
 };
 
-function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
+async function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedalDto[]) {
+  const retryLiveHeartOnce = await getOnceFunc(retryLiveHeart);
   for (const fansMedal of roomList) {
     const timerRef: Ref<NodeJS.Timer> = { value: undefined as unknown as NodeJS.Timer };
     const runOptions = {
@@ -243,16 +246,20 @@ function liveHeartPromise(resolve: (value: unknown) => void, roomList: FansMedal
       countRef,
       needTime.value,
     );
-    if (countRef.value < needTime.value) {
-      return;
-    }
-    if (needTime.increase && sendMessageFailList.has(room_info.room_id)) {
+    const timeDiff = needTime.value - countRef.value;
+    if (timeDiff <= 2 && needTime.increase && sendMessageFailList.has(room_info.room_id)) {
       needTime.value += 5;
+      retryRoom = room_info.room_id;
       sendMessageFailList.delete(room_info.room_id);
       return;
     }
+    if (timeDiff <= 0) return;
     timerRef && timerRef.value && clearInterval(timerRef.value);
-    await retryLiveHeart();
+    if (retryRoom === room_info.room_id) {
+      await retryLiveHeartOnce();
+    } else if (retryRoom === 0) {
+      await retryLiveHeart();
+    }
   }
 }
 
@@ -267,6 +274,7 @@ async function liveHeartPromiseSync(roomList: FansMedalDto[]) {
  * 完成一个直播间所有轮次的心跳
  * @param fansMedal
  * @param options
+ * @param countRef
  */
 async function allLiveHeart(
   fansMedal: FansMedalDto,
@@ -330,6 +338,10 @@ async function retryLiveHeart() {
   if (!TaskConfig.intimacy.isRetryHeart) {
     return;
   }
+  if (retryCount > 1) {
+    return;
+  }
+  retryCount++;
   liveLogger.debug('尝试检查直播心跳');
   await liveIntimacyService();
 }

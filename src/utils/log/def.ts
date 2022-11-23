@@ -4,6 +4,7 @@ import { isServerless, isQingLongPanel } from '@/utils/env';
 import { isBoolean } from '../is';
 import { resolvePath } from '../path';
 import { getPRCDate } from '../pure';
+import { writeError, writeOut } from './std';
 
 const LEVEL_VALUE = ['error', 'warn', 'info', 'verbose', 'debug'];
 
@@ -119,8 +120,21 @@ export class SimpleLogger {
     }
   }
 
-  public error(message: MessageType) {
-    this.log({ level: 'error' }, message);
+  public error(message: MessageType | Error, error?: Error) {
+    if (message instanceof Error) {
+      error = message;
+      message = '';
+    }
+    if (!error) {
+      this.log({ level: 'error' }, message);
+      return;
+    }
+    if (Reflect.has(error, 'message')) {
+      this.log({ level: 'error' }, `${message} ${error.message}`);
+    }
+    if (Reflect.has(error, 'stack')) {
+      this.log({ level: 'debug' }, error.stack);
+    }
   }
 
   public warn(message: MessageType) {
@@ -141,10 +155,10 @@ export class SimpleLogger {
 
   protected conslole(message: string, stderr: boolean) {
     if (stderr) {
-      process.stderr.write(message);
+      writeError(message);
       return;
     }
-    process.stdout.write(message);
+    writeOut(message);
   }
 
   protected file(message: string, stderr: boolean) {

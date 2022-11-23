@@ -1,4 +1,4 @@
-import type { Config } from '../types';
+import type { Config, UserConfig } from '../types';
 import { getConfig } from './setConfig';
 import { mergeConfig, setCookieValue } from './config';
 import { getAndroidUA } from '@/constant/biliUri';
@@ -64,7 +64,7 @@ abstract class TaskModuleTemplate {
 
 export let TaskModule: typeof TaskModuleTemplate;
 
-export function initialize(config?: Config) {
+export function initialize(config?: UserConfig) {
   if (!config) {
     config = getConfig(false);
   }

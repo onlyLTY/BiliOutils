@@ -27,8 +27,8 @@ export class Logger extends SimpleLogger {
     this.logFile = resolvePath(`./logs/bt_combined-${file}.log`);
   }
 
-  public error(message: MessageType) {
-    this.log({ level: 'error' }, message);
+  public error(message: MessageType | Error, error?: Error) {
+    super.error(message, error);
     TaskModule.hasError = true;
   }
 
@@ -50,7 +50,7 @@ export class Logger extends SimpleLogger {
     SimpleLogger.pushValue = '';
     SimpleLogger.brChar = br || TaskConfig.message.br || '\n';
   }
-  
+
   static async push(title = '日志推送') {
     const { sendMessage } = await import('@/utils/sendNotify');
     return sendMessage(title, this.pushValue);
@@ -70,3 +70,7 @@ export const _logger = new Logger({
   push: false,
   payload: 'cat',
 });
+
+export function notPush() {
+  return TaskConfig.message.onlyError && !TaskModule.hasError && TaskModule.pushTitle.length === 0;
+}

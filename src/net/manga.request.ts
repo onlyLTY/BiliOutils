@@ -166,7 +166,7 @@ export function getSeasonInfo() {
 }
 
 /**
- * 获取赛季信息
+ * 分享漫画
  */
 export function shareComic() {
   return mangaApi.post<ShareComicDto>(`twirp/activity.v1.Activity/ShareComic`, {

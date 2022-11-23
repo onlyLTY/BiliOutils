@@ -1,10 +1,11 @@
-import type { Config, ConfigArray } from './types';
+import type { UserConfig, ConfigArray } from './types';
 import { resolve } from 'path';
 import { fork } from 'child_process';
 import * as path from 'path';
 import { getArg } from './utils/args';
 import { getDelayTime, random, Sleep } from '@/utils/pure';
 import { clearLogs } from '@/utils/log/file';
+import { writeError } from './utils/log/std';
 
 /**
  * 获取配置
@@ -15,7 +16,7 @@ export async function config() {
   try {
     const configs = getConfigPathFile(resolve(process.cwd(), configPath));
     if (!configs.length) {
-      process.stderr.write('配置文件不存在');
+      writeError('配置文件不存在');
       return;
     }
     const itemIndex = getArg('item');
@@ -24,8 +25,8 @@ export async function config() {
     }
     return configs;
   } catch (error) {
-    process.stderr.write('配置路径可能存在问题');
-    process.stderr.write(error.message);
+    writeError('配置路径可能存在问题');
+    writeError(error.message);
   }
 }
 
@@ -45,7 +46,12 @@ export function getConfigByItem(configs: ConfigArray, item: string) {
     .filter(Boolean);
 }
 
-export function runForkSync(config: Config, index: number, forkPath = './bin/fork', tasks = '') {
+export function runForkSync(
+  config: UserConfig,
+  index: number,
+  forkPath = './bin/fork',
+  tasks = '',
+) {
   return new Promise((resolve, reject) => {
     const child = fork(path.resolve(__dirname, forkPath), [], {
       env: {
@@ -74,7 +80,6 @@ export function runForkSync(config: Config, index: number, forkPath = './bin/for
 }
 
 export async function runTask(configs?: ConfigArray, forkPath = './bin/fork', tasks = '') {
-  clearLogs();
   if (!configs) {
     const { getConfig } = await import('./config/setConfig');
     configs = getConfig(true);
@@ -99,6 +104,7 @@ export async function runTask(configs?: ConfigArray, forkPath = './bin/fork', ta
     }
     process.stdout.write('执行完毕\n\n');
   }
+  clearLogs();
 }
 
 function getItemIndex(item: string, len: number) {

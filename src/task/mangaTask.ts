@@ -3,6 +3,7 @@ import {
   buyMangaService,
   takeSeasonGift,
   shareComicService,
+  readMangaService,
 } from '@/service/manga.service';
 import { logger } from '../utils/log';
 
@@ -13,6 +14,8 @@ export default async function mangaTask() {
     await mangaSign();
     // 每日分享
     await shareComicService();
+    // 每日阅读
+    await readMangaService();
     // 领取任务奖励
     await takeSeasonGift();
     // 购买漫画

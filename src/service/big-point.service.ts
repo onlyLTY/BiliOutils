@@ -63,16 +63,19 @@ export async function bigPointService() {
     return;
   }
   const isEmpty = await bigPointTask(taskStatus);
-  if (isEmpty) {
-    return await printPoint();
-  }
+  if (isEmpty && (await printPoint())) return;
+  await retry(taskStatus);
+  // 如果积分不足，那再重试一次
+  return !(await printPoint()) && (await retry(taskStatus));
+}
+
+async function retry(taskStatus: TaskStatus) {
   const cfgIsRetry = TaskConfig.bigPoint.isRetry;
+  isRetry = true;
   if (cfgIsRetry) {
-    isRetry = true;
-    await apiDelay(isBoolean(cfgIsRetry) ? 5000 : cfgIsRetry * 1000);
+    await apiDelay(isBoolean(cfgIsRetry) ? 20000 : cfgIsRetry * 1000);
     await bigPointTask(taskStatus);
   }
-  return await printPoint();
 }
 
 type TaskStatus = Defined<UnPromisify<ReturnType<typeof getTaskStatus>>>;
@@ -328,13 +331,15 @@ async function getPoint() {
 
 async function printPoint() {
   const todayPoint = await getPoint();
-  if (!isDef(todayPoint)) return;
+  if (!isDef(todayPoint)) return false;
   if (todayPoint > 75) {
     logger.info(`今日获取积分【${todayPoint}】√`);
-    return;
+    return true;
   }
-  logger.warn(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
-  if (todayPoint === 0 && !isError) {
+  if (todayPoint === 0 && !isError && isRetry) {
+    logger.warn(`今日获取积分【${todayPoint}】, 部分任务未成功 ×`);
     logger.info('可能是完成获取，但是接口数据延迟。');
+    return false;
   }
+  return false;
 }

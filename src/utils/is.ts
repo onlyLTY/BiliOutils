@@ -91,3 +91,7 @@ export function isUrl(path: string): boolean {
 export function isEmail(val: string): boolean {
   return /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/.test(val);
 }
+
+export function isHexString(val: string): boolean {
+  return /^[01]+$/.test(val);
+}

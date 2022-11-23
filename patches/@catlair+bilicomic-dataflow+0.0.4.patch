@@ -1,0 +1,30 @@
+diff --git a/node_modules/@catlair/bilicomic-dataflow/bilicomic_dataflow.js b/node_modules/@catlair/bilicomic-dataflow/bilicomic_dataflow.js
+index e48bf3f..6d1148c 100644
+--- a/node_modules/@catlair/bilicomic-dataflow/bilicomic_dataflow.js
++++ b/node_modules/@catlair/bilicomic-dataflow/bilicomic_dataflow.js
+@@ -1,7 +1,7 @@
+ let imports = {};
+ imports['__wbindgen_placeholder__'] = module.exports;
+ let wasm;
+-const { fetch } = require(String.raw`./snippets/bilicomic-dataflow-eb673a8c566a4244/defined-in-js.js`);
++const { fetch } = require('./snippets/bilicomic-dataflow-eb673a8c566a4244/defined-in-js.js');
+ const { TextDecoder, TextEncoder } = require(`util`);
+ 
+ const heap = new Array(32).fill(undefined);
+@@ -298,11 +298,10 @@ module.exports.__wbindgen_closure_wrapper65 = function(arg0, arg1, arg2) {
+     return addHeapObject(ret);
+ };
+ 
+-const path = require('path').join(__dirname, 'bilicomic_dataflow_bg.wasm');
+-const bytes = require('fs').readFileSync(path);
++const bilicomic_dataflow_bg = require('./bilicomic_dataflow_bg.wasm');
+ 
+-const wasmModule = new WebAssembly.Module(bytes);
+-const wasmInstance = new WebAssembly.Instance(wasmModule, imports);
+-wasm = wasmInstance.exports;
+-module.exports.__wasm = wasm;
++bilicomic_dataflow_bg({ ...imports }).then(({ instance }) => {
++  wasm = instance.exports
++});
+ 
++module.exports.__wasm = wasm;

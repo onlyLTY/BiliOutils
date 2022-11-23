@@ -46,15 +46,14 @@ async function getOnePrivilege(type: number): Promise<boolean> {
     const { code, message } = await receiveVipPrivilege(type);
 
     if (code === 73319) {
-      logger.error(`${name}领取失败，账号存在异常（可能异地登陆）`);
+      logger.error(`${name}领取失败，需要手机验证（可能异地登陆），跳过`);
       return true;
     }
 
-    let status = '成功';
     if (code !== 0) {
-      status = `失败 ${message}`;
+      logger.info(`领取${name}失败：${code} ${message}`);
     }
-    logger.info(`领取${name}${status}`);
+    logger.info(`领取${name}成功！`);
     return true;
   } catch (error) {
     logger.error(`领取权益出现异常：${error.message}`);

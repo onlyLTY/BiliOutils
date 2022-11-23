@@ -1,4 +1,5 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { dirname } from 'path';
 import { isString } from './is';
 import { JSON5 } from './json5';
 import { defLogger } from './log/def';
@@ -45,7 +46,10 @@ export function replaceAllCookie(filePath: string, userId: number | string, newC
     const newJson5 = content.replaceAll(reg, substring => {
       let quote = substring.at(0) || '';
       /['"]/.test(quote) || (quote = '');
-      const quote2 = substring.match(/^['"]?cookie['"]?:\s?(['"])/)?.[1] || '"';
+      // 避免使用转义符
+      const quote2 = newCookie.includes("'")
+        ? '"'
+        : substring.match(/^['"]?cookie['"]?:\s?(['"])/)?.[1] || '"';
       return `${quote}cookie${quote}: ${quote2}${newCookie}${quote2}`;
     });
     writeFileSync(filePath, newJson5);
@@ -73,4 +77,18 @@ export function writeJsonFile(filepath: string, obj: Record<string, any>) {
   } catch (err) {
     defLogger.debug(err);
   }
+}
+
+/**
+ * 获取 config 路径
+ */
+export function getConfigPath() {
+  const path = process.env.__BT_CONFIG_PATH__;
+  if (!path) {
+    return undefined;
+  }
+  return {
+    path,
+    dir: dirname(path),
+  };
 }

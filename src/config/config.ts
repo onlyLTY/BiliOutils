@@ -1,5 +1,10 @@
 import type { LevelType } from '@/types/log';
-import type { ActivityLotteryIdType, CouponBalanceUseType, SessionHandleType } from '@/types';
+import type {
+  ActivityLotteryIdType,
+  CouponBalanceUseType,
+  SessionHandleType,
+  UserConfig,
+} from '@/types';
 import {
   DAILY_RUN_TIME,
   LOTTERY_EXCLUDE,
@@ -8,8 +13,8 @@ import {
   TODAY_MAX_FEED,
 } from '@/constant';
 import { cloneObject, deepMergeObject, arr2numArr } from '@/utils/pure';
-import { getBiliJct, getUserId } from '../utils/cookie';
-import { isString } from '../utils/is';
+import { getBiliJct, getUserId } from '@/utils/cookie';
+import { isNumber, isString, isUnDef } from '@/utils/is';
 
 type DefaultConfig = typeof defaultConfig;
 export type TheConfig = DefaultConfig;
@@ -86,9 +91,11 @@ export const defaultConfig = {
     judgement: false,
     // 转盘抽奖
     activityLottery: false,
+    // 每日电池
+    dailyBattery: false,
   },
   log: {
-    pushLevel: 'debug' as LevelType | boolean,
+    pushLevel: 'verbose' as LevelType | boolean,
     consoleLevel: 'debug' as LevelType | boolean,
     fileLevel: 'debug' as LevelType | boolean,
     useEmoji: true,
@@ -181,7 +188,7 @@ export const defaultConfig = {
     // 直播间来源方式 1 活动（活动链接可能更新不及时），2 扫描。其它值 所有方式依次尝试。
     source: 0,
     // 活动链接
-    uri: 'https://api.live.bilibili.com/xlive/fuxi-interface/AugRedPacket2022Controller/redPocketPlaying',
+    uri: '',
     // 仅使用活动时有效，每轮抢红包的间隔时间（秒）
     intervalActive: 60,
     // 中场休息时间，当每参加了几个直播间的时候，休息一下 [参加个数，休息时间（分，小于1为直接结束）]
@@ -238,12 +245,22 @@ export const defaultConfig = {
   },
   jury: {
     once: true,
+    // 默认投票 0-3 好-无法判断，从中随机
     vote: [0, 0, 1],
+    // 是否采用参考投票
+    opinion: true,
+    // 参考投票最少人数
     opinionMin: 3,
+    // 排除投票 0-3 好-无法判断，用于配合参考投票，不影响【默认投票】配置
+    notOpinion: [3],
     // 没有案件后的等待时间（分）
     waitTime: 20,
     // insiders 参考值
-    insiders: 0.8,
+    insiderWeight: 0.8,
+    // 是否观看视频 0 不观看，1 观看
+    insiders: [0, 1],
+    // 是否匿名 0 不匿名，1 匿名
+    anonymous: [0, 1],
     // 云函数下使用新的触发器进行休眠
     newTrigger: true,
   },
@@ -252,16 +269,14 @@ export const defaultConfig = {
     sign: true,
     // 购买漫画
     buy: false,
+    // read
+    read: false,
     // 购买漫画 id（优先级高）
     mc: [] as number[],
     // 购买漫画名称（优先级中）
     name: [] as string[],
     // 购买追漫（优先级低）
     love: true,
-    // 执行购买漫画间隔时间（单位天）
-    buyInterval: 2,
-    // 星期几执行购买漫画
-    buyWeek: [] as number[],
   },
   exchangeCoupon: {
     // 兑换漫读券数量
@@ -274,7 +289,7 @@ export const defaultConfig = {
   },
   bigPoint: {
     // 是否重试，或者重试间隔时间，单位秒
-    isRetry: true as boolean | number,
+    isRetry: 20 as boolean | number,
     // 是否观看视频
     isWatch: true,
     // 自定义观看视频的章节
@@ -294,7 +309,7 @@ export const defaultConfig = {
     // 关注？
     follow: false,
     // 请求 GitHub 使用的代理前缀
-    proxyPrefix: '',
+    proxyPrefix: 'https://ghproxy.com/',
     // 自定义活动列表链接
     customUrl: '',
   },
@@ -306,7 +321,7 @@ export function getDefaultConfig() {
   return cloneObject(defaultConfig, true);
 }
 
-export function mergeConfig(config: RecursivePartial<DefaultConfig>) {
+export function mergeConfig(config: UserConfig) {
   return configValueHandle(
     oldConfigHandle(deepMergeObject(getDefaultConfig(), beforeMergeConfig(config))),
   );
@@ -385,7 +400,7 @@ export function setCookieValue(config: TheConfig, cookie: string) {
  * 合并前处理用户配置
  * @param config
  */
-function beforeMergeConfig(config: RecursivePartial<DefaultConfig>) {
+function beforeMergeConfig(config: UserConfig) {
   // 需要注意用户配置可能没有定义各种配置项
   const { message } = config;
   if (message && isString(message.api)) {
@@ -399,6 +414,14 @@ function beforeMergeConfig(config: RecursivePartial<DefaultConfig>) {
   const { redPack } = config;
   if (redPack && Reflect.has(redPack, 'riskSleepTime') && !Reflect.has(redPack, 'riskTime')) {
     redPack.riskTime = [1, redPack.riskSleepTime];
+  }
+
+  // 处理 jury
+  const { jury } = config;
+  if (jury) {
+    if (isNumber(jury.insiders) && isUnDef(jury.insiderWeight)) {
+      jury.insiderWeight = jury.insiders;
+    }
   }
 
   return config;

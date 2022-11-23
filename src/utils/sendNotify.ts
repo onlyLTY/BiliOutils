@@ -13,7 +13,7 @@ import type { Method } from 'got/dist/source/as-promise/types';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { conciseNickname } from './bili';
 import { defHttp } from './http';
-import { logger } from './log';
+import { logger, notPush } from './log';
 import { stringify } from './pure';
 
 // 使用一个变量来记录当前的环境变量，避免多个账号复用同一个环境变量
@@ -220,6 +220,7 @@ async function customApi(title: string, text: string) {
       timeout,
       headers,
       url: '',
+      data: null,
     };
     options.url = apiTemplate.url
       .replace('{title}', encodeURIComponent(title))
@@ -237,17 +238,13 @@ async function customApi(title: string, text: string) {
       Object.assign(options, { httpsAgent });
     }
     // 处理data
-    const keys = Object.keys(data);
-    if (keys.length) {
-      keys.forEach(key => {
-        if (data[key] === '{text}') {
-          data[key] = text;
-        }
-        if (data[key] === '{title}') {
-          data[key] = title;
-        }
-      });
-      Object.assign(options, { data });
+    if (Object.keys(data).length) {
+      const str = JSON.stringify(data)
+        .replace(/{title}/g, title)
+        .replace(/{text}/g, text)
+        .replace(/\n/g, '\\n')
+        .replace(/\r/g, '\\r');
+      options.data = JSON.parse(str);
     }
     await defHttp.request(options);
     logger.info(`自定义接口消息已发送！`);
@@ -587,7 +584,7 @@ function qywxamNotify(text, desp) {
                 textcard: {
                   title: `${text}`,
                   description: `${desp}`,
-                  url: 'https://github.com/whyour/qinglong',
+                  url: 'https://github.com/catlair/BiliOutils',
                   btntxt: '更多',
                 },
               };
@@ -765,7 +762,7 @@ export async function sendMessage(title: string, text: string) {
     logger.info('消息推送已关闭');
     return;
   }
-  if (TaskConfig.message.onlyError && TaskModule.hasError) {
+  if (notPush()) {
     logger.info('仅在任务出错时发送消息');
     return;
   }

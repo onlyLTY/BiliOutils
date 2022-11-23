@@ -19,6 +19,8 @@ export const JuryVoteResult = {
   NO_OPINION: 1,
   /** Opinion 太少 */
   FEW_OPINION: 2,
+  被排除: 3,
+  不参考: 4,
 } as const;
 
 /**
