@@ -332,7 +332,7 @@ async function getPoint() {
 async function printPoint() {
   const todayPoint = await getPoint();
   if (!isDef(todayPoint)) return false;
-  if (todayPoint > 75) {
+  if (todayPoint > 65) {
     logger.info(`今日获取积分【${todayPoint}】√`);
     return true;
   }
