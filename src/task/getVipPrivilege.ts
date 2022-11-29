@@ -14,7 +14,7 @@ async function getPrivilegeStatus() {
       return;
     }
     const { list } = data;
-    const stateList = list.filter(item => item.state === 0 && [1, 3].includes(item.type));
+    const stateList = list.filter(item => item.state === 0 && [1, 3, 5].includes(item.type));
     if (stateList.length === 0) {
       return;
     }
@@ -32,9 +32,11 @@ function getPrivilegeName(type: number): string {
     case 2:
       return '会员购优惠券';
     case 3:
-      return '漫读券';
+      return '漫画福利券';
     case 4:
-      return '会员购运费券';
+      return '会员购包邮券';
+    case 5:
+      return '漫画商城优惠券';
     default:
       return '未知';
   }

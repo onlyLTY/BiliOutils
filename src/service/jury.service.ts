@@ -16,39 +16,17 @@ import { getRequestNameWrapper } from '@/utils/request';
 
 const juryLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'jury');
 const request = getRequestNameWrapper({ logger: juryLogger });
-const Count = {
-  tatol: 0,
-  confirm: 0,
-  def: 0,
-  opinion: 0,
-  view: 0,
-  error: 0,
-};
-function initCount() {
-  Count.tatol = 0;
-  Count.confirm = 0;
-  Count.def = 0;
-  Count.opinion = 0;
-  Count.view = 0;
-  Count.error = 0;
-}
 
 /**
  * 给案件投票
  */
 function voteCase(caseId: string, vote: number) {
-  try {
-    Count.tatol++;
-    return juryCaseVote(
-      caseId,
-      vote,
-      getRandomItem(TaskConfig.jury.insiders),
-      getRandomItem(TaskConfig.jury.anonymous),
-    );
-  } catch (error) {
-    Count.error++;
-    throw error;
-  }
+  return juryCaseVote(
+    caseId,
+    vote,
+    getRandomItem(TaskConfig.jury.insiders),
+    getRandomItem(TaskConfig.jury.anonymous),
+  );
 }
 
 /**
@@ -93,7 +71,6 @@ export async function voteJuryByOpinion(caseId: string) {
     const vote = opinion.vote;
     juryLogger.verbose(`为【${caseId}】选择了【${JuryVote[vote]}】（${vote}）`);
     await caseConfirm(caseId);
-    Count.opinion++;
 
     const { code, message } = await voteCase(caseId, vote);
     if (code !== 0) {
@@ -132,7 +109,6 @@ export async function replenishVote(caseId: string, defaultVote: number) {
     }
     const selectedVote = info.data.vote_items[defaultVote];
     await caseConfirm(caseId);
-    Count.def++;
     const vote = await voteCase(caseId, selectedVote.vote);
     if (vote.code === 0) {
       juryLogger.info(`成功根据【配置文件】为案件【${caseId}】投下【${selectedVote.vote_text}】`);
@@ -152,7 +128,6 @@ export async function replenishVote(caseId: string, defaultVote: number) {
 async function caseConfirm(caseId: string) {
   try {
     juryLogger.debug(`开始案件【${caseId}】`);
-    Count.confirm++;
     const { code, message } = await voteCase(caseId, 0);
     if (code !== 0) {
       logger.warn(`确认案件【${caseId}】失败，【${code}】【${message}】`);
@@ -171,28 +146,9 @@ export async function runJury(err = 3) {
     if (await runOneJury(errRef)) break;
     await apiDelay(2000, 5000);
   }
-  await debugInfo();
   if (errRef.value <= 0) {
     logger.error(`错误次数过多，结束任务！`);
     return false;
-  }
-}
-
-/**
- * 临时DEBUG
- */
-export async function debugInfo() {
-  const vote = Count.def + Count.opinion;
-  if (vote !== Count.confirm) {
-    logger.warn(
-      `[debug] 最终投票数（${Count.def},${Count.opinion}）与确认案件数（${Count.confirm}）不一致`,
-    );
-  }
-  if (vote + Count.confirm !== Count.tatol) {
-    logger.warn(`[debug] 获取到案件信息的次数与投票次数不一致！`);
-  }
-  if (Count.error > 0) {
-    logger.warn(`[debug] 投票过程中出现了${Count.error}次错误`);
   }
 }
 
@@ -204,7 +160,6 @@ async function runOneJury(errRef: Ref<number>) {
     const { code, data, message } = await getJuryCaseVote();
     switch (code) {
       case VoteResCode.成功:
-        Count.view++;
         return await handleSuccess(data, errRef);
       case VoteResCode.资格过期:
         return await handleJudgeExpired(message);
@@ -364,7 +319,6 @@ async function handleSuccess({ case_id = '' }: { case_id: string }, errRef: Ref<
  */
 export async function juryService() {
   try {
-    initCount();
     return await runJury();
   } catch (error) {
     logger.error(`jury 错误信息为：${error}`);

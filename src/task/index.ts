@@ -7,13 +7,11 @@ export const biliTaskArray = [
   ['bigPoint', () => import('./bigPoint')],
   ['shareAndWatch', () => import('./shareAndWatch')],
   ['silver2Coin', () => import('./silver2Coin')],
-  ['mangaSign', () => import('./mangaSign')],
   ['mangaTask', () => import('./mangaTask')],
   ['supGroupSign', () => import('./supGroupSign')],
   ['liveSendMessage', () => import('./liveSendMessage')],
   ['getVipPrivilege', () => import('./getVipPrivilege')],
   ['useCouponBp', () => import('./useCouponBp')],
-  ['charging', () => import('./charging')],
   ['matchGame', () => import('./matchGame')],
   ['giveGift', () => import('./giveGift')],
   ['liveIntimacy', () => import('./liveIntimacy')],
@@ -22,7 +20,6 @@ export const biliTaskArray = [
   ['liveRedPack', () => import('./liveRedPack')],
   ['dailyBattery', () => import('./dailyBattery')],
   ['activityLottery', () => import('./activityLottery')],
-  ['liveFamine', () => import('./liveFamine')],
   ['judgement', () => import('./judgement')],
 ] as const;
 
