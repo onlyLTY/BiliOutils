@@ -277,6 +277,8 @@ export const defaultConfig = {
     name: [] as string[],
     // 购买追漫（优先级低）
     love: true,
+    // 猜拳
+    guess: false,
   },
   exchangeCoupon: {
     // 兑换漫读券数量

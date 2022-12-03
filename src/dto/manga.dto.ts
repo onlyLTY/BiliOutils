@@ -407,7 +407,7 @@ export type SeasonInfoDto = OnlyMsg<{
   end_time: string;
   remain_amount: number;
   season_id: string;
-  tasks: any[];
+  tasks: SeasonTask[];
   welfare: SeasonWelfare[];
   next: SeasonNext;
   cover: string;
@@ -423,6 +423,15 @@ export type SeasonInfoDto = OnlyMsg<{
     is_visible: boolean;
   };
 }>;
+
+interface SeasonTask {
+  id: string;
+  type: number;
+  title: string;
+  status: number;
+  amount: number;
+  ctime: string;
+}
 
 interface SeasonPointrate {
   sign_in: number;
@@ -509,4 +518,99 @@ interface SeasonWelfare {
 
 export type ShareComicDto = OnlyMsg<{
   point: number;
+}>;
+
+/**
+ * game init
+ */
+export type GameInitDto = OnlyMsg<{
+  home: GameInitHome;
+  conf: GameInitConf;
+}>;
+
+interface GameInitConf {
+  current_season_id: string;
+  entrance_amount: number;
+  status: number;
+  play_limit: number;
+  round_limit: number;
+  cg_url: string;
+  role_card_background: string;
+  battlefield_background: string;
+  avatar_package_url: string;
+  role_resources: {
+    name: string;
+    url: string;
+  }[];
+}
+
+interface GameInitHome {
+  /** 运行过？ */
+  have_tried: boolean;
+  /** 使用角色 */
+  role: string;
+  /** 需要选择角色 */
+  change_role: boolean;
+  remain_amount: number;
+  /** 今日游戏次数 */
+  play_times: number;
+  session_open: boolean;
+  /** 上次游戏最后回合 */
+  last_round: number;
+  avatar: string;
+}
+
+/**
+ * 选择角色
+ */
+export type GameChooseRoleDto = OnlyMsg<null>;
+
+/**
+ * 完成初次尝试
+ */
+export type GameTryDto = OnlyMsg<{
+  /** 消耗 */
+  try_award: number;
+  /** 剩余 */
+  remain_amount: number;
+}>;
+
+/**
+ * 开始游戏
+ */
+export type GameStartDto = OnlyMsg<{
+  /** 剩余 */
+  remain_amount: number;
+}>;
+
+/**
+ * 开始回合
+ * code 1 已有进行中的回合
+ */
+export type GameRoundStartDto = OnlyMsg<{
+  /** 当前回合 */
+  round: number;
+}>;
+
+/**
+ * 猜拳
+ * code 1 回合已结束
+ * code 2 超时
+ */
+export type GameGuessDto = OnlyMsg<{
+  pc_card: 0 | 1 | 2 | 3;
+  win: 0 | 1 | 2 | 3;
+  round_result: 0 | 1 | 2;
+  winning_streak_round: number;
+  amount: number;
+  remain_amount: number;
+  is_last_round: boolean;
+}>;
+
+/**
+ * 上次游戏结果
+ */
+export type GameLastResultDto = OnlyMsg<{
+  total_amount: 0 | 20 | 50;
+  round_result: { round: number; win: 1 | 2; amount: 0 | 20 | 30 }[];
 }>;

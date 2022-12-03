@@ -59,16 +59,6 @@ jobs:
           cd dist
           mv index.*.js ../
           rm main.js
-      - name: PKG and ZIP
-        run: |
-          yarn global add pkg
-          yarn pkg
-          cd dist
-          rm bin.js
-          cd ../bin
-          zip -r -q bilitools-linux.zip bilitools-linux
-          zip -r -q bilitools-win.zip bilitools-win.exe
-          zip -r -q bilitools-macos.zip bilitools-macos
       - name: ZIP SCF
         run: |
           cp -rf ./tools/ ./package*.json yarn.lock ./build/.yarnclean ./node_modules/ ./dist/
@@ -114,9 +104,6 @@ jobs:
             aliyun_fc.zip
             baidu_cfc.zip
             huawei_agc.zip
-            bin/bilitools-linux.zip
-            bin/bilitools-win.zip
-            bin/bilitools-macos.zip
           draft: ${{ env.IS_TAG == 'false' }}
           prerelease: ${{ env.IS_TAG == 'true' && env.IS_RC == 'true' }}
         env:

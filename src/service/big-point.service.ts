@@ -193,7 +193,7 @@ async function watchTask(completeTimes: number) {
 async function completeTask(taskCode: string, msg: string) {
   try {
     await susWin();
-    apiDelay(1000, 2000);
+    await apiDelay(1000, 2000);
     const { code: comCode, message: comMsg } = await complete(taskCode);
     if (comCode !== 0) {
       logger.error(`${msg}失败: ${comCode} ${comMsg}`);

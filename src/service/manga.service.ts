@@ -1,10 +1,11 @@
-import type { Eplist, SearchMangaDto, SeasonInfoDto } from '@/dto/manga.dto';
+import type { Eplist, GameGuessDto, SearchMangaDto, SeasonInfoDto } from '@/dto/manga.dto';
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
-import { apiDelay, getPRCDate, isBoolean, logger } from '@/utils';
+import { apiDelay, getPRCDate, getRandomItem, isBoolean, logger, random } from '@/utils';
 import { request } from '@/utils/request';
 import { Bilicomic } from '@catlair/bilicomic-dataflow';
+import { RockPaperScissors, RockPaperScissorsResult, RoundResult } from '@/enums/manga-game.emum';
 
 let expireCouponNum: number;
 
@@ -300,15 +301,18 @@ async function getSeasonInfo() {
 export async function takeSeasonGift() {
   try {
     const seasonInfo = await getSeasonInfo();
-    if (!seasonInfo) return;
+    if (!seasonInfo) {
+      logger.debug('没有赛季信息，跳过任务');
+      return;
+    }
+    if (!seasonInfo.tasks?.length && !seasonInfo.today_tasks.find(el => el.status === 1)) {
+      logger.debug('没有可领取的任务奖励，跳过任务');
+      return;
+    }
 
     const { code, msg } = await mangaApi.takeSeasonGift(seasonInfo.season_id);
     if (code === 0) return;
-    if (code === 7) {
-      // 已领取或者未完成
-      // logger.debug(`获取任务礼包失败：${code} ${msg}`);
-      return;
-    }
+    if (code === 7) return;
     logger.warn(`获取任务礼包失败：${code} ${msg}`);
   } catch (error) {
     logger.error(`获取任务礼包异常: ${error.message}`);
@@ -489,5 +493,227 @@ export async function readMangaService(isNoLogin?: boolean) {
     }
   } catch (error) {
     logger.error(`每日漫画阅读任务异常`, error);
+  }
+}
+
+/**
+ * 猜拳游戏
+ */
+export async function guessGameService() {
+  if (!TaskConfig.manga.guess) {
+    return;
+  }
+  const init = await gameInit();
+  if (!init) return;
+  const { times, round_limit, round } = init;
+  // 积分
+  let score = 0;
+  if (round) {
+    logger.debug(`上次游戏还有未完成的局数，继续游戏`);
+    for (let index = 0; index < round; index++) {
+      await apiDelay(2000);
+      await doRoundGuessGame();
+    }
+  }
+  for (let index = 0; index < times; index++) {
+    logger.debug(`开始第${index + 1}次猜拳游戏`);
+    score -= 10;
+    score += await gamePlay(round_limit);
+    if (index !== times - 1) await apiDelay(6000);
+  }
+  logger.info(`猜拳游戏结束，获得积分：${score}`);
+}
+
+/**
+ * 游戏初始化
+ */
+async function gameInit() {
+  try {
+    const { code, msg, data } = await mangaApi.gameInit();
+    if (code !== 0) {
+      logger.error(`游戏初始化失败：${code} ${msg}`);
+      return;
+    }
+    const { have_tried, play_times, change_role, last_round } = data.home || {};
+    const { play_limit = 5, round_limit = 2 } = data.conf || {};
+    // 今日还能玩的次数
+    const times = play_limit - play_times;
+    logger.debug(`今天还能玩${times}次`);
+    const rData = {
+      times,
+      round_limit,
+      last_round,
+      // 剩余回合数
+      round: last_round === 0 ? 0 : round_limit - last_round,
+    };
+    if (times <= 0) {
+      // 回合没有剩余了
+      if (last_round === round_limit || last_round === 0) {
+        return;
+      }
+      return rData;
+    }
+    if (have_tried || !change_role) {
+      return rData;
+    }
+    logger.info(`开始初始化角色`);
+    const roles = data.conf.role_resources;
+    if (!roles?.length) {
+      logger.error('角色列表为空');
+      return;
+    }
+    await finishTry(roles);
+    return rData;
+  } catch (error) {
+    logger.error(`游戏初始化异常：`, error);
+  }
+}
+
+async function finishTry(
+  roles: {
+    name: string;
+    url: string;
+  }[],
+) {
+  try {
+    const role = getRandomItem(roles);
+    await mangaApi.chooseRole(role.name);
+    await apiDelay(500);
+    await mangaApi.finishTry();
+  } catch (error) {
+    logger.error(`游戏试玩异常：`, error);
+  }
+}
+
+/**
+ * 进行一轮猜拳
+ */
+async function gamePlay(round_limit = 2) {
+  try {
+    // 开始游戏
+    const { code, msg } = await mangaApi.startGame();
+    let round = 0;
+    if (code === 1) {
+      logger.warn(msg);
+      round = 1;
+    } else if (code !== 0) {
+      logger.error(`开始游戏失败：${code} ${msg}`);
+      return 0;
+    }
+
+    for (let index = 0; index < round_limit - round; index++) {
+      // 开始回合
+      await apiDelay(3000);
+      await doRoundGuessGame();
+    }
+
+    // 查看结果
+    await apiDelay(2000);
+    return await checkLastResult();
+  } catch (error) {
+    logger.error(`进行一轮猜拳异常：`, error);
+  }
+  return 0;
+}
+
+/**
+ * 查看结果
+ */
+async function checkLastResult() {
+  const { code, data, msg } = await mangaApi.checkLastResult();
+  if (code !== 0) {
+    logger.error(`查看结果失败：${code} ${msg}`);
+    return 0;
+  }
+  logger.debug(`本轮猜拳获取积分：${data.total_amount}`);
+  return data.total_amount;
+}
+
+/**
+ * 进行一回合猜拳
+ */
+async function doRoundGuessGame() {
+  try {
+    const { code, msg, data } = await mangaApi.startRound();
+    if (code === 1) {
+      logger.warn(msg);
+    } else if (code !== 0) {
+      logger.error(`开始回合失败：${code} ${msg}`);
+      return;
+    }
+    if (data && data.round) {
+      logger.debug(`开始第${data.round}回合`);
+    }
+    // 猜拳
+    await apiDelay(1500);
+    const guessGame = new GuessGame();
+    let lastResult = 0;
+    while (lastResult === 0) {
+      lastResult = await guessGame.run();
+      await apiDelay(3000);
+    }
+    logger.debug(`回合猜拳结束：${RoundResult[lastResult]}`);
+  } catch (error) {
+    logger.error(`开始回合异常：`, error);
+  }
+}
+
+/**
+ * 获取克制关系
+ */
+function getRestrict(card: number) {
+  return card === 1 ? 3 : card - 1;
+}
+
+class GuessGame {
+  card: number;
+  pc_card: number;
+  // 上次输赢
+  last_result: number;
+  // 电脑相同手势次数
+  pc_same_count = 0;
+
+  setCard() {
+    if ((this.last_result === 1 || this.last_result === 3) && this.pc_same_count < 2) {
+      this.card = getRestrict(this.pc_card);
+      return;
+    }
+    this.card = random(1, 3);
+    return;
+  }
+
+  setData(data: GameGuessDto['data']) {
+    this.last_result = data.win;
+    if (data.pc_card === this.pc_card) {
+      this.pc_same_count++;
+    } else {
+      this.pc_same_count = 0;
+    }
+    this.pc_card = data.pc_card;
+  }
+
+  async run() {
+    try {
+      this.setCard();
+      const { data, msg, code } = await mangaApi.guessFinger(this.card);
+      if (code !== 0) {
+        logger.error(`猜拳失败：${code} ${msg}`);
+        return RoundResult.输;
+      }
+      if (data.pc_card === 0) {
+        logger.debug(`出现异常，重新猜拳`);
+        return RoundResult.输;
+      }
+      this.setData(data);
+      logger.debug(
+        `我[${RockPaperScissors[this.card]}] VS 电脑[${RockPaperScissors[data.pc_card]}] ${
+          RockPaperScissorsResult[data.win]
+        }`,
+      );
+      return data.round_result;
+    } catch (error) {
+      logger.error(`猜拳异常：`, error);
+    }
+    return RoundResult.输;
   }
 }
