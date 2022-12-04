@@ -7,9 +7,3 @@ export async function handler(event, _context, callback) {
     callback?.(error);
   }
 }
-
-(async () => {
-  await handler({}, {}, () => {
-    console.log('done');
-  });
-})();

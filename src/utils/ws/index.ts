@@ -97,7 +97,6 @@ export async function biliDmWs(room_id: number, time = 0) {
 
   // WebSocket 连接成功
   ws.addEventListener('open', () => {
-    // console.log(`WebSocket：直播间${room_id}已连接，将在${time / 1000}秒后断开连接`);
     ws.send(getCertification(JSON.stringify(json)).buffer);
     // 心跳包的定时器
     timerMap.set(room_id, sendInterval());
@@ -105,7 +104,6 @@ export async function biliDmWs(room_id: number, time = 0) {
 
   // WebSocket 连接关闭
   ws.addEventListener('close', () => {
-    // console.log(`WebSocket：直播间${room_id}连接已关闭`);
     clearWsTimer(room_id);
   });
 

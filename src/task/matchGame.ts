@@ -77,13 +77,9 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
       const [{ id: questionsId, title, details, is_guess }] = questions;
       const [team1, team2] = details;
 
-      if (isLackOfCoin()) {
-        return count;
-      }
+      if (isLackOfCoin()) return count;
 
-      if (is_guess) {
-        continue;
-      }
+      if (is_guess) continue;
 
       logger.info(`${title} <=> ${team1.odds}:${team2.odds}`);
 
@@ -100,16 +96,21 @@ async function guessOne(list: GuessCollectionDto['data']['list']) {
       logger.info(`预测[ ${teamSelect.option} ] ${match.coins} 颗硬币`);
 
       await apiDelay();
-      const { code } = await guessAdd(contestId, questionsId, teamSelect.detail_id, match.coins);
+      const { code, message } = await guessAdd(
+        contestId,
+        questionsId,
+        teamSelect.detail_id,
+        match.coins,
+      );
       if (code !== 0) {
-        logger.info('预测失败');
+        logger.warn(`预测失败：${code} ${message}`);
       } else {
         count++;
         TaskModule.money -= match.coins;
       }
     }
   } catch (error) {
-    console.warn(error.message);
+    logger.error('赛事硬币竞猜出错了', error);
   }
   return count;
 }

@@ -1,11 +1,11 @@
-import type { Eplist, GameGuessDto, SearchMangaDto, SeasonInfoDto } from '@/dto/manga.dto';
+import type { Eplist, SearchMangaDto, SeasonInfoDto } from '@/dto/manga.dto';
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
 import { apiDelay, getPRCDate, getRandomItem, isBoolean, logger, random } from '@/utils';
 import { request } from '@/utils/request';
 import { Bilicomic } from '@catlair/bilicomic-dataflow';
-import { RockPaperScissors, RockPaperScissorsResult, RoundResult } from '@/enums/manga-game.emum';
+import { RPS, RPSResult, RoundResult } from '@/enums/manga-game.emum';
 
 let expireCouponNum: number;
 
@@ -22,11 +22,12 @@ async function getExpireCouponNum() {
     }
     const { user_coupons } = data;
     if (user_coupons.length === 0) {
-      logger.info('没有漫读券，跳过任务');
+      logger.info('没有即将过期的漫读券，跳过任务');
       return;
     }
     const coupons = user_coupons.filter(coupon => coupon.will_expire !== 0);
     expireCouponNum = coupons.reduce((acc, coupon) => acc + coupon.remain_amount, 0);
+    logger.info(`即将过期的漫读券数量：${expireCouponNum}`);
     return expireCouponNum;
   } catch (error) {
     logger.error(`获取漫读券异常: ${error}`);
@@ -123,7 +124,6 @@ async function buyOneEpManga(ep_id: number) {
     }
     // 购买成功，则减少漫读券数量
     expireCouponNum--;
-    logger.debug(`购买漫画 ${ep_id} 成功`);
   } catch (error) {
     logger.error(`购买漫画异常: ${error}`);
   }
@@ -333,6 +333,7 @@ export async function exchangeCoupon(num: number) {
       logger.info(`兑换商品成功，兑换数量：${num}`);
       return;
     }
+    // 太快
     if (code === 1 && msg.includes('快')) {
       logger.debug(msg);
       return true;
@@ -354,34 +355,56 @@ export async function exchangeCoupon(num: number) {
 }
 
 export async function exchangeCouponService() {
-  const { num: exchangeCouponNum, delay } = TaskConfig.exchangeCoupon;
-  if (exchangeCouponNum < 1) {
-    return;
-  }
-  logger.info(`开始兑换漫读券，预设数量：${exchangeCouponNum}`);
-  let num = exchangeCouponNum;
-  const { point } = await request(getMangaPoint, { name: '获取积分' });
-  const pointNum = parseInt(point, 10) || 0,
-    buyCouponNum = Math.floor(pointNum / 100);
-  logger.info(`当前积分：${pointNum}`);
-  if (buyCouponNum < num) {
-    num = buyCouponNum;
-  }
-  if (buyCouponNum < 1) {
-    logger.info('可兑换的漫读券数量不足 1，跳过任务');
-    return;
-  }
-  // 循环等待，到 12 点才开始兑换
-  while (new Date().getHours() !== 12) {
-    await apiDelay(10);
-  }
-  let isRepeat: boolean | undefined = true;
+  const num = await getExchangeNum();
+  if (!num) return;
+  if (await waitExchangeTime()) return;
+  const { delay } = TaskConfig.exchangeCoupon;
   // 尝试兑换
-  while (isRepeat) {
-    isRepeat = await exchangeCoupon(num);
-    // 等待 2s 再次尝试
+  while (await exchangeCoupon(num)) {
     await apiDelay(delay - 50, delay + 150);
   }
+}
+
+async function getExchangeNum() {
+  const { num: exchangeCouponNum, keepAmount = 0 } = TaskConfig.exchangeCoupon;
+  const { point } = await request(getMangaPoint, { name: '获取积分' });
+  const pointNum = parseInt(point, 10) || 0;
+  logger.info(`当前积分：${pointNum}`);
+  if (pointNum <= keepAmount) {
+    logger.info(`积分不足，需保留，跳过任务`);
+    return 0;
+  }
+  const buyCouponNum = Math.floor((pointNum - keepAmount) / 100);
+  if (buyCouponNum < 1) {
+    logger.info('可兑换的漫读券数量不足 1，跳过任务');
+    return 0;
+  }
+  let num: number;
+  // 是否设置自动数量
+  if (exchangeCouponNum < 1) {
+    num = buyCouponNum;
+  } else {
+    num = Math.min(buyCouponNum, exchangeCouponNum);
+  }
+  logger.info(`漫读券需要兑换数量：${num}/${buyCouponNum}`);
+  return num;
+}
+
+/**
+ * 等待兑换时间的到来
+ */
+async function waitExchangeTime() {
+  const hour = getPRCDate().getHours(),
+    minute = getPRCDate().getMinutes();
+  if (hour < 10 || hour > 12 || (hour === 12 && minute > 3)) {
+    logger.warn(`当前时间不在 10:00 - 12:03 之间，跳过任务`);
+    return true;
+  }
+  logger.debug(`循环等待，到 12 点才开始兑换...`);
+  while (hour !== 12) {
+    await apiDelay(100);
+  }
+  return false;
 }
 
 /**
@@ -548,7 +571,7 @@ async function gameInit() {
     };
     if (times <= 0) {
       // 回合没有剩余了
-      if (last_round === round_limit || last_round === 0) {
+      if (rData.round === 0) {
         return;
       }
       return rData;
@@ -672,24 +695,39 @@ class GuessGame {
   last_result: number;
   // 电脑相同手势次数
   pc_same_count = 0;
+  // 我方相同手势次数
+  my_same_count = 0;
 
+  // 虽然每次都是随机的，但是我就要玄学一波
   setCard() {
-    if ((this.last_result === 1 || this.last_result === 3) && this.pc_same_count < 2) {
-      this.card = getRestrict(this.pc_card);
-      return;
+    const { last_result } = this;
+    let card: number;
+    // 上次没赢，且电脑相同手势次数大小于 2，则出和电脑相反的手势
+    if ((last_result === RPSResult.平 || last_result === RPSResult.输) && this.pc_same_count < 2) {
+      card = getRestrict(this.pc_card);
+    } else {
+      card = random(1, 3);
     }
-    this.card = random(1, 3);
-    return;
+    if (card === this.card) {
+      this.my_same_count++;
+    } else {
+      this.my_same_count = 0;
+    }
+    if (this.my_same_count >= 2) {
+      // 两次相同手势，在另外两种手势中随机
+      card = getRandomItem([1, 2, 3].filter(item => item !== card));
+    }
+    this.card = card;
   }
 
-  setData(data: GameGuessDto['data']) {
-    this.last_result = data.win;
-    if (data.pc_card === this.pc_card) {
+  setData(pc_card: number, win: number) {
+    this.last_result = win;
+    if (pc_card === this.pc_card) {
       this.pc_same_count++;
     } else {
       this.pc_same_count = 0;
     }
-    this.pc_card = data.pc_card;
+    this.pc_card = pc_card;
   }
 
   async run() {
@@ -700,17 +738,14 @@ class GuessGame {
         logger.error(`猜拳失败：${code} ${msg}`);
         return RoundResult.输;
       }
-      if (data.pc_card === 0) {
+      const { pc_card, win, round_result } = data || {};
+      if (pc_card === 0) {
         logger.debug(`出现异常，重新猜拳`);
         return RoundResult.输;
       }
-      this.setData(data);
-      logger.debug(
-        `我[${RockPaperScissors[this.card]}] VS 电脑[${RockPaperScissors[data.pc_card]}] ${
-          RockPaperScissorsResult[data.win]
-        }`,
-      );
-      return data.round_result;
+      this.setData(pc_card, win);
+      logger.debug(`我[${RPS[this.card]}] VS 电脑[${RPS[pc_card]}] ${RPSResult[win]}`);
+      return round_result;
     } catch (error) {
       logger.error(`猜拳异常：`, error);
     }

@@ -1,5 +1,5 @@
 import * as net from '@/net/daily-battery.request';
-import { apiDelay, logger } from '@/utils';
+import { apiDelay, getRandomItem, logger } from '@/utils';
 import { sendOneMessage } from './intimacy.service';
 
 /**
@@ -68,9 +68,10 @@ async function dailyBattery() {
     }
     default: {
       // lol 的直播间发一条弹幕
+      const rooms = [21144080, 7734200, 46936];
       logger.debug(`发送弹幕 ${status - 10}`);
       for (let index = 0; index < 15 - status; index++) {
-        await sendOneMessage(7734200, 'bili官方');
+        await sendOneMessage(getRandomItem(rooms), 'bili官方');
         await apiDelay(10000, 15000);
       }
       return false;

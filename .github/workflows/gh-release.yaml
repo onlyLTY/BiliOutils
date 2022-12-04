@@ -55,7 +55,7 @@ jobs:
         run: |
           yarn build
           echo ${{ env.BILI_VERSION }} >> dist/version.txt
-          cp config/config.single.json dist/config/config.json
+          cp config/config.single.json5 dist/config/config.json5
           cd dist
           mv index.*.js ../
           rm main.js

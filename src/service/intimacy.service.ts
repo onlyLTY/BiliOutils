@@ -253,7 +253,7 @@ async function liveHeartPromise(resolve: (value: unknown) => void, roomList: Fan
       sendMessageFailList.delete(room_info.room_id);
       return;
     }
-    if (timeDiff <= 0) return;
+    if (timeDiff > 0) return;
     timerRef && timerRef.value && clearInterval(timerRef.value);
     if (retryRoom === room_info.room_id) {
       await retryLiveHeartOnce();

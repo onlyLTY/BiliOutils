@@ -154,12 +154,6 @@ export const defaultConfig = {
     /** 获取稿件的来源（排序），留空则来自 首页推荐 */
     src: ['自定义UP', '特别关注', '关注', '首页推荐', '分区排行'],
   },
-  sls: {
-    name: '',
-    description: '',
-    region: 'ap-chengdu',
-    dailyRunTime: DAILY_RUN_TIME,
-  },
   lottery: {
     /** 天选屏蔽奖品 */
     excludeAward: LOTTERY_EXCLUDE,
@@ -285,17 +279,14 @@ export const defaultConfig = {
     num: 1,
     // 间隔时间，单位 ms，随机误差 -50 ~ 150
     delay: 2000,
-  },
-  activity: {
-    liveFamineTime: 400,
+    // 保留积分数
+    keepAmount: 0,
   },
   bigPoint: {
     // 是否重试，或者重试间隔时间，单位秒
     isRetry: 20 as boolean | number,
     // 是否观看视频
     isWatch: true,
-    // 自定义观看视频的章节
-    epids: [] as number[],
     // 领取任务后的观看延时（秒）
     watchDelay: 40,
   },
