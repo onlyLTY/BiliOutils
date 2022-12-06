@@ -2,7 +2,7 @@ import type { Eplist, SearchMangaDto, SeasonInfoDto } from '@/dto/manga.dto';
 import { TaskConfig } from '@/config/globalVar';
 import * as mangaApi from '@/net/manga.request';
 import { exchangeMangaShop, getMangaPoint, shareComic } from '@/net/manga.request';
-import { apiDelay, getPRCDate, getRandomItem, isBoolean, logger, random } from '@/utils';
+import { apiDelay, getPRCDate, getRandomItem, isBoolean, isUnDef, logger, random } from '@/utils';
 import { request } from '@/utils/request';
 import { Bilicomic } from '@catlair/bilicomic-dataflow';
 import { RPS, RPSResult, RoundResult } from '@/enums/manga-game.emum';
@@ -22,13 +22,12 @@ async function getExpireCouponNum() {
     }
     const { user_coupons } = data;
     if (user_coupons.length === 0) {
-      logger.info('没有即将过期的漫读券，跳过任务');
+      logger.info('漫读券列表为空，跳过任务');
       return;
     }
-    const coupons = user_coupons.filter(coupon => coupon.will_expire !== 0);
-    expireCouponNum = coupons.reduce((acc, coupon) => acc + coupon.remain_amount, 0);
-    logger.info(`即将过期的漫读券数量：${expireCouponNum}`);
-    return expireCouponNum;
+    return user_coupons
+      .filter(coupon => coupon.will_expire !== 0)
+      .reduce((acc, coupon) => acc + coupon.remain_amount, 0);
   } catch (error) {
     logger.error(`获取漫读券异常: ${error}`);
   }
@@ -247,11 +246,16 @@ export async function buyMangaService() {
   if (!buy) {
     return false;
   }
-  expireCouponNum = (await getExpireCouponNum()) as number;
-  if (!expireCouponNum || expireCouponNum <= 0) {
+  const num = await getExpireCouponNum();
+  if (isUnDef(num)) {
+    return false;
+  }
+  if (num <= 0) {
     logger.info('没有即将过期的漫读券，跳过任务');
     return false;
   }
+  logger.info(`即将过期的漫读券数量：${num}`);
+  expireCouponNum = num;
   // 依次购买
   for (const buy of [buyMangaByMc, buyMangaByName, buyMangaByLove]) {
     logger.debug(`开始购买漫画：${buy.name}`);
@@ -279,7 +283,7 @@ export async function mangaSign() {
      */
     const { status, statusCode } = error.response || {};
     if (status === 400 || statusCode === 400) {
-      logger.info('已经签到过了，跳过任务');
+      logger.info('已经签到过了');
     } else {
       logger.error(`漫画签到异常 ${error.message}`);
     }

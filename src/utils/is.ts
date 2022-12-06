@@ -8,7 +8,7 @@ export function isDef<T = unknown>(val?: T): val is T {
   return typeof val !== 'undefined';
 }
 
-export function isUnDef<T = unknown>(val?: T): val is T {
+export function isUnDef<T = unknown>(val?: T): val is undefined {
   return !isDef(val);
 }
 

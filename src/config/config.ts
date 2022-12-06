@@ -257,6 +257,8 @@ export const defaultConfig = {
     anonymous: [0, 1],
     // 云函数下使用新的触发器进行休眠
     newTrigger: true,
+    // 异步，非云函数下使用。不支持推送结果
+    async: false,
   },
   manga: {
     // 签到
@@ -275,7 +277,7 @@ export const defaultConfig = {
     guess: false,
   },
   exchangeCoupon: {
-    // 兑换漫读券数量
+    // 兑换漫读券数量，小于 1 为自动
     num: 1,
     // 间隔时间，单位 ms，随机误差 -50 ~ 150
     delay: 2000,

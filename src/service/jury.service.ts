@@ -2,7 +2,7 @@
  * form https://github.com/dd178/BILI_judgement/blob/master/judgement.py
  */
 import type { JuryCaseOpinion } from '@/dto/jury.dto';
-import { TaskConfig } from '@/config/globalVar';
+import { TaskConfig, TaskModule } from '@/config/globalVar';
 import {
   applyJury,
   getJuryCase,
@@ -14,7 +14,10 @@ import { apiDelay, ENV, formatCron, getPRCDate, getRandomItem, Logger, logger } 
 import { JuryVote, JuryVoteResult, VoteResCode } from '@/enums/jury.emum';
 import { getRequestNameWrapper } from '@/utils/request';
 
-const juryLogger = new Logger({ console: 'debug', file: 'debug', push: 'warn' }, 'jury');
+const juryLogger = new Logger(
+  { console: 'debug', file: 'debug', push: 'warn', payload: `${TaskModule.nickname} jury` },
+  'jury',
+);
 const request = getRequestNameWrapper({ logger: juryLogger });
 
 /**
@@ -147,7 +150,7 @@ export async function runJury(err = 3) {
     await apiDelay(2000, 5000);
   }
   if (errRef.value <= 0) {
-    logger.error(`错误次数过多，结束任务！`);
+    logger.error(`风纪任务错误次数过多，结束任务！`);
     return false;
   }
 }
@@ -203,6 +206,7 @@ async function waitFor() {
 async function handleNoNewCase(message: string, errRef?: Ref<number>) {
   juryLogger.info(`${message}`);
   if (!TaskConfig.jury.once && errRef) {
+    logger.info(`不等待，直接结束任务！`);
     return true;
   }
   // 判断是云函数
@@ -269,6 +273,7 @@ async function deleteServerless() {
  */
 async function handleCaseFull(message: string) {
   logger.info(`${message}`);
+  logger.info('风纪任务完成 √');
   await deleteServerless();
   return true;
 }
@@ -319,8 +324,13 @@ async function handleSuccess({ case_id = '' }: { case_id: string }, errRef: Ref<
  */
 export async function juryService() {
   try {
-    return await runJury();
+    if (ENV.serverless || !TaskConfig.jury.async) {
+      return await runJury();
+    }
+    logger.info(`进行异步投票，不支持推送结果`);
+    runJury().catch(err => logger.error(`异步风纪任务出错：`, err));
+    return true;
   } catch (error) {
-    logger.error(`jury 错误信息为：${error}`);
+    logger.error(`风纪任务运行异常：${error}`);
   }
 }

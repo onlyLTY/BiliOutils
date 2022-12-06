@@ -86,6 +86,7 @@ const theConfig = {
     insiders: [0, 1],
     anonymous: [0, 1],
     newTrigger: true,
+    async: false,
   },
   log: {
     pushLevel: 'verbose',
@@ -129,6 +130,7 @@ const theConfig = {
   exchangeCoupon: {
     num: 1,
     delay: 2000,
+    keepAmount: 0,
   },
   lottery: {
     excludeAward: [

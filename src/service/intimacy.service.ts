@@ -137,7 +137,7 @@ async function liveMobileHeart(
       return;
     }
     countRef.value++;
-    liveLogger.info(`直播心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
+    liveLogger.debug(`直播心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
   } catch (error) {
     if (error.message.includes('Timeout awaiting')) {
       liveLogger.debug(error.message);
@@ -165,6 +165,7 @@ async function liveHeart(fansMealList: FansMedalDto[]) {
   const { liveHeart } = TaskConfig.intimacy;
   if (!liveHeart) return;
   if (isServerless()) return await liveHeartPromiseSync(fansMealList);
+  logger.info('直播间心跳（异步，不推送结果）');
   return new Promise(resolve => liveHeartPromise(resolve, fansMealList));
 }
 
@@ -267,7 +268,8 @@ async function liveHeartPromiseSync(roomList: FansMedalDto[]) {
   await Promise.all(
     roomList.map(fansMedal => allLiveHeart(fansMedal, getRandomOptions(), { value: 0 })),
   );
-  return await retryLiveHeart();
+  await retryLiveHeart();
+  logger.info('直播间心跳结束');
 }
 
 /**
@@ -314,7 +316,7 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   // 发送直播弹幕
   let sendMessageResult: number;
   if (liveSendMessage) {
-    liveLogger.verbose(`为【${nickName}】发送直播弹幕`);
+    liveLogger.verbose(`为[${nickName}]发送直播弹幕`);
     sendMessageResult = await sendOneMessage(roomid, nickName);
   }
   if (sendMessageResult! !== SeedMessageResult.Success) {
@@ -324,7 +326,7 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   // 点赞直播
   if (liveLike) {
     await apiDelay(100, 300);
-    liveLogger.verbose(`为 [${nickName}] 直播间点赞`);
+    liveLogger.debug(`为 [${nickName}] 直播间点赞`);
     await likeLive(roomid);
   }
 
@@ -344,6 +346,7 @@ async function retryLiveHeart() {
   retryCount++;
   liveLogger.debug('尝试检查直播心跳');
   await liveIntimacyService();
+  logger.debug('直播心跳检查完成');
 }
 
 // 发送直播弹幕 1 次 间隔 10s 以上

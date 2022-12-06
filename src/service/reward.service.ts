@@ -40,8 +40,8 @@ export async function checkShareAndWatch() {
       return;
     }
     const { share, watch } = data;
-    logger.info(`每日分享: ${share ? '已完成' : '[未完成]'}`);
-    logger.info(`每日播放: ${watch ? '已完成' : '[未完成]'}`);
+    share && logger.info(`分享任务已完成`);
+    watch && logger.info(`观看任务已完成`);
 
     TaskModule.share = share;
     TaskModule.watch = watch;
