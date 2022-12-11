@@ -155,7 +155,7 @@ async function watchTask(completeTimes: number) {
   await apiDelay(watchDelay * 1000);
   try {
     const { id, name, title, md, aid, cid, season } = await getRandomEpid();
-    bigLogger.debug(`使用《${name}》：《${title}》`);
+    bigLogger.debug(`使用《${name}·${title}》`);
     const watchTime = completeTimes === 1 ? random(905, 1800) : random(1805, 2000);
     // 播放西游记
     await videoHeartbeat({
@@ -204,8 +204,7 @@ async function completeTask(taskCode: string, msg: string) {
     }
     bigLogger.debug(`${msg}每日任务 ✓`);
   } catch (error) {
-    logger.error(error);
-    logger.error(`每日任务${msg}出现异常：${error.message}`);
+    logger.error(`每日任务${msg}出现异常：`, error);
   }
 }
 
@@ -221,8 +220,7 @@ async function vipMallView() {
     }
     logger.error(`浏览会员购失败: ${code} ${message}`);
   } catch (error) {
-    logger.error(error);
-    logger.error(`每日任务会员购出现异常：${error.message}`);
+    logger.error(`每日任务会员购出现异常：`, error);
   }
 }
 
@@ -344,5 +342,6 @@ async function printPoint() {
     logger.info('可能是完成获取，但是接口数据延迟。');
     return false;
   }
+  logger.warn(`今日获取积分【${todayPoint}】, 未达到预期 ×`);
   return false;
 }
