@@ -1,6 +1,6 @@
-import type { UserConfig, ConfigArray, MultiConfig, CommonConfig } from '@/types';
+import type { UserConfig, ConfigArray, CommonConfig } from '@/types';
 import * as path from 'path';
-import { defLogger as logger } from '@/utils/log/def';
+import { defLogger, defLogger as logger } from '@/utils/log/def';
 import { gzipDecode } from '@/utils/gzip';
 import { SystemConfig } from './systemConfig';
 import { readJsonFile } from '@/utils/file';
@@ -27,7 +27,7 @@ const configPathArr = Array.from(
  */
 const qlOldConfigArr = ['./config.json', resolveCWD('./config/config.json')];
 
-function getEnvConfig() {
+function readEnvConfig() {
   const { BILITOOLS_CONFIG, BILI_SCF_CONFIG, BILI_CONFIG } = process.env;
   const config = BILITOOLS_CONFIG || BILI_SCF_CONFIG || BILI_CONFIG;
   if (!config) {
@@ -42,31 +42,15 @@ function getEnvConfig() {
 }
 
 /**
- * 处理多用户配置
+ * 多用户转单用户
  */
-function handleMultiUserConfig(config: MultiConfig | UserConfig[]) {
-  let newConfig: UserConfig[];
-  const isArrayConf = isArray(config);
-  if (isArrayConf) {
-    newConfig = config.filter(Boolean);
-  } else {
-    // [兼容]
-    // 防止错误的将 account 用在配置中
-    newConfig = config.account.filter(conf => conf.cookie);
-  }
-
+function multi2SingleUserConfig(config: UserConfig[]) {
+  const newConfig = config.filter(Boolean);
   if (newConfig.length === 0) {
     return undefined;
   }
-
   logger.warn('在单用户场景下配置了多用户，我们将放弃多余的配置');
-  // [兼容]
-  // 合并 message 配置
-  const conf = newConfig[0];
-  if (!isArrayConf && Reflect.has(conf, 'account')) {
-    conf.message = Object.assign(config.message || {}, conf.message);
-  }
-  return conf;
+  return newConfig[0];
 }
 
 export function getConfigPathFile(filepath: string): ConfigArray {
@@ -83,8 +67,10 @@ export function getConfigPathFile(filepath: string): ConfigArray {
   return [config];
 }
 
-/** 设置 config */
-function setConfig() {
+/**
+ * 从配置文件或环境变量中读取配置
+ */
+function readConfig() {
   if (globalThis.BILITOOLS_CONFIG) {
     return globalThis.BILITOOLS_CONFIG;
   }
@@ -93,8 +79,7 @@ function setConfig() {
     configPathArr.splice(0, 1);
     configPathArr.push(...qlOldConfigArr);
   }
-  for (let index = 0; index < configPathArr.length; index++) {
-    let filepath = configPathArr[index];
+  for (let filepath of configPathArr) {
     const config =
       readJsonFile<UserConfig>(filepath) || readJsonFile<UserConfig>((filepath += '5'));
     if (config) {
@@ -103,11 +88,11 @@ function setConfig() {
       return config;
     }
   }
-  return getEnvConfig();
+  return readEnvConfig();
 }
 
 export function getConfig<T extends boolean>(more?: T): T extends false ? UserConfig : ConfigArray {
-  const config = checkConfig(setConfig(), more);
+  const config = checkConfig(readConfig(), more);
   if (isArray(config) && config.length === 0) {
     logger.error('配置文件为空，或配置的cookie缺少三要素（bili_jct, SESSDATA, DedeUserID）！');
   }
@@ -125,7 +110,7 @@ export function checkConfig(config: any, more = false) {
   }
 
   if (isMultiUserConfig(config)) {
-    const multiUserConfig = handleMultiUserConfig(config);
+    const multiUserConfig = multi2SingleUserConfig(config);
     if (multiUserConfig) {
       return multiUserConfig;
     }
@@ -143,25 +128,24 @@ export function checkConfig(config: any, more = false) {
  * 判断 config 是否是多用户配置
  * @param config
  */
-function isMultiUserConfig(config: MultiConfig | UserConfig[]) {
-  if (Array.isArray(config)) {
-    return true;
-  }
-  // [兼容]
-  return Boolean(config.account && config.account.length);
+function isMultiUserConfig(config: UserConfig[]) {
+  return Array.isArray(config);
 }
 
 /**
  * 处理无效的多用户配置
  * @param config
  */
-function mapMultiUserConfig(config: ConfigArray | MultiConfig) {
-  const map = (conf: UserConfig) => (isBiliCookie(conf.cookie) ? conf : undefined);
-  if (Array.isArray(config)) {
-    return mergeCommon(config).map(map);
+function mapMultiUserConfig(config: ConfigArray) {
+  return Array.isArray(config) ? mergeCommon(config).map(map) : [];
+
+  function map(conf: UserConfig) {
+    if (!isBiliCookie(conf.cookie)) {
+      defLogger.error('配置文件中的 cookie 无效！');
+      return undefined;
+    }
+    return conf;
   }
-  // [兼容]
-  return mergeCommon(config.account).map(map);
 }
 
 /**
@@ -175,8 +159,6 @@ export function mergeCommon(config: (UserConfig | CommonConfig | undefined)[]): 
 
   // clear commonConfig
   Reflect.deleteProperty(commonConfig, '__common__');
-  Reflect.deleteProperty(commonConfig, 'cookie');
-  Reflect.deleteProperty(commonConfig, 'accessKey');
 
   config.forEach(conf => conf && deepSetObject(conf, commonConfig));
   return config as ConfigArray;
