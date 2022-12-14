@@ -10,7 +10,7 @@ body:
       value: |
         感谢您花时间填写这个 bug 报告!
         在你填写之前你应该确认看过相关文档，然后查找 issue，确定该问题没有被提到（除非原问题已经被关闭）然后在提交该报告。
-  - type: input
+  - type: textarea
     id: env
     attributes:
       label: 运行环境和版本
@@ -24,9 +24,16 @@ body:
       label: 发生了什么
       description: 还有，告诉我们，你希望发生什么，能否复现？
       placeholder: 告诉我们你看到了什么!
-      value: '这里有一个bug! 我希望它能这样。'
+      value: ''
     validations:
       required: true
+  - type: textarea
+    id: what-expected
+    attributes:
+      label: 预期的结果
+      description: 如果没有错误，将会是什么样的？
+      placeholder: 告诉我们它应该是怎么样的!
+      value: ''
   - type: textarea
     id: logs
     attributes:

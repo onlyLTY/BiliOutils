@@ -78,8 +78,8 @@
   },
   "dependencies": {
     "@catlair/bilicomic-dataflow": "^0.0.4",
-    "@catlair/node-got": "^0.0.5",
-    "core-js": "^3.26.0",
+    "@catlair/node-got": "^0.0.9",
+    "core-js": "^3.26.1",
     "json5": "^2.2.1",
     "node-cron": "^3.0.2",
     "nodemailer": "^6.8.0",
@@ -89,6 +89,7 @@
   },
   "optionalDependencies": {
     "@alicloud/fc2": "^2.6.3",
+    "@catlair/blogin": "^0.0.8",
     "dotenv": "^16.0.3",
     "puppeteer": "^15.4.0",
     "tencentcloud-sdk-nodejs": "^4.0.455"

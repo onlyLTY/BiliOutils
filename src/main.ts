@@ -18,6 +18,10 @@ export function run() {
   require('./index');
 }
 
+export function sacnLogin() {
+  return require('./utils/login').scanLogin();
+}
+
 export function runInputTasks(task: string) {
   return require('./task').runInputBiliTask(task);
 }
