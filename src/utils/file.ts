@@ -38,7 +38,7 @@ export function jsonErrorHandle(message: string) {
  * 通过用户 id 匹配并替换 cookie
  */
 export function replaceAllCookie(filePath: string, userId: number | string, newCookie: string) {
-  if (!filePath) return;
+  if (!filePath) return false;
   try {
     const content = readFileSync(filePath, 'utf-8');
     const DedeUserID = `DedeUserID=${userId}`;
@@ -52,11 +52,13 @@ export function replaceAllCookie(filePath: string, userId: number | string, newC
         : substring.match(/^['"]?cookie['"]?:\s?(['"])/)?.[1] || '"';
       return `${quote}cookie${quote}: ${quote2}${newCookie}${quote2}`;
     });
+    if (content === newJson5) return false;
     writeFileSync(filePath, newJson5);
     return true;
   } catch (error) {
     defLogger.error(error);
   }
+  return false;
 }
 
 /**

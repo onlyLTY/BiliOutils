@@ -70,7 +70,7 @@ export function getConfigPathFile(filepath: string): ConfigArray {
 /**
  * 从配置文件或环境变量中读取配置
  */
-function readConfig() {
+export function readConfig() {
   if (globalThis.BILITOOLS_CONFIG) {
     return globalThis.BILITOOLS_CONFIG;
   }

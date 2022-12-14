@@ -10,4 +10,4 @@ node processConfig.js
 
 bilitools -v
 
-bilitools -c /usr/src/app/config/config.json
+bilitools -c /usr/src/app/config/config.json $@

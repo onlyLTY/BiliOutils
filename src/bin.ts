@@ -7,6 +7,7 @@ import { existsSync, readFileSync } from 'fs';
 import { config, runTask, waitForArgs } from './util';
 import * as cron from 'node-cron';
 import { isBiliCookie } from './utils/cookie';
+import { scanLogin } from './utils/login';
 
 const pkg = require('../package.json');
 
@@ -35,7 +36,7 @@ Options:
   --delay <time[-time]>     不带单位是延迟 time 分钟后执行，单位可以为 ms（毫秒）、s（秒）、m（分）、h（小时）
     eg: --delay=10 延迟 0-10 分钟后执行
         --delay=10m-2h 延迟 10分钟-2小时 后执行
-
+  --login, -l         扫码登录，可以配和 --config 使用
 `;
 
 (async () => {
@@ -48,6 +49,12 @@ Options:
   if (isArg('help')) {
     process.stdout.write(USAGE);
     return;
+  }
+  if (isArg('login', 'l')) {
+    if (isArg('config')) {
+      return await scanLogin(resolve(process.cwd(), getArg('config')!));
+    }
+    return await scanLogin();
   }
   if (isArg('createCookie', 'cck')) {
     return await createCookie();
