@@ -1,0 +1,1 @@
+import{_ as r,r as e,o as s,c,b as n,w as l}from"./app.d6e58541.js";const _={};function a(i,f){const o=e("ConfigVersion"),t=e("ClientOnly");return s(),c("div",null,[n(t,null,{default:l(()=>[n(o)]),_:1})])}var p=r(_,[["render",a],["__file","version.html.vue"]]);export{p as default};

@@ -1,0 +1,1 @@
+import{j as r,f as s,k as u}from"./app.d6e58541.js";const o=r("releases",()=>{const e=s("v0.6.221018"),a=s(!1);return u("/api/releases").then(({data:t})=>{e.value=JSON.parse(t.value).data.tag_name||e.value,a.value=!0}),{tagName:e,isRefreshed:a}});export{o as u};
