@@ -138,7 +138,7 @@ async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
       closeWs(room_id);
       return joinErrorHandle(uname, code, message);
     }
-    liveLogger.debug(`【${uname}】红包成功 √`);
+    liveLogger.debug(`成功参与【${uname}】的红包`);
     return biliDmHandle(redPacket, wsTime);
   } catch (error) {
     logger.error(`红包异常: ${error.message}`);

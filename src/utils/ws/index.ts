@@ -93,7 +93,7 @@ export async function biliDmWs(room_id: number, time = 0) {
     clientver: '1.6.3',
     key: wsLink.token,
   };
-  const ws = new WebSocket(`wss://${wsLink.uri || 'broadcastlv.chat.bilibili.com'}/sub`);
+  const ws = new WebSocket(`wss://broadcastlv.chat.bilibili.com/sub`);
 
   // WebSocket 连接成功
   ws.addEventListener('open', () => {
@@ -108,6 +108,7 @@ export async function biliDmWs(room_id: number, time = 0) {
   });
 
   ws.addEventListener('error', () => {
+    logger.error(`直播间${room_id}，ws连接出错`);
     closeWs(room_id);
   });
 
