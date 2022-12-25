@@ -1,9 +1,8 @@
 import type { FansMedalDto } from '@/dto/live.dto';
 import { TaskConfig, TaskModule } from '@/config/globalVar';
 import * as liveRequest from '../net/live.request';
-import { kaomoji, TODAY_MAX_FEED } from '@/constant';
+import { TODAY_MAX_FEED } from '@/constant';
 import {
-  random,
   apiDelay,
   logger,
   Logger,
@@ -16,8 +15,8 @@ import {
 import { likeLiveRoom, liveMobileHeartBeat } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
 import { SeedMessageResult } from '@/enums/intimacy.emum';
+import { sendDmMessage } from './dm.service';
 
-const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
 const liveLogger = new Logger(
   { console: 'debug', file: 'debug', push: 'warn', payload: TaskModule.nickname },
   'live',
@@ -86,28 +85,6 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
   }
   // 如果存在白名单，则只发送白名单里的
   return whiteList.includes(room_info.room_id) || whiteList.includes(medal.target_id);
-}
-
-export async function sendOneMessage(roomid: number, nickName: string) {
-  const msg = messageArray[random(messageArray.length - 1)];
-  try {
-    const { code, message } = await liveRequest.sendMessage(roomid, msg);
-
-    if (code === 0) {
-      // logger.info('发送成功!');
-      return SeedMessageResult.Success;
-    }
-    if (code === SeedMessageResult.Unresistant) {
-      logger.warn(`【${nickName}】${roomid}-可能未开启评论`);
-      return SeedMessageResult.Unresistant;
-    }
-    logger.warn(`【${nickName}】${roomid}-发送失败 ${message}`);
-    logger.verbose(`code: ${code}`);
-    return code;
-  } catch (error) {
-    logger.verbose(`发送弹幕异常 ${error.message}`);
-  }
-  return SeedMessageResult.Unknown;
 }
 
 async function likeLive(roomId: number) {
@@ -317,7 +294,7 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   let sendMessageResult: number;
   if (liveSendMessage) {
     liveLogger.verbose(`为[${nickName}]发送直播弹幕`);
-    sendMessageResult = await sendOneMessage(roomid, nickName);
+    sendMessageResult = await sendDmMessage(roomid, nickName);
   }
   if (sendMessageResult! !== SeedMessageResult.Success) {
     sendMessageFailList.set(roomid, fansMedal);

@@ -32,21 +32,21 @@ import { appSignString } from '@/utils/bili';
  * 直播签到
  */
 export function doLiveSign(): Promise<LiveSignDto> {
-  return liveApi.get('/xlive/web-ucenter/v1/sign/DoSign');
+  return liveApi.get('xlive/web-ucenter/v1/sign/DoSign');
 }
 
 /**
  * 直播签到信息
  */
 export function webGetSignInfo(): Promise<LiveSignInfoDto> {
-  return liveApi.get('/xlive/web-ucenter/v1/sign/WebGetSignInfo');
+  return liveApi.get('xlive/web-ucenter/v1/sign/WebGetSignInfo');
 }
 
 /**
  * 银瓜子兑换硬币
  */
 export function exchangeSilver2Coin(): Promise<Silver2CoinDto> {
-  return liveApi.post('/xlive/revenue/v1/wallet/silver2coin', {
+  return liveApi.post('xlive/revenue/v1/wallet/silver2coin', {
     csrf_token: TaskConfig.BILIJCT,
     csrf: TaskConfig.BILIJCT,
   });
@@ -77,14 +77,14 @@ export function exchangeBattery(couponBalance: number) {
  * 瓜子交换信息
  */
 export function exchangeStatus(): Promise<SilverStatusDto> {
-  return liveApi.get('/xlive/revenue/v1/wallet/getStatus');
+  return liveApi.get('xlive/revenue/v1/wallet/getStatus');
 }
 
 /**
  * 我的钱包
  */
 export function getMyWallet(): Promise<MyWalletDto> {
-  return liveApi.get('/xlive/revenue/v1/wallet/myWallet?need_bp=1&need_metal=1&platform=pc');
+  return liveApi.get('xlive/revenue/v1/wallet/myWallet?need_bp=1&need_metal=1&platform=pc');
 }
 
 /**
@@ -115,13 +115,13 @@ export function sendMessage(roomid: number, msg: string, dm_type?: number): Prom
 /**
  * 获取勋章
  * @param page 页
- * @param pageSize 页大小
+ * @param page_size 页大小
  */
-export function getFansMedalPanel(page = 1, pageSize = 50): Promise<FansMedalPanelDto> {
+export function getFansMedalPanel(page = 1, page_size = 50): Promise<FansMedalPanelDto> {
   return liveApi.get(
     `xlive/app-ucenter/v1/fansMedal/panel?${appSignString({
       page,
-      page_size: pageSize,
+      page_size,
     })}`,
   );
 }
@@ -131,8 +131,7 @@ export function getFansMedalPanel(page = 1, pageSize = 50): Promise<FansMedalPan
  * @param roomId 房间号(默认陈睿-嘻嘻)
  */
 export function getGiftBagList(roomId: IdType = 3394945): Promise<LiveGiftBagListDto> {
-  const time = new Date().getTime();
-  return liveApi.get(`/xlive/web-room/v1/gift/bag_list?t=${time}&room_id=${roomId}`);
+  return liveApi.get(`xlive/web-room/v1/gift/bag_list?t=${new Date().getTime()}&room_id=${roomId}`);
 }
 
 /**
@@ -143,9 +142,7 @@ export function getLiveFansMedal(pageNum = 1, pageSize = 10): Promise<LiveFansMe
   if (pageNum > 10) {
     pageNum = 10;
   }
-  return liveApi.get(
-    `/xlive/app-ucenter/v1/user/GetMyMedals?page=${pageNum}&page_size=${pageSize}`,
-  );
+  return liveApi.get(`xlive/app-ucenter/v1/user/GetMyMedals?page=${pageNum}&page_size=${pageSize}`);
 }
 
 /**
@@ -192,7 +189,7 @@ export function sendBagGift({
     csrf_token,
     uid: TaskConfig.USERID,
   };
-  return liveApi.post('/xlive/revenue/v2/gift/sendBag', postData, {
+  return liveApi.post('xlive/revenue/v2/gift/sendBag', postData, {
     headers: {
       Origin: OriginURLs.live,
     },
@@ -203,7 +200,7 @@ export function sendBagGift({
  * 获取分区信息
  */
 export function getArea(): Promise<LiveAreaDto> {
-  return liveApi.get('/xlive/web-interface/v1/index/getWebAreaList?source_id=2');
+  return liveApi.get('xlive/web-interface/v1/index/getWebAreaList?source_id=2');
 }
 
 /**
@@ -214,7 +211,7 @@ export function getArea(): Promise<LiveAreaDto> {
  */
 export function getLiveRoom(parentArea: IdType, areaId: IdType, page = 1): Promise<LiveRoomDto> {
   return liveApi.get(
-    `/xlive/web-interface/v1/second/getList?platform=web&parent_area_id=${parentArea}&area_id=${areaId}&page=${page}`,
+    `xlive/web-interface/v1/second/getList?platform=web&parent_area_id=${parentArea}&area_id=${areaId}&page=${page}`,
   );
 }
 
@@ -223,7 +220,7 @@ export function getLiveRoom(parentArea: IdType, areaId: IdType, page = 1): Promi
  * @param roomId 直播间id
  */
 export function checkLottery(roomId: IdType): Promise<LiveCheckLotteryRes> {
-  return liveApi.get(`/xlive/lottery-interface/v1/Anchor/Check?roomid=${roomId}`);
+  return liveApi.get(`xlive/lottery-interface/v1/Anchor/Check?roomid=${roomId}`);
 }
 
 /**
@@ -234,7 +231,7 @@ export function joinLottery(options: {
   gift_id: IdType;
   gift_num: number;
 }): Promise<JoinLotteryDto> {
-  return liveApi.post(`/xlive/lottery-interface/v1/Anchor/Join`, {
+  return liveApi.post(`xlive/lottery-interface/v1/Anchor/Join`, {
     ...options,
     csrf: TaskConfig.BILIJCT,
     csrf_token: TaskConfig.BILIJCT,
@@ -249,7 +246,7 @@ export function joinLottery(options: {
  */
 export function checkRedPacket(roomId: IdType) {
   return liveApi.get<LiveCheckRedRes>(
-    `/xlive/lottery-interface/v1/lottery/getLotteryInfoWeb?roomid=${roomId}`,
+    `xlive/lottery-interface/v1/lottery/getLotteryInfoWeb?roomid=${roomId}`,
   );
 }
 
@@ -259,12 +256,12 @@ export function checkRedPacket(roomId: IdType) {
  */
 export function joinRedPacket(params: { room_id: IdType; ruid: IdType; lot_id: IdType }) {
   return liveApi.post<JoinRedPacketRes>(
-    `/xlive/lottery-interface/v1/popularityRedPocket/RedPocketDraw`,
+    `xlive/lottery-interface/v1/popularityRedPocket/RedPocketDraw`,
     {
       ...params,
       spm_id: '444.8.red_envelope.extract',
       jump_from: '26000',
-      c_locale: 'en_US',
+      c_locale: 'zh_CN',
       device: 'android',
       mobi_app: 'android',
       platform: 'android',
@@ -289,7 +286,7 @@ export function joinRedPacket(params: { room_id: IdType; ruid: IdType; lot_id: I
  */
 export function getFollowLiveRoomList(page = 1, page_size = 9) {
   return liveApi.get<LiveFollowListDto>(
-    `/xlive/web-ucenter/user/following?page=${page}&page_size=${page_size}`,
+    `xlive/web-ucenter/user/following?page=${page}&page_size=${page_size}`,
   );
 }
 

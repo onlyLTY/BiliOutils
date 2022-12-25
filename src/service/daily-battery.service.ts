@@ -1,6 +1,6 @@
 import * as net from '@/net/daily-battery.request';
 import { apiDelay, getRandomItem, logger } from '@/utils';
-import { sendOneMessage } from './intimacy.service';
+import { sendDmMessage } from './dm.service';
 
 /**
  * 获取任务进度
@@ -71,7 +71,7 @@ async function dailyBattery() {
       const rooms = [21144080, 7734200, 46936];
       logger.debug(`发送弹幕 ${status - 10}`);
       for (let index = 0; index < 15 - status; index++) {
-        await sendOneMessage(getRandomItem(rooms), 'bili官方');
+        await sendDmMessage(getRandomItem(rooms), 'bili官方');
         await apiDelay(10000, 15000);
       }
       return false;
