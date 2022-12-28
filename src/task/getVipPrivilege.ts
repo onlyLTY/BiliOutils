@@ -26,20 +26,8 @@ async function getPrivilegeStatus() {
 }
 
 function getPrivilegeName(type: number): string {
-  switch (type) {
-    case 1:
-      return 'B 币券';
-    case 2:
-      return '会员购优惠券';
-    case 3:
-      return '漫画福利券';
-    case 4:
-      return '会员购包邮券';
-    case 5:
-      return '漫画商城优惠券';
-    default:
-      return '未知';
-  }
+  if (type > 5 || type < 1) return `未知权益 ${type}`;
+  return ['B 币券', '会员购优惠券', '漫画福利券', '会员购包邮券', '漫画商城优惠券'][type - 1];
 }
 
 async function getOnePrivilege(type: number): Promise<boolean> {
@@ -58,8 +46,7 @@ async function getOnePrivilege(type: number): Promise<boolean> {
     logger.info(`领取${name}成功！`);
     return true;
   } catch (error) {
-    logger.error(`领取权益出现异常：${error.message}`);
-    logger.error(error);
+    logger.error(`领取权益出现异常：`, error);
   }
   return false;
 }
@@ -100,7 +87,6 @@ export default async function getVipPrivilege() {
       await getPrivilege(privilege.type);
     }
   } catch (error) {
-    logger.error(`领取大会员权益出现异常：${error.message}`);
-    logger.error(error);
+    logger.error(`领取大会员权益出现异常：`, error);
   }
 }

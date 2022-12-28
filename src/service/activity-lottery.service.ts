@@ -5,7 +5,7 @@
  * -2 表示被风控等已知无法继续进行的原因，直接结束任务
  */
 import { TaskConfig, TaskModule } from '@/config/globalVar';
-import { ActivityLotteryStatus } from '@/enums/activity-lottery.emumm';
+import { ActivityLotteryStatus } from '@/enums/activity-lottery.emum';
 import { defHttp } from '@/net/api';
 import { ActivityLotteryIdType } from '@/types';
 import {

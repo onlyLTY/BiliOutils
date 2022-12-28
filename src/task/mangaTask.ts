@@ -4,6 +4,7 @@ import {
   takeSeasonGift,
   shareComicService,
   readMangaService,
+  guessGameService,
 } from '@/service/manga.service';
 import { logger } from '../utils/log';
 
@@ -16,11 +17,13 @@ export default async function mangaTask() {
     await shareComicService();
     // 每日阅读
     await readMangaService();
+    // 每日游戏
+    await guessGameService();
     // 领取任务奖励
     await takeSeasonGift();
     // 购买漫画
     await buyMangaService();
   } catch (error) {
-    logger.error(`漫画任务异常: ${error}`);
+    logger.error(`漫画任务异常：`, error);
   }
 }

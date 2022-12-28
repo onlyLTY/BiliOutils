@@ -79,9 +79,6 @@ async function coinHandle(state: State) {
   }
   // 这个函数不会报错的
   const { data, code, msg } = await getAidByByPriority();
-  console.log(code);
-  console.log(msg);
-  console.log(data);
 
   if (code === 1) {
     aidFuncName.next();

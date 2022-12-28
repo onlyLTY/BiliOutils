@@ -69,7 +69,7 @@ async function getVideoAid() {
       return;
     }
   } catch (error) {
-    logger.error(`获取视频出现异常: ${error.message}`);
+    logger.error(`获取视频出现异常：`, error);
     return;
   }
 }

@@ -2,13 +2,21 @@ import type { IdType } from '@/types';
 import { getRandomItem, getUnixTime, Logger, logger, pushIfNotExist, random, sleep } from '@/utils';
 import { joinRedPacket, checkRedPacket, sendMessage, getOnlineGoldRank } from '@/net/live.request';
 import { TaskConfig, TaskModule } from '@/config/globalVar';
-import { addWs, biliDmWs, bindMessageForRedPacket, clearWs, closeWs, wsMap } from '@/utils/ws';
+import {
+  addWs,
+  biliDmWs,
+  bindMessageForRedPacket,
+  clearWs,
+  closeWs,
+  waitForWebSocket,
+  wsMap,
+} from './ws.service';
 import { DMEmoji } from '@/constant/dm';
-import { getLiveArea, getLotteryRoomList } from './live-lottery.service';
+import { getLiveArea, getLotteryRoomList } from './live.service';
 import { request } from '@/utils/request';
 import { handleFollowUps } from './tags.service';
 import { getRedPacketController } from '@/net/red-packet.request';
-import { noWinRef } from '@/store/red-packet';
+import { noWinRef, realRisk } from '@/store/red-packet';
 import { ReturnStatus } from '@/enums/packet.enum';
 
 const liveLogger = new Logger(
@@ -107,6 +115,10 @@ async function returnStatusHandle() {
     logger.warn(`疑似风控连续${riskTotalCount}次，停止运行`);
     return ReturnStatus.退出;
   }
+  if (realRisk.value) {
+    logger.warn(`已被风控，停止运行`);
+    return ReturnStatus.退出;
+  }
   if (riskTime[0] > 0 && riskCount >= riskTime[0]) {
     // 当风控需要休眠时，重置中场次数
     liveLogger.warn(`疑似风控连续${riskCount}次，暂停运行${riskTime[1]}分`);
@@ -138,7 +150,7 @@ async function joinRedPacketHandle(redPacket: RedPacket, wsTime: number) {
       closeWs(room_id);
       return joinErrorHandle(uname, code, message);
     }
-    liveLogger.debug(`【${uname}】红包成功 √`);
+    liveLogger.debug(`成功参与【${uname}】的红包`);
     return biliDmHandle(redPacket, wsTime);
   } catch (error) {
     logger.error(`红包异常: ${error.message}`);
@@ -234,20 +246,6 @@ async function doRedPackArea(areaId: string, parentId: string) {
     await waitForWebSocket(linkRoomNum);
     if (returnStatus !== undefined) return returnStatus;
   }
-}
-
-/**
- * 通过 ws 数量限制红包并发数
- */
-function waitForWebSocket(conditions = 2) {
-  return new Promise(resolve => {
-    const timer = setInterval(() => {
-      if (wsMap.size < conditions) {
-        clearInterval(timer);
-        resolve(true);
-      }
-    }, 1000);
-  });
 }
 
 /**

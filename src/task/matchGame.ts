@@ -1,6 +1,6 @@
+import type { GuessCollectionDto, GuessDetails } from '../dto/match-game.dto';
 import { TaskConfig, TaskModule } from '../config/globalVar';
 import { getGuessCollection, guessAdd } from '../net/match-game.request';
-import { GuessCollectionDto } from '../dto/match-game.dto';
 import { apiDelay } from '../utils';
 import { logger } from '../utils/log';
 
@@ -64,60 +64,62 @@ async function getOneGuessCollection() {
 
     return list;
   } catch (error) {
-    logger.debug(error.message);
+    logger.error(`赛事竞猜异常：`, error);
   }
 }
 
 async function guessOne(list: GuessCollectionDto['data']['list']) {
   let count = 0;
   try {
-    for (const games of list) {
-      const { contest, questions } = games;
-      const contestId = contest.id;
+    for (const { contest, questions } of list) {
       const [{ id: questionsId, title, details, is_guess }] = questions;
-      const [team1, team2] = details;
 
-      if (isLackOfCoin()) {
-        return count;
-      }
+      if (isLackOfCoin()) return count;
 
-      if (is_guess) {
-        continue;
-      }
-
-      logger.info(`${title} <=> ${team1.odds}:${team2.odds}`);
-
-      const oddResult = team1.odds > team2.odds,
-        { match } = TaskConfig;
-      let teamSelect: typeof team1;
-      // 正选，赔率越小越选
-      if (match.selection > 0) {
-        teamSelect = oddResult ? team2 : team1;
-      } else {
-        teamSelect = oddResult ? team1 : team2;
-      }
-
-      logger.info(`预测[ ${teamSelect.option} ] ${match.coins} 颗硬币`);
+      if (is_guess) continue;
 
       await apiDelay();
-      const { code } = await guessAdd(contestId, questionsId, teamSelect.detail_id, match.coins);
+      const coins = TaskConfig.match.coins;
+      const { code, message } = await guessAdd(
+        contest.id,
+        questionsId,
+        selectOdd(title, details),
+        coins,
+      );
       if (code !== 0) {
-        logger.info('预测失败');
-      } else {
-        count++;
-        TaskModule.money -= match.coins;
+        logger.warn(`预测失败：${code} ${message}`);
+        continue;
       }
+      count++;
+      TaskModule.money -= coins;
     }
   } catch (error) {
-    console.warn(error.message);
+    logger.error('赛事硬币竞猜出错了', error);
   }
   return count;
+}
+
+function selectOdd(title: string, [team1, team2]: GuessDetails[]) {
+  logger.debug(`${title} <=> ${team1.odds}:${team2.odds}`);
+
+  const oddResult = team1.odds > team2.odds,
+    { match } = TaskConfig;
+  let teamSelect: typeof team1;
+  // 正选，赔率越小越选
+  if (match.selection > 0) {
+    teamSelect = oddResult ? team2 : team1;
+  } else {
+    teamSelect = oddResult ? team1 : team2;
+  }
+
+  logger.verbose(`预测[ ${teamSelect.option} ] ${match.coins} 颗硬币`);
+  return teamSelect.detail_id;
 }
 
 function isLackOfCoin() {
   const { coin, match } = TaskConfig;
   if (TaskModule.money - match.coins < coin.stayCoins) {
-    logger.info(`需要保留${coin.stayCoins}个硬币，任务结束`);
+    logger.verbose(`需要保留${coin.stayCoins}个硬币，任务结束`);
     return true;
   }
   return false;

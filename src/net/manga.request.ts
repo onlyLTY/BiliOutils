@@ -4,6 +4,13 @@ import type {
   ClockInDto,
   CouponDto,
   FavoriteManga,
+  GameChooseRoleDto,
+  GameGuessDto,
+  GameInitDto,
+  GameLastResultDto,
+  GameRoundStartDto,
+  GameStartDto,
+  GameTryDto,
   MangaDetailDto,
   MangaPointShopDto,
   PointShopBuyDto,
@@ -14,6 +21,14 @@ import type {
   WalletDto,
 } from '../dto/manga.dto';
 import { mangaApi } from './api';
+
+const MANGA_DATA = {
+  is_teenager: 0,
+  no_recommend: 0,
+  mobi_app: 'android_comic',
+  platform: 'android',
+  channel: 'bilicomic',
+};
 
 /**
  * 漫画签到
@@ -157,10 +172,8 @@ export function takeSeasonGift(season_id: number | string = '31') {
  */
 export function getSeasonInfo() {
   return mangaApi.post<SeasonInfoDto>(`twirp/user.v1.Season/GetSeasonInfo`, {
-    is_teenager: 0,
-    no_recommend: 0,
+    ...MANGA_DATA,
     take_type: 1,
-    mobi_app: 'android_comic',
     ts: new Date().getTime(),
   });
 }
@@ -170,7 +183,62 @@ export function getSeasonInfo() {
  */
 export function shareComic() {
   return mangaApi.post<ShareComicDto>(`twirp/activity.v1.Activity/ShareComic`, {
-    platform: 'android',
+    ...MANGA_DATA,
     ts: new Date().getTime(),
+  });
+}
+
+/**
+ * 游戏 init
+ */
+export function gameInit() {
+  return mangaApi.post<GameInitDto>(`twirp/user.v1.Season/GameInit`, { ...MANGA_DATA });
+}
+
+/**
+ * 选择角色
+ */
+export function chooseRole(role: string) {
+  return mangaApi.post<GameChooseRoleDto>(`twirp/user.v1.Season/ChooseRole`, {
+    ...MANGA_DATA,
+    role,
+  });
+}
+
+/**
+ * 完成初次尝试
+ */
+export function finishTry() {
+  return mangaApi.post<GameTryDto>(`twirp/user.v1.Season/FinishTry`, { ...MANGA_DATA });
+}
+
+/**
+ * 开始游戏
+ * code 1 已有进行中的游戏
+ */
+export function startGame() {
+  return mangaApi.post<GameStartDto>(`twirp/user.v1.Season/StartGame`, { ...MANGA_DATA });
+}
+
+/**
+ * 开始回合
+ */
+export function startRound() {
+  return mangaApi.post<GameRoundStartDto>(`twirp/user.v1.Season/StartRound`, { ...MANGA_DATA });
+}
+
+/**
+ * 猜拳
+ */
+export function guessFinger(card: number) {
+  return mangaApi.post<GameGuessDto>(`twirp/user.v1.Season/FingerGuess`, { ...MANGA_DATA, card });
+}
+
+/**
+ * 查看上次结果
+ */
+export function checkLastResult() {
+  return mangaApi.post<GameLastResultDto>(`twirp/user.v1.Season/ListRoundResult`, {
+    ...MANGA_DATA,
   });
 }

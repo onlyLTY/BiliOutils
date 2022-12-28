@@ -1,9 +1,8 @@
 import type { FansMedalDto } from '@/dto/live.dto';
 import { TaskConfig, TaskModule } from '@/config/globalVar';
 import * as liveRequest from '../net/live.request';
-import { kaomoji, TODAY_MAX_FEED } from '@/constant';
+import { TODAY_MAX_FEED } from '@/constant';
 import {
-  random,
   apiDelay,
   logger,
   Logger,
@@ -16,8 +15,8 @@ import {
 import { likeLiveRoom, liveMobileHeartBeat } from '@/net/intimacy.request';
 import type { MobileHeartBeatParams } from '@/net/intimacy.request';
 import { SeedMessageResult } from '@/enums/intimacy.emum';
+import { sendDmMessage } from './dm.service';
 
-const messageArray = kaomoji.concat('1', '2', '3', '4', '5', '6', '7', '8', '9', '签到', '哈哈');
 const liveLogger = new Logger(
   { console: 'debug', file: 'debug', push: 'warn', payload: TaskModule.nickname },
   'live',
@@ -88,28 +87,6 @@ function fansMedalFilter({ room_info, medal }: FansMedalDto) {
   return whiteList.includes(room_info.room_id) || whiteList.includes(medal.target_id);
 }
 
-export async function sendOneMessage(roomid: number, nickName: string) {
-  const msg = messageArray[random(messageArray.length - 1)];
-  try {
-    const { code, message } = await liveRequest.sendMessage(roomid, msg);
-
-    if (code === 0) {
-      // logger.info('发送成功!');
-      return SeedMessageResult.Success;
-    }
-    if (code === SeedMessageResult.Unresistant) {
-      logger.warn(`【${nickName}】${roomid}-可能未开启评论`);
-      return SeedMessageResult.Unresistant;
-    }
-    logger.warn(`【${nickName}】${roomid}-发送失败 ${message}`);
-    logger.verbose(`code: ${code}`);
-    return code;
-  } catch (error) {
-    logger.verbose(`发送弹幕异常 ${error.message}`);
-  }
-  return SeedMessageResult.Unknown;
-}
-
 async function likeLive(roomId: number) {
   try {
     const { code, message, data } = await likeLiveRoom(roomId);
@@ -137,7 +114,7 @@ async function liveMobileHeart(
       return;
     }
     countRef.value++;
-    liveLogger.info(`直播心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
+    liveLogger.debug(`直播心跳成功 ${heartbeatParams.uname}（${countRef.value}/${needTime}）`);
   } catch (error) {
     if (error.message.includes('Timeout awaiting')) {
       liveLogger.debug(error.message);
@@ -165,6 +142,7 @@ async function liveHeart(fansMealList: FansMedalDto[]) {
   const { liveHeart } = TaskConfig.intimacy;
   if (!liveHeart) return;
   if (isServerless()) return await liveHeartPromiseSync(fansMealList);
+  logger.info('直播间心跳（异步，不推送结果）');
   return new Promise(resolve => liveHeartPromise(resolve, fansMealList));
 }
 
@@ -253,7 +231,7 @@ async function liveHeartPromise(resolve: (value: unknown) => void, roomList: Fan
       sendMessageFailList.delete(room_info.room_id);
       return;
     }
-    if (timeDiff <= 0) return;
+    if (timeDiff > 0) return;
     timerRef && timerRef.value && clearInterval(timerRef.value);
     if (retryRoom === room_info.room_id) {
       await retryLiveHeartOnce();
@@ -267,7 +245,8 @@ async function liveHeartPromiseSync(roomList: FansMedalDto[]) {
   await Promise.all(
     roomList.map(fansMedal => allLiveHeart(fansMedal, getRandomOptions(), { value: 0 })),
   );
-  return await retryLiveHeart();
+  await retryLiveHeart();
+  logger.info('直播间心跳结束');
 }
 
 /**
@@ -314,8 +293,8 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   // 发送直播弹幕
   let sendMessageResult: number;
   if (liveSendMessage) {
-    liveLogger.verbose(`为【${nickName}】发送直播弹幕`);
-    sendMessageResult = await sendOneMessage(roomid, nickName);
+    liveLogger.verbose(`为[${nickName}]发送直播弹幕`);
+    sendMessageResult = await sendDmMessage(roomid, nickName);
   }
   if (sendMessageResult! !== SeedMessageResult.Success) {
     sendMessageFailList.set(roomid, fansMedal);
@@ -324,7 +303,7 @@ export async function liveInteract(fansMedal: FansMedalDto) {
   // 点赞直播
   if (liveLike) {
     await apiDelay(100, 300);
-    liveLogger.verbose(`为 [${nickName}] 直播间点赞`);
+    liveLogger.debug(`为 [${nickName}] 直播间点赞`);
     await likeLive(roomid);
   }
 
@@ -344,6 +323,7 @@ async function retryLiveHeart() {
   retryCount++;
   liveLogger.debug('尝试检查直播心跳');
   await liveIntimacyService();
+  logger.debug('直播心跳检查完成');
 }
 
 // 发送直播弹幕 1 次 间隔 10s 以上

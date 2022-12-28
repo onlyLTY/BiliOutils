@@ -296,8 +296,6 @@ async function getVideoByRandom(mid: number, page: number, index: number, total:
   const { aid, title, author, copyright, mid: upperMid } = data.list.vlist[index];
 
   if (upperMid !== mid && TaskConfig.coin.upperAccMatch) {
-    console.log('upperMid', upperMid, 'mid', mid);
-    console.log(author, title, '不是指定up主的视频，跳过');
     const { page, index } = getRandmonNum([total, 0, 0]) || { page: 1, index: 0 };
     return await getVideoByRandom(mid, page, index, total);
   }

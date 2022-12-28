@@ -4,6 +4,9 @@ import { logger } from '@/utils/log';
 import { biliHttp } from './api';
 
 export async function getRedPacketController() {
+  if (TaskConfig.redPack.uri === '') {
+    return;
+  }
   try {
     const resp = await biliHttp.get<{ _ts_rpc_return_: AugRedPacket2022Controller }>(
       TaskConfig.redPack.uri,

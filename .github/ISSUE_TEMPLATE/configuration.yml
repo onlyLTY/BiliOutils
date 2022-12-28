@@ -20,12 +20,12 @@ body:
       options:
         - label: 我确定阅读过文档
           required: true
-  - type: input
+  - type: textarea
     id: env
     attributes:
-      label: 运行环境
-      description: 您的程序是运行在什么环境下的？
-      placeholder: 腾讯云函数、本地 Windows11、MacOS等
+      label: 运行环境和版本
+      description: 您的程序是运行在什么环境下的，是什么版本的软件？如果在使用 npm 可以将 `bilitools -v` 的结果输入。
+      placeholder: 腾讯云函数、本地 Windows11、MacOS、青龙面板 2.13.2 等，版本 0.5.1。
     validations:
       required: true
   - type: textarea
@@ -37,14 +37,6 @@ body:
       value: '我对此存在疑问。'
     validations:
       required: true
-  - type: input
-    id: version
-    attributes:
-      label: 版本
-      description: 你用的是什么版本的软件?
-      placeholder: 0.5.1
-    validations:
-      required: false
   - type: textarea
     id: logs
     attributes:

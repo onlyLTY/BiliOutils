@@ -151,25 +151,11 @@ async function watchTask(completeTimes: number) {
   if (!TaskConfig.bigPoint.isWatch) {
     return;
   }
-  // 随机获取一集
-  function createEpid(prefix: string, min: number, max: number, exclude: number[] = []) {
-    let epid = random(min, max);
-    while (exclude.includes(epid)) {
-      epid = random(min, max);
-    }
-    return Number(prefix + epid);
-  }
-  const { epids, watchDelay = 40 } = TaskConfig.bigPoint;
+  const { watchDelay = 40 } = TaskConfig.bigPoint;
   await apiDelay(watchDelay * 1000);
   try {
-    let epid: number;
-    if (epids && epids.length > 0) {
-      epid = getRandomItem(epids);
-      bigLogger.debug(`使用随机视频: ${epid}`);
-    } else {
-      bigLogger.debug('使用默认视频（西游记随机集数）');
-      epid = createEpid('327', 107, 134, [122, 123]);
-    }
+    const { id, name, title, md, aid, cid, season } = await getRandomEpid();
+    bigLogger.debug(`使用《${name}·${title}》`);
     const watchTime = completeTimes === 1 ? random(905, 1800) : random(1805, 2000);
     // 播放西游记
     await videoHeartbeat({
@@ -177,14 +163,31 @@ async function watchTask(completeTimes: number) {
       realtime: watchTime,
       played_time: random(1000) + watchTime,
       real_played_time: watchTime,
-      refer_url: 'https://www.bilibili.com/bangumi/media/md28229051/',
-      epid,
+      refer_url: `https://www.bilibili.com/bangumi/media/md${md}/`,
+      epid: id,
+      aid,
+      cid,
+      sid: season,
     });
     bigLogger.debug(`观看视频任务 ✓`);
   } catch (error) {
-    logger.error(error);
-    logger.error(`观看视频任务出现异常：${error.message}`);
+    logger.error(`观看视频任务出现异常：`, error);
   }
+}
+
+/**
+ * 获取随机视频
+ */
+async function getRandomEpid() {
+  const { bangumiList } = await import('@/constant/bangumi');
+  // 随机获取一个番剧
+  const bangumi = getRandomItem(bangumiList);
+  return {
+    name: bangumi.name,
+    md: bangumi.md,
+    season: bangumi.season,
+    ...getRandomItem(bangumi.section),
+  };
 }
 
 /**
@@ -193,7 +196,7 @@ async function watchTask(completeTimes: number) {
 async function completeTask(taskCode: string, msg: string) {
   try {
     await susWin();
-    apiDelay(1000, 2000);
+    await apiDelay(1000, 2000);
     const { code: comCode, message: comMsg } = await complete(taskCode);
     if (comCode !== 0) {
       logger.error(`${msg}失败: ${comCode} ${comMsg}`);
@@ -201,8 +204,7 @@ async function completeTask(taskCode: string, msg: string) {
     }
     bigLogger.debug(`${msg}每日任务 ✓`);
   } catch (error) {
-    logger.error(error);
-    logger.error(`每日任务${msg}出现异常：${error.message}`);
+    logger.error(`每日任务${msg}出现异常：`, error);
   }
 }
 
@@ -218,8 +220,7 @@ async function vipMallView() {
     }
     logger.error(`浏览会员购失败: ${code} ${message}`);
   } catch (error) {
-    logger.error(error);
-    logger.error(`每日任务会员购出现异常：${error.message}`);
+    logger.error(`每日任务会员购出现异常：`, error);
   }
 }
 
@@ -341,5 +342,6 @@ async function printPoint() {
     logger.info('可能是完成获取，但是接口数据延迟。');
     return false;
   }
+  logger.warn(`今日获取积分【${todayPoint}】, 未达到预期 ×`);
   return false;
 }

@@ -2,7 +2,7 @@ import { TaskConfig } from '../config/globalVar';
 import { getGiftBagList, sendBagGift, getLiveFansMedal } from '../net/live.request';
 import { getUser } from '../net/user-info.request';
 import { LiveGiftBagListDto } from '../dto/live.dto';
-import { apiDelay, random, logger } from '../utils';
+import { apiDelay, random, logger, pushIfNotExist } from '../utils';
 import { MS2DATE } from '../constant';
 
 const EXPIRE_DATE = 2;
@@ -117,6 +117,7 @@ async function sendGift(
   { roomid, mid, name }: { roomid: number; mid: number; name: string },
   gifts: LiveGiftBagListDto['data']['list'],
 ) {
+  const success: string[] = [];
   for (const gift of gifts) {
     await apiDelay();
     try {
@@ -133,10 +134,11 @@ async function sendGift(
         continue;
       }
       data.gift_list.forEach(gift => {
-        logger.info(`成功给 【${name}】 投喂${gift.gift_name}`);
+        pushIfNotExist(success, `成功给 【${name}】 投喂${gift.gift_name}`);
       });
-    } catch {
-      logger.warn(`向【${name}】投喂[${gift.gift_name}]，异常`);
+    } catch (error) {
+      logger.error(`向【${name}】投喂[${gift.gift_name}]`, error);
     }
   }
+  success.forEach(msg => logger.info(msg));
 }

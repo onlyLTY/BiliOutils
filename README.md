@@ -16,9 +16,7 @@
 
 ## 说明
 
-是时候停更了，暂时不会删库，让它留个纪念吧，偶尔修复反馈的 bug。
-
-由于某些原因，现将 BiliTools 更名为 BiliOutils（法语），此更名只影响仓库和文档，npm 包和 docker 镜像依然使用原名称。
+停更了（即使这样他也是 Github 上最全的之一），暂时不会删库，让它留个纪念吧，偶尔修复反馈的 bug。
 
 反馈 bug 或提意见时，请务必清晰的描述你的问题或想法，写 100 行代码很容易，但是弄清楚一个逻辑很难，何况功能是给所有用户用的。如果你觉得这一切理所应当，那么希望你不要打扰我。
 
@@ -94,7 +92,6 @@ yarn build
 │  ├── task # 任务目录，用于放最终抛出的任务
 │  ├── types # 类型目录，用于放类型定义的 TypeScript 接口
 │  ├── utils # 工具目录，放使用到的公共函数
-│  ├── vm # 运行网络代码的虚拟机目录
 │  ├── util.ts # 入口文件使用的工具函数文件
 │  ├── env.d.ts # 环境变量类型文件
 │  ├── index.cfc.ts # cfc 入口文件
@@ -125,3 +122,11 @@ yarn build
 
 - [@catlair/bilicomic-dataflow](https://www.npmjs.com/package/@catlair/bilicomic-dataflow)：哔哩哔哩漫画阅读数据流生成器
 - [@catlair/node-got](https://www.npmjs.com/package/@catlair/node-got)：got 的简单封装
+
+## 致谢
+
+感谢 `JetBrains` 提供优秀的 IDE。
+
+<a href="https://www.jetbrains.com/?from=BiliHelper-personal" target="_blank">
+<img src="https://tva1.sinaimg.cn/large/008eGmZEly1gov9g3tzrnj30u00wj0tn.jpg" width="150"/>
+</a>
