@@ -63,7 +63,8 @@ export async function getLotteryRoomList(
     await sleep(100);
     const { data, code, message } = await getLiveRoom(parentId, areaId, page);
     if (code !== 0) {
-      logger.info(`获取直播间列表失败: ${code}-${message}`);
+      logger.warn(`获取直播间列表失败: ${code} ${message}`);
+      throw new Error(`获取直播间列表失败: ${code} ${message}`);
     }
     return pendentLottery(data.list)[lotType === 'lottery' ? 'lotteryTime' : 'lotteryPacket'];
   } catch (error) {

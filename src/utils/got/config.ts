@@ -1,6 +1,7 @@
+import type { VGotOptions } from '@catlair/node-got';
 import { defaultHeaders } from '@/constant/biliUri';
 
-export function getOptions() {
+export function getOptions(): VGotOptions {
   return {
     timeout: 10000,
     headers: {
@@ -18,5 +19,6 @@ export function getOptions() {
       // 是否携带 bili cookie
       withBiliCookie: true,
     },
+    throwHttpErrors: false,
   };
 }

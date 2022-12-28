@@ -9,7 +9,6 @@ export const biliTaskArray = [
   ['silver2Coin', () => import('./silver2Coin')],
   ['mangaTask', () => import('./mangaTask')],
   ['supGroupSign', () => import('./supGroupSign')],
-  ['liveSendMessage', () => import('./liveSendMessage')],
   ['getVipPrivilege', () => import('./getVipPrivilege')],
   ['useCouponBp', () => import('./useCouponBp')],
   ['matchGame', () => import('./matchGame')],
@@ -20,6 +19,7 @@ export const biliTaskArray = [
   ['liveRedPack', () => import('./liveRedPack')],
   ['dailyBattery', () => import('./dailyBattery')],
   ['activityLottery', () => import('./activityLottery')],
+  ['LiveReservation', () => import('./LiveReservation')],
   ['judgement', () => import('./judgement')],
 ] as const;
 

@@ -112,10 +112,9 @@ function getRequireUp(requireText: string) {
  * 进行一次天选时刻
  */
 async function doLottery(lottery: CheckedLottery, rememberUp = true) {
-  const { award_name, room_id, uname } = lottery;
+  const { award_name, room_id, uname, time = 66 } = lottery;
   try {
-    // 临时增加一个弹幕测试，时间就懒得计算了，按照 66 秒算
-    const ws = await biliDmWs(room_id, 66 * 1000);
+    const ws = await biliDmWs(room_id, time * 1000);
     if (!ws) return;
     addWs(room_id, ws);
     bindMessageForLottery(ws);
@@ -155,6 +154,7 @@ async function doLotteryArea(areaId: string, parentId: string, num = 2) {
       await doLottery(room);
       await sleep(300);
     }
+    await sleep(2000);
   }
 }
 
@@ -166,13 +166,15 @@ export async function liveLotteryService() {
   const { pageNum } = TaskConfig.lottery;
   // 获取直播分区
   const areaList = await getLiveArea();
-  // 遍历大区
-  for (const areas of areaList) {
-    // 遍历小区
-    for (const { areaId, parentId } of areas) {
-      await doLotteryArea(areaId, parentId, pageNum);
+  try {
+    // 遍历大区
+    for (const areas of areaList) {
+      // 遍历小区
+      for (const { areaId, parentId } of areas) {
+        await doLotteryArea(areaId, parentId, pageNum);
+      }
     }
-  }
+  } catch {}
   return newFollowUp;
 }
 
@@ -199,7 +201,7 @@ async function getLivingFollow() {
       }
       livingRoomList.push(...roomList);
     } catch (error) {
-      logger.error(`获取关注直播间异常: ${error.message}`);
+      logger.error(`获取关注直播间异常：`, error);
     }
   }
 }

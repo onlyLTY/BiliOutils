@@ -212,6 +212,11 @@ export function getArea(): Promise<LiveAreaDto> {
 export function getLiveRoom(parentArea: IdType, areaId: IdType, page = 1): Promise<LiveRoomDto> {
   return liveApi.get(
     `xlive/web-interface/v1/second/getList?platform=web&parent_area_id=${parentArea}&area_id=${areaId}&page=${page}`,
+    {
+      headers: {
+        Origin: OriginURLs.live,
+      },
+    },
   );
 }
 

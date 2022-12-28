@@ -122,3 +122,11 @@ yarn build
 
 - [@catlair/bilicomic-dataflow](https://www.npmjs.com/package/@catlair/bilicomic-dataflow)：哔哩哔哩漫画阅读数据流生成器
 - [@catlair/node-got](https://www.npmjs.com/package/@catlair/node-got)：got 的简单封装
+
+## 致谢
+
+感谢 `JetBrains` 提供优秀的 IDE。
+
+<a href="https://www.jetbrains.com/?from=BiliHelper-personal" target="_blank">
+<img src="https://tva1.sinaimg.cn/large/008eGmZEly1gov9g3tzrnj30u00wj0tn.jpg" width="150"/>
+</a>

@@ -24,6 +24,6 @@ export default async function mangaTask() {
     // 购买漫画
     await buyMangaService();
   } catch (error) {
-    logger.error(`漫画任务异常: ${error}`);
+    logger.error(`漫画任务异常：`, error);
   }
 }
